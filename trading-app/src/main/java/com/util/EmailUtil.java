@@ -12,10 +12,17 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.bugbycode.module.Result;
+import com.bugbycode.module.ResultCode;
+
 public class EmailUtil {
 	
-	public static void send(String host,int port,String userName,String password,String recipient,
-			String subject,String text) throws MessagingException, UnsupportedEncodingException {
+	public static Result<ResultCode, Exception> send(String host,int port,String userName,String password,String recipient,
+			String subject,String text)  {
+		
+		ResultCode code = ResultCode.SUCCESS;
+		Exception ex = null;
+		
 		Properties props = new Properties();
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", port);
@@ -29,28 +36,39 @@ public class EmailUtil {
             }
         });
         
-        MimeMessage message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(userName,"TRADE-BOT"));
+        try {
+        	MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(userName,"TRADE-BOT"));
+            
+            int recIndex = 0;
+            if(recipient.contains(",")) {
+            	String[] recUser = recipient.split(",");
+            	for(String rec : recUser) {
+            		if(StringUtil.isNotEmpty(rec)) {
+            			message.addRecipient(Message.RecipientType.TO, new InternetAddress(rec));
+            			recIndex++;
+            		}
+            	}
+            } else if(StringUtil.isNotEmpty(recipient)){
+            	message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            	recIndex++;
+            }
+            
+            message.setSubject(subject);
+            message.setText(text);
+            
+            if(recIndex > 0) {
+                Transport.send(message);
+            }
+            
+        } catch (UnsupportedEncodingException e) {
+        	ex = e;
+        	code = ResultCode.ERROR;
+		} catch (MessagingException e) {
+			ex = e;
+			code = ResultCode.ERROR;
+		}
         
-        int recIndex = 0;
-        if(recipient.contains(",")) {
-        	String[] recUser = recipient.split(",");
-        	for(String rec : recUser) {
-        		if(StringUtil.isNotEmpty(rec)) {
-        			message.addRecipient(Message.RecipientType.TO, new InternetAddress(rec));
-        			recIndex++;
-        		}
-        	}
-        } else if(StringUtil.isNotEmpty(recipient)){
-        	message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-        	recIndex++;
-        }
-        
-        message.setSubject(subject);
-        message.setText(text);
-        
-        if(recIndex > 0) {
-            Transport.send(message);
-        }
+		return new Result<ResultCode, Exception>(code, ex);
 	}
 }
