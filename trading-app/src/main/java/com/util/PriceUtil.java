@@ -47,6 +47,14 @@ public class PriceUtil {
 		return result;
 	}
 	
+	public static Klines getMaxPriceKLine(List<Klines> klinesList,int startIndex,int endIndex) {
+		return getMaxPriceKLine(klinesList.subList(startIndex, endIndex));
+	}
+	
+	public static Klines getMinPriceKLine(List<Klines> klinesList,int startIndex,int endIndex) {
+		return getMinPriceKLine(klinesList.subList(startIndex, endIndex));
+	}
+	
 	public static String formatDoubleDecimal(double number,int decimalPoint) {
 		String pattern = "#.";
 		for(int index = 0;index < decimalPoint;index++) {
