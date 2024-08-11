@@ -1,0 +1,4 @@
+2024-07-02 18:26:33.715 INFO [main][StartupInfoLogger.java:50] - Starting StartupApplication on DESKTOP-2FJNJFC with PID 41296 (D:\eclipse-workspace\trading-app\target\classes started by Administrator in D:\eclipse-workspace\trading-app)
+2024-07-02 18:26:33.721 INFO [main][SpringApplication.java:675] - No active profile set, falling back to default profiles: default
+2024-07-02 18:26:34.801 INFO [main][ExecutorConfigurationSupport.java:171] - Initializing ExecutorService 'taskScheduler'
+2024-07-02 18:26:34.832 INFO [main][StartupInfoLogger.java:59] - Started StartupApplication in 1.553 seconds (JVM running for 2.322)
