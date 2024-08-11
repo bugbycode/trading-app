@@ -55,7 +55,7 @@ public class LastDayPriceListenTask {
 		Date lastDayStartTimeDate = DateFormatUtil.getStartTime(hours);//前一天K线起始时间 yyyy-MM-dd 08:00:00
 		Date lastDayEndTimeDate = DateFormatUtil.getEndTime(hours);//前一天K线结束时间 yyyy-MM-dd 07:59:59
 		
-		Date oneYearAgo_x_3 = DateFormatUtil.getStartTimeBySetDay(lastDayStartTimeDate, -365 * 3);//三年以前起始时间
+		Date oneYearAgo = DateFormatUtil.getStartTimeBySetDay(lastDayStartTimeDate, -365);//1年以前起始时间
 		
 		try {
 			String[] pairArr = { pairs };
@@ -212,14 +212,17 @@ public class LastDayPriceListenTask {
 				
 				if (!(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text))) {
 					
-					logger.info("开始匹配" + pair + "近三年标志性高低点价格");
+					subject = "";
+					text = "";
+					
+					//logger.debug("开始匹配" + pair + "近1年标志性高低点价格");
 					
 					//近三年日线级别K线信息
-					List<Klines> klinesList_3_x_365_x_day = klinesService.continuousKlines(pair, restBaseUrl, oneYearAgo_x_3.getTime(), 
+					List<Klines> klinesList_365_x_day = klinesService.continuousKlines(pair, restBaseUrl, oneYearAgo.getTime(), 
 							lastDayEndTimeDate.getTime(), AppConfig.INERVAL_1D);
 					
-					if(klinesList_3_x_365_x_day.isEmpty()) {
-						logger.info("无法获取" + pair + "交易对最近三年日线级别K线信息");
+					if(klinesList_365_x_day.isEmpty()) {
+						logger.info("无法获取" + pair + "交易对最近1年日线级别K线信息");
 						continue;
 					}
 					
@@ -228,11 +231,11 @@ public class LastDayPriceListenTask {
 					//标志性低点K线信息
 					List<Klines> lconicLowPriceList = new ArrayList<Klines>();
 					//获取标志性高低点K线信息
-					int index_3_x_365day = klinesList_3_x_365_x_day.size() - 2;
-					while(index_3_x_365day >= 1) {
-						Klines klines_1day = klinesList_3_x_365_x_day.get(index_3_x_365day);
-						Klines klines_1day_parent = klinesList_3_x_365_x_day.get(index_3_x_365day - 1);
-						Klines klines_1day_after = klinesList_3_x_365_x_day.get(index_3_x_365day + 1);
+					int index_365day = klinesList_365_x_day.size() - 2;
+					while(index_365day >= 1) {
+						Klines klines_1day = klinesList_365_x_day.get(index_365day);
+						Klines klines_1day_parent = klinesList_365_x_day.get(index_365day - 1);
+						Klines klines_1day_after = klinesList_365_x_day.get(index_365day + 1);
 						//判断是否为标志性高点
 						if(klines_1day.getHighPrice() >= klines_1day_parent.getHighPrice() 
 								&& klines_1day.getHighPrice() >= klines_1day_after.getHighPrice()){
@@ -244,68 +247,90 @@ public class LastDayPriceListenTask {
 								&& klines_1day.getLowPrice() <= klines_1day_after.getLowPrice()){
 							lconicLowPriceList.add(klines_1day);
 						}
-						index_3_x_365day--;
+						index_365day--;
 					}
+					
+					//logger.info("开始匹配" + pair + "标志性高点=================================");
 					
 					double maxLconicHighPrice = 0;
 					//判断是否突破标志性高点
 					for(int index = 0;index < lconicHighPriceList.size();index++) {
 						Klines klines = lconicHighPriceList.get(index);
-						if(klines.getHighPrice() >= maxLconicHighPrice) {
+						
+						if(index > 0) {
+							//从已匹配的项找出最高值 如果已匹配的项中最高值大于当前K线最高价则继续匹配下一个
+							Klines maxPriceKlines = PriceUtil.getMaxPriceKLine(lconicHighPriceList, 0, index);
+							if(klines.getHighPrice() < maxPriceKlines.getHighPrice()) {
+								continue;
+							}
+						}
+						
+						//永远放最大值
+						if(klines.getHighPrice() >= maxLconicHighPrice || maxLconicHighPrice == 0) {
 							maxLconicHighPrice = klines.getHighPrice();
 						}
-						//价格突破高点行为 最低价小于标志性高点 最高价大于标志性高点
-						if(lowPrice_5m <= klines.getHighPrice() && hightPrice_5m >= klines.getHighPrice()
-								&& klines.getHighPrice() >= maxLconicHighPrice) {
-							//假突破 收盘价小于标志性高点
-							if(closePrice_5m <= klines.getHighPrice()) {
-								//subject = pair + "永续合约价格突破" + klines.getHighPrice() + "并收回 " + DateFormatUtil.format(new Date());
-								
-								//理想止盈价 fib382
-								//理想止损价 hightPrice_5m
-								text = StringUtil.formatShortMessage(pair, currentPrice, fib382, hightPrice_5m,decimalNum);
-								
-								subject = pair + "永续合约【难得的】做空机会 " + DateFormatUtil.format(new Date());
-								
-								break;
-							}//真突破 收盘价大于标志性高点
-							/*else if(closePrice_5m > klines.getHighPrice()) {
-								subject = pair + "永续合约价格突破" + klines.getHighPrice() + " " + DateFormatUtil.format(new Date());
-								break;
-							}*/
+						
+						//logger.info("匹配K线：" + klines.toString());
+						
+						if(maxLconicHighPrice > hightPrice_5m) {//如果遇到更高的高点且无法匹配直接退出
+							//logger.info("当前K线最高价大于当前五分钟k线最高价，因此无需继续匹配");
+							break;
+						}
+						
+						//价格假突破高点行为 收盘价小于等于标志性高点 最高价大于等于标志性高点
+						if(closePrice_5m <= maxLconicHighPrice) {
+							//理想止盈价 fib382
+							//理想止损价 hightPrice_5m
+							text = StringUtil.formatShortMessage(pair, currentPrice, fib382, hightPrice_5m,decimalNum);
+							
+							subject = pair + "永续合约【难得的】做空机会 " + DateFormatUtil.format(new Date());
+							
+							//logger.info("命中的K线信息：" + klines.toString());
+							
+							break;
 						}
 					}
 					
 					//判断是否跌破标志性低点
 					if(StringUtil.isEmpty(subject)) {
+						
+						//logger.info("开始匹配" + pair + "标志性低点++++++++++++++++++++++++++++++++++++++++++++++++++");
+						
 						double minLconicLowPrice = 0;
 						for(int index = 0;index < lconicLowPriceList.size();index++) {
 							Klines klines = lconicLowPriceList.get(index);
 							
-							if(klines.getLowPrice() <= minLconicLowPrice || minLconicLowPrice == 0) {
+							if(index > 0) {
+								//从已匹配的项中找出最低价的k线信息 如果已匹配的项中出现比当前匹配的K线最低价还低则继续匹配下一个
+								Klines minPriceKlines = PriceUtil.getMinPriceKLine(lconicLowPriceList, 0, index);
+								if(klines.getLowPrice() > minPriceKlines.getLowPrice()) {
+									continue;
+								}
+							}
+							
+							//永远放最小值
+							if(klines.getLowPrice() < minLconicLowPrice || minLconicLowPrice == 0) {
 								minLconicLowPrice = klines.getLowPrice();
 							}
 							
-							//价格跌破低点行为 最低价小于标志性低点 最高价大于标志性低点
-							if(lowPrice_5m <= klines.getLowPrice() && hightPrice_5m >= klines.getLowPrice()
-									&& klines.getLowPrice() <= minLconicLowPrice) {
-								//假跌破 收盘价大于标志性低点
-								if(closePrice_5m >= klines.getLowPrice()) {
-									//subject = pair + "永续合约价格跌破" + klines.getLowPrice() + "并收回 " + DateFormatUtil.format(new Date());
-									
-									//理想止盈价 fib382
-									//理想止损价 lowPrice_5m
-									text = StringUtil.formatLongMessage(pair, currentPrice, lowPrice_5m, fib382,decimalNum);
-									
-									subject = pair + "永续合约【难得的】做多机会 " + DateFormatUtil.format(new Date());
-									
-									break;
-								}
-								//真跌破 收盘价小于标志性低点
-								/*else if(closePrice_5m < klines.getLowPrice()) {
-									subject = pair + "永续合约价格跌破" + klines.getLowPrice() + " " + DateFormatUtil.format(new Date());
-									break;
-								}*/
+							//logger.info("匹配K线：" + klines.toString());
+							
+							if(minLconicLowPrice < lowPrice_5m) {//遇到更低的低点时直接退出
+								//logger.info("当前k线最低价小于当前五分钟k线最低价，因此无需继续匹配");
+								break;
+							}
+							
+							//假跌破 收盘价大于等于标志性低点 最低价小于等于标志性低点
+							if(closePrice_5m >= minLconicLowPrice) {
+								//理想止盈价 fib382
+								//理想止损价 lowPrice_5m
+								text = StringUtil.formatLongMessage(pair, currentPrice, lowPrice_5m, fib382,decimalNum);
+								
+								subject = pair + "永续合约【难得的】做多机会 " + DateFormatUtil.format(new Date());
+								
+								//logger.info("命中的K线信息：" + klines.toString());
+								
+								break;
 							}
 						}
 					}
