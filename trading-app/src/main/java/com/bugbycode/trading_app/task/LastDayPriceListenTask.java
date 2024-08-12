@@ -25,8 +25,8 @@ import com.util.StringUtil;
 /**
  * 昨日价格点位、以及标志性高低点价格监控
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class LastDayPriceListenTask {
 
 	private final Logger logger = LogManager.getLogger(LastDayPriceListenTask.class);
@@ -39,7 +39,7 @@ public class LastDayPriceListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "4 0/15 * * * ?")
+	//@Scheduled(cron = "4 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("LconicHighAndLowPricesListenTask start.");
 		Date now = new Date();

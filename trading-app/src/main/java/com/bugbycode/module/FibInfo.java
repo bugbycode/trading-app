@@ -26,6 +26,12 @@ public class FibInfo {
 	
 	private int decimalPoint;
 
+	/**
+	 * 
+	 * @param kline1 最低价k线
+	 * @param kline2 最高价k线
+	 * @param decimalPoint 保留小数点个数
+	 */
 	public FibInfo(Klines kline1, Klines kline2,int decimalPoint) {
 		if(kline1.getStarTime() < kline2.getStarTime()) {
 			this.high = kline1.getLowPrice();
@@ -75,6 +81,10 @@ public class FibInfo {
 
 	public double getFib1() {
 		return calculateFibonacciRetracement(low,high,fib1);
+	}
+	
+	public int getDecimalPoint() {
+		return decimalPoint;
 	}
 
 	/**
