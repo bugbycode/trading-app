@@ -4,11 +4,15 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.Klines;
 
 public class PriceUtil {
+	
+	private static final Logger LOGGER = LogManager.getLogger(PriceUtil.class);
 	
 	public static double getMaxPrice(double[] arr) {
 		double result = arr[0];
@@ -227,31 +231,15 @@ public class PriceUtil {
 		
 		boolean isLong = false;
 		
-		Klines lastKlines = getLastKlines(list);
-		
-		double openPrice = lastKlines.getOpenPrice();
-		double closePrice = lastKlines.getClosePrice();
-		double lowPrice = lastKlines.getLowPrice();
-		double hightPrice = lastKlines.getHighPrice();
-		
-		//收盘价大于等于条件价且最低价小于等于条件价
-		if(closePrice >= hitPrice && lowPrice <= hitPrice) {
-			isLong = true;
-		}
-
-		//判断这些k线是否都收盘在该价格之下 如果是则判定为初次突破 不适合追多
 		if(!CollectionUtils.isEmpty(list)) {
-			double hit = 0;
-			for(int index = 0; index < list.size(); index++) {
-				Klines k = list.get(index);
-				if(k.getClosePrice() < hitPrice) {
-					hit++;
-				}
-			}
+			int size = list.size();
+			Klines current = list.get(size - 1); //倒数第1根k线
+			Klines parent = list.get(size - 2);//倒数第2根k线
 			
-			//多数都收盘在该价格之下 判定为不适合追多
-			if(hit / list.size() > 0.5) {
-				isLong = false;
+			//上一根k线最低价小于条件价、收盘价大于条件价 且当前k线收盘价大于条件价 则适合做多
+			if(parent.getLowPrice() <= hitPrice && parent.getClosePrice() >= hitPrice 
+					&& current.getClosePrice() >= hitPrice) {
+				isLong = true;
 			}
 		}
 		
@@ -268,38 +256,19 @@ public class PriceUtil {
 		
 		boolean isShort = false;
 		
-		Klines lastKlines = getLastKlines(list);
-		
-		double openPrice = lastKlines.getOpenPrice();
-		double closePrice = lastKlines.getClosePrice();
-		double lowPrice = lastKlines.getLowPrice();
-		double hightPrice = lastKlines.getHighPrice();
-		
-		//收盘价小于等于条件价且最高价大于等于条件价
-		if(closePrice <= hitPrice && hightPrice >= hitPrice) {
-			isShort = true;
-		}
-
-		//判断这些k线是否都收盘在该价格之上 如果是则判定为初次跌破 不适合追空
 		if(!CollectionUtils.isEmpty(list)) {
-			double hit = 0;
-			for(int index = 0; index < list.size(); index++) {
-				Klines k = list.get(index);
-				if(k.getClosePrice() > hitPrice) {
-					hit++;
-				}
-			}
+			int size = list.size();
+			Klines current = list.get(size - 1); //当前k线
+			Klines parent = list.get(size - 2);//上一根k线
 			
-			//多数都收盘在该价格之上 判定为不适合追空
-			if(hit / list.size() > 0.5) {
-				isShort = false;
+			//上一根k线最高价大于条件价、收盘价小于条件价 且当前k线收盘价小于条件价 则适合做空
+			if(parent.getHighPrice() >= hitPrice && parent.getClosePrice() <= hitPrice
+					&& current.getClosePrice() <= hitPrice) {
+				isShort = true;
 			}
 		}
 		
 		return isShort;
 	}
 	
-	public static Klines getLastKlines(List<Klines> list) {
-		return CollectionUtils.isEmpty(list) ? null : list.get(list.size() - 1);
-	}
 }
