@@ -1,5 +1,6 @@
 package com.bugbycode.service;
 
+import java.util.Date;
 import java.util.List;
 
 import com.bugbycode.module.Klines;
@@ -17,4 +18,21 @@ public interface KlinesService {
 	public List<Klines> continuousKlines(String pair,long startTime,long endTime,String interval);
 	
 
+	/**
+	 * 查询日线级别K线信息
+	 * @param pair 交易对
+	 * @param now 时间
+	 * @param limit k线数量
+	 * @return
+	 */
+	public List<Klines> continuousKlinesDay(String pair,Date now,int limit);
+	
+	/**
+	 * 查询15分钟级别K线信息
+	 * @param pair 交易对
+	 * @param now 时间
+	 * @param limit k线数量
+	 * @return
+	 */
+	public List<Klines> continuousKlines15M(String pair,Date now,int limit);
 }

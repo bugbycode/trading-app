@@ -132,17 +132,15 @@ public class FuturesFibTradingListenTask {
 					//空头行情做空 fib1~fib236
 					for(int offset = codes.length - 1;offset > 0;offset--) {
 						
-						FibCode code = codes[offset];
+						FibCode code = codes[offset];//当前斐波那契点位
 						
 						if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_4_x_5m)) {
 							
-							FibCode closePpositionCode = codes[offset - 1];
+							FibCode closePpositionCode = null;
 							
-							switch (closePpositionCode) {
+							switch (code) {
+							
 							case FIB66:
-								closePpositionCode = codes[offset - 2];
-								break;
-							case FIB618:
 								closePpositionCode = codes[offset - 2];
 								break;
 
@@ -170,12 +168,9 @@ public class FuturesFibTradingListenTask {
 							
 							FibCode code = codes[offset];
 							
-							FibCode closePpositionCode = codes[offset + 1];
+							FibCode closePpositionCode = null;
 							
-							switch (closePpositionCode) {
-							case FIB66:
-								closePpositionCode = codes[offset + 2];
-								break;
+							switch (code) {
 							case FIB618:
 								closePpositionCode = codes[offset + 2];
 								break;
@@ -208,13 +203,10 @@ public class FuturesFibTradingListenTask {
 						
 						FibCode code = codes[offset];
 						
-						FibCode closePpositionCode = codes[offset - 1];
+						FibCode closePpositionCode = null;
 						
-						switch (closePpositionCode) {
+						switch (code) {
 						case FIB66:
-							closePpositionCode = codes[offset - 2];
-							break;
-						case FIB618:
 							closePpositionCode = codes[offset - 2];
 							break;
 
@@ -243,12 +235,10 @@ public class FuturesFibTradingListenTask {
 							
 							FibCode code = codes[offset];
 							
-							FibCode closePpositionCode = codes[offset + 1];
+							FibCode closePpositionCode = null;
 							
-							switch (closePpositionCode) {
-							case FIB66:
-								closePpositionCode = codes[offset + 2];
-								break;
+							switch (code) {
+							
 							case FIB618:
 								closePpositionCode = codes[offset + 2];
 								break;
