@@ -15,7 +15,6 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.service.KlinesService;
@@ -47,11 +46,6 @@ public class FuturesFibTradingListenTask {
 		Date now = new Date();
 		String restBaseUrl = AppConfig.REST_BASE_URL;
 		String pairs = AppConfig.PAIRS;
-		String emailUserName = AppConfig.EMAIL_USDRNAME;
-		String emailPassword = AppConfig.EMAIL_PASSWORD;
-		String smtpHost = AppConfig.SMTP_HOST;
-		int smtpPort = AppConfig.SMTP_PORT;
-		String recipient = AppConfig.RECIPIENT;
 		
 		int hours = DateFormatUtil.getHours(now.getTime());
 		Date lastDayStartTimeDate = DateFormatUtil.getStartTime(hours);//前一天K线起始时间 yyyy-MM-dd 08:00:00
@@ -325,7 +319,7 @@ public class FuturesFibTradingListenTask {
 					
 					text += "\n\nFib：" + fibInfo.toString();
 					
-					Result<ResultCode, Exception> result = EmailUtil.send(smtpHost, smtpPort, emailUserName, emailPassword, recipient, subject, text);
+					Result<ResultCode, Exception> result = EmailUtil.send(subject, text);
 					
 					switch (result.getResult()) {
 					case ERROR:
@@ -349,7 +343,7 @@ public class FuturesFibTradingListenTask {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			EmailUtil.send(smtpHost, smtpPort, emailUserName, emailPassword, recipient, "程序运行出现异常", e.getLocalizedMessage());
+			EmailUtil.send("程序运行出现异常", e.getLocalizedMessage());
 		} finally {
 			logger.info("LconicHighAndLowPricesListenTask finish.");
 		}
