@@ -27,6 +27,7 @@ import com.util.StringUtil;
  */
 //@Configuration
 //@EnableScheduling
+@Deprecated
 public class LastDayPriceListenTask {
 
 	private final Logger logger = LogManager.getLogger(LastDayPriceListenTask.class);
