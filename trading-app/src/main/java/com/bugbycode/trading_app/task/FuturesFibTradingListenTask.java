@@ -123,10 +123,8 @@ public class FuturesFibTradingListenTask {
 					continue;
 				}
 				
-				int decimalNum = lastDayKlines.getDecimalNum();
-				
 				//斐波那契回撤信息
-				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, decimalNum);
+				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, fibLowKlines.getDecimalNum());
 				
 				/*
 				logger.info("fibHightKlines：" + fibHightKlines.toString());
@@ -136,12 +134,14 @@ public class FuturesFibTradingListenTask {
 				*/
 				
 				double fib1 = fibInfo.getFib1();
+				/*
 				double fib236 = fibInfo.getFib236();
 				double fib382 = fibInfo.getFib382();
 				double fib5 = fibInfo.getFib5();
 				double fib618 = fibInfo.getFib618();
 				double fib66 = fibInfo.getFib66();
-				double fib786 = fibInfo.getFib786();
+				double fib786 = fibInfo.getFib786();*/
+				
 				double fib0 = fibInfo.getFib0();
 				
 				//15分钟级别K线起止时间
@@ -169,153 +169,92 @@ public class FuturesFibTradingListenTask {
 				
 				//logger.info(pair + ":" + fibInfo.toString());
 				
+				FibCode[] codes = FibCode.values();
+				
 				//空头行情
 				if(fib0 < fib1) {
 					
-					subject = pair + "永续合约做空机会 " + DateFormatUtil.format(new Date());
-					
-					//fib1做空
-					if(PriceUtil.isShort(fib1, klinesList_4_x_15m)) {
+					//空头行情做空 fib1~fib236
+					for(int offset = codes.length - 1;offset > 0;offset--) {
 						
-						text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB1,QuotationMode.SHORT);
+						FibCode code = codes[offset];
 						
-					} else if(PriceUtil.isShort(fib786, klinesList_4_x_15m)) {//0.786做空
-						
-						text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB786,QuotationMode.SHORT);
-						
-					} else if(PriceUtil.isShort(fib66, klinesList_4_x_15m)) {//0.66做空
-						
-						text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB66,QuotationMode.SHORT);
-						
-					} else if(PriceUtil.isShort(fib618, klinesList_4_x_15m)) {// 0.618做空
-						
-						text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB618,QuotationMode.SHORT);
-						
-					} else if(PriceUtil.isShort(fib5, klinesList_4_x_15m)) {//0.5做空
-						
-						text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB5,QuotationMode.SHORT);
-						
-					} else if(PriceUtil.isShort(fib382, klinesList_4_x_15m)) {//0.382做空
-						
-						text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB382,QuotationMode.SHORT);
-						
-					} else if(PriceUtil.isShort(fib236, klinesList_4_x_15m)) {//0.236做空
-						text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB236,QuotationMode.SHORT);
+						if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_4_x_15m)) {
+							
+							subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+											DateFormatUtil.format(new Date()));
+							
+							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, code,QuotationMode.SHORT);
+							
+							break;
+						}
 					}
 					
 					if(StringUtil.isEmpty(text)) {
-						subject = pair + "永续合约做多机会 " + DateFormatUtil.format(new Date());
 						
-						//空头行情做多的情况
-						if(PriceUtil.isLong(fib0, klinesList_4_x_15m)) {//fib0 
+						//空头行情做多 fib0~fib786
+						for(int offset = 0; offset < codes.length - 1;offset++) {
 							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB0, QuotationMode.SHORT);
+							FibCode code = codes[offset];
 							
-						} else if(PriceUtil.isLong(fib236, klinesList_4_x_15m)) {//fib236 
-							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB236, QuotationMode.SHORT);
-							
-						} else if(PriceUtil.isLong(fib382, klinesList_4_x_15m)) {//fib382 
-							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB382, QuotationMode.SHORT);
-							
-						} else if(PriceUtil.isLong(fib5, klinesList_4_x_15m)) {//fib5 
-							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB5, QuotationMode.SHORT);
-							
-						} else if(PriceUtil.isLong(fib618, klinesList_4_x_15m)) {//fib618 
-							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB618, QuotationMode.SHORT);
-							
-						} else if(PriceUtil.isLong(fib66, klinesList_4_x_15m)) {//fib66 
-							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB66, QuotationMode.SHORT);
-							
-						} else if(PriceUtil.isLong(fib786, klinesList_4_x_15m)) {//fib786 
-							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB786, QuotationMode.SHORT);
-							
+							if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_4_x_15m)) {//fib0 
+								
+								subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+										DateFormatUtil.format(new Date()));
+								
+								text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, code, QuotationMode.SHORT);
+								
+							}
 						}
 					}
 					
 				} else if(fib0 > fib1) {//多头行情
 					
-					subject = pair + "永续合约做多机会 " + DateFormatUtil.format(new Date());
-					
-					if(PriceUtil.isLong(fib1, klinesList_4_x_15m)) {//FIB1做多
+					//多头行情做多 fib1~fib236
+					for(int offset = codes.length - 1;offset > 0;offset--) {
 						
-						text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB1, QuotationMode.LONG);
-					
-					} else if(PriceUtil.isLong(fib786, klinesList_4_x_15m)) {
+						FibCode code = codes[offset];
+						if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_4_x_15m)) {//FIB1做多
+
+							subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+									DateFormatUtil.format(new Date()));
+							
+							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, code, QuotationMode.LONG);
 						
-						text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB786, QuotationMode.LONG);
-					
-					} else if(PriceUtil.isLong(fib66, klinesList_4_x_15m)) {
-						
-						text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB66, QuotationMode.LONG);
-					
-					} else if(PriceUtil.isLong(fib618, klinesList_4_x_15m)) {
-						
-						text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB618, QuotationMode.LONG);
-					
-					} else if(PriceUtil.isLong(fib5, klinesList_4_x_15m)) {
-						
-						text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB5, QuotationMode.LONG);
-					
-					} else if(PriceUtil.isLong(fib382, klinesList_4_x_15m)) {
-						
-						text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB382, QuotationMode.LONG);
-					
-					} else if(PriceUtil.isLong(fib236, klinesList_4_x_15m)) {
-						
-						text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, FibCode.FIB236, QuotationMode.LONG);
-					
+						}
 					}
 					
 					if(StringUtil.isEmpty(text)) {
 						
-						subject = pair + "永续合约做空机会 " + DateFormatUtil.format(new Date());
-						
-						//多头行情做空的情况
-						if(PriceUtil.isShort(fib0, klinesList_4_x_15m)) {
+						//多头行情做空 fib0~fib786
+						for(int offset = 0; offset < codes.length - 1;offset++) {
 							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB0, QuotationMode.LONG);
+							FibCode code = codes[offset];
 							
-						} else if(PriceUtil.isShort(fib236, klinesList_4_x_15m)) {
-							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB236, QuotationMode.LONG);
-							
-						} else if(PriceUtil.isShort(fib382, klinesList_4_x_15m)) {
-							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB382, QuotationMode.LONG);
-							
-						} else if(PriceUtil.isShort(fib5, klinesList_4_x_15m)) {
-							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB5, QuotationMode.LONG);
-							
-						} else if(PriceUtil.isShort(fib618, klinesList_4_x_15m)) {
-							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB618, QuotationMode.LONG);
-							
-						} else if(PriceUtil.isShort(fib66, klinesList_4_x_15m)) {
-							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB66, QuotationMode.LONG);
-							
-						} else if(PriceUtil.isShort(fib786, klinesList_4_x_15m)) {
-							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, FibCode.FIB786, QuotationMode.LONG);
-							
+							if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_4_x_15m)) {
+
+								subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+										DateFormatUtil.format(new Date()));
+								
+								text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, code, QuotationMode.LONG);
+								
+							}
 						}
+						
 					}
 					
 				}
 				
 				if(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
 					
-					text += "\n\nFib：" + fibInfo.toString();
-					
 					logger.info("邮件主题：" + subject);
 					logger.info("邮件内容：" + text);
+					
+					text += "\n\nFib：" + fibInfo.toString();
 					
 					Result<ResultCode, Exception> result = EmailUtil.send(smtpHost, smtpPort, emailUserName, emailPassword, recipient, subject, text);
 					

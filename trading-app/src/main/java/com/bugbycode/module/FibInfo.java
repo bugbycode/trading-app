@@ -50,6 +50,10 @@ public class FibInfo {
 	public double getStartPrice() {
 		return high;
 	}
+	
+	public double getFibValue(FibCode code) {
+		return calculateFibonacciRetracement(low,high,code.getValue());
+	}
 
 	public double getFib0() {
 		return calculateFibonacciRetracement(low,high,fib0);

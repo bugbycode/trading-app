@@ -12,8 +12,6 @@ import com.bugbycode.module.Klines;
 
 public class PriceUtil {
 	
-	private static final Logger LOGGER = LogManager.getLogger(PriceUtil.class);
-	
 	public static double getMaxPrice(double[] arr) {
 		double result = arr[0];
 		for(int index = 1;index < arr.length;index++) {
@@ -235,7 +233,10 @@ public class PriceUtil {
 			int size = list.size();
 			Klines current = list.get(size - 1); //倒数第1根k线
 			Klines parent = list.get(size - 2);//倒数第2根k线
-			
+			//LOGGER.info("parent: " + parent.toString());
+			//LOGGER.info("current: " + current.toString());
+			//LOGGER.info(parent.getLowPrice() <= hitPrice && parent.getClosePrice() >= hitPrice 
+			//		&& current.getClosePrice() >= hitPrice);
 			//上一根k线最低价小于条件价、收盘价大于条件价 且当前k线收盘价大于条件价 则适合做多
 			if(parent.getLowPrice() <= hitPrice && parent.getClosePrice() >= hitPrice 
 					&& current.getClosePrice() >= hitPrice) {
