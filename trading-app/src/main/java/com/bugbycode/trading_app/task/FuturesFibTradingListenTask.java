@@ -129,7 +129,7 @@ public class FuturesFibTradingListenTask {
 				switch (qm) {
 				
 				case SHORT:
-					//空头行情做空 fib1~fib236
+					//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 
 					for(int offset = codes.length - 1;offset > 0;offset--) {
 						
 						FibCode code = codes[offset];//当前斐波那契点位
@@ -143,7 +143,9 @@ public class FuturesFibTradingListenTask {
 							case FIB66:
 								closePpositionCode = codes[offset - 2];
 								break;
-
+							case FIB786:
+								closePpositionCode = codes[offset - 2];
+								break;
 							default:
 								
 								closePpositionCode = codes[offset - 1];
@@ -163,7 +165,7 @@ public class FuturesFibTradingListenTask {
 					
 					if(StringUtil.isEmpty(text)) {
 						
-						//空头行情做多 fib0~fib786
+						//空头行情做多 FIB0 FIB236 FIB382 FIB5 FIB618 FIB66 FIB786
 						for(int offset = 0; offset < codes.length - 1;offset++) {
 							
 							FibCode code = codes[offset];
@@ -198,7 +200,7 @@ public class FuturesFibTradingListenTask {
 					
 				case LONG:
 					
-					//多头行情做多 fib1~fib236
+					//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236
 					for(int offset = codes.length - 1;offset > 0;offset--) {
 						
 						FibCode code = codes[offset];
@@ -209,7 +211,9 @@ public class FuturesFibTradingListenTask {
 						case FIB66:
 							closePpositionCode = codes[offset - 2];
 							break;
-
+						case FIB786:
+							closePpositionCode = codes[offset - 2];
+							break;
 						default:
 							
 							closePpositionCode = codes[offset - 1];
@@ -230,7 +234,7 @@ public class FuturesFibTradingListenTask {
 					
 					if(StringUtil.isEmpty(text)) {
 						
-						//多头行情做空 fib0~fib786
+						//多头行情做空 FIB0 FIB236 FIB382 FIB5 FIB618 FIB66 FIB786
 						for(int offset = 0; offset < codes.length - 1;offset++) {
 							
 							FibCode code = codes[offset];
