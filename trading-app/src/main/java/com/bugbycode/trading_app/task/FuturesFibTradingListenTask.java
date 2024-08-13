@@ -199,10 +199,10 @@ public class FuturesFibTradingListenTask {
 							}
 							
 							subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
-									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(closePpositionCode),fibInfo.getDecimalPoint()),
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 											DateFormatUtil.format(new Date()));
 							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, code);
+							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, closePpositionCode);
 							
 							break;
 						}
@@ -235,10 +235,10 @@ public class FuturesFibTradingListenTask {
 							if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_4_x_15m)) {//fib0 
 								
 								subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(closePpositionCode),fibInfo.getDecimalPoint()),
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 										DateFormatUtil.format(new Date()));
 								
-								text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, code);
+								text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, closePpositionCode);
 								
 							}
 						}
@@ -271,10 +271,10 @@ public class FuturesFibTradingListenTask {
 						if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_4_x_15m)) {//FIB1做多
 
 							subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
-									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(closePpositionCode),fibInfo.getDecimalPoint()),
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 									DateFormatUtil.format(new Date()));
 							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, code);
+							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, closePpositionCode);
 						
 						}
 					}
@@ -306,10 +306,10 @@ public class FuturesFibTradingListenTask {
 							if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_4_x_15m)) {
 
 								subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(closePpositionCode),fibInfo.getDecimalPoint()),
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 										DateFormatUtil.format(new Date()));
 								
-								text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, code);
+								text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, closePpositionCode);
 								
 							}
 						}

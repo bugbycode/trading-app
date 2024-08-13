@@ -30,9 +30,10 @@ public class StringUtil {
 	public static String formatShortMessage(String pair,double currentPrice,
 			double minPrice,double maxPrice,int decimalPoint) {
 		//空头回报率 (开仓价 - 止盈价) / (止损价 - 开仓价) || 多头回报率 (止盈价 - 开仓价) / (开仓价 - 止损价)
-		return String.format("%s卖出价：%s，止盈价：%s，止损价：%s，盈亏比：%s",
-				pair,PriceUtil.formatDoubleDecimal(currentPrice,decimalPoint),PriceUtil.formatDoubleDecimal(minPrice,decimalPoint),
-				pair,PriceUtil.formatDoubleDecimal(maxPrice,decimalPoint),
+		return String.format("%s卖出价：%s，止盈价：%s，止损价：%s，盈亏比：%s", pair,
+				PriceUtil.formatDoubleDecimal(currentPrice,decimalPoint),
+				PriceUtil.formatDoubleDecimal(minPrice,decimalPoint),
+				PriceUtil.formatDoubleDecimal(maxPrice,decimalPoint),
 						PriceUtil.formatDoubleDecimal((currentPrice - minPrice) / (maxPrice - currentPrice),2));
 	}
 	
