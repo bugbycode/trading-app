@@ -63,76 +63,12 @@ public class StringUtil {
 	 * @param fibInfo 斐波那契信息
 	 * @param maxPrice 空头止损价
 	 * @param fibCode 斐波那契点位
-	 * @param mode 行情走势
 	 * @return
 	 */
 	public static String formatShortMessage(String pair,double currentPrice,
-			FibInfo fibInfo,double maxPrice,FibCode fibCode,QuotationMode mode) {
-		String result = null;
-		switch (mode) {
-		case SHORT:
-			//空头模式做空
-			switch (fibCode) {
-			case FIB1:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib786(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB786:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib618(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB66:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib5(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB618:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib5(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB5:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib382(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB382:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib236(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB236:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib0(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			default: //FIB0
-				break;
-			}
-			
-			break;
-
-		default:
-			
-			//多头行情做空
-			switch (fibCode) {
-			case FIB0:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib236(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB236:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib382(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB382:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib5(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB5:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib618(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB618:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib786(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB66:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib786(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-			case FIB786:
-				result = StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFib1(), maxPrice,fibInfo.getDecimalPoint());
-				break;
-
-			default://FIB1 什么也不做
-				break;
-			}
-			break;
-		}
+			FibInfo fibInfo,double maxPrice,FibCode fibCode) {
 		
-		return result;
+		return StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFibValue(fibCode), maxPrice,fibInfo.getDecimalPoint());
 	}
 	
 	/**
@@ -142,77 +78,12 @@ public class StringUtil {
 	 * @param fibInfo 斐波那契信息
 	 * @param minPrice 多头止损价
 	 * @param fibCode 斐波那契点位
-	 * @param mode 行情走势
 	 * @return
 	 */
 	public static String formatLongMessage(String pair,double currentPrice,
-			FibInfo fibInfo,double minPrice,FibCode fibCode,QuotationMode mode) {
+			FibInfo fibInfo,double minPrice,FibCode fibCode) {
 		
-		String result = null;
-		
-		switch (mode) {
-		
-		case SHORT:
-			//空头模式做多
-			switch (fibCode) {
-			case FIB0:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib236(), fibInfo.getDecimalPoint());
-				break;
-			case FIB236:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib382(), fibInfo.getDecimalPoint());
-				break;
-			case FIB382:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib5(), fibInfo.getDecimalPoint());
-				break;
-			case FIB5:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib618(), fibInfo.getDecimalPoint());
-				break;
-			case FIB618:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib786(), fibInfo.getDecimalPoint());
-				break;
-			case FIB66:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib786(), fibInfo.getDecimalPoint());
-				break;
-			case FIB786:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib1(), fibInfo.getDecimalPoint());
-				break;
-			default: //FIB1
-				break;
-			}
-			
-			break;
-
-		default:
-			//多头行情做多
-			switch (fibCode) {
-			case FIB1:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib786(), fibInfo.getDecimalPoint());
-				break;
-			case FIB786:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib618(), fibInfo.getDecimalPoint());
-				break;
-			case FIB66:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib5(), fibInfo.getDecimalPoint());
-				break;
-			case FIB618:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib5(), fibInfo.getDecimalPoint());
-				break;
-			case FIB5:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib382(), fibInfo.getDecimalPoint());
-				break;
-			case FIB382:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib236(), fibInfo.getDecimalPoint());
-				break;
-			case FIB236:
-				result = StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFib0(), fibInfo.getDecimalPoint());
-				break;
-			default://FIB0
-				break;
-			}
-			break;
-		}
-		
-		return result;
+		return StringUtil.formatLongMessage(pair, currentPrice, minPrice, fibInfo.getFibValue(fibCode), fibInfo.getDecimalPoint());
 	}
 	
 	/**

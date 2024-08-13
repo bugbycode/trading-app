@@ -185,7 +185,7 @@ public class FuturesFibTradingListenTask {
 									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 											DateFormatUtil.format(new Date()));
 							
-							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, code,QuotationMode.SHORT);
+							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, code);
 							
 							break;
 						}
@@ -204,7 +204,7 @@ public class FuturesFibTradingListenTask {
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 										DateFormatUtil.format(new Date()));
 								
-								text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, code, QuotationMode.SHORT);
+								text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, code);
 								
 							}
 						}
@@ -222,7 +222,7 @@ public class FuturesFibTradingListenTask {
 									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 									DateFormatUtil.format(new Date()));
 							
-							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, code, QuotationMode.LONG);
+							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_15m, code);
 						
 						}
 					}
@@ -240,7 +240,7 @@ public class FuturesFibTradingListenTask {
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 										DateFormatUtil.format(new Date()));
 								
-								text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, code, QuotationMode.LONG);
+								text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, code);
 								
 							}
 						}
