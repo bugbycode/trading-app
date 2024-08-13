@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Klines;
 import com.bugbycode.service.KlinesService;
 import com.util.CommandUtil;
@@ -16,10 +17,10 @@ public class KlinesServiceImpl implements KlinesService {
 	private final Logger logger = LogManager.getLogger(KlinesServiceImpl.class);
 
 	@Override
-	public List<Klines> continuousKlines(String pair, String restBaseUrl, long startTime, long endTime,
+	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
 			String interval) {
 		String command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s&endTime=%s"
-				+ "&interval=%s' %s/fapi/v1/continuousKlines", pair, startTime, endTime, interval, restBaseUrl);
+				+ "&interval=%s' %s/fapi/v1/continuousKlines", pair, startTime, endTime, interval, AppConfig.REST_BASE_URL);
 		
 		logger.debug(command);
 		

@@ -1,5 +1,7 @@
 package com.bugbycode.config;
 
+import java.util.Set;
+
 public class AppConfig {
 	
 	/**
@@ -34,7 +36,7 @@ public class AppConfig {
 	
 	public static String REST_BASE_URL;
 	
-	public static String PAIRS;
+	public static Set<String> PAIRS;
 	
 	public static String EMAIL_USDRNAME;//发件人
 	
@@ -44,5 +46,5 @@ public class AppConfig {
 	
 	public static int SMTP_PORT;//端口
 	
-	public static String RECIPIENT;//收件人
+	public static Set<String> RECIPIENT;//收件人
 }

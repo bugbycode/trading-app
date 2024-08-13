@@ -1,5 +1,7 @@
 package com.bugbycode.trading_app.init;
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,7 +18,7 @@ public class InitConfig implements ApplicationRunner {
 	private String restBaseUrl;
 	
 	@Value("${binance.pair}")
-	private String pairs;
+	private Set<String> pair;
 	
 	@Value("${email.auth.user}")
 	private String emailUserName;//发件人
@@ -31,12 +33,12 @@ public class InitConfig implements ApplicationRunner {
 	private int smtpPort;//端口
 	
 	@Value("${email.recipient}")
-	private String recipient;//收件人
+	private Set<String> recipient;//收件人
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		AppConfig.REST_BASE_URL = restBaseUrl;
-		AppConfig.PAIRS = pairs;
+		AppConfig.PAIRS = pair;
 		AppConfig.EMAIL_USDRNAME = emailUserName;
 		AppConfig.EMAIL_PASSWORD = emailPassword;
 		AppConfig.SMTP_HOST = smtpHost;

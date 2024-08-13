@@ -2,12 +2,12 @@ package com.util;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.Klines;
 
 public class PriceUtil {
@@ -272,4 +272,33 @@ public class PriceUtil {
 		return isShort;
 	}
 	
+	public static FibKlinesData<List<Klines>,List<Klines>> getFibKlinesData(List<Klines> list){
+		int klinesSize = list.size();
+		
+		//标志性高点K线信息
+		List<Klines> lconicHighPriceList = new ArrayList<Klines>();
+		//标志性低点K线信息
+		List<Klines> lconicLowPriceList = new ArrayList<Klines>();
+		//获取标志性高低点K线信息
+		int index = klinesSize - 2;
+		while(index >= 1) {
+			Klines klines = list.get(index);
+			Klines klines_parent = list.get(index - 1);
+			Klines klines_after = list.get(index + 1);
+			//判断是否为标志性高点
+			if(klines.getHighPrice() >= klines_parent.getHighPrice() 
+					&& klines.getHighPrice() >= klines_after.getHighPrice()){
+				lconicHighPriceList.add(klines);
+			}
+			
+			//判断是否为标志性低点
+			if(klines.getLowPrice() <= klines_parent.getLowPrice() 
+					&& klines.getLowPrice() <= klines_after.getLowPrice()){
+				lconicLowPriceList.add(klines);
+			}
+			index--;
+		}
+		
+		return new FibKlinesData<List<Klines>,List<Klines>>(lconicLowPriceList,lconicHighPriceList);
+	}
 }

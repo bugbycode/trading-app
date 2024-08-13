@@ -118,6 +118,10 @@ public class FibInfo {
         	return low + fibonacciLevel * range;
         }
     }
+    
+    public QuotationMode getQuotationMode() {
+    	return fib0 < fib1 ? QuotationMode.SHORT : QuotationMode.LONG;
+    }
 
 	@Override
 	public String toString() {

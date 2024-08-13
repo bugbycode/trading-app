@@ -21,8 +21,8 @@ public class EmailUtil {
 	public static Result<ResultCode, Exception> send(String subject,String text)  {
 		
 		ResultCode code = ResultCode.SUCCESS;
+		
 		Exception ex = null;
-		String recipient = AppConfig.RECIPIENT;
 		
 		Properties props = new Properties();
         props.put("mail.smtp.host", AppConfig.SMTP_HOST);
@@ -42,18 +42,13 @@ public class EmailUtil {
             message.setFrom(new InternetAddress(AppConfig.EMAIL_USDRNAME,"TRADE-BOT"));
             
             int recIndex = 0;
-            if(recipient.contains(",")) {
-            	String[] recUser = recipient.split(",");
-            	for(String rec : recUser) {
-            		if(StringUtil.isNotEmpty(rec)) {
-            			message.addRecipient(Message.RecipientType.TO, new InternetAddress(rec));
-            			recIndex++;
-            		}
-            	}
-            } else if(StringUtil.isNotEmpty(recipient)){
-            	message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-            	recIndex++;
-            }
+            
+            for(String rec : AppConfig.RECIPIENT) {
+        		if(StringUtil.isNotEmpty(rec)) {
+        			message.addRecipient(Message.RecipientType.TO, new InternetAddress(rec));
+        			recIndex++;
+        		}
+        	}
             
             message.setSubject(subject);
             message.setText(text);

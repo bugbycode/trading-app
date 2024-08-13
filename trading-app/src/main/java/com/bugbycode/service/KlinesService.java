@@ -9,13 +9,12 @@ public interface KlinesService {
 	/**
 	 * 根据时间段、时间级别获取k线信息
 	 * @param pair 交易对 如：BTCUSDT
-	 * @param restBaseUrl 请求地址
 	 * @param startTime 起始时间戳
 	 * @param endTime 结束时间戳
 	 * @param interval 时间级别 参考 com.bugbycode.config.AppConfig.java
 	 * @return
 	 */
-	public List<Klines> continuousKlines(String pair,String restBaseUrl,long startTime,long endTime,String interval);
+	public List<Klines> continuousKlines(String pair,long startTime,long endTime,String interval);
 	
 
 }
