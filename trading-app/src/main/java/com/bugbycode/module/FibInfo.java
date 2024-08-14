@@ -120,7 +120,7 @@ public class FibInfo {
     }
     
     public QuotationMode getQuotationMode() {
-    	return fib0 < fib1 ? QuotationMode.SHORT : QuotationMode.LONG;
+    	return getFib0() < getFib1() ? QuotationMode.SHORT : QuotationMode.LONG;
     }
 
 	@Override

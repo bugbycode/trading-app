@@ -4,36 +4,6 @@ import java.util.Set;
 
 public class AppConfig {
 	
-	/**
-	 * 15分钟
-	 */
-	public static final String INERVAL_5M = "5m";
-
-	/**
-	 * 15分钟
-	 */
-	public static final String INERVAL_15M = "15m";
-	
-	/**
-	 * 1小时
-	 */
-	public static final String INERVAL_1H = "1h";
-	
-	/**
-	 * 4小时
-	 */
-	public static final String INERVAL_4H = "4h";
-	
-	/**
-	 * 1天
-	 */
-	public static final String INERVAL_1D = "1d";
-	
-	/**
-	 * 1周
-	 */
-	public static final String INERVAL_1W = "1w";
-	
 	public static String REST_BASE_URL;
 	
 	public static Set<String> PAIRS;

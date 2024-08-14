@@ -48,12 +48,6 @@ public class FuturesFibTradingListenTask {
 		
 		Date now = new Date();
 		
-		int hours = DateFormatUtil.getHours(now.getTime());
-		Date lastDayStartTimeDate = DateFormatUtil.getStartTime(hours);//前一天K线起始时间 yyyy-MM-dd 08:00:00
-		Date lastDayEndTimeDate = DateFormatUtil.getEndTime(hours);//前一天K线结束时间 yyyy-MM-dd 07:59:59
-		
-		Date oneYearAgo = DateFormatUtil.getStartTimeBySetDay(lastDayStartTimeDate, -365);//1年以前起始时间
-		
 		try {
 			
 			for(String pair : AppConfig.PAIRS) {
@@ -66,8 +60,7 @@ public class FuturesFibTradingListenTask {
 				String subject = "";//邮件主题
 				
 				//近1年日线级别k线信息
-				List<Klines> klinesList_365_x_day = klinesService.continuousKlines(pair, oneYearAgo.getTime(), 
-						lastDayEndTimeDate.getTime(), AppConfig.INERVAL_1D);
+				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 365);
 				
 				if(klinesList_365_x_day.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近1年日线级别K线信息");
@@ -99,21 +92,15 @@ public class FuturesFibTradingListenTask {
 				//斐波那契回撤信息
 				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, fibLowKlines.getDecimalNum());
 				
-				//15分钟级别K线起止时间
-				Date endTime_5m = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
-				Date startTime_5m = DateFormatUtil.getStartTimeBySetMinute(endTime_5m, -5 * 4);//5x4分钟以前开盘时间
-				endTime_5m = DateFormatUtil.getStartTimeBySetSecond(endTime_5m, -1);//收盘时间
+				//一部分5分钟级别k线信息
+				List<Klines> klinesList_5m = klinesService.continuousKlines5M(pair, now, 150);
 				
-				//前4根5分钟级别k线信息
-				List<Klines> klinesList_4_x_5m = klinesService.continuousKlines(pair, startTime_5m.getTime(),
-						endTime_5m.getTime(), AppConfig.INERVAL_5M);
-				
-				if(klinesList_4_x_5m.isEmpty()) {
+				if(klinesList_5m.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
 					continue;
 				}
 				
-				Klines kline_5m = klinesList_4_x_5m.get(klinesList_4_x_5m.size() - 1);
+				Klines kline_5m = klinesList_5m.get(klinesList_5m.size() - 1);
 				
 				//15分钟开盘、收盘、最低、最高价格
 				double closePrice_5m = kline_5m.getClosePrice();
@@ -133,29 +120,35 @@ public class FuturesFibTradingListenTask {
 					for(int offset = codes.length - 1;offset > 0;offset--) {
 						
 						FibCode code = codes[offset];//当前斐波那契点位
+
+						FibCode closePpositionCode = null;
 						
-						if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_4_x_5m)) {
+						switch (code) {
+						
+						case FIB66:
+							closePpositionCode = codes[offset - 2];
+							break;
+						case FIB786:
+							closePpositionCode = codes[offset - 2];
+							break;
+						default:
 							
-							FibCode closePpositionCode = null;
+							closePpositionCode = codes[offset - 1];
 							
-							switch (code) {
+							break;
+						}
+						
+						if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_5m)) {
 							
-							case FIB66:
-								closePpositionCode = codes[offset - 2];
-								break;
-							case FIB786:
-								closePpositionCode = codes[offset - 2];
-								break;
-							default:
-								
-								closePpositionCode = codes[offset - 1];
-								
-								break;
+							String tipStr = "";
+							if(PriceUtil.isFirstfallingBelow(fibInfo.getFibValue(code), klinesList_5m)) {
+								tipStr = "(跌破单)";
 							}
 							
-							subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
+							subject = String.format("%s永续合约%s(%s)做空机会%s %s", pair, code.getDescription(),
 									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-											DateFormatUtil.format(new Date()));
+									tipStr,
+									DateFormatUtil.format(new Date()));
 							
 							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, closePpositionCode);
 							
@@ -184,10 +177,16 @@ public class FuturesFibTradingListenTask {
 								break;
 							}
 							
-							if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_4_x_5m)) {//fib0 
+							if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_5m)) {//fib0 
 								
-								subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
+								String tipStr = "";
+								if(PriceUtil.isFirstBreakthrough(fibInfo.getFibValue(code), klinesList_5m)) {
+									tipStr = "(突破单)";
+								}
+								
+								subject = String.format("%s永续合约%s(%s)做多机会%s %s", pair, code.getDescription(),
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+										tipStr,
 										DateFormatUtil.format(new Date()));
 								
 								text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_5m, closePpositionCode);
@@ -221,10 +220,15 @@ public class FuturesFibTradingListenTask {
 							break;
 						}
 						
-						if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_4_x_5m)) {//FIB1做多
+						if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_5m)) {//FIB1做多
 
-							subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
+							String tipStr = "";
+							if(PriceUtil.isFirstBreakthrough(fibInfo.getFibValue(code), klinesList_5m)) {
+								tipStr = "(突破单)";
+							}
+							subject = String.format("%s永续合约%s(%s)做多机会%s %s", pair, code.getDescription(),
 									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+									tipStr,
 									DateFormatUtil.format(new Date()));
 							
 							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_5m, closePpositionCode);
@@ -254,10 +258,15 @@ public class FuturesFibTradingListenTask {
 								break;
 							}
 							
-							if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_4_x_5m)) {
-
-								subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
+							if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_5m)) {
+								String tipStr = "";
+								if(PriceUtil.isFirstfallingBelow(fibInfo.getFibValue(code), klinesList_5m)) {
+									tipStr = "(跌破单)";
+								}
+								
+								subject = String.format("%s永续合约%s(%s)做空机会%s %s", pair, code.getDescription(),
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+										tipStr,
 										DateFormatUtil.format(new Date()));
 								
 								text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, closePpositionCode);

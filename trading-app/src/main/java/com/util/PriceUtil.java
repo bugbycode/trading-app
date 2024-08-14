@@ -233,10 +233,7 @@ public class PriceUtil {
 			int size = list.size();
 			Klines current = list.get(size - 1); //倒数第1根k线
 			Klines parent = list.get(size - 2);//倒数第2根k线
-			//LOGGER.info("parent: " + parent.toString());
-			//LOGGER.info("current: " + current.toString());
-			//LOGGER.info(parent.getLowPrice() <= hitPrice && parent.getClosePrice() >= hitPrice 
-			//		&& current.getClosePrice() >= hitPrice);
+			
 			//上一根k线最低价小于条件价、收盘价大于条件价 且当前k线收盘价大于条件价 则适合做多
 			if(parent.getLowPrice() <= hitPrice && parent.getClosePrice() >= hitPrice 
 					&& current.getClosePrice() >= hitPrice) {
@@ -245,6 +242,52 @@ public class PriceUtil {
 		}
 		
 		return isLong;
+	}
+	
+	/**
+	 * 判断是否为首次突破
+	 * @param list
+	 * @return
+	 */
+	public static boolean isFirstBreakthrough(double hitPrice,List<Klines> list) {
+		
+		boolean isFirstBreakthrough = false;
+		if(!CollectionUtils.isEmpty(list)) {
+			double hit = 0.0;
+			for(Klines klines : list) {
+				if(klines.getClosePrice() <= hitPrice) {
+					hit++;
+				}
+			}
+			
+			if(hit / list.size() > 0.5) {
+				isFirstBreakthrough = true;
+			}
+		}
+		return isFirstBreakthrough;
+	}
+	
+	/**
+	 * 判断是否为首次跌破
+	 * @param hitPrice
+	 * @param list
+	 * @return
+	 */
+	public static boolean isFirstfallingBelow(double hitPrice,List<Klines> list) {
+		boolean isFirstfallingBelow = true;
+		if(!CollectionUtils.isEmpty(list)) {
+			double hit = 0.0;
+			for(Klines klines : list) {
+				if(klines.getClosePrice() >= hitPrice) {
+					hit++;
+				}
+			}
+			
+			if(hit / list.size() > 0.5) {
+				isFirstfallingBelow = true;
+			}
+		}
+		return isFirstfallingBelow;
 	}
 	
 	/**

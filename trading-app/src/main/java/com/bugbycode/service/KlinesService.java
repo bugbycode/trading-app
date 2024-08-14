@@ -25,14 +25,14 @@ public interface KlinesService {
 	 * @param limit k线数量
 	 * @return
 	 */
-	public List<Klines> continuousKlinesDay(String pair,Date now,int limit);
+	public List<Klines> continuousKlines1Day(String pair,Date now,int limit);
 	
 	/**
-	 * 查询15分钟级别K线信息
+	 * 查询5分钟级别K线信息
 	 * @param pair 交易对
 	 * @param now 时间
 	 * @param limit k线数量
 	 * @return
 	 */
-	public List<Klines> continuousKlines15M(String pair,Date now,int limit);
+	public List<Klines> continuousKlines5M(String pair,Date now,int limit);
 }

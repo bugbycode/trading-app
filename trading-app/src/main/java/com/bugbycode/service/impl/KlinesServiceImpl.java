@@ -1,5 +1,6 @@
 package com.bugbycode.service.impl;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.service.KlinesService;
 import com.util.CommandUtil;
@@ -32,7 +34,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public List<Klines> continuousKlinesDay(String pair, Date now, int limit) {
+	public List<Klines> continuousKlines1Day(String pair, Date now, int limit) {
 		
 		int hours = DateFormatUtil.getHours(now.getTime());
 		Date lastDayStartTimeDate = DateFormatUtil.getStartTime(hours);//前一天K线起始时间 yyyy-MM-dd 08:00:00
@@ -41,12 +43,26 @@ public class KlinesServiceImpl implements KlinesService {
 		Date firstDayStartTime = DateFormatUtil.getStartTimeBySetDay(lastDayStartTimeDate, -limit);//多少天以前起始时间
 		
 		return continuousKlines(pair, firstDayStartTime.getTime(), 
-				lastDayEndTimeDate.getTime(), AppConfig.INERVAL_1D);
+				lastDayEndTimeDate.getTime(), Inerval.INERVAL_1D.getDescption());
 	}
 
 	@Override
-	public List<Klines> continuousKlines15M(String pair, Date now, int limit) {
-		return null;
+	public List<Klines> continuousKlines5M(String pair, Date now, int limit) {
+		List<Klines> result = null;
+		try {
+			//15分钟级别K线起止时间
+			Date endTime_5m = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
+			Date startTime_5m = DateFormatUtil.getStartTimeBySetMinute(endTime_5m, -Inerval.INERVAL_5M.getNumber() * limit);//limit根k线
+			endTime_5m = DateFormatUtil.getStartTimeBySetSecond(endTime_5m, -1);//收盘时间
+			
+			result = continuousKlines(pair, startTime_5m.getTime(),
+					endTime_5m.getTime(), Inerval.INERVAL_5M.getDescption());
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 
 }
