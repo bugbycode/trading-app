@@ -50,7 +50,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public List<Klines> continuousKlines5M(String pair, Date now, int limit) {
 		List<Klines> result = null;
 		try {
-			//15分钟级别K线起止时间
+			
 			Date endTime_5m = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
 			Date startTime_5m = DateFormatUtil.getStartTimeBySetMinute(endTime_5m, -Inerval.INERVAL_5M.getNumber() * limit);//limit根k线
 			endTime_5m = DateFormatUtil.getStartTimeBySetSecond(endTime_5m, -1);//收盘时间
