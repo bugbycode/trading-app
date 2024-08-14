@@ -1,6 +1,5 @@
 package com.bugbycode.trading_app.task;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -140,14 +139,8 @@ public class FuturesFibTradingListenTask {
 						
 						if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_5m)) {
 							
-							String tipStr = "";
-							if(PriceUtil.isFirstfallingBelow(fibInfo.getFibValue(code), klinesList_5m)) {
-								tipStr = "(跌破单)";
-							}
-							
-							subject = String.format("%s永续合约%s(%s)做空机会%s %s", pair, code.getDescription(),
+							subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
 									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-									tipStr,
 									DateFormatUtil.format(new Date()));
 							
 							text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, closePpositionCode);
@@ -179,14 +172,8 @@ public class FuturesFibTradingListenTask {
 							
 							if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_5m)) {//fib0 
 								
-								String tipStr = "";
-								if(PriceUtil.isFirstBreakthrough(fibInfo.getFibValue(code), klinesList_5m)) {
-									tipStr = "(突破单)";
-								}
-								
-								subject = String.format("%s永续合约%s(%s)做多机会%s %s", pair, code.getDescription(),
+								subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-										tipStr,
 										DateFormatUtil.format(new Date()));
 								
 								text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_5m, closePpositionCode);
@@ -222,13 +209,8 @@ public class FuturesFibTradingListenTask {
 						
 						if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_5m)) {//FIB1做多
 
-							String tipStr = "";
-							if(PriceUtil.isFirstBreakthrough(fibInfo.getFibValue(code), klinesList_5m)) {
-								tipStr = "(突破单)";
-							}
-							subject = String.format("%s永续合约%s(%s)做多机会%s %s", pair, code.getDescription(),
+							subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
 									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-									tipStr,
 									DateFormatUtil.format(new Date()));
 							
 							text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice_5m, closePpositionCode);
@@ -259,14 +241,8 @@ public class FuturesFibTradingListenTask {
 							}
 							
 							if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_5m)) {
-								String tipStr = "";
-								if(PriceUtil.isFirstfallingBelow(fibInfo.getFibValue(code), klinesList_5m)) {
-									tipStr = "(跌破单)";
-								}
-								
-								subject = String.format("%s永续合约%s(%s)做空机会%s %s", pair, code.getDescription(),
+								subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-										tipStr,
 										DateFormatUtil.format(new Date()));
 								
 								text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice_5m, closePpositionCode);
