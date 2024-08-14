@@ -4,7 +4,7 @@ public enum Inerval {
 
 	INERVAL_5M(5,"5m"),
 
-	INERVAL_15M(5,"15m"),
+	INERVAL_15M(15,"15m"),
 	
 	INERVAL_1H(1,"1h"),
 	
