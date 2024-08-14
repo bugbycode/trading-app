@@ -5,12 +5,16 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.Klines;
 
 public class PriceUtil {
+	
+	private static final Logger logger = LogManager.getLogger(PriceUtil.class);
 	
 	public static double getMaxPrice(double[] arr) {
 		double result = arr[0];
@@ -162,22 +166,20 @@ public class PriceUtil {
 		Klines current = null;
 		for(int index = 0;index < klinesList.size(); index++) {
 			Klines next = null;//前一根k线
-			current = klinesList.get(index);//当前k线
+			Klines tmp = klinesList.get(index);//当前k线
 			
-			//如果当前k线最高价小于昨日最高价则继续匹配下一根k线 直到匹配到比昨日最高价高的k线
-			if(current.getHighPrice() < lastDayKlines.getHighPrice()) {
-				continue;
-			}
-			
-			if(index < size - 1) {
-				next = klinesList.get(index + 1);//下一根k
-			} else {
-				continue;
-			}
-			
-			//如果当前标志性高点大于下一根k线最高价则退出循环
-			if(current.getHighPrice() > next.getHighPrice()) {
-				break;
+			if(lastDayKlines.getHighPrice() <= tmp.getHighPrice()) {
+				current = tmp;
+				
+				if(index < size - 1) {
+					next = klinesList.get(index + 1);//下一根k
+				} else {
+					next = current;
+				}
+				
+				if(current.getHighPrice() > next.getHighPrice()) {
+					break;
+				}
 			}
 		}
 		
@@ -197,22 +199,20 @@ public class PriceUtil {
 		for(int index = 0;index < size; index++) {
 			
 			Klines next = null;//前一根k线
-			current = klinesList.get(index);//当前k线
+			Klines tmp = klinesList.get(index);//当前k线
 			
-			//如果当前k线最低价大于昨日最低价则继续匹配下一根k线 直到匹配到比昨日最低价低的k线
-			if(current.getLowPrice() > lastDayKlines.getLowPrice()) {
-				continue;
-			}
-			
-			if(index < size - 1) {
-				next = klinesList.get(index + 1);//下一根k
-			} else {
-				continue;
-			}
-			
-			//如果当前标志性低点小于下一根k线最低价则退出循环
-			if(current.getLowPrice() < next.getLowPrice()) {
-				break;
+			if(tmp.getLowPrice() <= lastDayKlines.getLowPrice()) {
+				current = tmp;
+				
+				if(index < size - 1) {
+					next = klinesList.get(index + 1);//下一根k
+				} else {
+					next = current;
+				}
+				
+				if(current.getLowPrice() < next.getLowPrice()) {
+					break;
+				}
 			}
 		}
 		
