@@ -88,6 +88,9 @@ public class FuturesFibTradingListenTask {
 					continue;
 				}
 				
+				fibHightKlines = PriceUtil.rectificationFibHightKlines(lconicHighPriceList, fibLowKlines, fibHightKlines);
+				fibLowKlines = PriceUtil.rectificationFibLowKlines(lconicLowPriceList, fibLowKlines, fibHightKlines);
+				
 				//斐波那契回撤信息
 				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, fibLowKlines.getDecimalNum());
 				

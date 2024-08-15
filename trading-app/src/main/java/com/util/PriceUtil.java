@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.Klines;
@@ -183,7 +184,47 @@ public class PriceUtil {
 			}
 		}
 		
+		if(ObjectUtils.isEmpty(current)) {
+			current = lastDayKlines;
+		}
+		
 		return current;
+	}
+	
+	/**
+	 * 修正斐波那契高点信息
+	 * 
+	 * @param lconicHighPriceList 标志性高点k线信息
+	 * @param fibLowKlines 已知低点
+	 * @param fibHightKlines 已知高点
+	 * @return
+	 */
+	public static Klines rectificationFibHightKlines(List<Klines> lconicHighPriceList,Klines fibLowKlines,Klines fibHightKlines) {
+		if(!CollectionUtils.isEmpty(lconicHighPriceList)) {
+			long startTime = 0;
+			long endTime = 0;
+			if(fibLowKlines.getStarTime() < fibHightKlines.getStarTime()) {
+				startTime = fibLowKlines.getStarTime();
+				endTime = fibHightKlines.getStarTime();
+			} else {
+				startTime = fibHightKlines.getStarTime();
+				endTime = fibLowKlines.getStarTime();
+			}
+			
+			Klines tmp = null;
+			for(Klines k : lconicHighPriceList) {
+				if(k.getStarTime() >  startTime && k.getStarTime() < endTime) {
+					if(k.getHighPrice() > fibHightKlines.getHighPrice()) {
+						tmp = k;
+					}
+				}
+			}
+			
+			if(!ObjectUtils.isEmpty(tmp)) {
+				return tmp;
+			}
+		}
+		return fibHightKlines;
 	}
 	
 	/**
@@ -216,7 +257,47 @@ public class PriceUtil {
 			}
 		}
 		
+		if(ObjectUtils.isEmpty(current)) {
+			current = lastDayKlines;
+		}
+		
 		return current;
+	}
+	
+	/**
+	 * 修正斐波那契低点信息
+	 * 
+	 * @param lconicHighPriceList 标志性低点k线信息
+	 * @param fibLowKlines 已知低点
+	 * @param fibHightKlines 已知高点
+	 * @return
+	 */
+	public static Klines rectificationFibLowKlines(List<Klines> lconicLowPriceList,Klines fibLowKlines,Klines fibHightKlines) {
+		if(!CollectionUtils.isEmpty(lconicLowPriceList)) {
+			long startTime = 0;
+			long endTime = 0;
+			if(fibLowKlines.getStarTime() < fibHightKlines.getStarTime()) {
+				startTime = fibLowKlines.getStarTime();
+				endTime = fibHightKlines.getStarTime();
+			} else {
+				startTime = fibHightKlines.getStarTime();
+				endTime = fibLowKlines.getStarTime();
+			}
+			
+			Klines tmp = null;
+			for(Klines k : lconicLowPriceList) {
+				if(k.getStarTime() >  startTime && k.getStarTime() < endTime) {
+					if(k.getLowPrice() < fibLowKlines.getLowPrice()) {
+						tmp = k;
+					}
+				}
+			}
+			
+			if(!ObjectUtils.isEmpty(tmp)) {
+				return tmp;
+			}
+		}
+		return fibLowKlines;
 	}
 	
 	/**
