@@ -88,6 +88,7 @@ public class FuturesFibTradingListenTask {
 					continue;
 				}
 				
+				//修正斐波那契回撤点位
 				fibHightKlines = PriceUtil.rectificationFibHightKlines(lconicHighPriceList, fibLowKlines, fibHightKlines);
 				fibLowKlines = PriceUtil.rectificationFibLowKlines(lconicLowPriceList, fibLowKlines, fibHightKlines);
 				
