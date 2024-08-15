@@ -429,4 +429,22 @@ public class PriceUtil {
 		
 		return new FibKlinesData<List<Klines>,List<Klines>>(lconicLowPriceList,lconicHighPriceList);
 	}
+	
+	/**
+	 * 修正多头止损价
+	 * @param price
+	 * @return
+	 */
+	public static double rectificationCutLossLongPrice(double price) {
+		return price - (price * 0.01);
+	}
+	
+	/**
+	 * 修正空头止损价
+	 * @param price
+	 * @return
+	 */
+	public static double rectificationCutLossShortPrice(double price) {
+		return price + (price * 0.01);
+	}
 }
