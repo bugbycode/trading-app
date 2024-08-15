@@ -215,7 +215,9 @@ public class PriceUtil {
 			for(Klines k : lconicHighPriceList) {
 				if(k.getStarTime() >  startTime && k.getStarTime() < endTime) {
 					if(k.getHighPrice() > fibHightKlines.getHighPrice()) {
-						tmp = k;
+						if(ObjectUtils.isEmpty(tmp) || k.getHighPrice() > tmp.getHighPrice()) {
+							tmp = k;
+						}
 					}
 				}
 			}
@@ -288,7 +290,9 @@ public class PriceUtil {
 			for(Klines k : lconicLowPriceList) {
 				if(k.getStarTime() >  startTime && k.getStarTime() < endTime) {
 					if(k.getLowPrice() < fibLowKlines.getLowPrice()) {
-						tmp = k;
+						if(ObjectUtils.isEmpty(tmp) || k.getLowPrice() < tmp.getLowPrice()) {
+							tmp = k;
+						}
 					}
 				}
 			}
