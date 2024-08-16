@@ -317,11 +317,15 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(list)) {
 			int size = list.size();
 			Klines current = list.get(size - 1); //倒数第1根k线
-			Klines parent = list.get(size - 2);//倒数第2根k线
+			/*Klines parent = list.get(size - 2);//倒数第2根k线
 			
 			//上一根k线最低价小于条件价、收盘价大于条件价 且当前k线收盘价大于条件价 则适合做多
 			if(parent.getLowPrice() <= hitPrice && parent.getClosePrice() >= hitPrice 
 					&& current.getClosePrice() >= hitPrice) {
+				isLong = true;
+			}*/
+			//最低价小于等于条件价、收盘价大于等于条件价
+			if(current.getLowPrice() <= hitPrice && current.getClosePrice() >= hitPrice) {
 				isLong = true;
 			}
 		}
@@ -388,11 +392,15 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(list)) {
 			int size = list.size();
 			Klines current = list.get(size - 1); //当前k线
-			Klines parent = list.get(size - 2);//上一根k线
+			/*Klines parent = list.get(size - 2);//上一根k线
 			
 			//上一根k线最高价大于条件价、收盘价小于条件价 且当前k线收盘价小于条件价 则适合做空
 			if(parent.getHighPrice() >= hitPrice && parent.getClosePrice() <= hitPrice
 					&& current.getClosePrice() <= hitPrice) {
+				isShort = true;
+			}*/
+			//最高价大于等于条件价、收盘价小于等于条件价
+			if(current.getHighPrice() >= hitPrice && current.getClosePrice() <= hitPrice) {
 				isShort = true;
 			}
 		}

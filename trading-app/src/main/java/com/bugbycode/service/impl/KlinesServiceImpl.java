@@ -65,4 +65,23 @@ public class KlinesServiceImpl implements KlinesService {
 		return result;
 	}
 
+	@Override
+	public List<Klines> continuousKlines15M(String pair, Date now, int limit) {
+		List<Klines> result = null;
+		try {
+			
+			Date endTime = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
+			Date startTime = DateFormatUtil.getStartTimeBySetMinute(endTime, -Inerval.INERVAL_15M.getNumber() * limit);//limit根k线
+			endTime = DateFormatUtil.getStartTimeBySetSecond(endTime, -1);//收盘时间
+			
+			result = continuousKlines(pair, startTime.getTime(),
+					endTime.getTime(), Inerval.INERVAL_15M.getDescption());
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
 }
