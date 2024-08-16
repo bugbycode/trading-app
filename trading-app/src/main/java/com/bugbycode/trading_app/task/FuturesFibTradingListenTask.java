@@ -263,11 +263,11 @@ public class FuturesFibTradingListenTask {
 				}
 				
 				if(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
+
+					text += "\n\n" + fibInfo.getQuotationMode().getLabel() + "：" + fibInfo.toString();
 					
 					logger.info("邮件主题：" + subject);
 					logger.info("邮件内容：" + text);
-					
-					text += "\n\nFib：" + fibInfo.toString();
 					
 					Result<ResultCode, Exception> result = EmailUtil.send(subject, text);
 					

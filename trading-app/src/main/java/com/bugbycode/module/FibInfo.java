@@ -125,15 +125,16 @@ public class FibInfo {
 
 	@Override
 	public String toString() {
-		return String.format("0(%s), 0.236(%s), 0.382(%s), 0.5(%s), 0.618(%s), 0.66(%s), 0.786(%s), 1(%s)", 
-				PriceUtil.formatDoubleDecimal(getFib0(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib236(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib382(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib5(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib618(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib66(), decimalPoint),
+		
+		return String.format("1(%s), 0.786(%s), 0.66(%s), 0.618(%s), 0.5(%s), 0.382(%s), 0.236(%s), 0(%s)", 
+				PriceUtil.formatDoubleDecimal(getFib1(), decimalPoint),
 				PriceUtil.formatDoubleDecimal(getFib786(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib1(), decimalPoint));
+				PriceUtil.formatDoubleDecimal(getFib66(), decimalPoint),
+				PriceUtil.formatDoubleDecimal(getFib618(), decimalPoint),
+				PriceUtil.formatDoubleDecimal(getFib5(), decimalPoint),
+				PriceUtil.formatDoubleDecimal(getFib382(), decimalPoint),
+				PriceUtil.formatDoubleDecimal(getFib236(), decimalPoint),
+				PriceUtil.formatDoubleDecimal(getFib0(), decimalPoint));
 	}
     
     
