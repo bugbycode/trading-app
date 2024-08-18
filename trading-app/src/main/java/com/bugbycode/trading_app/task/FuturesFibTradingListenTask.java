@@ -37,11 +37,11 @@ public class FuturesFibTradingListenTask {
 	private KlinesService klinesService;
 	
 	/**
-	 * 查询k线信息 每五分钟执行一次
+	 * 查询k线信息 每十五分钟执行一次
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "4 0/5 * * * ?")
+	@Scheduled(cron = "4 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("FuturesFibTradingListenTask start.");
 		
@@ -95,21 +95,21 @@ public class FuturesFibTradingListenTask {
 				//斐波那契回撤信息
 				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, fibLowKlines.getDecimalNum());
 				
-				//一部分5分钟级别k线信息
-				List<Klines> klinesList_5m = klinesService.continuousKlines5M(pair, now, 5);
+				//一部分15分钟级别k线信息
+				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 5);
 				
-				if(klinesList_5m.isEmpty()) {
-					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
+				if(klinesList_hit.isEmpty()) {
+					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");
 					continue;
 				}
 				
-				Klines kline_5m = klinesList_5m.get(klinesList_5m.size() - 1);
+				Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
 				
 				//15分钟开盘、收盘、最低、最高价格
-				double closePrice = kline_5m.getClosePrice();
-				double openPrice = kline_5m.getOpenPrice();
-				double lowPrice = kline_5m.getLowPrice();
-				double hightPrice = kline_5m.getHighPrice();
+				double closePrice = hitKline.getClosePrice();
+				double openPrice = hitKline.getOpenPrice();
+				double lowPrice = hitKline.getLowPrice();
+				double hightPrice = hitKline.getHighPrice();
 				double currentPrice = closePrice;
 				
 				FibCode[] codes = FibCode.values();
@@ -141,7 +141,7 @@ public class FuturesFibTradingListenTask {
 							break;
 						}
 						
-						if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_5m)) {
+						if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)) {
 							
 							subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
 									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -174,7 +174,7 @@ public class FuturesFibTradingListenTask {
 								break;
 							}
 							
-							if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_5m)) {//fib0 
+							if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)) {//fib0 
 								
 								subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -211,7 +211,7 @@ public class FuturesFibTradingListenTask {
 							break;
 						}
 						
-						if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_5m)) {//FIB1做多
+						if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)) {//FIB1做多
 
 							subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
 									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -244,7 +244,7 @@ public class FuturesFibTradingListenTask {
 								break;
 							}
 							
-							if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_5m)) {
+							if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)) {
 								subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 										DateFormatUtil.format(new Date()));
