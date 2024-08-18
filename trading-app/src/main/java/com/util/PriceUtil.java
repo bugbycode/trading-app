@@ -319,18 +319,32 @@ public class PriceUtil {
 			Klines current = list.get(size - 1); //倒数第1根k线
 			Klines parent = list.get(size - 2);//倒数第2根k线
 			
-			//上一根k线最低价小于条件价、收盘价大于条件价 且当前k线收盘价大于条件价 则适合做多
-			if(parent.getLowPrice() <= hitPrice && parent.getClosePrice() >= hitPrice 
-					&& current.getClosePrice() >= hitPrice) {
+			if(isBreachLong(current, parent, hitPrice)) {
 				isLong = true;
 			}
-			/*//最低价小于等于条件价、收盘价大于等于条件价
-			if(current.getLowPrice() <= hitPrice && current.getClosePrice() >= hitPrice) {
-				isLong = true;
-			}*/
 		}
 		
 		return isLong;
+	}
+	
+	/**
+	 * 是否出现突破条件价的价格行为</br></br>
+	 * 1. 开盘价、收盘价大于等于条件价且最低价小于等于条件价</br> 
+	 * 2. 开盘价小于等于条件价 收盘价大于等于条件价 且没有上引线</br>
+	 * 3. 开盘价、收盘价大于等于条件价 且前一根k线开盘价小于等于条件价 收盘价大于等于条件价</br>
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param hitPrice 条件价
+	 * @return
+	 */
+	public static boolean isBreachLong(Klines current,Klines parent,double hitPrice) {
+		       //1. 开盘价、收盘价大于等于条件价且最低价小于等于条件价
+		return (current.getOpenPrice() >= hitPrice && current.getClosePrice() >= hitPrice && current.getLowPrice() <= hitPrice)
+				//2. 开盘价小于等于条件价 收盘价大于等于条件价 且没有上引线
+				|| (current.getOpenPrice() <= hitPrice && current.getClosePrice() >= hitPrice && !current.isUplead()) ||
+				//3. 开盘价、收盘价大于等于条件价 且前一根k线开盘价小于等于条件价 收盘价大于等于条件价
+				(current.getOpenPrice() >= hitPrice && current.getClosePrice() >= hitPrice && 
+				parent.getOpenPrice() <= hitPrice && parent.getClosePrice() >= hitPrice && current.isUplead());
 	}
 	
 	/**
@@ -394,18 +408,33 @@ public class PriceUtil {
 			Klines current = list.get(size - 1); //当前k线
 			Klines parent = list.get(size - 2);//上一根k线
 			
-			//上一根k线最高价大于条件价、收盘价小于条件价 且当前k线收盘价小于条件价 则适合做空
-			if(parent.getHighPrice() >= hitPrice && parent.getClosePrice() <= hitPrice
-					&& current.getClosePrice() <= hitPrice) {
+			if(isBreachShort(current, parent, hitPrice)) {
 				isShort = true;
 			}
-			/*//最高价大于等于条件价、收盘价小于等于条件价
-			if(current.getHighPrice() >= hitPrice && current.getClosePrice() <= hitPrice) {
-				isShort = true;
-			}*/
 		}
 		
 		return isShort;
+	}
+	
+	/**
+	 * 是否出现跌破条件价的价格行为</br></br>
+	 * 1、开盘价收盘价小于等于条件价且最高价大于等于条件价</br>
+	 * 2、开盘价大于等于条件价、收盘价小于等于条件价且没有下引线</br>
+	 * 3、开盘价收盘价小于等于条件价 且前一根k线开盘价大于等于条件价、收盘价小于等于条件价
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param hitPrice 条件价
+	 * @return
+	 */
+	public static boolean isBreachShort(Klines current,Klines parent,double hitPrice) {
+				//开盘价收盘价小于等于条件价且最高价大于等于条件价
+		return (current.getOpenPrice() <= hitPrice && current.getClosePrice() <= hitPrice && current.getHighPrice() >= hitPrice) ||
+			   //开盘价大于等于条件价、收盘价小于等于条件价且没有下引线
+				(current.getOpenPrice() >= hitPrice && current.getClosePrice() <= hitPrice && !current.isDownlead()) || 
+			   //开盘价收盘价小于等于条件价 且前一根k线开盘价大于等于条件价、收盘价小于等于条件价
+				(current.getOpenPrice() <= hitPrice && current.getClosePrice() <= hitPrice && 
+				parent.getOpenPrice() >= hitPrice && parent.getClosePrice() <= hitPrice && current.isDownlead());
 	}
 	
 	public static FibKlinesData<List<Klines>,List<Klines>> getFibKlinesData(List<Klines> list){
