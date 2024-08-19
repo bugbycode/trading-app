@@ -15,6 +15,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
+import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.service.KlinesService;
@@ -97,7 +98,7 @@ public class FuturesFibTradingListenTask {
 				
 				//第一级别斐波那契
 				//斐波那契回撤信息
-				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, fibLowKlines.getDecimalNum());
+				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, fibLowKlines.getDecimalNum(),FibLevel.LEVEL_1);
 				
 				//第一级别趋势
 				QuotationMode qm = fibInfo.getQuotationMode();
@@ -135,7 +136,7 @@ public class FuturesFibTradingListenTask {
 					continue;
 				}
 				
-				FibInfo secondFibInfo = new FibInfo(secondFibLowKlines, secondFibHightKlines, secondFibLowKlines.getDecimalNum());
+				FibInfo secondFibInfo = new FibInfo(secondFibLowKlines, secondFibHightKlines, secondFibLowKlines.getDecimalNum(),FibLevel.LEVEL_2);
 				
 				//第二级别趋势
 				QuotationMode secondQm = secondFibInfo.getQuotationMode();
@@ -173,7 +174,7 @@ public class FuturesFibTradingListenTask {
 					continue;
 				}
 				
-				FibInfo thirdFibInfo = new FibInfo(thirdFibLowKlines, thirdFibHightKlines, thirdFibLowKlines.getDecimalNum());
+				FibInfo thirdFibInfo = new FibInfo(thirdFibLowKlines, thirdFibHightKlines, thirdFibLowKlines.getDecimalNum(),FibLevel.LEVEL_3);
 				
 				QuotationMode thirdQm = thirdFibInfo.getQuotationMode();
 				

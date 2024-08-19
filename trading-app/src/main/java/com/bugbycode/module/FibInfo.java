@@ -25,14 +25,17 @@ public class FibInfo {
 	private double fib1 = 1;
 	
 	private int decimalPoint;
+	
+	private FibLevel level;
 
 	/**
 	 * 
 	 * @param kline1 最低价k线
 	 * @param kline2 最高价k线
 	 * @param decimalPoint 保留小数点个数
+	 * @param level 斐波那契回撤级别 lv1 lv2 lv3
 	 */
-	public FibInfo(Klines kline1, Klines kline2,int decimalPoint) {
+	public FibInfo(Klines kline1, Klines kline2,int decimalPoint,FibLevel level) {
 		if(kline1.getStarTime() < kline2.getStarTime()) {
 			this.high = kline1.getLowPrice();
 			this.low = kline2.getHighPrice();
@@ -41,6 +44,7 @@ public class FibInfo {
 			this.low = kline1.getLowPrice();
 		}
 		this.decimalPoint = decimalPoint;
+		this.level = level;
 	}
 
 	public double getEndPrice() {
@@ -122,6 +126,10 @@ public class FibInfo {
     public QuotationMode getQuotationMode() {
     	return getFib0() < getFib1() ? QuotationMode.SHORT : QuotationMode.LONG;
     }
+
+	public FibLevel getLevel() {
+		return level;
+	}
 
 	@Override
 	public String toString() {

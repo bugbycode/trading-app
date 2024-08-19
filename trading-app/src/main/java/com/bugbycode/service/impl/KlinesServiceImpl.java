@@ -130,8 +130,9 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)) {//FIB1~startFibCode做多
 
-				String subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
+				String subject = String.format("%s永续合约%s(%s)[%s]做多机会 %s", pair, code.getDescription(),
 						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+						fibInfo.getLevel().getLabel(),
 						DateFormatUtil.format(new Date()));
 				
 				String text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice, closePpositionCode);
@@ -188,8 +189,9 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)) {
 				
-				String subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
+				String subject = String.format("%s永续合约%s(%s)[%s]做空机会 %s", pair, code.getDescription(),
 						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+						fibInfo.getLevel().getLabel(),
 						DateFormatUtil.format(new Date()));
 				
 				String text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice, closePpositionCode);
@@ -208,7 +210,7 @@ public class KlinesServiceImpl implements KlinesService {
 	private void sendEmail(String subject,String text,FibInfo fibInfo) {
 		if(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
 
-			text += "\n\n" + fibInfo.getQuotationMode().getLabel() + "：" + fibInfo.toString();
+			text += "\n\n" + "[" + fibInfo.getLevel().getLabel() + "]" + fibInfo.getQuotationMode().getLabel() + "：" + fibInfo.toString();
 			
 			logger.info("邮件主题：" + subject);
 			logger.info("邮件内容：" + text);
