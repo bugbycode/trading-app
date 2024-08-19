@@ -210,7 +210,7 @@ public class KlinesServiceImpl implements KlinesService {
 	private void sendEmail(String subject,String text,FibInfo fibInfo) {
 		if(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
 
-			text += "\n\n" + "[" + fibInfo.getLevel().getLabel() + "]" + fibInfo.getQuotationMode().getLabel() + "：" + fibInfo.toString();
+			text += "\n\n" + "[" + fibInfo.getLevel().getLabel() + "] [" + fibInfo.getQuotationMode().getLabel() + "]：" + fibInfo.toString();
 			
 			logger.info("邮件主题：" + subject);
 			logger.info("邮件内容：" + text);

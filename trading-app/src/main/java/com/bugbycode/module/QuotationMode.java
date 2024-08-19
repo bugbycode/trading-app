@@ -5,8 +5,8 @@ package com.bugbycode.module;
  */
 public enum QuotationMode {
 	
-	LONG("Long"),
-	SHORT("Short");
+	LONG("LONG"),
+	SHORT("SHORT");
 
 	private String label;
 	
