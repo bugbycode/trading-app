@@ -9,11 +9,18 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.FibCode;
+import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.Result;
+import com.bugbycode.module.ResultCode;
 import com.bugbycode.service.KlinesService;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
+import com.util.EmailUtil;
+import com.util.PriceUtil;
+import com.util.StringUtil;
 
 @Service("klinesService")
 public class KlinesServiceImpl implements KlinesService {
@@ -82,6 +89,150 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public void openLong(FibInfo fibInfo, FibCode startFibCode, List<Klines> klinesList_hit) {
+		
+		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
+		
+		//开盘、收盘、最低、最高价格
+		double closePrice = hitKline.getClosePrice();
+		//double openPrice = hitKline.getOpenPrice();
+		double lowPrice = hitKline.getLowPrice();
+		//double hightPrice = hitKline.getHighPrice();
+		double currentPrice = closePrice;
+		
+		String pair = hitKline.getPair();
+		
+		FibCode[] codes = FibCode.values();
+		
+		//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236
+		for(int offset = codes.length - 1;offset > 0;offset--) {
+			
+			FibCode code = codes[offset];
+			
+			FibCode closePpositionCode = null;
+			
+			switch (code) {
+			case FIB66:
+				closePpositionCode = codes[offset - 2];
+				break;
+			case FIB786:
+				closePpositionCode = codes[offset - 2];
+				break;
+			default:
+				
+				closePpositionCode = codes[offset - 1];
+				
+				break;
+			}
+			
+			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)) {//FIB1~startFibCode做多
+
+				String subject = String.format("%s永续合约%s(%s)做多机会 %s", pair, code.getDescription(),
+						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+						DateFormatUtil.format(new Date()));
+				
+				String text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice, closePpositionCode);
+			
+				sendEmail(subject,text,fibInfo);
+
+				break;
+			}
+			
+			if(code.getValue() == startFibCode.getValue()) {
+				break;
+			}
+			
+		}
+	}
+
+	@Override
+	public void openShort(FibInfo fibInfo, FibCode startFibCode, List<Klines> klinesList_hit) {
+		
+		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
+		
+		//开盘、收盘、最低、最高价格
+		double closePrice = hitKline.getClosePrice();
+		//double openPrice = hitKline.getOpenPrice();
+		//double lowPrice = hitKline.getLowPrice();
+		double hightPrice = hitKline.getHighPrice();
+		double currentPrice = closePrice;
+		
+		String pair = hitKline.getPair();
+		
+		FibCode[] codes = FibCode.values();
+		
+		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 
+		for(int offset = codes.length - 1;offset > 0;offset--) {
+			
+			FibCode code = codes[offset];//当前斐波那契点位
+
+			FibCode closePpositionCode = null;
+			
+			switch (code) {
+			
+			case FIB66:
+				closePpositionCode = codes[offset - 2];
+				break;
+			case FIB786:
+				closePpositionCode = codes[offset - 2];
+				break;
+			default:
+				
+				closePpositionCode = codes[offset - 1];
+				
+				break;
+			}
+			
+			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)) {
+				
+				String subject = String.format("%s永续合约%s(%s)做空机会 %s", pair, code.getDescription(),
+						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+						DateFormatUtil.format(new Date()));
+				
+				String text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice, closePpositionCode);
+				
+				sendEmail(subject,text,fibInfo);
+				
+				break;
+			}
+			
+			if(code.getValue() == startFibCode.getValue()) {
+				break;
+			}
+		}
+	}
+	
+	private void sendEmail(String subject,String text,FibInfo fibInfo) {
+		if(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
+
+			text += "\n\n" + fibInfo.getQuotationMode().getLabel() + "：" + fibInfo.toString();
+			
+			logger.info("邮件主题：" + subject);
+			logger.info("邮件内容：" + text);
+			
+			Result<ResultCode, Exception> result = EmailUtil.send(subject, text);
+			
+			switch (result.getResult()) {
+			case ERROR:
+				
+				Exception ex = result.getErr();
+				
+				logger.info("邮件发送失败！失败原因：" + ex.getLocalizedMessage());
+				
+				ex.printStackTrace();
+				
+				break;
+				
+			default:
+				
+				logger.info("邮件发送成功！");
+				
+				break;
+			}
+		}
 	}
 
 }
