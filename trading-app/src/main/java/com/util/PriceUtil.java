@@ -484,4 +484,59 @@ public class PriceUtil {
 	public static double rectificationCutLossShortPrice(double price) {
 		return price + (price * 0.01);
 	}
+	
+	
+	/**
+	 * 获取起始k线之后的最低价k线信息
+	 * @param klinesList 所有k线信息 
+	 * @param startKlines 起始k线信息
+	 * @return 最低价k线信息
+	 */
+	public static Klines getLowKlinesByStartKlines(List<Klines> klinesList,Klines startKlines) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			for(Klines tmp : klinesList) {
+				if(tmp.getStarTime() <= startKlines.getStarTime()) {
+					continue;
+				}
+				
+				if(result == null) {
+					result = tmp;
+					continue;
+				}
+				
+				if(tmp.getLowPrice() < result.getLowPrice()) {
+					result = tmp;
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 获取起始k线之后的最高价k线信息
+	 * @param klinesList 所有k线信息 
+	 * @param startKlines 起始k线信息
+	 * @return 最高价k线信息
+	 */
+	public static Klines getHightKlinesByStartKlines(List<Klines> klinesList,Klines startKlines) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			for(Klines tmp : klinesList) {
+				if(tmp.getStarTime() <= startKlines.getStarTime()) {
+					continue;
+				}
+				
+				if(result == null) {
+					result = tmp;
+					continue;
+				}
+				
+				if(tmp.getHighPrice() > result.getHighPrice()) {
+					result = tmp;
+				}
+			}
+		}
+		return result;
+	}
 }

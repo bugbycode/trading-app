@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.ObjectUtils;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.FibCode;
@@ -41,7 +42,7 @@ public class FuturesFibTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "4 0/15 * * * ?")
+	@Scheduled(cron = "4 0/1 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("FuturesFibTradingListenTask start.");
 		
@@ -66,6 +67,9 @@ public class FuturesFibTradingListenTask {
 					continue;
 				}
 				
+				//一部分15分钟级别k线信息
+				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 5);
+				
 				FibKlinesData<List<Klines>,List<Klines>> fibKlinesData = PriceUtil.getFibKlinesData(klinesList_365_x_day);
 				
 				//标志性高点K线信息
@@ -83,8 +87,8 @@ public class FuturesFibTradingListenTask {
 				//获取斐波那契回撤低点
 				Klines fibLowKlines = PriceUtil.getFibLowKlines(lconicLowPriceList,lastDayKlines);
 				
-				if(fibHightKlines == null || fibLowKlines == null) {
-					logger.info("无法计算出" + pair + "斐波那契回撤信息");
+				if(ObjectUtils.isEmpty(fibHightKlines) || ObjectUtils.isEmpty(fibLowKlines)) {
+					logger.info("无法计算出" + pair + "第一级别斐波那契回撤信息");
 					continue;
 				}
 				
@@ -92,9 +96,72 @@ public class FuturesFibTradingListenTask {
 				fibHightKlines = PriceUtil.rectificationFibHightKlines(lconicHighPriceList, fibLowKlines, fibHightKlines);
 				fibLowKlines = PriceUtil.rectificationFibLowKlines(lconicLowPriceList, fibLowKlines, fibHightKlines);
 				
+				//第一级别斐波那契
 				//斐波那契回撤信息
 				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, fibLowKlines.getDecimalNum());
+				logger.info(pair + "第一级别斐波那契回撤=============================================================");
+				logger.info(fibInfo.toString());
 				
+				//第一级别趋势
+				QuotationMode qm = fibInfo.getQuotationMode();
+				
+				//开始获取第二级别斐波那契回撤信息
+				Klines secondFibHightKlines = null;
+				Klines secondFibLowKlines = null;
+				
+				//开始获取第二级别斐波那契回撤终点
+				switch (qm) {
+				case LONG:
+					secondFibHightKlines = fibHightKlines;
+					secondFibLowKlines = PriceUtil.getLowKlinesByStartKlines(klinesList_365_x_day, secondFibHightKlines);
+					break;
+
+				default:
+					secondFibLowKlines = fibLowKlines;
+					secondFibHightKlines = PriceUtil.getHightKlinesByStartKlines(klinesList_365_x_day, secondFibLowKlines);
+					break;
+				}
+				
+				if(ObjectUtils.isEmpty(secondFibHightKlines) || ObjectUtils.isEmpty(secondFibLowKlines)) {
+					logger.info("无法计算出" + pair + "第二级别斐波那契回撤信息");
+					continue;
+				}
+				
+				FibInfo secondFibInfo = new FibInfo(secondFibLowKlines, secondFibHightKlines, secondFibLowKlines.getDecimalNum());
+				
+				logger.info(pair + "第二级别斐波那契回撤+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+				logger.info(secondFibInfo.toString());
+				
+				//第二级别趋势
+				QuotationMode secondQm = secondFibInfo.getQuotationMode();
+				
+				//开始获取第三级别斐波那契回撤信息
+				Klines thirdFibHightKlines = null;
+				Klines thirdFibLowKlines = null;
+				//开始获取第三级斐波那契回撤
+				switch (secondQm) {
+				case LONG:
+					thirdFibHightKlines = secondFibHightKlines;
+					thirdFibLowKlines = PriceUtil.getLowKlinesByStartKlines(klinesList_365_x_day, thirdFibHightKlines);
+					break;
+
+				default:
+					thirdFibLowKlines = secondFibLowKlines;
+					thirdFibHightKlines = PriceUtil.getHightKlinesByStartKlines(klinesList_365_x_day, thirdFibLowKlines);
+					break;
+				}
+				
+				if(ObjectUtils.isEmpty(thirdFibHightKlines) || ObjectUtils.isEmpty(thirdFibLowKlines)) {
+					logger.info("无法计算出" + pair + "第三级别斐波那契回撤信息");
+					continue;
+				}
+				
+				FibInfo thirdFibInfo = new FibInfo(thirdFibLowKlines, thirdFibHightKlines, thirdFibLowKlines.getDecimalNum());
+				
+				logger.info(pair + "第三级别斐波那契回撤******************************************************************************");
+				logger.info(thirdFibInfo.toString());
+				
+				/*
 				//一部分15分钟级别k线信息
 				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 5);
 				
@@ -288,7 +355,7 @@ public class FuturesFibTradingListenTask {
 						
 						break;
 					}
-				}
+				}*/
 			}
 			
 		} catch (Exception e) {
