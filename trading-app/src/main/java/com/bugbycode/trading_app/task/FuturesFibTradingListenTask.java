@@ -88,7 +88,7 @@ public class FuturesFibTradingListenTask {
 				Klines fibLowKlines = PriceUtil.getFibLowKlines(lconicLowPriceList,lastDayKlines);
 				
 				if(ObjectUtils.isEmpty(fibHightKlines) || ObjectUtils.isEmpty(fibLowKlines)) {
-					logger.info("无法计算出" + pair + "第一级别斐波那契回撤信息");
+					logger.debug("无法计算出" + pair + "第一级别斐波那契回撤信息");
 					continue;
 				}
 				
@@ -132,7 +132,7 @@ public class FuturesFibTradingListenTask {
 				}
 				
 				if(ObjectUtils.isEmpty(secondFibHightKlines) || ObjectUtils.isEmpty(secondFibLowKlines)) {
-					logger.info("无法计算出" + pair + "第二级别斐波那契回撤信息");
+					logger.debug("无法计算出" + pair + "第二级别斐波那契回撤信息");
 					continue;
 				}
 				
@@ -170,7 +170,7 @@ public class FuturesFibTradingListenTask {
 				}
 				
 				if(ObjectUtils.isEmpty(thirdFibHightKlines) || ObjectUtils.isEmpty(thirdFibLowKlines)) {
-					logger.info("无法计算出" + pair + "第三级别斐波那契回撤信息");
+					logger.debug("无法计算出" + pair + "第三级别斐波那契回撤信息");
 					continue;
 				}
 				
