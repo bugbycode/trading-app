@@ -92,7 +92,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openLong(FibInfo fibInfo, FibCode startFibCode, List<Klines> klinesList_hit) {
+	public void openLong(FibInfo fibInfo, List<Klines> klinesList_hit) {
 		
 		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
 		
@@ -112,21 +112,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];
 			
-			FibCode closePpositionCode = null;
-			
-			switch (code) {
-			case FIB66:
-				closePpositionCode = codes[offset - 2];
-				break;
-			case FIB786:
-				closePpositionCode = codes[offset - 2];
-				break;
-			default:
-				
-				closePpositionCode = codes[offset - 1];
-				
-				break;
-			}
+			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
 			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)) {//FIB1~startFibCode做多
 
@@ -142,7 +128,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			}
 			
-			if(code.getValue() == startFibCode.getValue()) {
+			if(code.getValue() == fibInfo.startFibCode().getValue()) {
 				break;
 			}
 			
@@ -150,7 +136,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openShort(FibInfo fibInfo, FibCode startFibCode, List<Klines> klinesList_hit) {
+	public void openShort(FibInfo fibInfo, List<Klines> klinesList_hit) {
 		
 		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
 		
@@ -170,22 +156,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 
-			FibCode closePpositionCode = null;
-			
-			switch (code) {
-			
-			case FIB66:
-				closePpositionCode = codes[offset - 2];
-				break;
-			case FIB786:
-				closePpositionCode = codes[offset - 2];
-				break;
-			default:
-				
-				closePpositionCode = codes[offset - 1];
-				
-				break;
-			}
+			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
 			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)) {
 				
@@ -201,7 +172,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			}
 			
-			if(code.getValue() == startFibCode.getValue()) {
+			if(code.getValue() == fibInfo.startFibCode().getValue()) {
 				break;
 			}
 		}

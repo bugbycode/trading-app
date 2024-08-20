@@ -105,11 +105,11 @@ public class FuturesFibTradingListenTask {
 				//第一级别斐波那契开仓
 				switch (qm) {
 				case LONG:
-					klinesService.openLong(fibInfo, FibCode.FIB5, klinesList_hit);
+					klinesService.openLong(fibInfo, klinesList_hit);
 					break;
 
 				default:
-					klinesService.openShort(fibInfo, FibCode.FIB5, klinesList_hit);
+					klinesService.openShort(fibInfo, klinesList_hit);
 					break;
 				}
 				
@@ -144,11 +144,11 @@ public class FuturesFibTradingListenTask {
 				//第二级别斐波那契开仓
 				switch (secondQm) {
 				case LONG:
-					klinesService.openLong(secondFibInfo, FibCode.FIB5, klinesList_hit);
+					klinesService.openLong(secondFibInfo, klinesList_hit);
 					break;
 
 				default:
-					klinesService.openShort(secondFibInfo, FibCode.FIB5, klinesList_hit);
+					klinesService.openShort(secondFibInfo, klinesList_hit);
 					break;
 				}
 				
@@ -181,11 +181,11 @@ public class FuturesFibTradingListenTask {
 				//第三级别斐波那契开仓
 				switch (thirdQm) {
 				case LONG:
-					klinesService.openLong(thirdFibInfo, FibCode.FIB618, klinesList_hit);
+					klinesService.openLong(thirdFibInfo, klinesList_hit);
 					break;
 
 				default:
-					klinesService.openShort(thirdFibInfo, FibCode.FIB618, klinesList_hit);
+					klinesService.openShort(thirdFibInfo, klinesList_hit);
 					break;
 				}
 				

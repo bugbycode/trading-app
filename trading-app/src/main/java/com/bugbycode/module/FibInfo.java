@@ -27,6 +27,67 @@ public class FibInfo {
 	private int decimalPoint;
 	
 	private FibLevel level;
+	
+	/**
+	 * 止盈点位
+	 * @param code 开仓时所处的斐波那契回撤点位
+	 * @return 止盈的斐波那契回撤点位
+	 */
+	public FibCode getTakeProfit(FibCode code) {
+		
+		FibCode takeProfit;
+		
+		switch (level) {
+		
+		case LEVEL_1:
+			
+			switch (code) {
+			
+			case FIB1:
+				takeProfit = FibCode.FIB786;
+				break;
+			case FIB786:
+				takeProfit = FibCode.FIB618;
+				break;
+			case FIB66:
+				takeProfit = FibCode.FIB5;
+				break;
+			case FIB618:
+				takeProfit = FibCode.FIB5;
+				break;
+			default:
+				takeProfit = FibCode.FIB382;
+				break;
+			}
+			
+			break;
+		default:
+			takeProfit = FibCode.FIB382;
+			break;
+		}
+		
+		return takeProfit;
+	}
+	
+	/**
+	 * 获取可建仓的回撤起点 例如：该值为0.5， 则为0.5 0.618 0.66 0.786 1分别判断是否满足建仓条件
+	 * @return
+	 */
+	public FibCode startFibCode() {
+		FibCode startFibCode;
+		switch (level) {
+		case LEVEL_3:
+			
+			startFibCode = FibCode.FIB618; //0.618~1
+			break;
+
+		default:
+			
+			startFibCode = FibCode.FIB5;//0.5~1
+			break;
+		}
+		return startFibCode;
+	}
 
 	/**
 	 * 
