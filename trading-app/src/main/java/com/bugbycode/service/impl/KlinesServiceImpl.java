@@ -195,7 +195,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				logger.info("邮件发送失败！失败原因：" + ex.getLocalizedMessage());
 				
-				ex.printStackTrace();
+				AppConfig.nexEmailAuth();
 				
 				break;
 				

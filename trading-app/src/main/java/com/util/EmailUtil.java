@@ -13,6 +13,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.EmailAuth;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
 
@@ -31,15 +32,17 @@ public class EmailUtil {
         props.put("mail.smtp.starttls.enable", true);
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         
+        EmailAuth emailAuth = AppConfig.getEmailAuth();
+        
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(AppConfig.EMAIL_USDRNAME, AppConfig.EMAIL_PASSWORD);
+                return new PasswordAuthentication(emailAuth.getUser(), emailAuth.getPassword());
             }
         });
         
         try {
         	MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(AppConfig.EMAIL_USDRNAME,"TRADE-BOT"));
+            message.setFrom(new InternetAddress(emailAuth.getUser(),"TRADE-BOT"));
             
             int recIndex = 0;
             
