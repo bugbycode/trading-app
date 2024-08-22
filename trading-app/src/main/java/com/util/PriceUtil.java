@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import com.bugbycode.module.EMAType;
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.Klines;
 
@@ -77,40 +78,6 @@ public class PriceUtil {
 		BigDecimal bigDecimal = new BigDecimal(decimalFormat.format(number));
 		
 		return bigDecimal.toPlainString();
-	}
-	
-	public static double getEma7(List<Klines> klinesList) {
-		//周期 N
-		int n = klinesList.size() - 1;
-		//平滑常数
-		double a = 2 / (6 + 1);
-		//SMA(9)
-		double sma_7 = (/*klinesList.get(0).getClosePrice() + klinesList.get(1).getClosePrice() +*/ klinesList.get(2).getClosePrice() + 
-				klinesList.get(3).getClosePrice() + klinesList.get(4).getClosePrice() + klinesList.get(5).getClosePrice()
-				+ klinesList.get(6).getClosePrice() + klinesList.get(7).getClosePrice() + klinesList.get(8).getClosePrice()) / 7;
-		//p7
-		double p_7 = klinesList.get(9).getClosePrice();
-		//EMA7 
-		double ema_7 = a * p_7 + (1 - a) * sma_7;
-		
-		return ema_7;
-	}
-	
-	public static double getEma7_parent(List<Klines> klinesList) {
-		//周期 N
-		int n = klinesList.size() - 1;
-		//平滑常数
-		double a = 2 / (6 + 1);
-		//SMA(9)
-		double sma_7 = (/*klinesList.get(0).getClosePrice() +*/ klinesList.get(1).getClosePrice() + klinesList.get(2).getClosePrice() + 
-				klinesList.get(3).getClosePrice() + klinesList.get(4).getClosePrice() + klinesList.get(5).getClosePrice()
-				+ klinesList.get(6).getClosePrice() + klinesList.get(7).getClosePrice()) / 7;
-		//p7
-		double p_7 = klinesList.get(8).getClosePrice();
-		//EMA7 
-		double ema_7 = a * p_7 + (1 - a) * sma_7;
-		
-		return ema_7;
 	}
 	
 	/**
@@ -528,4 +495,124 @@ public class PriceUtil {
 		}
 		return result;
 	}
+	
+	/**
+     * 计算单个周期的EMA值
+     *
+     * @param previousEMA 上一个周期的EMA值
+     * @param price 当前周期的价格（通常为收盘价）
+     * @param period EMA的周期长度，例如99表示99周期的EMA
+     * @return 计算出的当前周期的EMA值
+     */
+    public static double calculateEMA(double previousEMA, double price, int period) {
+        // 计算平滑因子
+        double smoothingFactor = 2.0 / (period + 1);
+        // 使用公式计算EMA值
+        return (price - previousEMA) * smoothingFactor + previousEMA;
+    }
+
+    /**
+     * 计算给定价格数组的EMA
+     *
+     * @param prices 包含时间序列的价格数组，从旧到新排序
+     * @param type EMA的周期长度，例如99表示99周期的EMA
+     * @return 计算出的EMA值数组，其中每个元素对应于prices数组的同一索引处的EMA值
+     */
+    public static void calculateEMAArray(List<Klines> klinesList, EMAType type) {
+        
+        double initialSMA = 0.0;
+
+        int period = type.getValue(); 
+        
+        // 计算初始的SMA作为第一个EMA的起始点
+        for (int i = 0; i < period; i++) {
+        	initialSMA += klinesList.get(i).getClosePrice();
+        }
+        initialSMA /= period;
+
+        // 第一个有效的EMA值是初始SMA
+        switch (type) {
+		case EMA7:
+	        klinesList.get(period - 1).setEma7(initialSMA);
+			break;
+		case EMA25:
+	        klinesList.get(period - 1).setEma25(initialSMA);
+			break;
+
+		default:
+	        klinesList.get(period - 1).setEma99(initialSMA);
+			break;
+		}
+
+        // 从第period个价格开始计算EMA
+        for (int i = period; i < klinesList.size(); i++) {
+        	switch (type) {
+			case EMA7:
+	        	klinesList.get(i).setEma7(calculateEMA(klinesList.get(i - 1).getEma7(), klinesList.get(i).getClosePrice(), period));
+				break;
+			case EMA25:
+	        	klinesList.get(i).setEma25(calculateEMA(klinesList.get(i - 1).getEma25(), klinesList.get(i).getClosePrice(), period));
+				break;
+			default:
+	        	klinesList.get(i).setEma99(calculateEMA(klinesList.get(i - 1).getEma99(), klinesList.get(i).getClosePrice(), period));
+				break;
+			}
+        }
+    }
+    
+    /**
+     * 根据EMA判断是否可做空
+     * @param klinesList
+     * @return
+     */
+    public static boolean isOpenShortEMA(List<Klines> klinesList) {
+    	
+    	boolean isOpenShort = false;
+    	int size = klinesList.size();
+    	
+    	Klines klines = klinesList.get(size - 1);
+    	
+    	double ema7 = klines.getEma7();
+		double ema25 = klines.getEma25();
+		double ema99 = klines.getEma99();
+		double closePrice = klines.getClosePrice();
+		double openPrice = klines.getOpenPrice();
+		double hightPrice = klines.getHighPrice();
+		double lowPrice = klines.getLowPrice();
+		
+		//做空判断
+		if(hightPrice >= ema99 && closePrice <= ema99) {
+			isOpenShort = true;
+		}
+		
+    	return isOpenShort;
+    }
+    
+    /**
+     * 根据EMA判断是否可做多
+     * @param klinesList
+     * @return
+     */
+    public static boolean isOpenLongEMA(List<Klines> klinesList) {
+    	
+    	boolean isOpenLong = false;
+    	int size = klinesList.size();
+    	
+    	Klines klines = klinesList.get(size - 1);
+    	
+    	double ema7 = klines.getEma7();
+		double ema25 = klines.getEma25();
+		double ema99 = klines.getEma99();
+		double closePrice = klines.getClosePrice();
+		double openPrice = klines.getOpenPrice();
+		double hightPrice = klines.getHighPrice();
+		double lowPrice = klines.getLowPrice();
+		
+		//做多判断
+		if(lowPrice <= ema99 && closePrice >= ema99) {
+			isOpenLong = true;
+		}
+		
+    	return isOpenLong;
+    }
 }

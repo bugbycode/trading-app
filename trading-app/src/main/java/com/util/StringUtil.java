@@ -115,4 +115,14 @@ public class StringUtil {
 		return new EmailInfo(subject,text);
 	}
 	
+	public static String concat(double[] arr) {
+		StringBuffer buff = new StringBuffer();
+		for(int index = 0;index < arr.length;index++) {
+			if(index > 0) {
+				buff.append(',');
+			}
+			buff.append(arr[index]);
+		}
+		return buff.toString();
+	}
 }

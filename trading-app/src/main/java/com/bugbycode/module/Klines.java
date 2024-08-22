@@ -17,6 +17,12 @@ public class Klines {
 	
 	private double closePrice;//收盘价
 	
+	private double ema7;
+	
+	private double ema25;
+	
+	private double ema99;
+	
 	private long endTime;
 	
 	private int decimalNum = 2;
@@ -81,6 +87,30 @@ public class Klines {
 		return !isRise();
 	}
 	
+	public double getEma7() {
+		return ema7;
+	}
+
+	public void setEma7(double ema7) {
+		this.ema7 = ema7;
+	}
+
+	public double getEma25() {
+		return ema25;
+	}
+
+	public void setEma25(double ema25) {
+		this.ema25 = ema25;
+	}
+
+	public double getEma99() {
+		return ema99;
+	}
+
+	public void setEma99(double ema99) {
+		this.ema99 = ema99;
+	}
+
 	/**
 	 * 是否出现上引线
 	 * 

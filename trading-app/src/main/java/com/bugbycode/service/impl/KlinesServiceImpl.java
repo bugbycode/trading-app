@@ -13,6 +13,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.service.KlinesService;
@@ -29,9 +30,21 @@ public class KlinesServiceImpl implements KlinesService {
 
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
-			String interval) {
-		String command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s&endTime=%s"
-				+ "&interval=%s' %s/fapi/v1/continuousKlines", pair, startTime, endTime, interval, AppConfig.REST_BASE_URL);
+			String interval,QUERY_SPLIT split) {
+		
+		String command = null;
+		
+		switch (split) {
+		case ALL:
+			command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s"
+					+ "&interval=%s&limit=1500' %s/fapi/v1/continuousKlines", pair, startTime, interval, AppConfig.REST_BASE_URL);
+			break;
+
+		default:
+			command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s&endTime=%s"
+					+ "&interval=%s&limit=1500' %s/fapi/v1/continuousKlines", pair, startTime, endTime, interval, AppConfig.REST_BASE_URL);
+			break;
+		}
 		
 		logger.debug(command);
 		
@@ -41,7 +54,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public List<Klines> continuousKlines1Day(String pair, Date now, int limit) {
+	public List<Klines> continuousKlines1Day(String pair, Date now, int limit,QUERY_SPLIT split) {
 		
 		int hours = DateFormatUtil.getHours(now.getTime());
 		Date lastDayStartTimeDate = DateFormatUtil.getStartTime(hours);//前一天K线起始时间 yyyy-MM-dd 08:00:00
@@ -50,11 +63,11 @@ public class KlinesServiceImpl implements KlinesService {
 		Date firstDayStartTime = DateFormatUtil.getStartTimeBySetDay(lastDayStartTimeDate, -limit);//多少天以前起始时间
 		
 		return continuousKlines(pair, firstDayStartTime.getTime(), 
-				lastDayEndTimeDate.getTime(), Inerval.INERVAL_1D.getDescption());
+				lastDayEndTimeDate.getTime(), Inerval.INERVAL_1D.getDescption(),split);
 	}
 
 	@Override
-	public List<Klines> continuousKlines5M(String pair, Date now, int limit) {
+	public List<Klines> continuousKlines5M(String pair, Date now, int limit,QUERY_SPLIT split) {
 		List<Klines> result = null;
 		try {
 			
@@ -63,7 +76,7 @@ public class KlinesServiceImpl implements KlinesService {
 			endTime_5m = DateFormatUtil.getStartTimeBySetSecond(endTime_5m, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime_5m.getTime(),
-					endTime_5m.getTime(), Inerval.INERVAL_5M.getDescption());
+					endTime_5m.getTime(), Inerval.INERVAL_5M.getDescption(),split);
 			
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -73,7 +86,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public List<Klines> continuousKlines15M(String pair, Date now, int limit) {
+	public List<Klines> continuousKlines15M(String pair, Date now, int limit,QUERY_SPLIT split) {
 		List<Klines> result = null;
 		try {
 			
@@ -82,7 +95,7 @@ public class KlinesServiceImpl implements KlinesService {
 			endTime = DateFormatUtil.getStartTimeBySetSecond(endTime, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime.getTime(),
-					endTime.getTime(), Inerval.INERVAL_15M.getDescption());
+					endTime.getTime(), Inerval.INERVAL_15M.getDescption(),split);
 			
 		} catch (ParseException e) {
 			e.printStackTrace();

@@ -17,6 +17,7 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.service.KlinesService;
 import com.util.EmailUtil;
@@ -26,8 +27,8 @@ import com.util.StringUtil;
 /**
  * 永续合约日线级别斐波那契回撤交易监听计划任务
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FuturesFibTradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesFibTradingListenTask.class);
@@ -55,7 +56,7 @@ public class FuturesFibTradingListenTask {
 				}
 				
 				//近1年日线级别k线信息
-				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 365);
+				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 365, QUERY_SPLIT.NOT_ENDTIME);
 				
 				if(klinesList_365_x_day.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近1年日线级别K线信息");
@@ -63,7 +64,7 @@ public class FuturesFibTradingListenTask {
 				}
 				
 				//一部分5分钟级别k线信息
-				List<Klines> klinesList_hit = klinesService.continuousKlines5M(pair, now, 5);
+				List<Klines> klinesList_hit = klinesService.continuousKlines5M(pair, now, 5, QUERY_SPLIT.NOT_ENDTIME);
 				
 				if(klinesList_hit.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
