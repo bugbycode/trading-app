@@ -571,6 +571,7 @@ public class PriceUtil {
     	int size = klinesList.size();
     	
     	Klines klines = klinesList.get(size - 1);
+    	Klines parent = klinesList.get(size - 2);
     	
     	double ema7 = klines.getEma7();
 		double ema25 = klines.getEma25();
@@ -580,8 +581,23 @@ public class PriceUtil {
 		double hightPrice = klines.getHighPrice();
 		double lowPrice = klines.getLowPrice();
 		
+		double parentEma7 = parent.getEma7();
+		double parentEma25 = parent.getEma25();
+		double parentEma99 = parent.getEma99();
+		
+		double parentClosePrice = parent.getClosePrice();
+		double parentOpenPrice = parent.getOpenPrice();
+		double parentHightPrice = parent.getHighPrice();
+		double parentLowPrice = parent.getLowPrice();
+		
 		//做空判断
-		if(hightPrice >= ema99 && closePrice <= ema99) {
+		//1、最高价大于ema99 收盘价小于ema99 且ema7、ema25小于ema99
+		if(hightPrice >= ema99 && closePrice <= ema99 && ema7 <= ema99 && ema25 <= ema99) {
+			isOpenShort = true;
+		}else 
+		//2、如果ema7或ema25大于ema99 当前开盘价收盘价小于ema99 前一根k线最高价大于ema99 收盘价小于ema99
+		if((parentEma7 >= parentEma99 || parentEma25 >= parentEma99) && (openPrice <= ema99 && closePrice <= ema99)
+			&& (parentHightPrice >= parentEma99 && parentClosePrice <= ema99)) {
 			isOpenShort = true;
 		}
 		
@@ -599,20 +615,35 @@ public class PriceUtil {
     	int size = klinesList.size();
     	
     	Klines klines = klinesList.get(size - 1);
-    	
+    	Klines parent = klinesList.get(size - 2);
     	double ema7 = klines.getEma7();
 		double ema25 = klines.getEma25();
 		double ema99 = klines.getEma99();
+		
 		double closePrice = klines.getClosePrice();
 		double openPrice = klines.getOpenPrice();
 		double hightPrice = klines.getHighPrice();
 		double lowPrice = klines.getLowPrice();
+
+		double parentEma7 = parent.getEma7();
+		double parentEma25 = parent.getEma25();
+		double parentEma99 = parent.getEma99();
+		
+		double parentClosePrice = parent.getClosePrice();
+		double parentOpenPrice = parent.getOpenPrice();
+		double parentHightPrice = parent.getHighPrice();
+		double parentLowPrice = parent.getLowPrice();
 		
 		//做多判断
-		if(lowPrice <= ema99 && closePrice >= ema99) {
+		//1、最低价小于ema99 收盘价大于ema99 且ema7、ema25大于ema99
+		if(lowPrice <= ema99 && closePrice >= ema99 && ema7 >= ema99 && ema25 >= ema99) {
+			isOpenLong = true;
+		} else 
+		//2、如果ema7或ema25小于ema99 当前k线开盘价收盘价均大于ema99、前一根k线最低价小于ema99 收盘价大于ema99
+		if((parentEma7 <= parentEma99 || parentEma25 <= parentEma99) && (openPrice >= ema99 && closePrice >= ema99)
+				&& (parentLowPrice <= parentEma99 && parentClosePrice >= parentEma99)) {
 			isOpenLong = true;
 		}
-		
     	return isOpenLong;
     }
 }
