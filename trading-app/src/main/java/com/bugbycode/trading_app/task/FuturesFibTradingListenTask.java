@@ -55,16 +55,11 @@ public class FuturesFibTradingListenTask {
 				}
 				
 				//近1年日线级别k线信息
-				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 1499, QUERY_SPLIT.NOT_ENDTIME);
+				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 4 * 365, QUERY_SPLIT.NOT_ENDTIME);
 				
 				if(klinesList_365_x_day.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近1年日线级别K线信息");
 					continue;
-				}
-				
-				Klines last = klinesList_365_x_day.get(klinesList_365_x_day.size() - 1);
-				if("BTCUSDT".equals(last.getPair())) {
-					logger.info(last.toString());
 				}
 				
 				//一部分5分钟级别k线信息
