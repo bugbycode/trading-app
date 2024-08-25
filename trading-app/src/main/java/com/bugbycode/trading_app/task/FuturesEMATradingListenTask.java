@@ -25,8 +25,8 @@ import com.util.StringUtil;
 /**
  * 永续合约EMA指标交易监听计划任务
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FuturesEMATradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesEMATradingListenTask.class);
@@ -39,7 +39,7 @@ public class FuturesEMATradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "4 0/15 * * * ?")
+	//@Scheduled(cron = "4 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("FuturesFibTradingListenTask start.");
 		

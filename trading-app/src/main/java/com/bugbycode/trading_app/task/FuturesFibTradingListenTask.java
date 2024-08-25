@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.ObjectUtils;
 
 import com.bugbycode.config.AppConfig;
-import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.FibLevel;
@@ -27,8 +26,8 @@ import com.util.StringUtil;
 /**
  * 永续合约日线级别斐波那契回撤交易监听计划任务
  */
-//@Configuration
-//@EnableScheduling
+@Configuration
+@EnableScheduling
 public class FuturesFibTradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesFibTradingListenTask.class);
@@ -56,11 +55,16 @@ public class FuturesFibTradingListenTask {
 				}
 				
 				//近1年日线级别k线信息
-				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 365, QUERY_SPLIT.NOT_ENDTIME);
+				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 1499, QUERY_SPLIT.NOT_ENDTIME);
 				
 				if(klinesList_365_x_day.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近1年日线级别K线信息");
 					continue;
+				}
+				
+				Klines last = klinesList_365_x_day.get(klinesList_365_x_day.size() - 1);
+				if("BTCUSDT".equals(last.getPair())) {
+					logger.info(last.toString());
 				}
 				
 				//一部分5分钟级别k线信息
@@ -114,7 +118,7 @@ public class FuturesFibTradingListenTask {
 					break;
 				}
 				
-				
+				/*
 				//开始获取第二级别斐波那契回撤信息
 				Klines secondFibHightKlines = null;
 				Klines secondFibLowKlines = null;
@@ -188,7 +192,7 @@ public class FuturesFibTradingListenTask {
 				default:
 					klinesService.openShort(thirdFibInfo, klinesList_hit);
 					break;
-				}
+				}*/
 				
 			}
 			
