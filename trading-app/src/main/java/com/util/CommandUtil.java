@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import com.bugbycode.module.Klines;
 
@@ -66,19 +67,24 @@ public class CommandUtil {
 		List<Klines> klinesList = new ArrayList<Klines>();
 		
 		if(StringUtil.isNotEmpty(str)) {
-			
-			JSONArray jsonArr = new JSONArray(str);
-			
-			for(int index = 0;index < jsonArr.length();index++) {
+			try {
+				JSONArray jsonArr = new JSONArray(str);
 				
-				JSONArray klJson = jsonArr.getJSONArray(index);
-				decimalNum = klJson.getString(1).substring(klJson.getString(1).indexOf(".") + 1).length();
-				Klines kl = new Klines(pair,klJson.getLong(0),
-						klJson.getDouble(1),klJson.getDouble(2),
-						klJson.getDouble(3),klJson.getDouble(4),
-						klJson.getLong(6),decimalNum);
-				klinesList.add(kl);
-			};
+				for(int index = 0;index < jsonArr.length();index++) {
+					
+					JSONArray klJson = jsonArr.getJSONArray(index);
+					decimalNum = klJson.getString(1).substring(klJson.getString(1).indexOf(".") + 1).length();
+					Klines kl = new Klines(pair,klJson.getLong(0),
+							klJson.getDouble(1),klJson.getDouble(2),
+							klJson.getDouble(3),klJson.getDouble(4),
+							klJson.getLong(6),decimalNum);
+					klinesList.add(kl);
+				};
+				
+			} catch (JSONException e) {
+				throw new RuntimeException("解析" + pair + "返回的JSON时出现错误，错误信息：" + e.getLocalizedMessage() + "\n"
+						+ "返回的JSON：" + str);
+			}
 		}
 		return klinesList;
 	}
