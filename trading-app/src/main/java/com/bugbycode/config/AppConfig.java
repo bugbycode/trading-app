@@ -19,6 +19,8 @@ public class AppConfig {
 	
 	public static Set<String> RECIPIENT;//收件人
 	
+	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
+	
 	private static int EMAIL_AUTH_USE_OFFSET = 0;//邮件认证使用
 	
 	public static EmailAuth getEmailAuth() {

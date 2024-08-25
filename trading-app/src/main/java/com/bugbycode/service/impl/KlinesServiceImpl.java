@@ -20,6 +20,7 @@ import com.bugbycode.service.KlinesService;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
+import com.util.FileUtil;
 import com.util.PriceUtil;
 import com.util.StringUtil;
 
@@ -32,25 +33,42 @@ public class KlinesServiceImpl implements KlinesService {
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
 			String interval,QUERY_SPLIT split) {
 		
-		String command = null;
+		String filePathName = AppConfig.CACHE_PATH + "/" + pair + "_" + interval + ".json";
 		
-		switch (split) {
-		case ALL:
-			command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s"
-					+ "&interval=%s&limit=1500' %s/fapi/v1/continuousKlines", pair, startTime, interval, AppConfig.REST_BASE_URL);
-			break;
+		//从缓存中读取
+		List<Klines> list = FileUtil.readKlinesFile(pair, filePathName);
+		
+		//缓存不存在或者不是最新数据
+		if(list.isEmpty() || list.get(list.size() - 1).getEndTime() < endTime + 999) {
+			
+			String command = null;
+			
+			switch (split) {
+			case ALL:
+				command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s"
+						+ "&interval=%s&limit=1500' %s/fapi/v1/continuousKlines", pair, startTime, interval, AppConfig.REST_BASE_URL);
+				break;
 
-		default:
-			command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s&endTime=%s"
-					+ "&interval=%s&limit=1500' %s/fapi/v1/continuousKlines", pair, startTime, endTime, interval, AppConfig.REST_BASE_URL);
-			break;
+			default:
+				command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s&endTime=%s"
+						+ "&interval=%s&limit=1500' %s/fapi/v1/continuousKlines", pair, startTime, endTime, interval, AppConfig.REST_BASE_URL);
+				break;
+			}
+			
+			logger.debug(command);
+			
+			String result = CommandUtil.run(command);
+			
+			list = CommandUtil.format(pair, result);
+			
+			FileUtil.writeFile(filePathName, result);
+		} else {
+			logger.debug("读取缓存文件：" + filePathName);
+			logger.debug("缓存条数：" + list.size());
+			logger.debug("缓存最后一条k线：" + list.get(list.size() - 1).toString());
 		}
 		
-		logger.debug(command);
-		
-		String result = CommandUtil.run(command);
-
-		return CommandUtil.format(pair, result);
+		return list;
 	}
 
 	@Override
