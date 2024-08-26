@@ -66,6 +66,34 @@ public class PriceUtil {
 		return getMinPriceKLine(klinesList.subList(startIndex, endIndex));
 	}
 	
+	public static Klines getMaxPriceKLine(List<Klines> klinesList,long startTime,long endTime) {
+		int startIndex = 0;
+		int endIndex = 0;
+		for(int index = 0;index < klinesList.size();index++) {
+			Klines tmp = klinesList.get(index);
+			if(tmp.getStarTime() == startTime) {
+				startIndex = index;
+			} else if(tmp.getEndTime() == endTime) {
+				endIndex = index;
+			}
+		}
+		return getMaxPriceKLine(klinesList,startIndex,endIndex);
+	}
+	
+	public static Klines getMinPriceKLine(List<Klines> klinesList,long startTime,long endTime) {
+		int startIndex = 0;
+		int endIndex = 0;
+		for(int index = 0;index < klinesList.size();index++) {
+			Klines tmp = klinesList.get(index);
+			if(tmp.getStarTime() == startTime) {
+				startIndex = index;
+			} else if(tmp.getEndTime() == endTime) {
+				endIndex = index;
+			}
+		}
+		return getMinPriceKLine(klinesList,startIndex,endIndex);
+	}
+	
 	public static String formatDoubleDecimal(double number,int decimalPoint) {
 		String pattern = "0.";
 		
@@ -645,5 +673,65 @@ public class PriceUtil {
 			isOpenLong = true;
 		}
     	return isOpenLong;
+    }
+    
+    /**
+     * 获取盘整区第一根k线
+     * @param list
+     * @return
+     */
+    public static Klines getConsolidationAreaFirstKlines(List<Klines> list) {
+    	
+    	int len = list.size();
+    	;
+    	
+    	Klines first = null;
+    	double highPrice = 0;
+    	double lowPrice = 0;
+    	
+    	for(int offset = len - 1; offset > 0;offset--) {
+    		Klines tmp = list.get(offset);
+    		//开盘价收盘价均在lowPrice~highPrice之间 或者最高价最低价包含lowPrice~highPrice
+    		if(first == null || isConsolidationArea(tmp,highPrice,lowPrice)) {
+    			
+    			if(first == null) {
+    				highPrice = tmp.getHighPrice();
+        			lowPrice = tmp.getLowPrice();
+    			}
+    			
+    			if(tmp.getHighPrice() > highPrice) {
+    				highPrice = tmp.getHighPrice();
+    			}
+    			
+    			if(tmp.getLowPrice() < lowPrice) {
+    				lowPrice = tmp.getLowPrice();
+    			}
+    			
+    			first = tmp;
+    		}
+    		
+    		if(!isConsolidationArea(tmp,highPrice,lowPrice)) {
+    			break;
+    		}
+    	}
+    	
+    	return first;
+    }
+    
+    /**
+     * 判断k线是否在某个盘整区
+     * @param klines k线
+     * @param highPrice 盘整区最高价
+     * @param lowPrice 盘整区最低价
+     * @return
+     */
+    public static boolean isConsolidationArea(Klines klines,double highPrice,double lowPrice) {
+    	boolean flag = false;
+    	if((klines.getOpenPrice() <= highPrice && klines.getOpenPrice() >= lowPrice && 
+    			klines.getClosePrice() <= highPrice && klines.getClosePrice() >= lowPrice)
+    			|| (klines.getHighPrice() >= highPrice && klines.getLowPrice() <= lowPrice)) {
+    		flag = true;
+    	}
+    	return flag;
     }
 }
