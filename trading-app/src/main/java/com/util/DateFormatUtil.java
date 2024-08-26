@@ -86,6 +86,19 @@ public class DateFormatUtil {
 	}
 	
 	/**
+	 * 将时间更新到多少毫秒以前或之后
+	 * @param now 当前时间
+	 * @param minute 多少秒
+	 * @return
+	 */
+	public static Date getStartTimeBySetMillisecond(Date now,int second) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(now);
+		c.add(Calendar.MILLISECOND, second);
+		return c.getTime();
+	}
+	
+	/**
 	 * 前一天K线起始时间 东八区早上八点整
 	 * @param hours
 	 * @return
