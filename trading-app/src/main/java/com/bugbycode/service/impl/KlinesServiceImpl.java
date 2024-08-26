@@ -14,6 +14,7 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
+import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.service.KlinesService;
@@ -39,7 +40,7 @@ public class KlinesServiceImpl implements KlinesService {
 		List<Klines> list = FileUtil.readKlinesFile(pair, filePathName);
 		
 		//缓存不存在或者不是最新数据
-		if(list.isEmpty() || list.get(list.size() - 1).getEndTime() < endTime + 999) {
+		if(list.isEmpty() || list.get(list.size() - 1).getEndTime() < endTime) {
 			
 			String command = null;
 			
@@ -81,7 +82,7 @@ public class KlinesServiceImpl implements KlinesService {
 		Date firstDayStartTime = DateFormatUtil.getStartTimeBySetDay(lastDayStartTimeDate, -limit);//多少天以前起始时间
 		
 		return continuousKlines(pair, firstDayStartTime.getTime(), 
-				lastDayEndTimeDate.getTime(), Inerval.INERVAL_1D.getDescption(),split);
+				lastDayEndTimeDate.getTime() + 999, Inerval.INERVAL_1D.getDescption(),split);
 	}
 
 	@Override
@@ -91,7 +92,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			Date endTime_5m = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
 			Date startTime_5m = DateFormatUtil.getStartTimeBySetMinute(endTime_5m, -Inerval.INERVAL_5M.getNumber() * limit);//limit根k线
-			endTime_5m = DateFormatUtil.getStartTimeBySetSecond(endTime_5m, -1);//收盘时间
+			endTime_5m = DateFormatUtil.getStartTimeBySetMillisecond(endTime_5m, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime_5m.getTime(),
 					endTime_5m.getTime(), Inerval.INERVAL_5M.getDescption(),split);
@@ -110,7 +111,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			Date endTime = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
 			Date startTime = DateFormatUtil.getStartTimeBySetMinute(endTime, -Inerval.INERVAL_15M.getNumber() * limit);//limit根k线
-			endTime = DateFormatUtil.getStartTimeBySetSecond(endTime, -1);//收盘时间
+			endTime = DateFormatUtil.getStartTimeBySetMillisecond(endTime, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime.getTime(),
 					endTime.getTime(), Inerval.INERVAL_15M.getDescption(),split);
@@ -209,6 +210,168 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 	}
 	
+
+	@Override
+	public void openLongConsolidationArea(FibInfo fibInfo, List<Klines> klinesList_hit) {
+		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
+		
+		//开盘、收盘、最低、最高价格
+		double closePrice = hitKline.getClosePrice();
+		//double openPrice = hitKline.getOpenPrice();
+		double lowPrice = hitKline.getLowPrice();
+		//double hightPrice = hitKline.getHighPrice();
+		double currentPrice = closePrice;
+		
+		String pair = hitKline.getPair();
+		
+		FibCode[] codes = FibCode.values();
+		
+		QuotationMode qm = fibInfo.getQuotationMode();
+		
+		
+		//做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
+		for(int offset = codes.length - 1;offset >= 0;offset--) {
+			
+			FibCode code = codes[offset];
+			
+			FibCode closePpositionCode = fibInfo.getLongTakeProfitConsolidationArea();//止盈点位
+			
+			if(isOpenLongConsolidationArea(code,qm) && PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)) {//FIB1~startFibCode做多
+
+				String subject = String.format("%s永续合约%s(%s)[%s]做多机会 %s", pair, code.getDescription(),
+						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+						fibInfo.getLevel().getLabel(),
+						DateFormatUtil.format(new Date()));
+				
+				String text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice, closePpositionCode);
+			
+				sendEmail(subject,text,fibInfo);
+
+				break;
+			}
+		}
+	}
+	
+	private boolean isOpenLongConsolidationArea(FibCode code,QuotationMode qm) {
+		
+		boolean result = true; 
+		
+		switch (qm) {
+		case LONG: //多头行情做多
+			
+			switch (code) {
+			case FIB1:
+				break;
+			case FIB786:
+				break;
+
+			default:
+				result = false; 
+				break;
+			}
+			
+			break;
+
+		default://空头行情做多
+			
+			switch (code) {
+			case FIB0:
+				
+				break;
+			case FIB236:
+				
+				break;
+			default:
+				result = false; 
+				break;
+			}
+			
+			break;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public void openShortConsolidationArea(FibInfo fibInfo, List<Klines> klinesList_hit) {
+		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
+		
+		//开盘、收盘、最低、最高价格
+		double closePrice = hitKline.getClosePrice();
+		//double openPrice = hitKline.getOpenPrice();
+		//double lowPrice = hitKline.getLowPrice();
+		double hightPrice = hitKline.getHighPrice();
+		double currentPrice = closePrice;
+		
+		String pair = hitKline.getPair();
+		
+		FibCode[] codes = FibCode.values();
+		QuotationMode qm = fibInfo.getQuotationMode();
+		
+		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 
+		for(int offset = codes.length - 1;offset >= 0;offset--) {
+			
+			FibCode code = codes[offset];//当前斐波那契点位
+
+			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
+			
+			if(isOpenShortConsolidationArea(code,qm) && PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)) {
+				
+				String subject = String.format("%s永续合约%s(%s)[%s]做空机会 %s", pair, code.getDescription(),
+						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+						fibInfo.getLevel().getLabel(),
+						DateFormatUtil.format(new Date()));
+				
+				String text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice, closePpositionCode);
+				
+				sendEmail(subject,text,fibInfo);
+				
+				break;
+			}
+		}
+	}
+	
+	
+	private boolean isOpenShortConsolidationArea(FibCode code,QuotationMode qm) {
+		
+		boolean result = true; 
+		
+		switch (qm) {
+		case SHORT: //空头行情做空
+			
+			switch (code) {
+			case FIB1:
+				break;
+			case FIB786:
+				break;
+
+			default:
+				result = false; 
+				break;
+			}
+			
+			break;
+
+		default: //多头行情做空
+			
+			switch (code) {
+			case FIB0:
+				
+				break;
+			case FIB236:
+				
+				break;
+			default:
+				result = false; 
+				break;
+			}
+			
+			break;
+		}
+		
+		return result;
+	}
+	
 	private void sendEmail(String subject,String text,FibInfo fibInfo) {
 		if(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
 
@@ -238,5 +401,4 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 		}
 	}
-
 }
