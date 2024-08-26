@@ -29,6 +29,48 @@ public class FibInfo {
 	private FibLevel level;
 	
 	/**
+	 * 盘整区做多止盈点位
+	 * @return
+	 */
+	public FibCode getLongTakeProfitConsolidationArea() {
+		FibCode takeProfit = null;
+		QuotationMode qm = getQuotationMode();
+		switch (qm) {
+		case LONG:
+			takeProfit = FibCode.FIB236;
+			break;
+
+		default:
+			
+			takeProfit = FibCode.FIB786;
+			
+			break;
+		}
+		return takeProfit;
+	}
+	
+	/**
+	 * 盘整区做空止盈点位
+	 * @return
+	 */
+	public FibCode getShortTakeProfitConsolidationArea() {
+		FibCode takeProfit = null;
+		QuotationMode qm = getQuotationMode();
+		switch (qm) {
+		case LONG:
+			
+			takeProfit = FibCode.FIB786;
+			break;
+
+		default:
+			takeProfit = FibCode.FIB236;
+			
+			break;
+		}
+		return takeProfit;
+	}
+	
+	/**
 	 * 止盈点位
 	 * @param code 开仓时所处的斐波那契回撤点位
 	 * @return 止盈的斐波那契回撤点位
@@ -88,13 +130,13 @@ public class FibInfo {
 		}
 		return startFibCode;
 	}
-
+	
 	/**
 	 * 
 	 * @param kline1 最低价k线
 	 * @param kline2 最高价k线
 	 * @param decimalPoint 保留小数点个数
-	 * @param level 斐波那契回撤级别 lv1 lv2 lv3
+	 * @param level 斐波那契回撤级别 lv1 lv2 lv3 ……
 	 */
 	public FibInfo(Klines kline1, Klines kline2,int decimalPoint,FibLevel level) {
 		if(kline1.getStarTime() < kline2.getStarTime()) {
