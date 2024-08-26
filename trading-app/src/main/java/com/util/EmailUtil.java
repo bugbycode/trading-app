@@ -68,6 +68,8 @@ public class EmailUtil {
 			code = ResultCode.ERROR;
 		}
         
+        AppConfig.nexEmailAuth();
+        
 		return new Result<ResultCode, Exception>(code, ex);
 	}
 }

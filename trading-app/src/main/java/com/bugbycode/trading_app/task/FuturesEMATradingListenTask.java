@@ -88,8 +88,6 @@ public class FuturesEMATradingListenTask {
 						
 						logger.info("邮件发送失败！失败原因：" + ex.getLocalizedMessage());
 						
-						AppConfig.nexEmailAuth();
-						
 						break;
 						
 					default:
