@@ -73,8 +73,9 @@ public class PriceUtil {
 			Klines tmp = klinesList.get(index);
 			if(tmp.getStarTime() == startTime) {
 				startIndex = index;
-			} else if(tmp.getEndTime() == endTime) {
-				endIndex = index;
+			} 
+			if(tmp.getEndTime() == endTime) {
+				endIndex = index + 1;
 			}
 		}
 		return getMaxPriceKLine(klinesList,startIndex,endIndex);
@@ -87,8 +88,9 @@ public class PriceUtil {
 			Klines tmp = klinesList.get(index);
 			if(tmp.getStarTime() == startTime) {
 				startIndex = index;
-			} else if(tmp.getEndTime() == endTime) {
-				endIndex = index;
+			}
+			if(tmp.getEndTime() == endTime) {
+				endIndex = index + 1;
 			}
 		}
 		return getMinPriceKLine(klinesList,startIndex,endIndex);
