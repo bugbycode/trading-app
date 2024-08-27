@@ -137,4 +137,19 @@ public class DateFormatUtil {
 			throw new RuntimeException(e.getLocalizedMessage());
 		}
 	}
+	
+	/**
+	 * 获取今天的开始时间
+	 * @param date 当前时间
+	 * @return
+	 */
+	public static Date getTodayStartTime(Date date) {
+		int hours = getHours(date.getTime());
+		Date lastDayEndTimeDate = DateFormatUtil.getEndTime(hours);
+		try {
+			return parse(format_yyyy_mm_dd_08_00_00(lastDayEndTimeDate));
+		} catch (ParseException e) {
+			throw new RuntimeException(e.getLocalizedMessage());
+		}
+	}
 }

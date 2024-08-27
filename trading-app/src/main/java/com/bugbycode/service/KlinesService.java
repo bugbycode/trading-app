@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.bugbycode.module.FibInfo;
+import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 
@@ -66,5 +67,16 @@ public interface KlinesService {
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
 	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	
+	
+	/**
+	 * 获取当天所有的k线信息
+	 * @param pair 交易对
+	 * @param now 时间
+	 * @param interval 时间级别
+	 * @param split 用来判断是否读取所有K线 ALL 所有 NOT_ENDTIME 没有返回最后一根K线
+	 * @return
+	 */
+	public List<Klines> continuousKlinesToday(String pair,Date now,Inerval interval,QUERY_SPLIT split);
 	
 }

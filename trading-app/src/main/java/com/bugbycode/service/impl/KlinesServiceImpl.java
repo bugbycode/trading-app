@@ -127,6 +127,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
 		
+		Klines hitLowKlines = PriceUtil.getMinPriceKLine(klinesList_hit);
+		
 		//开盘、收盘、最低、最高价格
 		double closePrice = hitKline.getClosePrice();
 		//double openPrice = hitKline.getOpenPrice();
@@ -146,7 +148,8 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
 			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit) 
-					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {//FIB1~startFibCode做多
+					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
+					&& !PriceUtil.isObsoleteLong(fibInfo,hitLowKlines,codes,offset)) {//FIB1~startFibCode做多
 
 				String subject = String.format("%s永续合约%s(%s)[%s]做多机会 %s", pair, code.getDescription(),
 						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -171,6 +174,8 @@ public class KlinesServiceImpl implements KlinesService {
 	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
+
+		Klines hitHighKlines = PriceUtil.getMaxPriceKLine(klinesList_hit);
 		
 		//开盘、收盘、最低、最高价格
 		double closePrice = hitKline.getClosePrice();
@@ -191,7 +196,8 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
 			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit) && 
-					!PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
+					!PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
+					&& !PriceUtil.isObsoleteShort(fibInfo,hitHighKlines,codes,offset)) {
 				
 				String subject = String.format("%s永续合约%s(%s)[%s]做空机会 %s", pair, code.getDescription(),
 						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -237,5 +243,26 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public List<Klines> continuousKlinesToday(String pair, Date now, Inerval interval, QUERY_SPLIT split) {
+		List<Klines> result = null;
+		
+		try {
+			
+			Date startTime = DateFormatUtil.getTodayStartTime(now);
+			
+			Date endTime = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
+			
+			endTime = DateFormatUtil.getStartTimeBySetMillisecond(endTime, -1);//收盘时间
+			
+			result = continuousKlines(pair, startTime.getTime(), endTime.getTime(), interval.getDescption(), split);
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 }

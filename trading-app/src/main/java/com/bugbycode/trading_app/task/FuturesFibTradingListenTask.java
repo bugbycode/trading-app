@@ -15,6 +15,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.FibLevel;
+import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
@@ -63,7 +64,7 @@ public class FuturesFibTradingListenTask {
 				}
 				
 				//一部分5分钟级别k线信息
-				List<Klines> klinesList_hit = klinesService.continuousKlines5M(pair, now, 5, QUERY_SPLIT.NOT_ENDTIME);
+				List<Klines> klinesList_hit = klinesService.continuousKlinesToday(pair, now, Inerval.INERVAL_5M, QUERY_SPLIT.NOT_ENDTIME);
 				
 				if(klinesList_hit.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
