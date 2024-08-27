@@ -7,8 +7,7 @@ public enum FibLevel {
 
 	LEVEL_1(1,"Lv1"),
 	LEVEL_2(1,"Lv2"),
-	LEVEL_3(1,"Lv3"),
-	LEVEL_4(1,"Lv4");
+	LEVEL_3(1,"Lv3");
 
 	private int value;
 	
