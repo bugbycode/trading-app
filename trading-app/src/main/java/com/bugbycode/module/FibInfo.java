@@ -8,22 +8,6 @@ public class FibInfo {
 	
 	private double high;
 	
-	private double fib0 = 0;
-	
-	private double fib236 = 0.236;
-	
-	private double fib382 = 0.382;
-	
-	private double fib5 = 0.5;
-	
-	private double fib618 = 0.618;
-	
-	private double fib66 = 0.66;
-	
-	private double fib786 = 0.786;
-	
-	private double fib1 = 1;
-	
 	private int decimalPoint;
 	
 	private FibLevel level;
@@ -119,38 +103,6 @@ public class FibInfo {
 	public double getFibValue(FibCode code) {
 		return calculateFibonacciRetracement(low,high,code.getValue());
 	}
-
-	public double getFib0() {
-		return calculateFibonacciRetracement(low,high,fib0);
-	}
-
-	public double getFib236() {
-		return calculateFibonacciRetracement(low,high,fib236);
-	}
-
-	public double getFib382() {
-		return calculateFibonacciRetracement(low,high,fib382);
-	}
-
-	public double getFib5() {
-		return calculateFibonacciRetracement(low,high,fib5);
-	}
-
-	public double getFib618() {
-		return calculateFibonacciRetracement(low,high,fib618);
-	}
-
-	public double getFib66() {
-		return calculateFibonacciRetracement(low,high,fib66);
-	}
-
-	public double getFib786() {
-		return calculateFibonacciRetracement(low,high,fib786);
-	}
-
-	public double getFib1() {
-		return calculateFibonacciRetracement(low,high,fib1);
-	}
 	
 	public int getDecimalPoint() {
 		return decimalPoint;
@@ -185,7 +137,7 @@ public class FibInfo {
     }
     
     public QuotationMode getQuotationMode() {
-    	return getFib0() < getFib1() ? QuotationMode.SHORT : QuotationMode.LONG;
+    	return getFibValue(FibCode.FIB0) < getFibValue(FibCode.FIB1) ? QuotationMode.SHORT : QuotationMode.LONG;
     }
 
 	public FibLevel getLevel() {
@@ -195,15 +147,31 @@ public class FibInfo {
 	@Override
 	public String toString() {
 		
-		return String.format("1(%s), 0.786(%s), 0.66(%s), 0.618(%s), 0.5(%s), 0.382(%s), 0.236(%s), 0(%s)", 
-				PriceUtil.formatDoubleDecimal(getFib1(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib786(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib66(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib618(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib5(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib382(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib236(), decimalPoint),
-				PriceUtil.formatDoubleDecimal(getFib0(), decimalPoint));
+		FibCode[] codes = FibCode.values();
+		
+		int len = codes.length;
+		
+		//[Lv1] [LONG]：1(0.1361400),0.786(0.1460696),0.66(0.1519160),0.618(0.1538648),0.5(0.1593400),0.382(0.1648152),0.236(0.1715896),0(0.1825400)
+		StringBuffer formatBuf = new StringBuffer();
+		Object[] arr = new Object[len];
+		
+		formatBuf.append("[");
+		formatBuf.append(this.getLevel().getLabel());
+		formatBuf.append("] [");
+		formatBuf.append(this.getQuotationMode().getLabel());
+		formatBuf.append("]: ");
+		
+		for(int offset = 0;offset < len;offset++) {
+			FibCode code = codes[offset];
+			if(offset > 0) {
+				formatBuf.append(", ");
+			}
+			formatBuf.append(code.getDescription());
+			formatBuf.append("(%s)");
+			arr[offset] = PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint);
+		}
+		
+		return String.format(formatBuf.toString(), arr);
 	}
     
     
