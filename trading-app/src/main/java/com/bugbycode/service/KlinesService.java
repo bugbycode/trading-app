@@ -3,7 +3,6 @@ package com.bugbycode.service;
 import java.util.Date;
 import java.util.List;
 
-import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
@@ -55,15 +54,17 @@ public interface KlinesService {
 	/**
 	 * 合约做多
 	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param afterLowKlines 回撤之后的最低日线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openLong(FibInfo fibInfo,List<Klines> klinesList_hit);
+	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
 	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param afterHighKlines 回撤之后的最高日线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openShort(FibInfo fibInfo,List<Klines> klinesList_hit);
+	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 }

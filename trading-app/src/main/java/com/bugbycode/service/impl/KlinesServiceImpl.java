@@ -123,7 +123,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openLong(FibInfo fibInfo, List<Klines> klinesList_hit) {
+	public void openLong(FibInfo fibInfo, Klines afterLowKlines, List<Klines> klinesList_hit) {
 		
 		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
 		
@@ -145,7 +145,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
-			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)) {//FIB1~startFibCode做多
+			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit) 
+					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {//FIB1~startFibCode做多
 
 				String subject = String.format("%s永续合约%s(%s)[%s]做多机会 %s", pair, code.getDescription(),
 						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -167,7 +168,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openShort(FibInfo fibInfo, List<Klines> klinesList_hit) {
+	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
 		
@@ -189,7 +190,8 @@ public class KlinesServiceImpl implements KlinesService {
 
 			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
-			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)) {
+			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit) && 
+					!PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				
 				String subject = String.format("%s永续合约%s(%s)[%s]做空机会 %s", pair, code.getDescription(),
 						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),

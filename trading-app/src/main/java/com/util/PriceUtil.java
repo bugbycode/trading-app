@@ -11,6 +11,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import com.bugbycode.module.EMAType;
+import com.bugbycode.module.FibCode;
+import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.Klines;
 
@@ -321,6 +323,46 @@ public class PriceUtil {
 		}
 		
 		return isLong;
+	}
+	
+	/**
+	 * 判断以往的价格是否低于当前回撤点位
+	 * @param fibInfo 回撤价格信息
+	 * @param afterLowKlines 最低价
+	 * @param codes 回撤点位
+	 * @param codeOffset 
+	 * @return
+	 */
+	public static boolean isObsoleteLong(FibInfo fibInfo,Klines afterLowKlines,FibCode[] codes,int codeOffset) {
+		boolean result = false;
+
+		if(!ObjectUtils.isEmpty(afterLowKlines)) {
+			if(codeOffset > 0 && afterLowKlines.getLowPrice() <= fibInfo.getFibValue(codes[codeOffset - 1])) {
+				result = true;
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 判断以往的价格是否高于当前回撤点位
+	 * @param fibInfo 回撤价格信息
+	 * @param afterHighKlines 最高价
+	 * @param codes 回撤点位
+	 * @param codeOffset
+	 * @return
+	 */
+	public static boolean isObsoleteShort(FibInfo fibInfo,Klines afterHighKlines,FibCode[] codes,int codeOffset) {
+		boolean result = false;
+
+		if(!ObjectUtils.isEmpty(afterHighKlines)) {
+			if(codeOffset > 0 && afterHighKlines.getHighPrice() >= fibInfo.getFibValue(codes[codeOffset - 1])) {
+				result = true;
+			}
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -736,4 +778,5 @@ public class PriceUtil {
     	}
     	return flag;
     }
+    
 }

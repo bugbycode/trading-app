@@ -100,16 +100,21 @@ public class FuturesFibTradingListenTask {
 				//斐波那契回撤信息
 				FibInfo fibInfo = new FibInfo(fibLowKlines, fibHightKlines, fibLowKlines.getDecimalNum(),FibLevel.LEVEL_1);
 				
+				Klines afterHighKlines = null;//回撤之后的最高日线
+				Klines afterLowKlines = null;//回撤之后最低日线
+				
 				//第一级别趋势
 				QuotationMode qm = fibInfo.getQuotationMode();
 				//第一级别斐波那契开仓
 				switch (qm) {
 				case LONG:
-					klinesService.openLong(fibInfo, klinesList_hit);
+					afterLowKlines = PriceUtil.getLowKlinesByStartKlines(klinesList_365_x_day, fibHightKlines);
+					klinesService.openLong(fibInfo, afterLowKlines, klinesList_hit);
 					break;
 
 				default:
-					klinesService.openShort(fibInfo, klinesList_hit);
+					afterHighKlines = PriceUtil.getHightKlinesByStartKlines(klinesList_365_x_day, fibLowKlines);
+					klinesService.openShort(fibInfo,afterHighKlines,klinesList_hit);
 					break;
 				}
 				
@@ -143,11 +148,13 @@ public class FuturesFibTradingListenTask {
 				//第二级别斐波那契开仓
 				switch (secondQm) {
 				case LONG:
-					klinesService.openLong(secondFibInfo, klinesList_hit);
+					afterLowKlines = PriceUtil.getLowKlinesByStartKlines(klinesList_365_x_day, secondFibHightKlines);
+					klinesService.openLong(secondFibInfo,afterLowKlines, klinesList_hit);
 					break;
 
 				default:
-					klinesService.openShort(secondFibInfo, klinesList_hit);
+					afterHighKlines = PriceUtil.getHightKlinesByStartKlines(klinesList_365_x_day, secondFibLowKlines);
+					klinesService.openShort(secondFibInfo, afterHighKlines, klinesList_hit);
 					break;
 				}
 				
@@ -180,11 +187,13 @@ public class FuturesFibTradingListenTask {
 				//第三级别斐波那契开仓
 				switch (thirdQm) {
 				case LONG:
-					klinesService.openLong(thirdFibInfo, klinesList_hit);
+					afterLowKlines = PriceUtil.getLowKlinesByStartKlines(klinesList_365_x_day, thirdFibHightKlines);
+					klinesService.openLong(thirdFibInfo, afterLowKlines,klinesList_hit);
 					break;
 
 				default:
-					klinesService.openShort(thirdFibInfo, klinesList_hit);
+					afterHighKlines = PriceUtil.getHightKlinesByStartKlines(klinesList_365_x_day, thirdFibLowKlines);
+					klinesService.openShort(thirdFibInfo,afterHighKlines, klinesList_hit);
 					break;
 				}
 				
