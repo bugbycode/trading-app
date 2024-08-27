@@ -66,18 +66,4 @@ public interface KlinesService {
 	 */
 	public void openShort(FibInfo fibInfo,List<Klines> klinesList_hit);
 	
-	/**
-	 * 盘整区做多
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openLongConsolidationArea(FibInfo fibInfo,List<Klines> klinesList_hit);
-	
-	/**
-	 * 盘整区做空
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openShortConsolidationArea(FibInfo fibInfo,List<Klines> klinesList_hit);
-	
 }

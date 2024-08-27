@@ -29,48 +29,6 @@ public class FibInfo {
 	private FibLevel level;
 	
 	/**
-	 * 盘整区做多止盈点位
-	 * @return
-	 */
-	public FibCode getLongTakeProfitConsolidationArea() {
-		FibCode takeProfit = null;
-		QuotationMode qm = getQuotationMode();
-		switch (qm) {
-		case LONG:
-			takeProfit = FibCode.FIB236;
-			break;
-
-		default:
-			
-			takeProfit = FibCode.FIB786;
-			
-			break;
-		}
-		return takeProfit;
-	}
-	
-	/**
-	 * 盘整区做空止盈点位
-	 * @return
-	 */
-	public FibCode getShortTakeProfitConsolidationArea() {
-		FibCode takeProfit = null;
-		QuotationMode qm = getQuotationMode();
-		switch (qm) {
-		case LONG:
-			
-			takeProfit = FibCode.FIB786;
-			break;
-
-		default:
-			takeProfit = FibCode.FIB236;
-			
-			break;
-		}
-		return takeProfit;
-	}
-	
-	/**
 	 * 止盈点位
 	 * @param code 开仓时所处的斐波那契回撤点位
 	 * @return 止盈的斐波那契回撤点位
