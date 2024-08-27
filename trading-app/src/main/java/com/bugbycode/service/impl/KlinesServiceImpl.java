@@ -138,8 +138,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibCode[] codes = FibCode.values();
 		
-		//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236
-		for(int offset = codes.length - 1;offset > 0;offset--) {
+		//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
+		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];
 			
@@ -182,8 +182,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibCode[] codes = FibCode.values();
 		
-		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 
-		for(int offset = codes.length - 1;offset > 0;offset--) {
+		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
+		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 
