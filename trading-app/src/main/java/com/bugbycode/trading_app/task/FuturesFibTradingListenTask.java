@@ -37,11 +37,11 @@ public class FuturesFibTradingListenTask {
 	private KlinesService klinesService;
 	
 	/**
-	 * 查询k线信息 每五分钟执行一次
+	 * 查询k线信息 每十五分钟执行一次
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "4 0/5 * * * ?")
+	@Scheduled(cron = "4 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("FuturesFibTradingListenTask start.");
 		
@@ -59,15 +59,15 @@ public class FuturesFibTradingListenTask {
 				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 4 * 365, QUERY_SPLIT.NOT_ENDTIME);
 				
 				if(klinesList_365_x_day.isEmpty()) {
-					logger.info("无法获取" + pair + "交易对最近1年日线级别K线信息");
+					logger.info("无法获取" + pair + "交易对最近4年日线级别K线信息");
 					continue;
 				}
 				
-				//一部分5分钟级别k线信息
-				List<Klines> klinesList_hit = klinesService.continuousKlinesToday(pair, now, Inerval.INERVAL_5M, QUERY_SPLIT.NOT_ENDTIME);
+				//一部分15分钟级别k线信息
+				List<Klines> klinesList_hit = klinesService.continuousKlinesToday(pair, now, Inerval.INERVAL_15M, QUERY_SPLIT.NOT_ENDTIME);
 				
 				if(klinesList_hit.isEmpty()) {
-					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
+					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");
 					continue;
 				}
 				
