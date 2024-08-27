@@ -160,6 +160,15 @@ public class Klines {
 		}
 	}
 	
+	/**
+     * 判断是否为同一根k线
+     * @param klines0
+     * @return
+     */
+    public boolean isEequals(Klines klines0) {
+    	return klines0 != null && klines0.getStarTime() == this.getStarTime();
+    }
+	
 	@Override
 	public String toString() {
 		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s，价格波动幅度：%s%%", 
