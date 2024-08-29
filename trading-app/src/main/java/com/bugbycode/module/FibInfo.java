@@ -104,6 +104,10 @@ public class FibInfo {
 		return calculateFibonacciRetracement(low,high,code.getValue());
 	}
 	
+	public double getFibValue(double fibValue) {
+		return calculateFibonacciRetracement(low,high,fibValue);
+	}
+	
 	public int getDecimalPoint() {
 		return decimalPoint;
 	}
