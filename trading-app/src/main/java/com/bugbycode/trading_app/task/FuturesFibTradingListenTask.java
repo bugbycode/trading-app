@@ -19,6 +19,8 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.Result;
+import com.bugbycode.module.ResultCode;
 import com.bugbycode.service.KlinesService;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
@@ -81,18 +83,50 @@ public class FuturesFibTradingListenTask {
 					//比特币昨日最高最低价监控
 					double highPrice = lastDayKlines.getHighPrice();
 					double lowPrice = lastDayKlines.getLowPrice();
+					
+					String subject = "";
+					String text = "";
+					
 					if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
-						String subject = String.format("%s永续合约跌破昨日最低价%s并收回 %s", pair,lowPrice,DateFormatUtil.format(new Date()));
-						EmailUtil.send(subject, "");
+						
+						subject = String.format("%s永续合约跌破昨日最低价%s并收回 %s", pair,lowPrice,DateFormatUtil.format(new Date()));
+						
 					} else if(PriceUtil.isLong(highPrice, klinesList_hit)) {
-						String subject = String.format("%s永续合约突破昨日最高价%s %s", pair,lowPrice,DateFormatUtil.format(new Date()));
-						EmailUtil.send(subject, "");
+						
+						subject = String.format("%s永续合约突破昨日最高价%s %s", pair,lowPrice,DateFormatUtil.format(new Date()));
+						
 					} else if(PriceUtil.isShort(highPrice, klinesList_hit)) {
-						String subject = String.format("%s永续合约突破昨日最高价%s并收回 %s", pair,lowPrice,DateFormatUtil.format(new Date()));
-						EmailUtil.send(subject, "");
+						
+						subject = String.format("%s永续合约突破昨日最高价%s并收回 %s", pair,lowPrice,DateFormatUtil.format(new Date()));
+						
 					} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
-						String subject = String.format("%s永续合约跌破昨日最低价%s %s", pair,lowPrice,DateFormatUtil.format(new Date()));
-						EmailUtil.send(subject, "");
+						
+						subject = String.format("%s永续合约跌破昨日最低价%s %s", pair,lowPrice,DateFormatUtil.format(new Date()));
+						
+					}
+					
+					if(StringUtil.isNotEmpty(subject)) {
+						
+						logger.info("邮件主题：" + subject);
+						logger.info("邮件内容：" + text);
+						
+						Result<ResultCode, Exception> result = EmailUtil.send(subject, text);
+						
+						switch (result.getResult()) {
+						case ERROR:
+							
+							Exception ex = result.getErr();
+							
+							logger.info("邮件发送失败！失败原因：" + ex.getLocalizedMessage());
+							
+							break;
+							
+						default:
+							
+							logger.info("邮件发送成功！");
+							
+							break;
+						}
 					}
 				//}
 				
