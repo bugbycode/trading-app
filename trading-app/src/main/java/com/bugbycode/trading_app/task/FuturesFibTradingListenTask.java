@@ -20,6 +20,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.service.KlinesService;
+import com.util.DateFormatUtil;
 import com.util.EmailUtil;
 import com.util.PriceUtil;
 import com.util.StringUtil;
@@ -41,7 +42,7 @@ public class FuturesFibTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "4 0/15 * * * ?")
+	@Scheduled(cron = "6 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("FuturesFibTradingListenTask start.");
 		
@@ -70,6 +71,30 @@ public class FuturesFibTradingListenTask {
 					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");
 					continue;
 				}
+
+				int klinesSize = klinesList_365_x_day.size();
+				
+				//昨日K线信息
+				Klines lastDayKlines = klinesList_365_x_day.get(klinesSize - 1);
+				
+				//if("BTCUSDT".equals(pair)) {
+					//比特币昨日最高最低价监控
+					double highPrice = lastDayKlines.getHighPrice();
+					double lowPrice = lastDayKlines.getLowPrice();
+					if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
+						String subject = String.format("%s永续合约跌破昨日最低价%s并收回 %s", pair,lowPrice,DateFormatUtil.format(new Date()));
+						EmailUtil.send(subject, "");
+					} else if(PriceUtil.isLong(highPrice, klinesList_hit)) {
+						String subject = String.format("%s永续合约突破昨日最高价%s %s", pair,lowPrice,DateFormatUtil.format(new Date()));
+						EmailUtil.send(subject, "");
+					} else if(PriceUtil.isShort(highPrice, klinesList_hit)) {
+						String subject = String.format("%s永续合约突破昨日最高价%s并收回 %s", pair,lowPrice,DateFormatUtil.format(new Date()));
+						EmailUtil.send(subject, "");
+					} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
+						String subject = String.format("%s永续合约跌破昨日最低价%s %s", pair,lowPrice,DateFormatUtil.format(new Date()));
+						EmailUtil.send(subject, "");
+					}
+				//}
 				
 				FibKlinesData<List<Klines>,List<Klines>> fibKlinesData = PriceUtil.getFibKlinesData(klinesList_365_x_day);
 				
@@ -77,11 +102,6 @@ public class FuturesFibTradingListenTask {
 				List<Klines> lconicHighPriceList = fibKlinesData.getLconicHighPriceList();
 				//标志性低点K线信息
 				List<Klines> lconicLowPriceList = fibKlinesData.getLconicLowPriceList();
-				
-				int klinesSize = klinesList_365_x_day.size();
-				
-				//昨日K线信息
-				Klines lastDayKlines = klinesList_365_x_day.get(klinesSize - 1);
 				
 				//获取斐波那契回撤高点
 				Klines fibHightKlines = PriceUtil.getFibHightKlines(lconicHighPriceList,lastDayKlines);
