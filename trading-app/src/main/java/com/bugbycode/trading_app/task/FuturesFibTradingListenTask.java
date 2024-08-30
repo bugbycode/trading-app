@@ -66,8 +66,8 @@ public class FuturesFibTradingListenTask {
 					continue;
 				}
 				
-				//一部分15分钟级别k线信息
-				List<Klines> klinesList_hit = klinesService.continuousKlinesToday(pair, now, Inerval.INERVAL_15M, QUERY_SPLIT.NOT_ENDTIME);
+				//一部分15分钟级别k线信息 最近两天
+				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 192, QUERY_SPLIT.NOT_ENDTIME);
 				
 				if(klinesList_hit.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");

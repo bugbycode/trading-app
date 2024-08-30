@@ -3,6 +3,7 @@ package com.util;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +39,35 @@ public class PriceUtil {
 			}
 		}
 		return result;
+	}
+	
+	public static Klines getLastKlines(List<Klines> klinesList) {
+		Klines result = null;
+		
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(klinesList.size() - 1);
+		}
+		
+		return result;
+	}
+	
+	public static List<Klines> getTodayKlines(List<Klines> klinesList) {
+		
+		int size = klinesList.size();
+		int startIndex = 0;
+		int endIndex = size;
+		Date now = new Date();
+		Date todayStart = DateFormatUtil.getTodayStartTime(now);
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			for(int index = 0; index < size; index++) {
+				Klines tmp = klinesList.get(index);
+				if(tmp.getStarTime() >= todayStart.getTime()) {
+					startIndex = index;
+					break;
+				}
+			}
+		}
+		return klinesList.subList(startIndex, endIndex);
 	}
 	
 	public static Klines getMaxPriceKLine(List<Klines> klinesList) {

@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.FibCode;
@@ -125,9 +126,11 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void openLong(FibInfo fibInfo, Klines afterLowKlines, List<Klines> klinesList_hit) {
 		
-		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
+		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
-		Klines hitLowKlines = PriceUtil.getMinPriceKLine(klinesList_hit);
+		List<Klines> todayKlinesList = PriceUtil.getTodayKlines(klinesList_hit);
+		
+		Klines hitLowKlines = CollectionUtils.isEmpty(todayKlinesList) ? null : PriceUtil.getMinPriceKLine(todayKlinesList);
 		
 		//开盘、收盘、最低、最高价格
 		double closePrice = hitKline.getClosePrice();
@@ -173,9 +176,11 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
-		Klines hitKline = klinesList_hit.get(klinesList_hit.size() - 1);
+		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
+		
+		List<Klines> todayKlinesList = PriceUtil.getTodayKlines(klinesList_hit);
 
-		Klines hitHighKlines = PriceUtil.getMaxPriceKLine(klinesList_hit);
+		Klines hitHighKlines = CollectionUtils.isEmpty(todayKlinesList) ? null : PriceUtil.getMaxPriceKLine(todayKlinesList);
 		
 		//开盘、收盘、最低、最高价格
 		double closePrice = hitKline.getClosePrice();
@@ -244,25 +249,5 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 		}
 	}
-
-	@Override
-	public List<Klines> continuousKlinesToday(String pair, Date now, Inerval interval, QUERY_SPLIT split) {
-		List<Klines> result = null;
-		
-		try {
-			
-			Date startTime = DateFormatUtil.getTodayStartTime(now);
-			
-			Date endTime = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
-			
-			endTime = DateFormatUtil.getStartTimeBySetMillisecond(endTime, -1);//收盘时间
-			
-			result = continuousKlines(pair, startTime.getTime(), endTime.getTime(), interval.getDescption(), split);
-			
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		
-		return result;
-	}
+	
 }
