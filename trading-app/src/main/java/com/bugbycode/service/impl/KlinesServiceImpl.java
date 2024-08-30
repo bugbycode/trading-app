@@ -15,6 +15,7 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
+import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.service.KlinesService;
@@ -247,6 +248,59 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				break;
 			}
+		}
+	}
+
+	@Override
+	public void sendFib0Email(FibInfo fibInfo, List<Klines> klinesList_hit) {
+
+		String subject = "";
+		String text = "";
+		
+		Klines lastKlines = PriceUtil.getLastKlines(klinesList_hit);
+		
+		double fib0Price = fibInfo.getFibValue(FibCode.FIB0);
+		
+		QuotationMode qm = fibInfo.getQuotationMode();
+		
+		switch (qm) {
+		
+		case LONG:
+			
+			if(PriceUtil.isLong(fib0Price, klinesList_hit)) {
+				
+				subject = String.format("%s永续合约突破%s(%s)[%s] %s", lastKlines.getPair(), FibCode.FIB0.getDescription(),
+						fib0Price, fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
+				
+			} else if(PriceUtil.isShort(fib0Price, klinesList_hit)) {
+				
+				subject = String.format("%s永续合约突破%s(%s)[%s]并收回 %s", lastKlines.getPair(), FibCode.FIB0.getDescription(),
+						fib0Price, fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
+				
+			}
+			
+			break;
+
+		default:
+			
+			if(PriceUtil.isLong(fib0Price, klinesList_hit)) {
+				
+				subject = String.format("%s永续合约跌破%s(%s)[%s]并收回 %s", lastKlines.getPair(), FibCode.FIB0.getDescription(),
+						fib0Price, fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
+				
+			} else if(PriceUtil.isShort(fib0Price, klinesList_hit)) {
+				
+				subject = String.format("%s永续合约跌破%s(%s)[%s] %s", lastKlines.getPair(), FibCode.FIB0.getDescription(),
+						fib0Price, fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
+				
+			}
+			
+			break;
+			
+		}
+		
+		if(StringUtil.isNotEmpty(subject)) {
+			sendEmail(subject, text, fibInfo);
 		}
 	}
 	

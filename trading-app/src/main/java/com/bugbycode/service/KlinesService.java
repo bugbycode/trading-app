@@ -68,4 +68,12 @@ public interface KlinesService {
 	 */
 	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
+	
+	/**
+	 * 发送Fib0价格行为
+	 * @param fibInfo 斐波那契回撤信息
+	 * @param klinesList_hit 最近时间段内部分k线信息
+	 */
+	public void sendFib0Email(FibInfo fibInfo,List<Klines> klinesList_hit);
+	
 }
