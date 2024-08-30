@@ -163,7 +163,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			}
 			
-			if(code.getValue() == fibInfo.startFibCode(pair).getValue()) {
+			if(code.getValue() == fibInfo.getLevel().getStartFibCode().getValue()) {
 				break;
 			}
 			
@@ -211,7 +211,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			}
 			
-			if(code.getValue() == fibInfo.startFibCode(pair).getValue()) {
+			if(code.getValue() == fibInfo.getLevel().getStartFibCode().getValue()) {
 				break;
 			}
 		}

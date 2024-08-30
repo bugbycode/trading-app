@@ -5,17 +5,20 @@ package com.bugbycode.module;
  */
 public enum FibLevel {
 
-	LEVEL_1(1,"Lv1"),
-	LEVEL_2(1,"Lv2"),
-	LEVEL_3(1,"Lv3");
+	LEVEL_1(1,"Lv1",FibCode.FIB5),
+	LEVEL_2(1,"Lv2",FibCode.FIB5),
+	LEVEL_3(1,"Lv3",FibCode.FIB618);
 
 	private int value;
 	
 	private String label;
 	
-	FibLevel(int value, String label) {
+	private FibCode startFibCode;
+	
+	FibLevel(int value, String label,FibCode startFibCode) {
 		this.value = value;
 		this.label = label;
+		this.startFibCode = startFibCode;
 	}
 
 	public int getValue() {
@@ -25,6 +28,9 @@ public enum FibLevel {
 	public String getLabel() {
 		return label;
 	}
-	
+
+	public FibCode getStartFibCode() {
+		return startFibCode;
+	}
 	
 }

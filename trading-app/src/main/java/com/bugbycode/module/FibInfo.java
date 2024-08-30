@@ -54,26 +54,6 @@ public class FibInfo {
 	}
 	
 	/**
-	 * 获取可建仓的回撤起点 例如：该值为0.5， 则为0.5 0.618 0.66 0.786 1分别判断是否满足建仓条件
-	 * @param pair
-	 * @return
-	 */
-	public FibCode startFibCode(String pair) {
-		
-		FibCode startFibCode = FibCode.FIB1;
-		
-		CoinPairs[] coinArr = CoinPairs.values();
-		
-		for(CoinPairs coin : coinArr) {
-			if(pair.equals(coin.getPair())) {
-				startFibCode = coin.getStartFibCode();
-			}
-		}
-		
-		return startFibCode;
-	}
-	
-	/**
 	 * 
 	 * @param kline1 最低价k线
 	 * @param kline2 最高价k线
