@@ -40,15 +40,17 @@ public class FuturesFibTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "6 0/15 * * * ?")
+	@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("FuturesFibTradingListenTask start.");
 		
 		Date now = new Date();
 		
+		String[] pairs = {"BTCUSDT","ETHUSDT"};
+		
 		try {
 			
-			for(String pair : AppConfig.PAIRS) {
+			for(String pair : pairs) {
 				pair = pair.trim();
 				if(StringUtil.isEmpty(pair)) {
 					continue;
@@ -208,7 +210,7 @@ public class FuturesFibTradingListenTask {
 			e.printStackTrace();
 			EmailUtil.send("程序运行出现异常", e.getLocalizedMessage());
 		} finally {
-			logger.info("LconicHighAndLowPricesListenTask finish.");
+			logger.info("FuturesFibTradingListenTask finish.");
 		}
 	}
 }
