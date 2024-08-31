@@ -41,7 +41,7 @@ public class FuturesLastDayTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "10 0/5 * * * ?")
+	@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FuturesLastDayTradingListenTask start.");
@@ -83,9 +83,9 @@ public class FuturesLastDayTradingListenTask {
 				lconicHighPriceList.sort(kc);
 				lconicLowPriceList.sort(kc);
 				
-				List<Klines> klinesList_hit = klinesService.continuousKlines5M(pair, now, 5, QUERY_SPLIT.NOT_ENDTIME);
+				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 5, QUERY_SPLIT.NOT_ENDTIME);
 				if(klinesList_hit.isEmpty()) {
-					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
+					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");
 					continue;
 				}
 				
@@ -110,7 +110,7 @@ public class FuturesLastDayTradingListenTask {
 								PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
 					} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
 						
-						subject = String.format("%s永续合约跌破昨%s %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
+						subject = String.format("%s永续合约跌破%s %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
 						
 						text = String.format("%s永续合约跌破(%s)最低价(%s)", pair, 
 								DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
