@@ -70,6 +70,29 @@ public class PriceUtil {
 		return klinesList.subList(startIndex, endIndex);
 	}
 	
+	public static List<Klines> getLastDayKlines(List<Klines> klinesList){
+		int size = klinesList.size();
+		int startIndex = 0;
+		int endIndex = 0;
+		Date now = new Date();
+		Date todayStart = DateFormatUtil.getTodayStartTime(now);
+		Date lastDayStart = DateFormatUtil.getStartTimeBySetDay(todayStart, -1);
+		
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			for(int index = 0; index < size; index++) {
+				Klines tmp = klinesList.get(index);
+				if(tmp.getStarTime() == todayStart.getTime()) {
+					endIndex = index;
+				}
+				
+				if(tmp.getStarTime() == lastDayStart.getTime()) {
+					startIndex = index;
+				}
+			}
+		}
+		return klinesList.subList(startIndex, endIndex);
+	}
+	
 	public static Klines getMaxPriceKLine(List<Klines> klinesList) {
 		Klines result = klinesList.get(0);
 		for(int index = 1;index < klinesList.size();index++) {
