@@ -832,4 +832,128 @@ public class PriceUtil {
     	return flag;
     }
     
+    /**
+     * 截取某段K线数据
+     * @param startKlines 起始K线
+     * @param endKlines 结束K线
+     * @param list 要截取的K线集合
+     * @return 从startKlines~endKlines的所有K线
+     */
+    public static List<Klines> subList(Klines startKlines,Klines endKlines,List<Klines> list){
+    	int startIndex = -1;
+    	int endIndex = -1;
+    	for(int index = 0;index < list.size(); index++) {
+    		Klines tmp = list.get(index);
+    		if(startKlines.getStarTime() == tmp.getStarTime()) {
+    			startIndex = index;
+    		}
+    		if(endKlines.getStarTime() == tmp.getStarTime()) {
+    			endIndex = index + 1;
+    		}
+    		
+    		if(!(startIndex == -1 || endIndex == -1)) {
+    			break;
+    		}
+    	}
+    	
+    	if(startIndex == -1 || endIndex == -1) {
+    		startIndex = 0;
+    		endIndex = 0;
+    	}
+    	return list.subList(startIndex, endIndex);
+    }
+    
+    /**
+     * 截取某段K线数据
+     * @param startKlines 起始K线
+     * @param list 要截取的K线集合
+     * @return 从startKlines开始的所有K线
+     */
+    public static List<Klines> subList(Klines startKlines,List<Klines> list){
+    	
+    	return subList(startKlines, getLastKlines(list), list);
+    	
+    }
+    
+    /**
+     * 检查是否还有更高的k线
+     * @param klines 条件k线
+     * @param list 匹配的集合
+     * @return true为真 false为假
+     */
+    public static boolean checkHigherKlines(Klines klines,List<Klines> list) {
+    	
+    	boolean result = false;
+    	
+    	for(Klines tmp : list) {
+    		if(tmp.getStarTime() == klines.getStarTime()) {
+    			continue;
+    		}
+    		if(tmp.getHighPrice() > klines.getHighPrice()) {
+    			result = true;
+    			break;
+    		}
+    	}
+    	return result;
+    }
+    
+    /**
+     * 检查是否还有更低的k线
+     * @param klines 条件k线
+     * @param list 匹配的集合
+     * @return true为真 false为假
+     */
+    public static boolean checkLowerKlines(Klines klines,List<Klines> list) {
+    	
+    	boolean result = false;
+    	
+    	for(Klines tmp : list) {
+    		if(tmp.getStarTime() == klines.getStarTime()) {
+    			continue;
+    		}
+    		if(tmp.getLowPrice() < klines.getLowPrice()) {
+    			result = true;
+    			break;
+    		}
+    	}
+    	return result;
+    }
+    
+    /**
+     * 获取命中的高点k线信息
+     * @param list 标志性高点K线信息
+     * @param hitKlines
+     * @return
+     */
+    public static Klines getPositionHighKlines(List<Klines> list,List<Klines> klinesList_hit) {
+    	Klines result = null;
+    	for(Klines k : list) {
+    		double highPrice = k.getHighPrice();
+    		if((isLong(highPrice, klinesList_hit) || isShort(highPrice, klinesList_hit)) 
+    				&& !checkHigherKlines(k, subList(k, list))) {
+    			result = k;
+    			break;
+    		}
+    	}
+    	return result;
+    }
+    
+    /**
+     * 获取命中的低点k线信息
+     * @param list 标志性低点K线信息
+     * @param hitKlines 
+     * @return
+     */
+    public static Klines getPositionLowKlines(List<Klines> list,List<Klines> klinesList_hit) {
+    	Klines result = null;
+    	for(Klines k : list) {
+    		double lowPrice = k.getLowPrice();
+    		if((isLong(lowPrice, klinesList_hit) || isShort(lowPrice, klinesList_hit)) 
+    				&& !checkLowerKlines(k, subList(k, list))) {
+    			result = k;
+    			break;
+    		}
+    	}
+    	return result;
+    }
 }

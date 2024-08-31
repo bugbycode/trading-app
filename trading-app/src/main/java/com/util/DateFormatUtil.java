@@ -15,6 +15,8 @@ public class DateFormatUtil {
 	
 	private static SimpleDateFormat sdf_yyyy_mm_dd_HH_mm_00 = new SimpleDateFormat("yyyy-MM-dd HH:mm:00");
 	
+	private static SimpleDateFormat sdf_yyyy_mm_dd = new SimpleDateFormat("yyyy-MM-dd");
+	
 	public static String format(long time) {
 		return format(new Date(time));
 	}
@@ -28,6 +30,10 @@ public class DateFormatUtil {
 	
 	public static String format(Date date) {
 		return sdf.format(date);
+	}
+	
+	public static String format_yyyy_mm_dd(Date date) {
+		return sdf_yyyy_mm_dd.format(date);
 	}
 	
 	public static String format_yyyy_mm_dd_08_00_00(Date date) {

@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.ObjectUtils;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.Result;
@@ -18,6 +20,7 @@ import com.bugbycode.module.ResultCode;
 import com.bugbycode.service.KlinesService;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
+import com.util.KlinesComparator;
 import com.util.PriceUtil;
 import com.util.StringUtil;
 
@@ -43,6 +46,8 @@ public class FuturesLastDayTradingListenTask {
 		
 		logger.info("FuturesLastDayTradingListenTask start.");
 		
+		KlinesComparator kc = new KlinesComparator();
+		
 		Date now = new Date();
 		
 		try {
@@ -53,54 +58,86 @@ public class FuturesLastDayTradingListenTask {
 					continue;
 				}
 				
-				//一部分15分钟级别k线信息 最近两天
-				//List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 192, QUERY_SPLIT.NOT_ENDTIME);
-				List<Klines> klinesList_hit = klinesService.continuousKlines5M(pair, now, 577, QUERY_SPLIT.NOT_ENDTIME);
+				//近1年日线级别k线信息
+				List<Klines> klinesList_365_x_day = klinesService.continuousKlines1Day(pair, now, 4 * 365, QUERY_SPLIT.NOT_ENDTIME);
+				
+				if(klinesList_365_x_day.isEmpty()) {
+					logger.info("无法获取" + pair + "交易对最近4年日线级别K线信息");
+					return;
+				}
+				
+				FibKlinesData<List<Klines>,List<Klines>> fibKlinesData = PriceUtil.getFibKlinesData(klinesList_365_x_day);
+				
+				//标志性高点K线信息
+				List<Klines> lconicHighPriceList = fibKlinesData.getLconicHighPriceList();
+				//标志性低点K线信息
+				List<Klines> lconicLowPriceList = fibKlinesData.getLconicLowPriceList();
+				
+				//昨日K线信息
+				Klines lastDayKlines = PriceUtil.getLastKlines(klinesList_365_x_day);
+				
+				lconicHighPriceList.add(lastDayKlines);
+				lconicLowPriceList.add(lastDayKlines);
+				
+				//排序 按开盘时间升序 从旧到新
+				lconicHighPriceList.sort(kc);
+				lconicLowPriceList.sort(kc);
+				
+				List<Klines> klinesList_hit = klinesService.continuousKlines5M(pair, now, 5, QUERY_SPLIT.NOT_ENDTIME);
 				if(klinesList_hit.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
 					continue;
 				}
 				
-				List<Klines> lastDayKlinesList = PriceUtil.getLastDayKlines(klinesList_hit);
-				
-				if(lastDayKlinesList.isEmpty()) {
-					logger.info("无法获取昨日" + pair + "交易对5分钟级别K线信息");
-					continue;
-				}
-				
-				Klines newStartKlines = lastDayKlinesList.get(0);
-				Klines newEndKlines = PriceUtil.getLastKlines(lastDayKlinesList);
-				
-				Klines highPriceKlines = PriceUtil.getMaxPriceKLine(lastDayKlinesList);
-				Klines lowPriceKlines = PriceUtil.getMinPriceKLine(lastDayKlinesList);
-				
-				double highPrice = highPriceKlines.getHighPrice();
-				double lowPrice = lowPriceKlines.getLowPrice();
-				
-				Klines lastDayKlines = new Klines(pair, newStartKlines.getStarTime(), 
-						newStartKlines.getOpenPrice(), highPrice, lowPrice, newEndKlines.getClosePrice(), 
-						newEndKlines.getEndTime(), newEndKlines.getDecimalNum());
-				
-				String subject = "";
-				String text = lastDayKlines.toString();
+				Klines hitLowKlines = PriceUtil.getPositionLowKlines(lconicLowPriceList, klinesList_hit);
+				Klines hitHighKlines = PriceUtil.getPositionHighKlines(lconicHighPriceList, klinesList_hit);
 				
 				String dateStr = DateFormatUtil.format(new Date());
 				
-				if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
+				String subject = "";
+				String text = "";
+				
+				if(!ObjectUtils.isEmpty(hitLowKlines)) {
 					
-					subject = String.format("%s永续合约跌破昨日最低价%s并收回 %s", pair,lowPrice,dateStr);
+					double lowPrice = hitLowKlines.getLowPrice();
 					
-				} else if(PriceUtil.isLong(highPrice, klinesList_hit)) {
+					if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
+						
+						subject = String.format("%s永续合约跌破%s并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
+						
+						text = String.format("%s永续合约跌破%s最低价%s并收回", pair, 
+								DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
+								PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
+					} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
+						
+						subject = String.format("%s永续合约跌破昨%s %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
+						
+						text = String.format("%s永续合约跌破%s最低价%s", pair, 
+								DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
+								PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
+					}
+				
+				} else if(!ObjectUtils.isEmpty(hitHighKlines)) {
 					
-					subject = String.format("%s永续合约突破昨日最高价%s %s", pair,highPrice,dateStr);
+					double highPrice = hitHighKlines.getHighPrice();
 					
-				} else if(PriceUtil.isShort(highPrice, klinesList_hit)) {
-					
-					subject = String.format("%s永续合约突破昨日最高价%s并收回 %s", pair,highPrice,dateStr);
-					
-				} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
-					
-					subject = String.format("%s永续合约跌破昨日最低价%s %s", pair,lowPrice,dateStr);
+					if(PriceUtil.isLong(highPrice, klinesList_hit)) {
+						
+						subject = String.format("%s永续合约突破%s %s", pair,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
+						
+						text = String.format("%s永续合约突破%s最高价%s", pair, 
+								DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStarTime())), 
+								PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()));
+						
+					} else if(PriceUtil.isShort(highPrice, klinesList_hit)) {
+						
+						subject = String.format("%s永续合约突破%s并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
+						
+						text = String.format("%s永续合约突破%s最高价%s并收回", pair,
+								DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStarTime())), 
+								PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()));
+						
+					}
 					
 				}
 				
