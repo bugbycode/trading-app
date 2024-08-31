@@ -270,12 +270,12 @@ public class KlinesServiceImpl implements KlinesService {
 			if(PriceUtil.isLong(fib0Price, klinesList_hit)) {
 				
 				subject = String.format("%s永续合约突破%s(%s)[%s] %s", lastKlines.getPair(), FibCode.FIB0.getDescription(),
-						fib0Price, fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
+						PriceUtil.formatDoubleDecimal(fib0Price,fibInfo.getDecimalPoint()), fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
 				
 			} else if(PriceUtil.isShort(fib0Price, klinesList_hit)) {
 				
 				subject = String.format("%s永续合约突破%s(%s)[%s]并收回 %s", lastKlines.getPair(), FibCode.FIB0.getDescription(),
-						fib0Price, fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
+						PriceUtil.formatDoubleDecimal(fib0Price,fibInfo.getDecimalPoint()), fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
 				
 			}
 			
@@ -286,12 +286,12 @@ public class KlinesServiceImpl implements KlinesService {
 			if(PriceUtil.isLong(fib0Price, klinesList_hit)) {
 				
 				subject = String.format("%s永续合约跌破%s(%s)[%s]并收回 %s", lastKlines.getPair(), FibCode.FIB0.getDescription(),
-						fib0Price, fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
+						PriceUtil.formatDoubleDecimal(fib0Price,fibInfo.getDecimalPoint()), fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
 				
 			} else if(PriceUtil.isShort(fib0Price, klinesList_hit)) {
 				
 				subject = String.format("%s永续合约跌破%s(%s)[%s] %s", lastKlines.getPair(), FibCode.FIB0.getDescription(),
-						fib0Price, fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
+						PriceUtil.formatDoubleDecimal(fib0Price,fibInfo.getDecimalPoint()), fibInfo.getLevel().getLabel(), DateFormatUtil.format(new Date()));
 				
 			}
 			
