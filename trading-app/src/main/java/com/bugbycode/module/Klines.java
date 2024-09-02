@@ -165,7 +165,7 @@ public class Klines {
      * @param klines0
      * @return
      */
-    public boolean isEequals(Klines klines0) {
+    public boolean isEquals(Klines klines0) {
     	return klines0 != null && klines0.getStarTime() == this.getStarTime();
     }
 	
