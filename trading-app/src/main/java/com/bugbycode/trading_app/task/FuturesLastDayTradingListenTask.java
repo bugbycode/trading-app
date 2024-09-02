@@ -37,11 +37,11 @@ public class FuturesLastDayTradingListenTask {
 	private KlinesService klinesService;
 	
 	/**
-	 * 查询k线信息 每十五分钟执行一次
+	 * 查询k线信息 每五分钟执行一次
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/15 * * * ?")
+	@Scheduled(cron = "5 0/5 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FuturesLastDayTradingListenTask start.");
@@ -83,9 +83,9 @@ public class FuturesLastDayTradingListenTask {
 				lconicHighPriceList.sort(kc);
 				lconicLowPriceList.sort(kc);
 				
-				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 5, QUERY_SPLIT.NOT_ENDTIME);
+				List<Klines> klinesList_hit = klinesService.continuousKlines5M(pair, now, 2, QUERY_SPLIT.NOT_ENDTIME);
 				if(klinesList_hit.isEmpty()) {
-					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");
+					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
 					continue;
 				}
 				
@@ -97,20 +97,26 @@ public class FuturesLastDayTradingListenTask {
 				String subject = "";
 				String text = "";
 				
+				String lastDayStr = "";
+				
 				if(!ObjectUtils.isEmpty(hitLowKlines)) {
 					
 					double lowPrice = hitLowKlines.getLowPrice();
 					
+					if(lastDayKlines.isEquals(hitLowKlines)) {
+						lastDayStr = "昨日最低价";
+					}
+					
 					if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
 						
-						subject = String.format("%s永续合约跌破%s并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
+						subject = String.format("%s永续合约跌破%s(%s)并收回 %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
 						
 						text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
 								DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
 								PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
 					} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
 						
-						subject = String.format("%s永续合约跌破%s %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
+						subject = String.format("%s永续合约跌破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
 						
 						text = String.format("%s永续合约跌破(%s)最低价(%s)", pair, 
 								DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
@@ -119,11 +125,15 @@ public class FuturesLastDayTradingListenTask {
 				
 				} else if(!ObjectUtils.isEmpty(hitHighKlines)) {
 					
+					if(lastDayKlines.isEquals(hitHighKlines)) {
+						lastDayStr = "昨日最高价";
+					}
+					
 					double highPrice = hitHighKlines.getHighPrice();
 					
 					if(PriceUtil.isLong(highPrice, klinesList_hit)) {
 						
-						subject = String.format("%s永续合约突破%s %s", pair,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
+						subject = String.format("%s永续合约突破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
 						
 						text = String.format("%s永续合约突破(%s)最高价(%s)", pair, 
 								DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStarTime())), 
@@ -131,7 +141,7 @@ public class FuturesLastDayTradingListenTask {
 						
 					} else if(PriceUtil.isShort(highPrice, klinesList_hit)) {
 						
-						subject = String.format("%s永续合约突破%s并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
+						subject = String.format("%s永续合约突破%s(%s)并收回 %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
 						
 						text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair,
 								DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStarTime())), 
