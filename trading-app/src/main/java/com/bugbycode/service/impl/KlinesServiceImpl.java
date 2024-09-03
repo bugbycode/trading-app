@@ -6,8 +6,11 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.FibCode;
@@ -31,6 +34,9 @@ public class KlinesServiceImpl implements KlinesService {
 
 	private final Logger logger = LogManager.getLogger(KlinesServiceImpl.class);
 
+	@Autowired
+	private RestTemplate restTemplate;
+	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
 			String interval,QUERY_SPLIT split) {
@@ -43,23 +49,29 @@ public class KlinesServiceImpl implements KlinesService {
 		//缓存不存在或者不是最新数据
 		if(list.isEmpty() || list.get(list.size() - 1).getEndTime() < endTime) {
 			
-			String command = null;
+			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
+	                .queryParam("pair", pair)
+	                .queryParam("contractType", "PERPETUAL")
+	                .queryParam("startTime", startTime)
+	                .queryParam("interval", interval)
+	                .queryParam("limit", 1500);
 			
 			switch (split) {
-			case ALL:
-				command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s"
-						+ "&interval=%s&limit=1500' %s/fapi/v1/continuousKlines", pair, startTime, interval, AppConfig.REST_BASE_URL);
+			case NOT_ENDTIME:
+				
+				uriBuilder.queryParam("endTime", endTime);
+				
 				break;
 
 			default:
-				command = String.format("curl -G -d 'pair=%s&contractType=PERPETUAL&startTime=%s&endTime=%s"
-						+ "&interval=%s&limit=1500' %s/fapi/v1/continuousKlines", pair, startTime, endTime, interval, AppConfig.REST_BASE_URL);
 				break;
 			}
 			
-			logger.debug(command);
+			String url = uriBuilder.toUriString();
 			
-			String result = CommandUtil.run(command);
+			logger.debug(url);
+			
+			String result = restTemplate.getForObject(url, String.class);
 			
 			list = CommandUtil.format(pair, result);
 			
