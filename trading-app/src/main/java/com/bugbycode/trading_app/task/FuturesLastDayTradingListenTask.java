@@ -37,11 +37,11 @@ public class FuturesLastDayTradingListenTask {
 	private KlinesService klinesService;
 	
 	/**
-	 * 查询k线信息 每五分钟执行一次
+	 * 查询k线信息 每15分钟执行一次
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/5 * * * ?")
+	@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FuturesLastDayTradingListenTask start.");
@@ -74,18 +74,18 @@ public class FuturesLastDayTradingListenTask {
 				List<Klines> lconicLowPriceList = fibKlinesData.getLconicLowPriceList();
 				
 				//昨日K线信息
-				Klines lastDayKlines = PriceUtil.getLastKlines(klinesList_365_x_day);
-				
+				//Klines lastDayKlines = PriceUtil.getLastKlines(klinesList_365_x_day);
+				/*
 				lconicHighPriceList.add(lastDayKlines);
 				lconicLowPriceList.add(lastDayKlines);
-				
+				*/
 				//排序 按开盘时间升序 从旧到新
 				lconicHighPriceList.sort(kc);
 				lconicLowPriceList.sort(kc);
 				
-				List<Klines> klinesList_hit = klinesService.continuousKlines5M(pair, now, 2, QUERY_SPLIT.NOT_ENDTIME);
+				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 2, QUERY_SPLIT.NOT_ENDTIME);
 				if(klinesList_hit.isEmpty()) {
-					logger.info("无法获取" + pair + "交易对最近5分钟级别K线信息");
+					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");
 					continue;
 				}
 				
@@ -102,10 +102,10 @@ public class FuturesLastDayTradingListenTask {
 				if(!ObjectUtils.isEmpty(hitLowKlines)) {
 					
 					double lowPrice = hitLowKlines.getLowPrice();
-					
+					/*
 					if(lastDayKlines.isEquals(hitLowKlines)) {
 						lastDayStr = "昨日最低价";
-					}
+					}*/
 					
 					if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
 						
@@ -124,10 +124,10 @@ public class FuturesLastDayTradingListenTask {
 					}
 				
 				} else if(!ObjectUtils.isEmpty(hitHighKlines)) {
-					
+					/*
 					if(lastDayKlines.isEquals(hitHighKlines)) {
 						lastDayStr = "昨日最高价";
-					}
+					}*/
 					
 					double highPrice = hitHighKlines.getHighPrice();
 					
