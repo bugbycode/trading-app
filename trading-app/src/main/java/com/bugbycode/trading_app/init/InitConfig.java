@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -12,6 +15,9 @@ import org.springframework.stereotype.Component;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.EmailAuth;
+import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoint;
+import com.bugbycode.websocket.realtime.handler.MessageHandler;
+import com.util.CoinPairSet;
 import com.util.StringUtil;
 
 @Component
@@ -20,6 +26,9 @@ public class InitConfig implements ApplicationRunner {
 
 	@Value("${binance.baseUrl.rest}")
 	private String restBaseUrl;
+	
+	@Value("${binance.baseUrl.websocket}")
+	private String websocketBaseUrl; 
 	
 	@Value("${binance.pair}")
 	private Set<String> pair;
@@ -39,9 +48,13 @@ public class InitConfig implements ApplicationRunner {
 	@Value("${email.recipient}")
 	private Set<String> recipient;//收件人
 	
+	@Autowired
+	private MessageHandler messageHandler;
+	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		AppConfig.REST_BASE_URL = restBaseUrl;
+		AppConfig.WEBSOCKET_URL = websocketBaseUrl;
 		AppConfig.PAIRS = pair;
 		AppConfig.SMTP_HOST = smtpHost;
 		AppConfig.SMTP_PORT = smtpPort;
@@ -59,6 +72,15 @@ public class InitConfig implements ApplicationRunner {
 		}
 		
 		AppConfig.setEmailAuth(emailAuthList);
+		/*
+		CoinPairSet set = new CoinPairSet();
+		for(String coin : pair) {
+			if(set.isFull()) {
+				new PerpetualWebSocketClientEndpoint(set.getStreamName(), messageHandler);
+				set.clear();
+			}
+			set.add(coin);
+		}*/
 	}
 
 }

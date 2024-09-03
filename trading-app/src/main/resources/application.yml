@@ -12,6 +12,7 @@ email:
 binance: 
   baseUrl: 
     rest: https://fapi.binance.com
+    websocket: wss://fstream.binancefuture.com
   pair: |
     BTCUSDT,ETHUSDT,DOGEUSDT,BNBUSDT,SOLUSDT,LINKUSDT,ZKUSDT,1000PEPEUSDT,ENSUSDT,
     XRPUSDT,LTCUSDT,BCHUSDT,FILUSDT,ZECUSDT,ADAUSDT,ETHFIUSDT,TONUSDT,1000BONKUSDT,

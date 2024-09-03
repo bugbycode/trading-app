@@ -9,6 +9,8 @@ public class AppConfig {
 	
 	public static String REST_BASE_URL;
 	
+	public static String WEBSOCKET_URL;
+	
 	public static Set<String> PAIRS;
 	
 	private static List<EmailAuth> EMAIL_AUTH;//邮件认证信息
