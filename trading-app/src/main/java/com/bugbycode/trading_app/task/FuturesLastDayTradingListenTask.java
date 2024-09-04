@@ -74,11 +74,11 @@ public class FuturesLastDayTradingListenTask {
 				List<Klines> lconicLowPriceList = fibKlinesData.getLconicLowPriceList();
 				
 				//昨日K线信息
-				//Klines lastDayKlines = PriceUtil.getLastKlines(klinesList_365_x_day);
-				/*
+				Klines lastDayKlines = PriceUtil.getLastKlines(klinesList_365_x_day);
+				
 				lconicHighPriceList.add(lastDayKlines);
 				lconicLowPriceList.add(lastDayKlines);
-				*/
+				
 				//排序 按开盘时间升序 从旧到新
 				lconicHighPriceList.sort(kc);
 				lconicLowPriceList.sort(kc);
@@ -102,10 +102,10 @@ public class FuturesLastDayTradingListenTask {
 				if(!ObjectUtils.isEmpty(hitLowKlines)) {
 					
 					double lowPrice = hitLowKlines.getLowPrice();
-					/*
+					
 					if(lastDayKlines.isEquals(hitLowKlines)) {
 						lastDayStr = "昨日最低价";
-					}*/
+					}
 					
 					if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
 						
@@ -124,10 +124,10 @@ public class FuturesLastDayTradingListenTask {
 					}
 				
 				} else if(!ObjectUtils.isEmpty(hitHighKlines)) {
-					/*
+					
 					if(lastDayKlines.isEquals(hitHighKlines)) {
 						lastDayStr = "昨日最高价";
-					}*/
+					}
 					
 					double highPrice = hitHighKlines.getHighPrice();
 					
