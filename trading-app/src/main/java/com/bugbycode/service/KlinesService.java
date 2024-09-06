@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.bugbycode.module.FibInfo;
-import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 
@@ -75,5 +74,21 @@ public interface KlinesService {
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
 	public void sendFib0Email(FibInfo fibInfo,List<Klines> klinesList_hit);
+	
+	/**
+	 * 标志性高低点价格监控
+	 * 
+	 * @param klinesList
+	 * @param klinesList_hit
+	 */
+	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
+	
+	/**
+	 * 日线级别斐波那契回撤点位监控
+	 * 
+	 * @param klinesList
+	 * @param klinesList_hit
+	 */
+	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 }
