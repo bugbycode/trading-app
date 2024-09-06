@@ -335,8 +335,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String pair = lastDayKlines.getPair();
 		
-		lconicHighPriceList.add(lastDayKlines);
-		lconicLowPriceList.add(lastDayKlines);
+		//lconicHighPriceList.add(lastDayKlines);
+		//lconicLowPriceList.add(lastDayKlines);
 		
 		//排序 按开盘时间升序 从旧到新
 		lconicHighPriceList.sort(kc);
