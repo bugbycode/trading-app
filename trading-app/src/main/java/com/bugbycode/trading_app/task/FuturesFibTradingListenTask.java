@@ -27,8 +27,8 @@ import com.util.StringUtil;
 /**
  * 永续合约日线级别斐波那契回撤交易监听计划任务
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FuturesFibTradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesFibTradingListenTask.class);
@@ -41,7 +41,7 @@ public class FuturesFibTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/15 * * * ?")
+	//@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("FuturesFibTradingListenTask start.");
 		
@@ -75,13 +75,6 @@ public class FuturesFibTradingListenTask {
 
 				//斐波那契回撤点位监控
 				klinesService.futuresFibMonitor(klinesList_365_x_day, klinesList_hit);
-				
-				//标志性高低点监控
-				//============================================================================================================
-				
-				klinesService.futuresHighOrLowMonitor(klinesList_365_x_day, klinesList_hit);
-				
-				//============================================================================================================
 				
 			}
 			
