@@ -145,17 +145,29 @@ public class FibInfo {
 		formatBuf.append(this.getQuotationMode().getLabel());
 		formatBuf.append("]: ");
 		
+		StringBuffer extensionBuffer = new StringBuffer();
+		
 		for(int offset = 0;offset < len;offset++) {
 			FibCode code = codes[offset];
-			if(offset > 0) {
-				formatBuf.append(", ");
+			
+			if(code.getValue() > 1) {
+				if(extensionBuffer.length() > 0) {
+					extensionBuffer.append(", ");
+					extensionBuffer.append(code.getDescription());
+					extensionBuffer.append("(%s)");
+					arr[offset] = PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint);
+				}
+			} else {
+				if(formatBuf.length() > 0) {
+					formatBuf.append(", ");
+				}
+				formatBuf.append(code.getDescription());
+				formatBuf.append("(%s)");
+				arr[offset] = PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint);
 			}
-			formatBuf.append(code.getDescription());
-			formatBuf.append("(%s)");
-			arr[offset] = PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint);
 		}
 		
-		return String.format(formatBuf.toString(), arr);
+		return String.format(formatBuf.toString(), arr) + "\nExtension: " + extensionBuffer.toString();
 	}
     
     

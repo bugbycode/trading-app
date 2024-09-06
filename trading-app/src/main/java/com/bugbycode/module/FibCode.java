@@ -5,6 +5,10 @@ package com.bugbycode.module;
  */
 public enum FibCode {
 	
+	FIB1_618(1.618,"1.618"),
+	FIB1_414(1.414,"1.414"),
+	FIB1_272(1.272,"1.272"),
+	
 	FIB1(1,"1"),
 	FIB786(0.786,"0.786"),
 	FIB66(0.66,"0.66"),
