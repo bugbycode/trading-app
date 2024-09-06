@@ -9,26 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.util.ObjectUtils;
 
 import com.bugbycode.config.AppConfig;
-import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
-import com.bugbycode.module.Result;
-import com.bugbycode.module.ResultCode;
 import com.bugbycode.service.KlinesService;
-import com.util.DateFormatUtil;
 import com.util.EmailUtil;
-import com.util.KlinesComparator;
-import com.util.PriceUtil;
 import com.util.StringUtil;
 
 /**
  * 昨日最高价和最低价监控
  */
-//@Configuration
-//@EnableScheduling
+@Configuration
+@EnableScheduling
 public class FuturesLastDayTradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesLastDayTradingListenTask.class);
@@ -41,12 +34,10 @@ public class FuturesLastDayTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	//@Scheduled(cron = "5 0/15 * * * ?")
+	@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FuturesLastDayTradingListenTask start.");
-		
-		KlinesComparator kc = new KlinesComparator();
 		
 		Date now = new Date();
 		
@@ -66,116 +57,13 @@ public class FuturesLastDayTradingListenTask {
 					return;
 				}
 				
-				FibKlinesData<List<Klines>,List<Klines>> fibKlinesData = PriceUtil.getFibKlinesData(klinesList_365_x_day);
-				
-				//标志性高点K线信息
-				List<Klines> lconicHighPriceList = fibKlinesData.getLconicHighPriceList();
-				//标志性低点K线信息
-				List<Klines> lconicLowPriceList = fibKlinesData.getLconicLowPriceList();
-				
-				//昨日K线信息
-				Klines lastDayKlines = PriceUtil.getLastKlines(klinesList_365_x_day);
-				
-				lconicHighPriceList.add(lastDayKlines);
-				lconicLowPriceList.add(lastDayKlines);
-				
-				//排序 按开盘时间升序 从旧到新
-				lconicHighPriceList.sort(kc);
-				lconicLowPriceList.sort(kc);
-				
 				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 1, QUERY_SPLIT.NOT_ENDTIME);
 				if(klinesList_hit.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");
 					continue;
 				}
 				
-				Klines hitLowKlines = PriceUtil.getPositionLowKlines(lconicLowPriceList, klinesList_hit);
-				Klines hitHighKlines = PriceUtil.getPositionHighKlines(lconicHighPriceList, klinesList_hit);
-				
-				String dateStr = DateFormatUtil.format(new Date());
-				
-				String subject = "";
-				String text = "";
-				
-				String lastDayStr = "";
-				
-				if(!ObjectUtils.isEmpty(hitLowKlines)) {
-					
-					double lowPrice = hitLowKlines.getLowPrice();
-					
-					if(lastDayKlines.isEquals(hitLowKlines)) {
-						lastDayStr = "昨日最低价";
-					}
-					
-					if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
-						
-						subject = String.format("%s永续合约跌破%s(%s)并收回 %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
-						
-						text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
-								DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
-								PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
-					} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
-						
-						subject = String.format("%s永续合约跌破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
-						
-						text = String.format("%s永续合约跌破(%s)最低价(%s)", pair, 
-								DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
-								PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
-					}
-				
-				} else if(!ObjectUtils.isEmpty(hitHighKlines)) {
-					
-					if(lastDayKlines.isEquals(hitHighKlines)) {
-						lastDayStr = "昨日最高价";
-					}
-					
-					double highPrice = hitHighKlines.getHighPrice();
-					
-					if(PriceUtil.isLong(highPrice, klinesList_hit)) {
-						
-						subject = String.format("%s永续合约突破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
-						
-						text = String.format("%s永续合约突破(%s)最高价(%s)", pair, 
-								DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStarTime())), 
-								PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()));
-						
-					} else if(PriceUtil.isShort(highPrice, klinesList_hit)) {
-						
-						subject = String.format("%s永续合约突破%s(%s)并收回 %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
-						
-						text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair,
-								DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStarTime())), 
-								PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()));
-						
-					}
-					
-				}
-				
-				if(StringUtil.isNotEmpty(subject)) {
-					
-					text += "\n\n" + dateStr;
-					
-					logger.info("邮件主题：" + subject);
-					logger.info("邮件内容：" + text);
-					
-					Result<ResultCode, Exception> result = EmailUtil.send(subject, text);
-					
-					switch (result.getResult()) {
-					case ERROR:
-						
-						Exception ex = result.getErr();
-						
-						logger.info("邮件发送失败！失败原因：" + ex.getLocalizedMessage());
-						
-						break;
-						
-					default:
-						
-						logger.info("邮件发送成功！");
-						
-						break;
-					}
-				}
+				klinesService.futuresHighOrLowMonitor(klinesList_365_x_day, klinesList_hit);
 			}
 			
 		} catch (Exception e) {
