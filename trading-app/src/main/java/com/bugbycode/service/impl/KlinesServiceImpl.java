@@ -335,8 +335,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String pair = lastDayKlines.getPair();
 		
-		//lconicHighPriceList.add(lastDayKlines);
-		//lconicLowPriceList.add(lastDayKlines);
+		lconicHighPriceList.add(lastDayKlines);
+		lconicLowPriceList.add(lastDayKlines);
 		
 		//排序 按开盘时间升序 从旧到新
 		lconicHighPriceList.sort(kc);
@@ -358,8 +358,7 @@ public class KlinesServiceImpl implements KlinesService {
 			double lowPrice = hitLowKlines.getLowPrice();
 			
 			if(lastDayKlines.isEquals(hitLowKlines)) {
-				//lastDayStr = "昨日最低价";
-				return;
+				lastDayStr = "昨日最低价";
 			}
 			
 			if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
@@ -381,8 +380,7 @@ public class KlinesServiceImpl implements KlinesService {
 		} else if(!ObjectUtils.isEmpty(hitHighKlines)) {
 			
 			if(lastDayKlines.isEquals(hitHighKlines)) {
-				//lastDayStr = "昨日最高价";
-				return;
+				lastDayStr = "昨日最高价";
 			}
 			
 			double highPrice = hitHighKlines.getHighPrice();
