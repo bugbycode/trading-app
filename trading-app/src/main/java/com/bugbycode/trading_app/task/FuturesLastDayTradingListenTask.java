@@ -27,8 +27,8 @@ import com.util.StringUtil;
 /**
  * 昨日最高价和最低价监控
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FuturesLastDayTradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesLastDayTradingListenTask.class);
@@ -41,7 +41,7 @@ public class FuturesLastDayTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/15 * * * ?")
+	//@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FuturesLastDayTradingListenTask start.");
@@ -83,7 +83,7 @@ public class FuturesLastDayTradingListenTask {
 				lconicHighPriceList.sort(kc);
 				lconicLowPriceList.sort(kc);
 				
-				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 2, QUERY_SPLIT.NOT_ENDTIME);
+				List<Klines> klinesList_hit = klinesService.continuousKlines15M(pair, now, 1, QUERY_SPLIT.NOT_ENDTIME);
 				if(klinesList_hit.isEmpty()) {
 					logger.info("无法获取" + pair + "交易对最近15分钟级别K线信息");
 					continue;
