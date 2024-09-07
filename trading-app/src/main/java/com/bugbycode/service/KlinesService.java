@@ -91,4 +91,12 @@ public interface KlinesService {
 	 */
 	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
+	/**
+	 * 发送邮件
+	 * @param subject 主题
+	 * @param text 内容
+	 * @param fibInfo 斐波那契回撤指标
+	 */
+	public void sendEmail(String subject,String text,FibInfo fibInfo);
+	
 }
