@@ -20,8 +20,8 @@ import com.util.StringUtil;
 /**
  * 昨日最高价和最低价监控
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FuturesLastDayTradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesLastDayTradingListenTask.class);
@@ -34,7 +34,7 @@ public class FuturesLastDayTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/5 * * * ?")
+	//@Scheduled(cron = "5 0/5 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FuturesLastDayTradingListenTask start.");
