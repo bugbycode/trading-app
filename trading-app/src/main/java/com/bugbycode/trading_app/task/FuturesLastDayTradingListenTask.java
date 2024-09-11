@@ -20,8 +20,8 @@ import com.util.StringUtil;
 /**
  * 标志性高低点监控
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FuturesLastDayTradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesLastDayTradingListenTask.class);
@@ -34,7 +34,7 @@ public class FuturesLastDayTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/15 * * * ?")
+	//@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FuturesLastDayTradingListenTask start.");
