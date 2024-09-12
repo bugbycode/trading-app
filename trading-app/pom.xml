@@ -12,12 +12,12 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<tomcat.version>8.5.32</tomcat.version>
+	<tomcat.version>10.1.29</tomcat.version>
   </properties>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.5.RELEASE</version>
+		<version>3.3.3</version>
 	</parent>
   <dependencies>
 	  <dependency>
@@ -60,7 +60,6 @@
 		<dependency>
 		    <groupId>junit</groupId>
 		    <artifactId>junit</artifactId>
-		    <version>4.13.2</version>
 		    <scope>test</scope>
 		</dependency>
 		
