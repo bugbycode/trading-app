@@ -5,10 +5,10 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.repository.KlinesRepository;
 import com.bugbycode.service.KlinesService;
+import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
 import com.util.KlinesUtil;
-import com.util.PriceUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -32,11 +32,15 @@ public class SyncKlinesTask implements Runnable{
 
     private KlinesRepository klinesRepository;
 
-    public SyncKlinesTask(String pair,Date now, KlinesService klinesService,KlinesRepository klinesRepository){
+    private WorkTaskPool analysisWorkTaskPool;
+
+    public SyncKlinesTask(String pair,Date now, KlinesService klinesService,
+        KlinesRepository klinesRepository,WorkTaskPool analysisWorkTaskPool){
         this.pair = pair;
         this.now = now;
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
+        this.analysisWorkTaskPool = analysisWorkTaskPool;
     }
 
     @Override
@@ -57,8 +61,7 @@ public class SyncKlinesTask implements Runnable{
             Klines lastDayKlines = ku.removeLast();
             
             if(lastDayKlines != null && lastDayKlines.getStartTime() >= lastDayStartTimeDate.getTime()){
-                //logger.info(lastDayKlines);
-                logger.info(pair + "日线级别k线已是最新");
+                logger.info(pair + "日线级别k线已是最新数据");
             } else {
                 
                 long startTime = lastDayKlines == null ? firstDayStartTime.getTime() : lastDayKlines.getEndTime() + 1;
@@ -103,18 +106,17 @@ public class SyncKlinesTask implements Runnable{
             List<Klines> klines_list_15m = klinesService.continuousKlines(pair, startTime, endTime_15m.getTime(), 
                         Inerval.INERVAL_15M.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
             if(!CollectionUtils.isEmpty(klines_list_15m)){
-                logger.info("同步到" + klines_list_15m.size() + "条" + pair + "十五分钟级别k线信息");
                 
-                //klines_list_15m.remove(klines_list_15m.size() - 1);
+                logger.info("同步到" + klines_list_15m.size() + "条" + pair + "十五分钟级别k线信息");
 
                 klinesRepository.insert(klines_list_15m);
-
-                Klines lastKlines = PriceUtil.getLastKlines(klines_list_15m);
-
-                logger.info(pair + "最后1条15分钟级别k线信息：" + lastKlines);
             }
+
+            //开始分析k线
+            this.analysisWorkTaskPool.add(new AnalysisKlinesTask(pair,klinesService,klinesRepository));
+
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
 			EmailUtil.send("程序运行出现异常", e.getLocalizedMessage());
         }
     }

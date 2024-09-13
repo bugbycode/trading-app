@@ -43,6 +43,9 @@ public class FromBinancePullKlines15mTask {
     @Autowired
     private WorkTaskPool workTaskPool;
 
+	@Autowired
+	private WorkTaskPool analysisWorkTaskPool;
+
     /**
 	 * 查询k线信息 每15分钟执行一次
 	 * 
@@ -65,7 +68,7 @@ public class FromBinancePullKlines15mTask {
 					continue;
 				}
                 
-                workTaskPool.add(new SyncKlinesTask(pair, now, klinesService, klinesRepository));
+                workTaskPool.add(new SyncKlinesTask(pair, now, klinesService, klinesRepository,analysisWorkTaskPool));
             }
         } catch (Exception e) {
 			e.printStackTrace();
