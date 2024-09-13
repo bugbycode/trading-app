@@ -21,31 +21,34 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 
     @Override
     public void insert(Klines klines) {
-        Klines tmp = findOneByStartTime(klines.getStartTime(),klines.getPair());
+        Klines tmp = findOneByStartTime(klines.getStartTime(),klines.getPair(),klines.getInterval());
         if(tmp == null) {
             template.insert(klines);
         }
     }
 
     @Override
-    public List<Klines> findByPair(String pair) {
-        return template.find(Query.query(Criteria.where("pair").is(pair))
+    public List<Klines> findByPair(String pair, String interval) {
+        return template.find(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval))
             .with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
     }
 
     @Override
-    public Klines findOneByStartTime(long startTime,String pair) {
-        return template.findOne(Query.query(Criteria.where("startTime").is(startTime).and("pair").is(pair)), Klines.class);
+    public Klines findOneByStartTime(long startTime,String pair, String interval) {
+        return template.findOne(Query.query(Criteria.where("startTime").is(startTime)
+        .and("pair").is(pair).and("interval").is(interval)), Klines.class);
     }
 
     @Override
-    public void remove(long startTime,String pair) {
-        template.remove(Query.query(Criteria.where("startTime").is(startTime).and("pair").is(pair)), Klines.class);
+    public void remove(long startTime,String pair, String interval) {
+        template.remove(Query.query(Criteria.where("startTime").is(startTime).and("pair").is(pair)
+        .and("interval").is(interval)), Klines.class);
     }
 
     @Override
-    public List<Klines> findByPairAndGtStartTime(String pair, long startTime) {
-        return template.find(Query.query(Criteria.where("pair").is(pair).and("startTime").gte(startTime))
+    public List<Klines> findByPairAndGtStartTime(String pair, long startTime, String interval) {
+        return template.find(Query.query(Criteria.where("pair").is(pair).and("startTime").gte(startTime)
+            .and("interval").is(interval))
             .with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
     }
 

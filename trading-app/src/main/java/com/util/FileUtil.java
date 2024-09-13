@@ -15,8 +15,8 @@ import com.bugbycode.module.Klines;
 
 public class FileUtil {
 
-	public static List<Klines> readKlinesFile(String pair,String path){
-		return CommandUtil.format(pair, readFile(path));
+	public static List<Klines> readKlinesFile(String pair,String path,String interval){
+		return CommandUtil.format(pair, readFile(path),interval);
 	}
 	
 	public static void writeFile(String path,String jsonStr) {

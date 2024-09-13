@@ -48,7 +48,7 @@ public class KlinesServiceImpl implements KlinesService {
 		String filePathName = AppConfig.CACHE_PATH + "/" + pair + "_" + interval + ".json";
 		
 		//从缓存中读取
-		List<Klines> list = FileUtil.readKlinesFile(pair, filePathName);
+		List<Klines> list = FileUtil.readKlinesFile(pair, filePathName,interval);
 		
 		//缓存不存在或者不是最新数据
 		if(list.isEmpty() || list.get(list.size() - 1).getEndTime() < endTime) {
@@ -77,7 +77,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			String result = restTemplate.getForObject(url, String.class);
 			
-			list = CommandUtil.format(pair, result);
+			list = CommandUtil.format(pair, result, interval);
 			
 			FileUtil.writeFile(filePathName, result);
 		} else {

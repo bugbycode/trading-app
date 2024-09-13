@@ -20,10 +20,11 @@ public class MessageHandlerImpl implements MessageHandler{
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
 		int decimalNum = openPriceStr.substring(openPriceStr.indexOf(".") + 1).length();
+		/*
 		Klines kline = new Klines(result.getString("ps"), klinesJson.getLong("t"), klinesJson.getDouble("o"), 
 				klinesJson.getDouble("h"), klinesJson.getDouble("l"), klinesJson.getDouble("c"), klinesJson.getLong("T"), decimalNum);
 		
-		logger.info(kline);
+		logger.info(kline); */
 		
 	}
 	

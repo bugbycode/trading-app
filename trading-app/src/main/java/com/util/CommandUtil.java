@@ -62,7 +62,7 @@ public class CommandUtil {
 		return output.toString();
 	}
 	
-	public static List<Klines> format(String pair,String str){
+	public static List<Klines> format(String pair,String str,String interval){
 		int decimalNum = 0;
 		List<Klines> klinesList = new ArrayList<Klines>();
 		
@@ -77,7 +77,7 @@ public class CommandUtil {
 					Klines kl = new Klines(pair,klJson.getLong(0),
 							klJson.getDouble(1),klJson.getDouble(2),
 							klJson.getDouble(3),klJson.getDouble(4),
-							klJson.getLong(6),decimalNum);
+							klJson.getLong(6),interval,decimalNum);
 					klinesList.add(kl);
 				};
 				

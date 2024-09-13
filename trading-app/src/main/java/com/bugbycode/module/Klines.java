@@ -1,7 +1,6 @@
 package com.bugbycode.module;
 
 import com.util.DateFormatUtil;
-import com.util.PriceUtil;
 
 public class Klines {
 	
@@ -16,6 +15,8 @@ public class Klines {
 	private double lowPrice;//最低价
 	
 	private double closePrice;//收盘价
+
+	private String interval;//时间级别
 	
 	private double ema7;
 	
@@ -28,7 +29,7 @@ public class Klines {
 	private int decimalNum = 2;
 
 	public Klines(String pair,long startTime, double openPrice, double highPrice, double lowPrice, 
-			double closePrice, long endTime,int decimalNum) {
+			double closePrice, long endTime,String interval,int decimalNum) {
 		this.pair = pair;
 		this.startTime = startTime;
 		this.openPrice = openPrice;
@@ -37,6 +38,7 @@ public class Klines {
 		this.closePrice = closePrice;
 		this.endTime = endTime;
 		this.decimalNum = decimalNum;
+		this.interval = interval;
 	}
 	
 	public String getPair() {
@@ -111,6 +113,10 @@ public class Klines {
 		this.ema99 = ema99;
 	}
 
+	public String getInterval(){
+		return this.interval;
+	}
+
 	/**
 	 * 是否出现上引线
 	 * 
@@ -172,8 +178,8 @@ public class Klines {
 	
 	@Override
 	public String toString() {
-		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s", 
+		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s，时间级别：%s", 
 				pair,DateFormatUtil.format(startTime),getOpenPrice(),getHighPrice()
-				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime));
+				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime),this.interval);
 	}
 }
