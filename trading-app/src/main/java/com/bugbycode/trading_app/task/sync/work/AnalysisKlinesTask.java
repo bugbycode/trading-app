@@ -54,7 +54,7 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
 
         } catch (Exception e) {
-            logger.error("分析" + pair + "k线信息时出现异常", e);
+            logger.error("分析" + pair + "交易对K线信息时出现异常", e);
 			EmailUtil.send("程序运行出现异常", "分析" + pair + "k线信息时出现异常，异常信息：" + e.getLocalizedMessage());
         }
     }
