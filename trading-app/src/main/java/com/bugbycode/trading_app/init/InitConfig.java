@@ -91,6 +91,6 @@ public class InitConfig implements ApplicationRunner {
 
 	@Bean
 	public WorkTaskPool workTaskPool(){
-		return new WorkTaskPool("SyncTaskPool", 10);
+		return new WorkTaskPool("SyncTaskPool", 5);
 	}
 }
