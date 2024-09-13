@@ -33,7 +33,6 @@ public class AnalysisKlinesTask implements Runnable{
 
     @Override
     public void run() {
-        logger.info("开始执行k线分析任务");
         try {
             //查询日线级别K线信息
             List<Klines> klines_list_1d = klinesRepository.findByPair(pair, Inerval.INERVAL_1D.getDescption());
@@ -55,10 +54,9 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
 
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
-			EmailUtil.send("程序运行出现异常", e.getLocalizedMessage());
+            logger.error("分析" + pair + "k线信息时出现异常", e);
+			EmailUtil.send("程序运行出现异常", "分析" + pair + "k线信息时出现异常，异常信息：" + e.getLocalizedMessage());
         }
-        logger.info("k线分析任务执行完成");
     }
 
 }

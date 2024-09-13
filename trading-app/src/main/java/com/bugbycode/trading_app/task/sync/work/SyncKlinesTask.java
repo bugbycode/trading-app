@@ -102,6 +102,7 @@ public class SyncKlinesTask implements Runnable{
             } else {
                 startTime = startTime_15m.getTime();
             }
+
             //同步15分钟级别k线信息
             List<Klines> klines_list_15m = klinesService.continuousKlines(pair, startTime, endTime_15m.getTime(), 
                         Inerval.INERVAL_15M.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
@@ -116,8 +117,8 @@ public class SyncKlinesTask implements Runnable{
             this.analysisWorkTaskPool.add(new AnalysisKlinesTask(pair,klinesService,klinesRepository));
 
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
-			EmailUtil.send("程序运行出现异常", e.getLocalizedMessage());
+            logger.error("同步" + pair + "K线信息时出现异常", e);
+			EmailUtil.send("程序运行出现异常", "同步" + pair + "K线信息时出现异常，异常信息：" + e.getLocalizedMessage());
         }
     }
     
