@@ -48,14 +48,13 @@ public class FromBinancePullKlines15mTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/5 * * * ?")
+	@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FromBinancePullKlines15mTask start.");
 		
 		Date now = new Date();
         
-		
 		try {
 			
 			for(String pair : AppConfig.PAIRS) {
