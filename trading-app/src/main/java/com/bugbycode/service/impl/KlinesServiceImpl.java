@@ -368,14 +368,14 @@ public class KlinesServiceImpl implements KlinesService {
 				subject = String.format("%s永续合约跌破%s(%s)并收回 %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
 				
 				text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStartTime())), 
 						PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
 			} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
 				
 				subject = String.format("%s永续合约跌破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
 				
 				text = String.format("%s永续合约跌破(%s)最低价(%s)", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStarTime())), 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStartTime())), 
 						PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
 			}
 		
@@ -392,7 +392,7 @@ public class KlinesServiceImpl implements KlinesService {
 				subject = String.format("%s永续合约突破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
 				
 				text = String.format("%s永续合约突破(%s)最高价(%s)", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStarTime())), 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStartTime())), 
 						PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()));
 				
 			} else if(PriceUtil.isShort(highPrice, klinesList_hit)) {
@@ -400,7 +400,7 @@ public class KlinesServiceImpl implements KlinesService {
 				subject = String.format("%s永续合约突破%s(%s)并收回 %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
 				
 				text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair,
-						DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStarTime())), 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStartTime())), 
 						PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()));
 				
 			}

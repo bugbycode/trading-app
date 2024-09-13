@@ -61,7 +61,7 @@ public class FibInfo {
 	 * @param level 斐波那契回撤级别 lv1 lv2 lv3 ……
 	 */
 	public FibInfo(Klines kline1, Klines kline2,int decimalPoint,FibLevel level) {
-		if(kline1.getStarTime() < kline2.getStarTime()) {
+		if(kline1.getStartTime() < kline2.getStartTime()) {
 			this.high = kline1.getLowPrice();
 			this.low = kline2.getHighPrice();
 		} else {

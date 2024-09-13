@@ -7,7 +7,7 @@ public class Klines {
 	
 	private String pair;//交易对
 	
-	private long starTime; //开盘时间
+	private long startTime; //开盘时间
 	
 	private double openPrice;//开盘价
 	
@@ -27,10 +27,10 @@ public class Klines {
 	
 	private int decimalNum = 2;
 
-	public Klines(String pair,long starTime, double openPrice, double highPrice, double lowPrice, 
+	public Klines(String pair,long startTime, double openPrice, double highPrice, double lowPrice, 
 			double closePrice, long endTime,int decimalNum) {
 		this.pair = pair;
-		this.starTime = starTime;
+		this.startTime = startTime;
 		this.openPrice = openPrice;
 		this.highPrice = highPrice;
 		this.lowPrice = lowPrice;
@@ -43,8 +43,8 @@ public class Klines {
 		return pair;
 	}
 
-	public long getStarTime() {
-		return starTime;
+	public long getStartTime() {
+		return startTime;
 	}
 
 	public double getOpenPrice() {
@@ -166,13 +166,14 @@ public class Klines {
      * @return
      */
     public boolean isEquals(Klines klines0) {
-    	return klines0 != null && klines0.getStarTime() == this.getStarTime();
+    	return klines0 != null && klines0.getStartTime() == this.getStartTime();
     }
+	
 	
 	@Override
 	public String toString() {
-		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s，价格波动幅度：%s%%", 
-				pair,DateFormatUtil.format(starTime),getOpenPrice(),getHighPrice()
-				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime),PriceUtil.formatDoubleDecimal(getPriceFluctuationPercentage(), 2));
+		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s", 
+				pair,DateFormatUtil.format(startTime),getOpenPrice(),getHighPrice()
+				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime));
 	}
 }

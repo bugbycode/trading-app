@@ -12,11 +12,11 @@ public class KlinesComparator implements Comparator<Klines> {
 	@Override
 	public int compare(Klines k0, Klines k1) {
 		int result = 0;
-		if(k0.getStarTime() < k1.getStarTime()) {
+		if(k0.getStartTime() < k1.getStartTime()) {
 			result = -1;
-		} else if(k0.getStarTime() == k1.getStarTime()) {
+		} else if(k0.getStartTime() == k1.getStartTime()) {
 			result = 0;
-		} else if(k0.getStarTime() > k1.getStarTime()) {
+		} else if(k0.getStartTime() > k1.getStartTime()) {
 			result = 1;
 		}
 		return result;

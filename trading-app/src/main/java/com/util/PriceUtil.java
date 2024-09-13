@@ -61,7 +61,7 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(klinesList)) {
 			for(int index = 0; index < size; index++) {
 				Klines tmp = klinesList.get(index);
-				if(tmp.getStarTime() >= todayStart.getTime()) {
+				if(tmp.getStartTime() >= todayStart.getTime()) {
 					startIndex = index;
 					break;
 				}
@@ -81,11 +81,11 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(klinesList)) {
 			for(int index = 0; index < size; index++) {
 				Klines tmp = klinesList.get(index);
-				if(tmp.getStarTime() == todayStart.getTime()) {
+				if(tmp.getStartTime() == todayStart.getTime()) {
 					endIndex = index;
 				}
 				
-				if(tmp.getStarTime() == lastDayStart.getTime()) {
+				if(tmp.getStartTime() == lastDayStart.getTime()) {
 					startIndex = index;
 				}
 			}
@@ -126,7 +126,7 @@ public class PriceUtil {
 		int endIndex = 0;
 		for(int index = 0;index < klinesList.size();index++) {
 			Klines tmp = klinesList.get(index);
-			if(tmp.getStarTime() == startTime) {
+			if(tmp.getStartTime() == startTime) {
 				startIndex = index;
 			} 
 			if(tmp.getEndTime() == endTime) {
@@ -141,7 +141,7 @@ public class PriceUtil {
 		int endIndex = 0;
 		for(int index = 0;index < klinesList.size();index++) {
 			Klines tmp = klinesList.get(index);
-			if(tmp.getStarTime() == startTime) {
+			if(tmp.getStartTime() == startTime) {
 				startIndex = index;
 			}
 			if(tmp.getEndTime() == endTime) {
@@ -255,17 +255,17 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(lconicHighPriceList)) {
 			long startTime = 0;
 			long endTime = 0;
-			if(fibLowKlines.getStarTime() < fibHightKlines.getStarTime()) {
-				startTime = fibLowKlines.getStarTime();
-				endTime = fibHightKlines.getStarTime();
+			if(fibLowKlines.getStartTime() < fibHightKlines.getStartTime()) {
+				startTime = fibLowKlines.getStartTime();
+				endTime = fibHightKlines.getStartTime();
 			} else {
-				startTime = fibHightKlines.getStarTime();
-				endTime = fibLowKlines.getStarTime();
+				startTime = fibHightKlines.getStartTime();
+				endTime = fibLowKlines.getStartTime();
 			}
 			
 			Klines tmp = null;
 			for(Klines k : lconicHighPriceList) {
-				if(k.getStarTime() >  startTime && k.getStarTime() < endTime) {
+				if(k.getStartTime() >  startTime && k.getStartTime() < endTime) {
 					if(k.getHighPrice() > fibHightKlines.getHighPrice()) {
 						if(ObjectUtils.isEmpty(tmp) || k.getHighPrice() > tmp.getHighPrice()) {
 							tmp = k;
@@ -330,17 +330,17 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(lconicLowPriceList)) {
 			long startTime = 0;
 			long endTime = 0;
-			if(fibLowKlines.getStarTime() < fibHightKlines.getStarTime()) {
-				startTime = fibLowKlines.getStarTime();
-				endTime = fibHightKlines.getStarTime();
+			if(fibLowKlines.getStartTime() < fibHightKlines.getStartTime()) {
+				startTime = fibLowKlines.getStartTime();
+				endTime = fibHightKlines.getStartTime();
 			} else {
-				startTime = fibHightKlines.getStarTime();
-				endTime = fibLowKlines.getStarTime();
+				startTime = fibHightKlines.getStartTime();
+				endTime = fibLowKlines.getStartTime();
 			}
 			
 			Klines tmp = null;
 			for(Klines k : lconicLowPriceList) {
-				if(k.getStarTime() >  startTime && k.getStarTime() < endTime) {
+				if(k.getStartTime() >  startTime && k.getStartTime() < endTime) {
 					if(k.getLowPrice() < fibLowKlines.getLowPrice()) {
 						if(ObjectUtils.isEmpty(tmp) || k.getLowPrice() < tmp.getLowPrice()) {
 							tmp = k;
@@ -577,7 +577,7 @@ public class PriceUtil {
 		Klines result = null;
 		if(!CollectionUtils.isEmpty(klinesList)) {
 			for(Klines tmp : klinesList) {
-				if(tmp.getStarTime() <= startKlines.getStarTime()) {
+				if(tmp.getStartTime() <= startKlines.getStartTime()) {
 					continue;
 				}
 				
@@ -604,7 +604,7 @@ public class PriceUtil {
 		Klines result = null;
 		if(!CollectionUtils.isEmpty(klinesList)) {
 			for(Klines tmp : klinesList) {
-				if(tmp.getStarTime() <= startKlines.getStarTime()) {
+				if(tmp.getStartTime() <= startKlines.getStartTime()) {
 					continue;
 				}
 				
@@ -844,10 +844,10 @@ public class PriceUtil {
     	int endIndex = -1;
     	for(int index = 0;index < list.size(); index++) {
     		Klines tmp = list.get(index);
-    		if(startKlines.getStarTime() == tmp.getStarTime()) {
+    		if(startKlines.getStartTime() == tmp.getStartTime()) {
     			startIndex = index;
     		}
-    		if(endKlines.getStarTime() == tmp.getStarTime()) {
+    		if(endKlines.getStartTime() == tmp.getStartTime()) {
     			endIndex = index + 1;
     		}
     		
@@ -886,7 +886,7 @@ public class PriceUtil {
     	boolean result = false;
     	
     	for(Klines tmp : list) {
-    		if(tmp.getStarTime() == klines.getStarTime()) {
+    		if(tmp.getStartTime() == klines.getStartTime()) {
     			continue;
     		}
     		if(tmp.getHighPrice() > klines.getHighPrice()) {
@@ -908,7 +908,7 @@ public class PriceUtil {
     	boolean result = false;
     	
     	for(Klines tmp : list) {
-    		if(tmp.getStarTime() == klines.getStarTime()) {
+    		if(tmp.getStartTime() == klines.getStartTime()) {
     			continue;
     		}
     		if(tmp.getLowPrice() < klines.getLowPrice()) {
