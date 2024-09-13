@@ -7,15 +7,15 @@ import java.util.Date;
 
 public class DateFormatUtil {
 
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static final ThreadLocal<SimpleDateFormat> sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 	
-	private static SimpleDateFormat sdf_yyyy_mm_dd_08_00_00 = new SimpleDateFormat("yyyy-MM-dd 08:00:00");
+	private static final ThreadLocal<SimpleDateFormat> sdf_yyyy_mm_dd_08_00_00 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd 08:00:00"));
 	
-	private static SimpleDateFormat sdf_yyyy_mm_dd_07_59_59 = new SimpleDateFormat("yyyy-MM-dd 07:59:59");
+	private static final ThreadLocal<SimpleDateFormat> sdf_yyyy_mm_dd_07_59_59 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd 07:59:59"));
 	
-	private static SimpleDateFormat sdf_yyyy_mm_dd_HH_mm_00 = new SimpleDateFormat("yyyy-MM-dd HH:mm:00");
+	private static final ThreadLocal<SimpleDateFormat> sdf_yyyy_mm_dd_HH_mm_00 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:00"));
 	
-	private static SimpleDateFormat sdf_yyyy_mm_dd = new SimpleDateFormat("yyyy-MM-dd");
+	private static final ThreadLocal<SimpleDateFormat> sdf_yyyy_mm_dd = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 	
 	public static String format(long time) {
 		return format(new Date(time));
@@ -29,27 +29,27 @@ public class DateFormatUtil {
 	}
 	
 	public static String format(Date date) {
-		return sdf.format(date);
+		return sdf.get().format(date);
 	}
 	
 	public static String format_yyyy_mm_dd(Date date) {
-		return sdf_yyyy_mm_dd.format(date);
+		return sdf_yyyy_mm_dd.get().format(date);
 	}
 	
 	public static String format_yyyy_mm_dd_08_00_00(Date date) {
-		return sdf_yyyy_mm_dd_08_00_00.format(date);
+		return sdf_yyyy_mm_dd_08_00_00.get().format(date);
 	}
 	
 	public static String format_yyyy_mm_dd_07_59_59(Date date) {
-		return sdf_yyyy_mm_dd_07_59_59.format(date);
+		return sdf_yyyy_mm_dd_07_59_59.get().format(date);
 	}
 	
 	public static String format_yyyy_mm_dd_HH_mm_00(Date date) {
-		return sdf_yyyy_mm_dd_HH_mm_00.format(date);
+		return sdf_yyyy_mm_dd_HH_mm_00.get().format(date);
 	}
 	
 	public static Date parse(String date) throws ParseException {
-		return sdf.parse(date);
+		return sdf.get().parse(date);
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class DateFormatUtil {
 			c.add(Calendar.HOUR_OF_DAY, - (hours + 1) - 15 - 24);
 		}
 		try {
-			return sdf.parse(format_yyyy_mm_dd_08_00_00(c.getTime()));
+			return sdf.get().parse(format_yyyy_mm_dd_08_00_00(c.getTime()));
 		} catch (ParseException e) {
 			throw new RuntimeException(e.getLocalizedMessage());
 		}
@@ -138,7 +138,7 @@ public class DateFormatUtil {
 			c.add(Calendar.HOUR_OF_DAY, - (hours + 1) - 16);
 		}
 		try {
-			return sdf.parse(format_yyyy_mm_dd_07_59_59(c.getTime()));
+			return sdf.get().parse(format_yyyy_mm_dd_07_59_59(c.getTime()));
 		} catch (ParseException e) {
 			throw new RuntimeException(e.getLocalizedMessage());
 		}
