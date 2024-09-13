@@ -14,6 +14,12 @@ public interface KlinesRepository {
     public void insert(Klines klines);
 
     /**
+     * 批量添加k线信息
+     * @param list
+     */
+    public void insert(List<Klines> list);
+
+    /**
      * 根据交易对名称查询所有k线信息
      * @param pair 交易对
      * @param interval 时间级别

@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.KlinesRepository;
@@ -50,6 +51,15 @@ public class KlinesRepositoryImpl implements KlinesRepository{
         return template.find(Query.query(Criteria.where("pair").is(pair).and("startTime").gte(startTime)
             .and("interval").is(interval))
             .with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
+    }
+
+    @Override
+    public void insert(List<Klines> list) {
+        if(!CollectionUtils.isEmpty(list)){
+            for(Klines k : list){
+                insert(k);
+            }
+        }
     }
 
 }
