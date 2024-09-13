@@ -23,8 +23,8 @@ import com.util.StringUtil;
 /**
  * 涨跌监控
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FuturesRiseAndFallTradingListenTask {
 
 	private final Logger logger = LogManager.getLogger(FuturesRiseAndFallTradingListenTask.class);
@@ -37,7 +37,7 @@ public class FuturesRiseAndFallTradingListenTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/15 * * * ?")
+	//@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		logger.info("FuturesRiseAndFallTradingListenTask start.");
 		
