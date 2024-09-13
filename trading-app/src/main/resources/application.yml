@@ -1,6 +1,10 @@
 spring: 
   main: 
     web-application-type: NONE
+  datasource:
+    mongodb:
+      url: mongodb://trading:trading@localhost:27017
+      database: trading
 email: 
   recipient: test@qq.com
   smtp: 
