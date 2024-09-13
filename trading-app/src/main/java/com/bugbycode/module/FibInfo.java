@@ -155,7 +155,7 @@ public class FibInfo {
 				}
 				extensionBuffer.append(code.getDescription());
 				extensionBuffer.append("(");
-				formatBuf.append(PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint));
+				extensionBuffer.append(PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint));
 				extensionBuffer.append(")");
 			} else {
 				if(formatBuf.length() > 0) {
