@@ -137,8 +137,7 @@ public class FibInfo {
 		
 		//[Lv1] [LONG]：1(0.1361400),0.786(0.1460696),0.66(0.1519160),0.618(0.1538648),0.5(0.1593400),0.382(0.1648152),0.236(0.1715896),0(0.1825400)
 		StringBuffer formatBuf = new StringBuffer();
-		Object[] arr = new Object[len];
-		
+
 		formatBuf.append("[");
 		formatBuf.append(this.getLevel().getLabel());
 		formatBuf.append("] [");
@@ -153,21 +152,23 @@ public class FibInfo {
 			if(code.getValue() > 1) {
 				if(extensionBuffer.length() > 0) {
 					extensionBuffer.append(", ");
-					extensionBuffer.append(code.getDescription());
-					extensionBuffer.append("(%s)");
-					arr[offset] = PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint);
 				}
+				extensionBuffer.append(code.getDescription());
+				extensionBuffer.append("(");
+				formatBuf.append(PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint));
+				extensionBuffer.append(")");
 			} else {
 				if(formatBuf.length() > 0) {
 					formatBuf.append(", ");
 				}
 				formatBuf.append(code.getDescription());
-				formatBuf.append("(%s)");
-				arr[offset] = PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint);
+				formatBuf.append("(");
+				formatBuf.append(PriceUtil.formatDoubleDecimal(getFibValue(code), this.decimalPoint));
+				formatBuf.append(")");
 			}
 		}
 		
-		return String.format(formatBuf.toString(), arr) + "\nExtension: " + extensionBuffer.toString();
+		return formatBuf.toString() + "\nExtension: " + extensionBuffer.toString();
 	}
     
     
