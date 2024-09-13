@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.EmailAuth;
+import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoint;
 import com.bugbycode.websocket.realtime.handler.MessageHandler;
 import com.util.CoinPairSet;
@@ -86,5 +87,10 @@ public class InitConfig implements ApplicationRunner {
 	@Bean("restTemplate")
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	public WorkTaskPool workTaskPool(){
+		return new WorkTaskPool("SyncTaskPool", 10);
 	}
 }
