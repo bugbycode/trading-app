@@ -45,48 +45,31 @@ public class KlinesServiceImpl implements KlinesService {
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
 			String interval,QUERY_SPLIT split) {
 		
-		String filePathName = AppConfig.CACHE_PATH + "/" + pair + "_" + interval + ".json";
+				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
+				.queryParam("pair", pair)
+				.queryParam("contractType", "PERPETUAL")
+				.queryParam("startTime", startTime)
+				.queryParam("interval", interval)
+				.queryParam("limit", 1500);
 		
-		//从缓存中读取
-		List<Klines> list = FileUtil.readKlinesFile(pair, filePathName,interval);
-		
-		//缓存不存在或者不是最新数据
-		if(list.isEmpty() || list.get(list.size() - 1).getEndTime() < endTime) {
+		switch (split) {
+		case NOT_ENDTIME:
 			
-			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
-	                .queryParam("pair", pair)
-	                .queryParam("contractType", "PERPETUAL")
-	                .queryParam("startTime", startTime)
-	                .queryParam("interval", interval)
-	                .queryParam("limit", 1500);
+			uriBuilder.queryParam("endTime", endTime);
 			
-			switch (split) {
-			case NOT_ENDTIME:
-				
-				uriBuilder.queryParam("endTime", endTime);
-				
-				break;
+			break;
 
-			default:
-				break;
-			}
-			
-			String url = uriBuilder.toUriString();
-			
-			logger.debug(url);
-			
-			String result = restTemplate.getForObject(url, String.class);
-			
-			list = CommandUtil.format(pair, result, interval);
-			
-			FileUtil.writeFile(filePathName, result);
-		} else {
-			logger.debug("读取缓存文件：" + filePathName);
-			logger.debug("缓存条数：" + list.size());
-			logger.debug("缓存最后一条k线：" + list.get(list.size() - 1).toString());
+		default:
+			break;
 		}
 		
-		return list;
+		String url = uriBuilder.toUriString();
+		
+		logger.debug(url);
+		
+		String result = restTemplate.getForObject(url, String.class);
+		
+		return CommandUtil.format(pair, result, interval);
 	}
 
 	@Override

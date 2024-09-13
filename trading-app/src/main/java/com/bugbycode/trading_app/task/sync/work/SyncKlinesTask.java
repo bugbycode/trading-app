@@ -8,6 +8,7 @@ import com.bugbycode.service.KlinesService;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
 import com.util.KlinesUtil;
+import com.util.PriceUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -56,11 +57,11 @@ public class SyncKlinesTask implements Runnable{
             Klines lastDayKlines = ku.removeLast();
             
             if(lastDayKlines != null && lastDayKlines.getStartTime() >= lastDayStartTimeDate.getTime()){
-                logger.info(lastDayKlines);
+                //logger.info(lastDayKlines);
                 logger.info(pair + "日线级别k线已是最新");
             } else {
                 
-                long startTime = lastDayKlines == null ? firstDayStartTime.getTime() : lastDayKlines.getEndTime();
+                long startTime = lastDayKlines == null ? firstDayStartTime.getTime() : lastDayKlines.getEndTime() + 1;
                 
                 List<Klines> klines_list = klinesService.continuousKlines(pair, startTime, lastDayEndTimeDate.getTime(), 
                                             Inerval.INERVAL_1D.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
@@ -78,13 +79,17 @@ public class SyncKlinesTask implements Runnable{
             List<Klines> klines_list_15m_db = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
             KlinesUtil ku_15m = new KlinesUtil(klines_list_15m_db);
             Klines lastKlines_15m = ku_15m.removeLast();
-            logger.info("数据库中已拥有" + pair + "15分钟级别" + klines_list_15m_db.size() + "条k线信息");
+            //logger.info("数据库中已拥有" + pair + "15分钟级别" + klines_list_15m_db.size() + "条k线信息");
 
             //开盘时间
             long startTime = 0;
 
+            Date endTime_15m = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
+            Date startTime_15m = DateFormatUtil.getStartTimeBySetMinute(endTime_15m, -Inerval.INERVAL_15M.getNumber() * 4 * 365);//limit根k线
+            endTime_15m = DateFormatUtil.getStartTimeBySetMillisecond(endTime_15m, -1);//收盘时间
+
             if(lastKlines_15m != null){
-                startTime = lastKlines_15m.getEndTime();
+                startTime = lastKlines_15m.getEndTime() + 1;
                 if(klines_list_15m_db.size() > 3000){
                     Klines last_15m_klines = ku_15m.removeFirst();
                     klinesRepository.remove(last_15m_klines.getStartTime(), pair, Inerval.INERVAL_15M.getDescption());
@@ -92,24 +97,21 @@ public class SyncKlinesTask implements Runnable{
                     //logger.info(last_15m_klines);
                 }
             } else {
-                Date endTime_15m = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
-                Date startTime_15m = DateFormatUtil.getStartTimeBySetMinute(endTime_15m, -Inerval.INERVAL_15M.getNumber() * 4 * 365);//limit根k线
-                //endTime_15m = DateFormatUtil.getStartTimeBySetMillisecond(endTime_15m, -1);//收盘时间
                 startTime = startTime_15m.getTime();
             }
             //同步15分钟级别k线信息
-            List<Klines> klines_list_15m = klinesService.continuousKlines(pair, startTime, now.getTime(), 
+            List<Klines> klines_list_15m = klinesService.continuousKlines(pair, startTime, endTime_15m.getTime(), 
                         Inerval.INERVAL_15M.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
             if(!CollectionUtils.isEmpty(klines_list_15m)){
                 logger.info("同步到" + klines_list_15m.size() + "条" + pair + "十五分钟级别k线信息");
                 
-                klines_list_15m.remove(klines_list_15m.size() - 1);
+                //klines_list_15m.remove(klines_list_15m.size() - 1);
 
                 klinesRepository.insert(klines_list_15m);
 
-                //Klines lastKlines = PriceUtil.getLastKlines(klines_list_15m);
+                Klines lastKlines = PriceUtil.getLastKlines(klines_list_15m);
 
-                //logger.info(pair + "最后1条15分钟级别k线信息：" + lastKlines);
+                logger.info(pair + "最后1条15分钟级别k线信息：" + lastKlines);
             }
         } catch (Exception e) {
             e.printStackTrace();
