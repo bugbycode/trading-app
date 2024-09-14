@@ -585,5 +585,73 @@ public class KlinesServiceImpl implements KlinesService {
 			sendEmail(subject, text, null);
 		}
 	}
+
+	@Override
+	public void futuresRiseAndFall(List<Klines> klinesList) {
+
+		if(!CollectionUtils.isEmpty(klinesList)){
+			int lastIndex = klinesList.size() - 1;
+
+			Klines currentKlines = klinesList.get(lastIndex);
+
+			String pair = currentKlines.getPair();
+					
+			String percentageStr = PriceUtil.formatDoubleDecimal(PriceUtil.getPriceFluctuationPercentage(klinesList, lastIndex), 2);
+			
+			double pricePercentage = Double.valueOf(percentageStr);
+			
+			String text = "";//邮件内容
+			String subject = "";//邮件主题
+			String dateStr = DateFormatUtil.format(new Date());
+			if(currentKlines.isFall()) {//下跌
+				
+				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT")) {
+					if(pricePercentage >= 5) {
+						subject = pair + "永续合约价格大暴跌";
+					} else if(pricePercentage >= 3) {
+						subject = pair + "永续合约价格暴跌";
+					}else if(pricePercentage >= 1.5) {
+						subject = pair + "永续合约价格大跌";
+					}
+				} else {
+					if(pricePercentage >= 10) {
+						subject = pair + "永续合约价格大暴跌";
+					} else if(pricePercentage >= 5) {
+						subject = pair + "永续合约价格暴跌";
+					}else if(pricePercentage >= 3) {
+						subject = pair + "永续合约价格大跌";
+					}
+				}
+				
+			} else if(currentKlines.isRise()) {
+				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT")) {
+					if(pricePercentage >= 5) {
+						subject = pair + "永续合约价格大暴涨";
+					} else if(pricePercentage >= 3) {
+						subject = pair + "永续合约价格暴涨";
+					}else if(pricePercentage >= 1.5) {
+						subject = pair + "永续合约价格大涨";
+					}
+				} else {
+					if(pricePercentage >= 10) {
+						subject = pair + "永续合约价格大暴涨";
+					} else if(pricePercentage >= 5) {
+						subject = pair + "永续合约价格暴涨";
+					}else if(pricePercentage >= 3) {
+						subject = pair + "永续合约价格大涨";
+					}
+				}
+			}
+			
+			if(StringUtil.isNotEmpty(subject)) {
+				
+				subject += percentageStr + "% " + dateStr;
+				
+				text = subject;
+				
+				sendEmail(subject, text, null);
+			}
+		}
+	}
 	
 }
