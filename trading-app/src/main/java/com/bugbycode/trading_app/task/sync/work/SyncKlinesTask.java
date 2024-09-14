@@ -56,6 +56,8 @@ public class SyncKlinesTask implements Runnable{
             //日线级别
             //数据库中存储的k线信息
             List<Klines> klines_list_db = klinesRepository.findByPair(pair, Inerval.INERVAL_1D.getDescption());
+            
+            klinesRepository.checkData(klines_list_db);
 
             KlinesUtil ku = new KlinesUtil(klines_list_db);
             Klines lastDayKlines = ku.removeLast();
@@ -80,6 +82,9 @@ public class SyncKlinesTask implements Runnable{
             //=======================================================================================================
             //十五分钟级别
             List<Klines> klines_list_15m_db = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
+
+            klinesRepository.checkData(klines_list_15m_db);
+
             KlinesUtil ku_15m = new KlinesUtil(klines_list_15m_db);
             Klines lastKlines_15m = ku_15m.removeLast();
             //logger.info("数据库中已拥有" + pair + "15分钟级别" + klines_list_15m_db.size() + "条k线信息");
