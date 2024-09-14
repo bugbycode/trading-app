@@ -52,4 +52,24 @@ public interface KlinesRepository {
      * @return
      */
     public List<Klines> findByPairAndGtStartTime(String pair,long startTime,String interval);
+
+    /**
+     * 校验K线是否出现重复
+     * @param list k线集合
+     * @return true 表示没有重复 false 表示出现重复k线
+     */
+    public boolean checkData(List<Klines> list);
+
+    /**
+     * 根据ID删除一条k线信息
+     * @param _id
+     */
+    public void remove(String _id);
+
+    /**
+     * 根据ID查询一条K线信息
+     * @param _id
+     * @return
+     */
+    public Klines findById(String _id);
 }
