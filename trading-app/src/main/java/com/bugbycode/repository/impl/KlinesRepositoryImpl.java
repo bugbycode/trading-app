@@ -56,9 +56,7 @@ public class KlinesRepositoryImpl implements KlinesRepository{
     @Override
     public void insert(List<Klines> list) {
         if(!CollectionUtils.isEmpty(list)){
-            for(Klines k : list){
-                insert(k);
-            }
+            template.insertAll(list);
         }
     }
 
