@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.EMAType;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
@@ -28,7 +29,6 @@ import com.bugbycode.service.KlinesService;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
-import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
 import com.util.StringUtil;
@@ -552,6 +552,36 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		sendFib0Email(thirdFibInfo, klinesList_hit);
+	}
+
+	@Override
+	public void futuresEMAMonitor(List<Klines> klinesList) {
+		if(!CollectionUtils.isEmpty(klinesList)){
+			PriceUtil.calculateEMAArray(klinesList, EMAType.EMA7);
+			PriceUtil.calculateEMAArray(klinesList, EMAType.EMA25);
+			PriceUtil.calculateEMAArray(klinesList, EMAType.EMA99);
+
+			Klines lastKlines = PriceUtil.getLastKlines(klinesList);
+			String pair = lastKlines.getPair();
+			int decimalNum = lastKlines.getDecimalNum();
+
+			String subject = "";
+			String text = "";
+			String dateStr = DateFormatUtil.format(new Date());
+
+			if(PriceUtil.isOpenLongEMA(klinesList)){
+				subject = String.format("%s永续合约做多机会 %s", pair, dateStr);
+			} else if(PriceUtil.isOpenShortEMA(klinesList)){
+				subject = String.format("%s永续合约做空机会 %s", pair, dateStr);
+			}
+
+			text = lastKlines.toString() + "\n\n";
+		 	text += String.format("EMA7: %s, EMA25: %s, EMA99: %s ", PriceUtil.formatDoubleDecimal(lastKlines.getEma7(), decimalNum),
+		 			PriceUtil.formatDoubleDecimal(lastKlines.getEma25(), decimalNum),
+		 			PriceUtil.formatDoubleDecimal(lastKlines.getEma99(), decimalNum));
+					
+			sendEmail(subject, text, null);
+		}
 	}
 	
 }

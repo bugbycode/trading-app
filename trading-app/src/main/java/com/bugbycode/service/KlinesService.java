@@ -90,6 +90,12 @@ public interface KlinesService {
 	 * @param klinesList_hit
 	 */
 	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
+
+	/**
+	 * EMA点位监控
+	 * @param klinesList
+	 */
+	public void futuresEMAMonitor(List<Klines> klinesList);
 	
 	/**
 	 * 发送邮件
