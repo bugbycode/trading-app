@@ -30,6 +30,7 @@ import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
 import com.util.KlinesComparator;
+import com.util.KlinesUtil;
 import com.util.PriceUtil;
 import com.util.StringUtil;
 
@@ -650,6 +651,46 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, null);
 			}
 		}
+	}
+
+	@Override
+	public void futuresEmaRiseAndFall(List<Klines> klinesList) {
+
+		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA7);
+		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA25);
+		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA99);
+		
+		KlinesUtil ku = new KlinesUtil(klinesList);
+		Klines lastKlines = ku.removeLast();
+		Klines parentKlines = ku.removeLast();
+
+		String pair = lastKlines.getPair();
+		
+		int decimalNum = lastKlines.getDecimalNum();
+		
+		String subject = "";
+		String text = "";
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		//开始上涨
+		if(parentKlines.getEma7() < parentKlines.getEma25() && 
+				lastKlines.getEma7() >= lastKlines.getEma25()) {
+			subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
+		}
+		//开始下跌
+		else if(parentKlines.getEma7() > parentKlines.getEma25() && 
+				lastKlines.getEma7() <= lastKlines.getEma25()) {
+			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
+		}
+		
+		text = lastKlines.toString() + "\n\n";
+		text += String.format("EMA7: %s, EMA25: %s, EMA99: %s ", PriceUtil.formatDoubleDecimal(lastKlines.getEma7(), decimalNum),
+				PriceUtil.formatDoubleDecimal(lastKlines.getEma25(), decimalNum),
+				PriceUtil.formatDoubleDecimal(lastKlines.getEma99(), decimalNum));
+		
+		//logger.info(text);
+		
+		sendEmail(subject, text, null);
 	}
 	
 }

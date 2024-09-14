@@ -102,6 +102,12 @@ public interface KlinesService {
 	 * @param klinesList
 	 */
 	public void futuresRiseAndFall(List<Klines> klinesList);
+
+	/**
+	 * EMA指标判断涨跌
+	 * @param klinesList
+	 */
+	public void futuresEmaRiseAndFall(List<Klines> klinesList);
 	
 	/**
 	 * 发送邮件
