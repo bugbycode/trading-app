@@ -1,9 +1,14 @@
 package com.bugbycode.module;
 
+import org.springframework.data.annotation.Id;
+
 import com.util.DateFormatUtil;
 
 public class Klines {
 	
+	@Id
+	private String id;//mongodb数据库唯一标识
+
 	private String pair;//交易对
 	
 	private long startTime; //开盘时间
@@ -41,6 +46,10 @@ public class Klines {
 		this.interval = interval;
 	}
 	
+	public String getId(){
+		return this.id;
+	}
+
 	public String getPair() {
 		return pair;
 	}
