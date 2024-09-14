@@ -118,7 +118,7 @@ public class SyncKlinesTask implements Runnable{
 
         } catch (Exception e) {
             logger.error("同步" + pair + "交易对K线信息时出现异常", e);
-			EmailUtil.send("程序运行出现异常", "同步" + pair + "K线信息时出现异常，异常信息：" + e.getLocalizedMessage());
+			EmailUtil.send("程序运行出现异常", "同步" + pair + "交易对K线信息时出现异常，异常信息：" + e.getLocalizedMessage());
         }
     }
     

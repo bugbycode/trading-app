@@ -58,7 +58,7 @@ public class AnalysisKlinesTask implements Runnable{
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
-			EmailUtil.send("程序运行出现异常", "分析" + pair + "k线信息时出现异常，异常信息：" + e.getLocalizedMessage());
+			EmailUtil.send("程序运行出现异常", "分析" + pair + "交易对k线信息时出现异常，异常信息：" + e.getLocalizedMessage());
         }
     }
 
