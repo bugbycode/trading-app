@@ -14,11 +14,14 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.bugbycode.module.EMAType;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.repository.KlinesRepository;
 import com.bugbycode.service.KlinesService;
+import com.util.DateFormatUtil;
+import com.util.PriceUtil;
 
 import jakarta.annotation.Resource;
 
@@ -39,19 +42,24 @@ public class AppJunitTest {
 
 	@Test
 	public void testMongo(){
-		Date now = new Date();
-		String interval = Inerval.INERVAL_1H.getDescption();
-		Klines k = new Klines("BTCUSDT", now.getTime() + 60000, 0, 0, 0, 0, now.getTime(),interval, 2);
-		klinesRepository.insert(k);
-		k = new Klines("BTCUSDT", now.getTime(), 0, 0, 0, 0, now.getTime(),interval, 2);
-		klinesRepository.insert(k);
-		//logger.info(k);
-		List<Klines> list = klinesRepository.findByPairAndGtStartTime("BTCUSDT", now.getTime() - 99999,interval);
+		List<Klines> list = klinesRepository.findByPair("BTCUSDT", Inerval.INERVAL_1D.getDescption());
 		logger.info(list);
-
-		for(Klines kl : list){
-			klinesRepository.remove(kl.getStartTime(),kl.getPair(),interval);
-		}
 	}
 	
+	@Test
+	public void query15MKlines(){
+		List<Klines> list = klinesRepository.findByPair("ETCUSDT", Inerval.INERVAL_15M.getDescption());
+		PriceUtil.calculateEMAArray(list, EMAType.EMA7);
+		PriceUtil.calculateEMAArray(list, EMAType.EMA25);
+		PriceUtil.calculateEMAArray(list, EMAType.EMA99);
+		for(Klines kl : list){
+			logger.info(kl.getId() + ": " + kl);
+		}
+	}
+
+	@Test
+	public void testFindById(){
+		Klines klines = klinesRepository.findById("66e45a7e074d3d1e99fa5edf");
+		logger.info(klines);
+	}
 }
