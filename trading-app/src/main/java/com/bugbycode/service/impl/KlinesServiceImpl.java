@@ -344,6 +344,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(lastDayKlines.isEquals(hitLowKlines)) {
 				lastDayStr = "昨日最低价";
+				return;
 			}
 			
 			if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
@@ -366,6 +367,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(lastDayKlines.isEquals(hitHighKlines)) {
 				lastDayStr = "昨日最高价";
+				return;
 			}
 			
 			double highPrice = hitHighKlines.getHighPrice();
