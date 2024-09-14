@@ -73,7 +73,7 @@ public class SyncKlinesTask implements Runnable{
                 
                 if(!CollectionUtils.isEmpty(klines_list)){
                     
-                    logger.info("同步到" + klines_list.size() + "条" + pair + "日线级别k线信息");
+                    logger.info("已获取到" + klines_list.size() + "条" + pair + "日线级别k线信息");
                     
                     klinesRepository.insert(klines_list);
                 }
@@ -113,7 +113,7 @@ public class SyncKlinesTask implements Runnable{
                         Inerval.INERVAL_15M.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
             if(!CollectionUtils.isEmpty(klines_list_15m)){
                 
-                logger.info("同步到" + klines_list_15m.size() + "条" + pair + "十五分钟级别k线信息");
+                logger.info("已获取到" + klines_list_15m.size() + "条" + pair + "十五分钟级别k线信息");
 
                 klinesRepository.insert(klines_list_15m);
             }
