@@ -48,9 +48,9 @@ public class AnalysisKlinesTask implements Runnable{
             }
 
             //斐波那契回撤分析
-            if("BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)) {
+            /*if("BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)) {
                 klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
-            }
+            }*/
             
             //涨跌分析
             klinesService.futuresRiseAndFall(klines_list_15m);
