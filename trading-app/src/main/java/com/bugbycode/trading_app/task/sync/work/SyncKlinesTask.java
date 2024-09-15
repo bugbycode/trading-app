@@ -63,7 +63,7 @@ public class SyncKlinesTask implements Runnable{
             Klines lastDayKlines = ku.removeLast();
             
             if(lastDayKlines != null && lastDayKlines.getStartTime() >= lastDayStartTimeDate.getTime()){
-                logger.info(pair + "日线级别k线已是最新数据");
+                logger.info(pair + "交易对日线级别k线已是最新数据");
             } else {
                 
                 long startTime = lastDayKlines == null ? firstDayStartTime.getTime() : lastDayKlines.getEndTime() + 1;
@@ -73,7 +73,7 @@ public class SyncKlinesTask implements Runnable{
                 
                 if(!CollectionUtils.isEmpty(klines_list)){
                     
-                    logger.info("已获取到" + klines_list.size() + "条" + pair + "日线级别k线信息");
+                    logger.info("已获取到" + klines_list.size() + "条" + pair + "交易对日线级别k线信息");
                     
                     klinesRepository.insert(klines_list);
                 }
@@ -101,7 +101,7 @@ public class SyncKlinesTask implements Runnable{
                 if(klines_list_15m_db.size() > 3000){
                     Klines last_15m_klines = ku_15m.removeFirst();
                     klinesRepository.remove(last_15m_klines.getStartTime(), pair, Inerval.INERVAL_15M.getDescption());
-                    logger.info(pair + "15分钟级别数据库中已超过3000条，将删除最旧的一条k线数据");
+                    logger.info(pair + "交易对15分钟级别数据库中已超过3000条，将删除最旧的一条k线数据");
                     //logger.info(last_15m_klines);
                 }
             } else {
@@ -113,7 +113,7 @@ public class SyncKlinesTask implements Runnable{
                         Inerval.INERVAL_15M.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
             if(!CollectionUtils.isEmpty(klines_list_15m)){
                 
-                logger.info("已获取到" + klines_list_15m.size() + "条" + pair + "十五分钟级别k线信息");
+                logger.info("已获取到" + klines_list_15m.size() + "条" + pair + "交易对十五分钟级别k线信息");
 
                 klinesRepository.insert(klines_list_15m);
             }
