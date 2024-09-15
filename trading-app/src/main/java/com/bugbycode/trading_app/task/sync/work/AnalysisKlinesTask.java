@@ -37,20 +37,18 @@ public class AnalysisKlinesTask implements Runnable{
             //查询日线级别K线信息
             List<Klines> klines_list_1d = klinesRepository.findByPair(pair, Inerval.INERVAL_1D.getDescption());
             if(CollectionUtils.isEmpty(klines_list_1d)){
-                logger.info("无法获取" + pair + "日线级别K线信息");
+                logger.info("无法获取" + pair + "交易对日线级别K线信息");
                 return;
             }
             //查询15分钟级别k线信息
             List<Klines> klines_list_15m = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
             if(CollectionUtils.isEmpty(klines_list_15m)){
-                logger.info("无法获取" + pair + "15分钟级别K线信息");
+                logger.info("无法获取" + pair + "交易对15分钟级别K线信息");
                 return;
             }
 
             //斐波那契回撤分析
-            /*if("BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)) {
-                klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
-            }*/
+            klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
             
             //涨跌分析
             klinesService.futuresRiseAndFall(klines_list_15m);
@@ -62,7 +60,7 @@ public class AnalysisKlinesTask implements Runnable{
             //klinesService.futuresEmaRiseAndFall(klines_list_15m);
 
             //标志性高低点分析
-            klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
+            //klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
