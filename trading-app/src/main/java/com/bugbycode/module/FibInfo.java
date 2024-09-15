@@ -101,7 +101,7 @@ public class FibInfo {
 	 */
     public double calculateFibonacciRetracement(double low, double high, double fibonacciLevel) {
         
-    	if (fibonacciLevel < FibCode.FIB0.getValue() || fibonacciLevel > FibCode.FIB1_618.getValue()) {
+    	if (fibonacciLevel < FibCode.FIB0.getValue() || fibonacciLevel > FibCode.FIB4_764.getValue()) {
             throw new IllegalArgumentException("参数不合法。");
         }
 
