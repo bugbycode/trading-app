@@ -9,7 +9,6 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.LongOrShortType;
 import com.bugbycode.module.PlanStatus;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.TradingPlan;
 
 public class StringUtil {
@@ -161,6 +160,7 @@ public class StringUtil {
 				plan.setLongOrShort(LongOrShortType.resolve(arr[1]).getValue());
 				plan.setHitPrice(Double.valueOf(arr[2]));
 				plan.setStatus(PlanStatus.VALID.getValue());
+				plan.setFilename(filename);
 				list.add(plan);
 			}
 		}

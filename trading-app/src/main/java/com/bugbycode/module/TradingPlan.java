@@ -37,6 +37,8 @@ public class TradingPlan {
     
     //执行时间
     private long execTime;
+    
+    private String filename;
 
 	public String getId() {
 		return id;
@@ -126,6 +128,14 @@ public class TradingPlan {
 
 	public void setExecTime(long execTime) {
 		this.execTime = execTime;
+	}
+
+	public String getFilename() {
+		return filename;
+	}
+
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 
 	@Override

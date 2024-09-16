@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.bugbycode.config.AppConfig;
-import com.bugbycode.module.LongOrShortType;
 import com.bugbycode.module.TradingPlan;
 import com.bugbycode.service.plan.TradingPlanService;
 import com.util.StringUtil;
@@ -26,8 +25,7 @@ public class TradingPlanServiceImpl implements TradingPlanService {
 	}
 
 	@Override
-	public void removeTradingPlan(String pair, LongOrShortType type, double hitPrice) {
-		String filename = String.format("%s_%s_%s", pair, type.getLabel(), hitPrice).toLowerCase();
+	public void removeTradingPlan(String filename) {
 		File file = new File(AppConfig.CACHE_PATH + "/" + filename);
 		if(file.exists()) {
 			file.delete();
