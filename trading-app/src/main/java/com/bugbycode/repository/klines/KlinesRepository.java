@@ -1,4 +1,4 @@
-package com.bugbycode.repository;
+package com.bugbycode.repository.klines;
 
 import java.util.List;
 

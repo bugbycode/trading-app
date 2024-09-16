@@ -6,6 +6,7 @@ import com.bugbycode.module.EmailInfo;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.TradingPlan;
 
 public class StringUtil {
 	
@@ -124,5 +125,25 @@ public class StringUtil {
 			buff.append(arr[index]);
 		}
 		return buff.toString();
+	}
+	
+	/**
+	 * 交易计划信息格式
+	 * @param plan
+	 * @param decimalPoint
+	 * @return
+	 */
+	public static String formatPlan(TradingPlan plan,int decimalPoint) {
+		String formatStr = "开仓价：%s，止盈价：%s，止损价：%s，盈亏比：%s";
+		String ration = "";
+		switch (plan.getLongOrShortType()) {
+		case LONG: {
+			ration = PriceUtil.formatDoubleDecimal((plan.getTakeProfitPrice() - plan.getOpeningPrice()) / (plan.getOpeningPrice() - plan.getStopLossPrice()),2);
+			break;
+		}
+		default:
+			ration = PriceUtil.formatDoubleDecimal((plan.getOpeningPrice() - plan.getTakeProfitPrice()) / (plan.getStopLossPrice() - plan.getOpeningPrice()),2);
+		}
+		return String.format(formatStr, plan.getTakeProfitPrice(), plan.getStopLossPrice(),ration);
 	}
 }

@@ -1,4 +1,4 @@
-package com.bugbycode.repository.impl;
+package com.bugbycode.repository.klines.impl;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.Klines;
-import com.bugbycode.repository.KlinesRepository;
+import com.bugbycode.repository.klines.KlinesRepository;
 import com.util.KlinesComparator;
 import com.util.StringUtil;
 

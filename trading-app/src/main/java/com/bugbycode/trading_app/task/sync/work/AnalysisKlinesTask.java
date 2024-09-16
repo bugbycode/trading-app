@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
-import com.bugbycode.repository.KlinesRepository;
+import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.KlinesService;
 import com.util.EmailUtil;
 
