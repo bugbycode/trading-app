@@ -61,7 +61,7 @@ public class SyncKlinesTask implements Runnable{
 					
 					Klines klines = PriceUtil.getLastKlines(list_1_x_15m);
 					
-					logger.info(klines);
+					//logger.info(klines);
 					
 					analysisWorkTaskPool.add(new AnalysisKlinesTask(plan, klines, klinesService, planRepository));
 				}
