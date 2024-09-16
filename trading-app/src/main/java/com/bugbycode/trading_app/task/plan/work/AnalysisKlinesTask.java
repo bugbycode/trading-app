@@ -58,14 +58,14 @@ public class AnalysisKlinesTask implements Runnable {
 			case LONG: {
 				if(hitKlines.getLowPrice() <= hitPrice && hitKlines.getHighPrice() >= hitPrice) {
 					subject = plan.getPair() + "永续合约(" + plan.getHitPrice() + ")做多交易计划 " + dateStr;
-					text = plan.getPair() + "永续合约价格已下跌到(" + plan.getHitPrice() + ")，请注意查看是否存在做多机会！";
+					text = plan.getPair() + "永续合约价格已下跌至(" + plan.getHitPrice() + ")，请注意查看是否存在做多机会！";
 				}
 				break;
 			}
 			default:
 				if(hitKlines.getLowPrice() <= hitPrice && hitKlines.getHighPrice() >= hitPrice) {
 					subject = plan.getPair() + "永续合约(" + plan.getHitPrice() + ")做空交易计划 " + dateStr;
-					text = plan.getPair() + "永续合约价格已上涨到(" + plan.getHitPrice() + ")，请注意查看是否存在做空机会！";
+					text = plan.getPair() + "永续合约价格已上涨至(" + plan.getHitPrice() + ")，请注意查看是否存在做空机会！";
 				}
 			}
 			
