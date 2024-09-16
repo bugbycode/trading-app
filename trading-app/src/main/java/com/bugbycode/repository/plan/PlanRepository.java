@@ -26,12 +26,12 @@ public interface PlanRepository {
 	public TradingPlan findById(String _id);
 	
 	/**
-	 * 根据交易对、开仓价格查询交易计划
+	 * 根据交易对、触发价格查询交易计划
 	 * @param pair
-	 * @param openingPrice
+	 * @param hitPrice
 	 * @return
 	 */
-	public TradingPlan findByPairAndOpeningPrice(String pair,double openingPrice);
+	public TradingPlan findByPairAndHitPrice(String pair,double hitPrice);
 	
 	/**
 	 * 根据交易对查询所有交易计划

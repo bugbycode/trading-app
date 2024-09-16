@@ -25,7 +25,7 @@ public class PlanRepositoryImpl implements PlanRepository {
 	
 	@Override
 	public void insert(TradingPlan plan) {
-		TradingPlan tmp = findByPairAndOpeningPrice(plan.getPair(), plan.getOpeningPrice());
+		TradingPlan tmp = findByPairAndHitPrice(plan.getPair(), plan.getHitPrice());
 		if(tmp != null) { 
 			deleteById(tmp.getId());
 		}
@@ -43,9 +43,9 @@ public class PlanRepositoryImpl implements PlanRepository {
 	}
 
 	@Override
-	public TradingPlan findByPairAndOpeningPrice(String pair, double openingPrice) {
+	public TradingPlan findByPairAndHitPrice(String pair, double hitPrice) {
 		
-		Query query = Query.query(Criteria.where("pair").is(pair).and("openingPrice").is(openingPrice));
+		Query query = Query.query(Criteria.where("pair").is(pair).and("hitPrice").is(hitPrice));
 		
 		return template.findOne(query, TradingPlan.class);
 	}
