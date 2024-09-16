@@ -19,7 +19,7 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
-import com.bugbycode.service.KlinesService;
+import com.bugbycode.service.klines.KlinesService;
 import com.util.EmailUtil;
 import com.util.PriceUtil;
 import com.util.StringUtil;

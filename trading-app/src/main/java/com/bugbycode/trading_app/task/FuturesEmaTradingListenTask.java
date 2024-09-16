@@ -15,7 +15,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.EMAType;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
-import com.bugbycode.service.KlinesService;
+import com.bugbycode.service.klines.KlinesService;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
 import com.util.KlinesUtil;

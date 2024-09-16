@@ -1,4 +1,4 @@
-package com.bugbycode.service;
+package com.bugbycode.service.klines;
 
 import java.util.Date;
 import java.util.List;

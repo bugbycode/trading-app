@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
-import com.bugbycode.service.KlinesService;
+import com.bugbycode.service.klines.KlinesService;
 import com.util.EmailUtil;
 import com.util.StringUtil;
 

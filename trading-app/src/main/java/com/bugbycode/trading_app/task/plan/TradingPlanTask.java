@@ -13,7 +13,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.TradingPlan;
 import com.bugbycode.repository.plan.PlanRepository;
-import com.bugbycode.service.KlinesService;
+import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.plan.work.SyncKlinesTask;
 import com.util.PlanPairSet;

@@ -12,7 +12,7 @@ import com.bugbycode.module.PlanStatus;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.TradingPlan;
 import com.bugbycode.repository.plan.PlanRepository;
-import com.bugbycode.service.KlinesService;
+import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.util.EmailUtil;
 import com.util.PriceUtil;

@@ -1,4 +1,4 @@
-package com.bugbycode.service.impl;
+package com.bugbycode.service.klines.impl;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -25,7 +25,7 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
-import com.bugbycode.service.KlinesService;
+import com.bugbycode.service.klines.KlinesService;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
