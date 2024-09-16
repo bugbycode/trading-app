@@ -144,6 +144,6 @@ public class StringUtil {
 		default:
 			ration = PriceUtil.formatDoubleDecimal((plan.getOpeningPrice() - plan.getTakeProfitPrice()) / (plan.getStopLossPrice() - plan.getOpeningPrice()),2);
 		}
-		return String.format(formatStr, plan.getTakeProfitPrice(), plan.getStopLossPrice(),ration);
+		return String.format(formatStr, plan.getOpeningPrice() ,plan.getTakeProfitPrice(), plan.getStopLossPrice(),ration);
 	}
 }
