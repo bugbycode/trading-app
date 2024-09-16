@@ -36,4 +36,14 @@ public enum LongOrShortType {
 		}
 		throw new RuntimeException("仓位类型错误");
 	}
+	
+	public static LongOrShortType resolve(String typeStr) {
+		LongOrShortType[] arr = values();
+		for(LongOrShortType type : arr) {
+			if(type.getLabel().equals(typeStr)) {
+				return type;
+			}
+		}
+		throw new RuntimeException("仓位类型错误");
+	}
 }

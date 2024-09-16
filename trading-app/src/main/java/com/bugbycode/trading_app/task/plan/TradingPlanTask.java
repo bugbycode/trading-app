@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.TradingPlan;
-import com.bugbycode.repository.plan.PlanRepository;
 import com.bugbycode.service.klines.KlinesService;
+import com.bugbycode.service.plan.TradingPlanService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.plan.work.SyncKlinesTask;
 import com.util.PlanPairSet;
@@ -34,7 +34,7 @@ public class TradingPlanTask {
     private WorkTaskPool workTaskPool;
 	
 	@Autowired
-	private PlanRepository planRepository;
+	private TradingPlanService tradingPlanService;
 	
 	@Autowired
 	private KlinesService klinesService;
@@ -50,7 +50,7 @@ public class TradingPlanTask {
 		Date now = new Date();
 		
 		//查询所有任务
-		List<TradingPlan> list = planRepository.findAll();
+		List<TradingPlan> list = tradingPlanService.getAllTradingPlan();
 		
 		if(CollectionUtils.isEmpty(list)) {
 			logger.info("当前没有交易计划可执行");
@@ -61,7 +61,7 @@ public class TradingPlanTask {
 		planPairSet.addPair(list);
 		
 		for(String pair : planPairSet) {
-			workTaskPool.add(new SyncKlinesTask(klinesService, planRepository, analysisWorkTaskPool, pair, now));
+			workTaskPool.add(new SyncKlinesTask(klinesService, tradingPlanService, analysisWorkTaskPool, pair, now));
 		}
 	}
 }

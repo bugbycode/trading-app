@@ -1,10 +1,14 @@
 package com.util;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.bugbycode.module.EmailInfo;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
+import com.bugbycode.module.LongOrShortType;
+import com.bugbycode.module.PlanStatus;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.TradingPlan;
 
@@ -145,5 +149,21 @@ public class StringUtil {
 			ration = PriceUtil.formatDoubleDecimal((plan.getOpeningPrice() - plan.getTakeProfitPrice()) / (plan.getStopLossPrice() - plan.getOpeningPrice()),2);
 		}
 		return String.format(formatStr, plan.getOpeningPrice() ,plan.getTakeProfitPrice(), plan.getStopLossPrice(),ration);
+	}
+	
+	public static List<TradingPlan> parse(String[] filenames){
+		List<TradingPlan> list = new ArrayList<TradingPlan>();
+		if(filenames != null) {
+			for(String filename : filenames) {
+				String[] arr = filename.toUpperCase().split("_");
+				TradingPlan plan = new TradingPlan();
+				plan.setPair(arr[0]);
+				plan.setLongOrShort(LongOrShortType.resolve(arr[1]).getValue());
+				plan.setHitPrice(Double.valueOf(arr[2]));
+				plan.setStatus(PlanStatus.VALID.getValue());
+				list.add(plan);
+			}
+		}
+		return list;
 	}
 }

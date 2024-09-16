@@ -9,8 +9,8 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.LongOrShortType;
 import com.bugbycode.module.PlanStatus;
 import com.bugbycode.module.TradingPlan;
-import com.bugbycode.repository.plan.PlanRepository;
 import com.bugbycode.service.klines.KlinesService;
+import com.bugbycode.service.plan.TradingPlanService;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
 import com.util.StringUtil;
@@ -28,14 +28,14 @@ public class AnalysisKlinesTask implements Runnable {
 	
 	private KlinesService klinesService;
 	
-	private PlanRepository planRepository;
+	private TradingPlanService tradingPlanService;
 	
 	public AnalysisKlinesTask(TradingPlan plan, Klines hitKlines,KlinesService klinesService,
-			PlanRepository planRepository) {
+			TradingPlanService tradingPlanService) {
 		this.plan = plan;
 		this.hitKlines = hitKlines;
 		this.klinesService = klinesService;
-		this.planRepository = planRepository;
+		this.tradingPlanService = tradingPlanService;
 	}
 
 	@Override
@@ -51,27 +51,28 @@ public class AnalysisKlinesTask implements Runnable {
 			double hitPrice = plan.getHitPrice();
 			
 			String subject = "";
-			String text = StringUtil.formatPlan(plan, hitKlines.getDecimalNum());
+			//String text = StringUtil.formatPlan(plan, hitKlines.getDecimalNum());
+			String text = "";
 			
 			switch (type) {
 			case LONG: {
-				//最低价小于条件价 开盘价大于条件价
-				if(hitKlines.getLowPrice() <= hitPrice && hitKlines.getOpenPrice() >= hitPrice) {
+				if(hitKlines.getLowPrice() <= hitPrice && hitKlines.getHighPrice() >= hitPrice) {
 					subject = plan.getPair() + "永续合约(" + plan.getHitPrice() + ")做多交易计划 " + dateStr;
+					text = plan.getPair() + "永续合约价格已上涨到(" + plan.getHitPrice() + ")，请注意查看是否存在做多机会！";
 				}
 				break;
 			}
 			default:
-				//最高价大于条件价 开盘价小于条件价
-				if(hitKlines.getHighPrice() >= hitPrice && hitKlines.getOpenPrice() <= hitPrice) {
+				if(hitKlines.getLowPrice() <= hitPrice && hitKlines.getHighPrice() >= hitPrice) {
 					subject = plan.getPair() + "永续合约(" + plan.getHitPrice() + ")做空交易计划 " + dateStr;
+					text = plan.getPair() + "永续合约价格已下跌到(" + plan.getHitPrice() + ")，请注意查看是否存在做空机会！";
 				}
 			}
 			
 			if(StringUtil.isNotEmpty(subject)) {
 				klinesService.sendEmail(subject, text, null);
-				planRepository.deleteById(plan.getId());
-				logger.info("交易计划任务已触发，已从数据库中删除");
+				tradingPlanService.removeTradingPlan(plan.getPair(), plan.getLongOrShortType(), hitPrice);
+				logger.info("交易计划任务已触发，已将其删除");
 			}
 			
 		} catch (Exception e) {

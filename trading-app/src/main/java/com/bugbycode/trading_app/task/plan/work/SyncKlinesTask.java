@@ -11,8 +11,8 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.PlanStatus;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.TradingPlan;
-import com.bugbycode.repository.plan.PlanRepository;
 import com.bugbycode.service.klines.KlinesService;
+import com.bugbycode.service.plan.TradingPlanService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.util.EmailUtil;
 import com.util.PriceUtil;
@@ -26,7 +26,7 @@ public class SyncKlinesTask implements Runnable{
 	
 	private KlinesService klinesService;
 	
-	private PlanRepository planRepository;
+	private TradingPlanService tradingPlanService;
 	
 	private WorkTaskPool analysisWorkTaskPool;
 	
@@ -34,9 +34,9 @@ public class SyncKlinesTask implements Runnable{
 	
 	private Date now;
 	
-	public SyncKlinesTask(KlinesService klinesService, PlanRepository planRepository, WorkTaskPool analysisWorkTaskPool, String pair, Date now) {
+	public SyncKlinesTask(KlinesService klinesService, TradingPlanService tradingPlanService, WorkTaskPool analysisWorkTaskPool, String pair, Date now) {
 		this.klinesService = klinesService;
-		this.planRepository = planRepository;
+		this.tradingPlanService = tradingPlanService;
 		this.pair = pair;
 		this.now = now;
 		this.analysisWorkTaskPool = analysisWorkTaskPool;
@@ -45,9 +45,12 @@ public class SyncKlinesTask implements Runnable{
 	@Override
 	public void run() {
 		try {
-			List<TradingPlan> list = planRepository.find(pair);
+			List<TradingPlan> list = tradingPlanService.getAllTradingPlan();
 			if(!CollectionUtils.isEmpty(list)) {
 				for(TradingPlan plan : list) {
+					if(!plan.getPair().equals(pair)) {
+						continue;
+					}
 					if(plan.getPlanStatus() == PlanStatus.IN_VALID) {
 						logger.info("任务已失效");
 						return;
@@ -61,9 +64,7 @@ public class SyncKlinesTask implements Runnable{
 					
 					Klines klines = PriceUtil.getLastKlines(list_1_x_15m);
 					
-					//logger.info(klines);
-					
-					analysisWorkTaskPool.add(new AnalysisKlinesTask(plan, klines, klinesService, planRepository));
+					analysisWorkTaskPool.add(new AnalysisKlinesTask(plan, klines, klinesService, tradingPlanService));
 				}
 			}
 		} catch (Exception e) {
