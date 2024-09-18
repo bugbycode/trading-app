@@ -21,8 +21,8 @@ import com.util.PlanPairSet;
 /**
  * 交易计划任务
  */
-//@Configuration
-//@EnableScheduling
+@Configuration
+@EnableScheduling
 public class TradingPlanTask {
 
 	private final Logger logger = LogManager.getLogger(TradingPlanTask.class);
@@ -44,7 +44,7 @@ public class TradingPlanTask {
 	 * 
 	 * @throws Exception
 	 */
-	//@Scheduled(cron = "6 0/5 * * * ?")
+	@Scheduled(cron = "6 0/5 * * * ?")
 	public void execute() throws Exception {
 		
 		Date now = new Date();
