@@ -19,12 +19,14 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.FibLevel;
+import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
+import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
@@ -41,6 +43,9 @@ public class KlinesServiceImpl implements KlinesService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private HighOrLowHitPriceRepository highOrLowHitPriceRepository;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -309,6 +314,10 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit) {
 		KlinesComparator kc = new KlinesComparator();
+		Date now = new Date();
+
+		Date lastDayEndTime = DateFormatUtil.getEndTime(DateFormatUtil.getHours(now.getTime()));
+		
 		FibKlinesData<List<Klines>,List<Klines>> fibKlinesData = PriceUtil.getFibKlinesData(klinesList);
 		
 		//标志性高点K线信息
@@ -328,11 +337,21 @@ public class KlinesServiceImpl implements KlinesService {
 		lconicHighPriceList.sort(kc);
 		lconicLowPriceList.sort(kc);
 		
+
+		highOrLowHitPriceRepository.remove(pair, lastDayEndTime.getTime());
+		
+		List<HighOrLowHitPrice> priceList = highOrLowHitPriceRepository.find(pair);
+		
+		logger.info("今天命中的价格：");
+		logger.info(priceList);
+		
+		HighOrLowHitPrice todayHitLowPrice = PriceUtil.getMin(priceList);
+		HighOrLowHitPrice todayHitHighPrice = PriceUtil.getMax(priceList);
 		
 		Klines hitLowKlines = PriceUtil.getPositionLowKlines(lconicLowPriceList, klinesList_hit);
 		Klines hitHighKlines = PriceUtil.getPositionHighKlines(lconicHighPriceList, klinesList_hit);
 		
-		String dateStr = DateFormatUtil.format(new Date());
+		String dateStr = DateFormatUtil.format(now);
 		
 		String subject = "";
 		String text = "";
@@ -343,18 +362,21 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			double lowPrice = hitLowKlines.getLowPrice();
 			
+			HighOrLowHitPrice price = new HighOrLowHitPrice(pair, lowPrice, now.getTime());
+			highOrLowHitPriceRepository.insert(price);
+			
 			if(lastDayKlines.isEquals(hitLowKlines)) {
 				lastDayStr = "昨日最低价";
 			}
 			
-			if(PriceUtil.isLong(lowPrice, klinesList_hit)) {
+			if(PriceUtil.isLong(lowPrice, klinesList_hit) && (todayHitLowPrice == null || todayHitLowPrice.getPrice() >= lowPrice)) {
 				
 				subject = String.format("%s永续合约跌破%s(%s)并收回 %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
 				
 				text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
 						DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStartTime())), 
 						PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
-			} else if(PriceUtil.isShort(lowPrice, klinesList_hit)) {
+			} else if(PriceUtil.isShort(lowPrice, klinesList_hit) && (todayHitLowPrice == null || todayHitLowPrice.getPrice() >= lowPrice)) {
 				
 				subject = String.format("%s永续合约跌破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
 				
@@ -371,7 +393,10 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			double highPrice = hitHighKlines.getHighPrice();
 			
-			if(PriceUtil.isLong(highPrice, klinesList_hit)) {
+			HighOrLowHitPrice price = new HighOrLowHitPrice(pair, highPrice, now.getTime());
+			highOrLowHitPriceRepository.insert(price);
+			
+			if(PriceUtil.isLong(highPrice, klinesList_hit) && (todayHitHighPrice == null || todayHitHighPrice.getPrice() <= highPrice)) {
 				
 				subject = String.format("%s永续合约突破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
 				
@@ -379,7 +404,7 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format_yyyy_mm_dd(new Date(hitHighKlines.getStartTime())), 
 						PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()));
 				
-			} else if(PriceUtil.isShort(highPrice, klinesList_hit)) {
+			} else if(PriceUtil.isShort(highPrice, klinesList_hit) && (todayHitHighPrice == null || todayHitHighPrice.getPrice() <= highPrice)) {
 				
 				subject = String.format("%s永续合约突破%s(%s)并收回 %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
 				

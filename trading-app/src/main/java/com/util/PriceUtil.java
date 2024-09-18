@@ -15,6 +15,7 @@ import com.bugbycode.module.EMAType;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
+import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Klines;
 
 public class PriceUtil {
@@ -917,6 +918,30 @@ public class PriceUtil {
     				&& !checkLowerKlines(k, subList(k, list))) {
     			result = k;
     			break;
+    		}
+    	}
+    	return result;
+    }
+    
+    public static HighOrLowHitPrice getMax(List<HighOrLowHitPrice> list) {
+    	HighOrLowHitPrice result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		for(HighOrLowHitPrice price : list) {
+    			if(result == null || result.getPrice() < price.getPrice()) {
+    				result = price;
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
+    public static HighOrLowHitPrice getMin(List<HighOrLowHitPrice> list) {
+    	HighOrLowHitPrice result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		for(HighOrLowHitPrice price : list) {
+    			if(result == null || result.getPrice() > price.getPrice()) {
+    				result = price;
+    			}
     		}
     	}
     	return result;
