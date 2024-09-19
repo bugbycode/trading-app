@@ -377,7 +377,8 @@ public class KlinesServiceImpl implements KlinesService {
 				text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
 						DateFormatUtil.format_yyyy_mm_dd(new Date(hitLowKlines.getStartTime())), 
 						PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()));
-			} else if(PriceUtil.isShort(lowPrice, klinesList_hit) && (todayHitLowPrice == null || todayHitLowPrice.getPrice() >= lowPrice)) {
+			} else if(PriceUtil.isShort(lowPrice, klinesList_hit) && (todayHitLowPrice == null || todayHitLowPrice.getPrice() >= lowPrice)
+				&& ("BTCUSDT".equals(pair) || "ETHUSDT".equals(pair))) {
 				
 				subject = String.format("%s永续合约跌破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(lowPrice, hitLowKlines.getDecimalNum()),dateStr);
 				
@@ -397,7 +398,8 @@ public class KlinesServiceImpl implements KlinesService {
 			HighOrLowHitPrice price = new HighOrLowHitPrice(pair, highPrice, now.getTime());
 			highOrLowHitPriceRepository.insert(price);
 			
-			if(PriceUtil.isLong(highPrice, klinesList_hit) && (todayHitHighPrice == null || todayHitHighPrice.getPrice() <= highPrice)) {
+			if(PriceUtil.isLong(highPrice, klinesList_hit) && (todayHitHighPrice == null || todayHitHighPrice.getPrice() <= highPrice)
+				&& ("BTCUSDT".equals(pair) || "ETHUSDT".equals(pair))) {
 				
 				subject = String.format("%s永续合约突破%s(%s) %s", pair,lastDayStr,PriceUtil.formatDoubleDecimal(highPrice, hitHighKlines.getDecimalNum()),dateStr);
 				
