@@ -330,11 +330,11 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String pair = lastDayKlines.getPair();
 		
-		if(lastDayKlines.isDownlead() || "BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)){
+		if(lastDayKlines.isDownlead()){
 			lconicLowPriceList.add(lastDayKlines);
 		}
 		
-		if(lastDayKlines.isUplead() || "BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)){
+		if(lastDayKlines.isUplead()){
 			lconicHighPriceList.add(lastDayKlines);
 		}
 		
