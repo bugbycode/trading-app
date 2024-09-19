@@ -330,20 +330,21 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String pair = lastDayKlines.getPair();
 		
-		lconicHighPriceList.add(lastDayKlines);
-		lconicLowPriceList.add(lastDayKlines);
+		if(lastDayKlines.isDownlead() || "BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)){
+			lconicLowPriceList.add(lastDayKlines);
+		}
+		
+		if(lastDayKlines.isUplead() || "BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)){
+			lconicHighPriceList.add(lastDayKlines);
+		}
 		
 		//排序 按开盘时间升序 从旧到新
 		lconicHighPriceList.sort(kc);
 		lconicLowPriceList.sort(kc);
 		
-
 		highOrLowHitPriceRepository.remove(pair, lastDayEndTime.getTime());
 		
 		List<HighOrLowHitPrice> priceList = highOrLowHitPriceRepository.find(pair);
-		
-		logger.info("今天命中的价格：");
-		logger.info(priceList);
 		
 		HighOrLowHitPrice todayHitLowPrice = PriceUtil.getMin(priceList);
 		HighOrLowHitPrice todayHitHighPrice = PriceUtil.getMax(priceList);
