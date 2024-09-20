@@ -26,13 +26,13 @@ import com.util.PriceUtil;
 import com.util.StringUtil;
 
 /**
- * 从币安同步k线定时任务 每十五分钟执行一次
+ * 从币安同步k线定时任务
  */
 @Configuration
 @EnableScheduling
-public class FromBinancePullKlines15mTask {
+public class FromBinancePullKlinesTask {
 
-    private final Logger logger = LogManager.getLogger(FromBinancePullKlines15mTask.class);
+    private final Logger logger = LogManager.getLogger(FromBinancePullKlinesTask.class);
 
     @Autowired
 	private KlinesService klinesService;
@@ -47,14 +47,14 @@ public class FromBinancePullKlines15mTask {
 	private WorkTaskPool analysisWorkTaskPool;
 
     /**
-	 * 查询k线信息 每15分钟执行一次
+	 * 查询k线信息
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/15 * * * ?")
+	@Scheduled(cron = "5 0 * * * ?")
 	public void continuousKlines() throws Exception {
 		
-		logger.info("FromBinancePullKlines15mTask start.");
+		logger.info("FromBinancePullKlinesTask start.");
 		
 		Date now = new Date();
         
@@ -74,7 +74,7 @@ public class FromBinancePullKlines15mTask {
 			e.printStackTrace();
 			EmailUtil.send("程序运行出现异常", e.getLocalizedMessage());
 		} finally {
-			logger.info("FromBinancePullKlines15mTask finish.");
+			logger.info("FromBinancePullKlinesTask finish.");
 		}
     }
 }

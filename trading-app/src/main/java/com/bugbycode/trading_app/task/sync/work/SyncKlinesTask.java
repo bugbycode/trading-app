@@ -80,42 +80,41 @@ public class SyncKlinesTask implements Runnable{
             }
 
             //=======================================================================================================
-            //十五分钟级别
-            List<Klines> klines_list_15m_db = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
+            //1小时级别
+            List<Klines> klines_list_1h_db = klinesRepository.findByPair(pair, Inerval.INERVAL_1H.getDescption());
 
-            klinesRepository.checkData(klines_list_15m_db);
+            klinesRepository.checkData(klines_list_1h_db);
 
-            KlinesUtil ku_15m = new KlinesUtil(klines_list_15m_db);
-            Klines lastKlines_15m = ku_15m.removeLast();
-            //logger.info("数据库中已拥有" + pair + "15分钟级别" + klines_list_15m_db.size() + "条k线信息");
+            KlinesUtil ku_1h = new KlinesUtil(klines_list_1h_db);
+            Klines lastKlines_1h = ku_1h.removeLast();
+            
 
             //开盘时间
             long startTime = 0;
 
-            Date endTime_15m = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
-            Date startTime_15m = DateFormatUtil.getStartTimeBySetMinute(endTime_15m, -Inerval.INERVAL_15M.getNumber() * 4 * 365);//limit根k线
-            endTime_15m = DateFormatUtil.getStartTimeBySetMillisecond(endTime_15m, -1);//收盘时间
+            Date endTime_1h = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
+            Date startTime_1h = DateFormatUtil.getStartTimeBySetHour(endTime_1h, -Inerval.INERVAL_1H.getNumber() * 4 * 365);//limit根k线
+            endTime_1h = DateFormatUtil.getStartTimeBySetMillisecond(endTime_1h, -1);//收盘时间
 
-            if(lastKlines_15m != null){
-                startTime = lastKlines_15m.getEndTime() + 1;
-                if(klines_list_15m_db.size() > 3000){
-                    Klines last_15m_klines = ku_15m.removeFirst();
-                    klinesRepository.remove(last_15m_klines.getStartTime(), pair, Inerval.INERVAL_15M.getDescption());
-                    logger.info(pair + "交易对15分钟级别数据库中已超过3000条，将删除最旧的一条k线数据");
-                    //logger.info(last_15m_klines);
+            if(lastKlines_1h != null){
+                startTime = lastKlines_1h.getEndTime() + 1;
+                if(klines_list_1h_db.size() > 3000){
+                    Klines last_1h_klines = ku_1h.removeFirst();
+                    klinesRepository.remove(last_1h_klines.getStartTime(), pair, Inerval.INERVAL_1H.getDescption());
+                    logger.info(pair + "交易对1小时级别数据库中已超过3000条，将删除最旧的一条k线数据");
                 }
             } else {
-                startTime = startTime_15m.getTime();
+                startTime = startTime_1h.getTime();
             }
 
-            //同步15分钟级别k线信息
-            List<Klines> klines_list_15m = klinesService.continuousKlines(pair, startTime, endTime_15m.getTime(), 
-                        Inerval.INERVAL_15M.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
-            if(!CollectionUtils.isEmpty(klines_list_15m)){
+            //同步1小时级别k线信息
+            List<Klines> klines_list_1h = klinesService.continuousKlines(pair, startTime, endTime_1h.getTime(), 
+                        Inerval.INERVAL_1H.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
+            if(!CollectionUtils.isEmpty(klines_list_1h)){
                 
-                logger.info("已获取到" + klines_list_15m.size() + "条" + pair + "交易对十五分钟级别k线信息");
+                logger.info("已获取到" + klines_list_1h.size() + "条" + pair + "交易对1小时级别k线信息");
 
-                klinesRepository.insert(klines_list_15m);
+                klinesRepository.insert(klines_list_1h);
             }
 
             //开始分析k线

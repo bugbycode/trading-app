@@ -105,6 +105,19 @@ public class DateFormatUtil {
 	}
 	
 	/**
+	 * 将时间更新到多少小时以前或之后
+	 * @param now 当前时间
+	 * @param hour 多少小时
+	 * @return
+	 */
+	public static Date getStartTimeBySetHour(Date now,int hour) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(now);
+		c.add(Calendar.HOUR, hour);
+		return c.getTime();
+	}
+	
+	/**
 	 * 前一天K线起始时间 东八区早上八点整
 	 * @param hours
 	 * @return
