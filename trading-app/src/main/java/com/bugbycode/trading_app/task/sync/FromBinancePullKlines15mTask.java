@@ -28,8 +28,8 @@ import com.util.StringUtil;
 /**
  * 从币安同步k线定时任务 每十五分钟执行一次
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FromBinancePullKlines15mTask {
 
     private final Logger logger = LogManager.getLogger(FromBinancePullKlines15mTask.class);
@@ -51,7 +51,7 @@ public class FromBinancePullKlines15mTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0/15 * * * ?")
+	//@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FromBinancePullKlines15mTask start.");
