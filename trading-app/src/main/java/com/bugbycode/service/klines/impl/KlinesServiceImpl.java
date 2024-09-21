@@ -641,11 +641,11 @@ public class KlinesServiceImpl implements KlinesService {
 						subject = pair + "永续合约价格大跌";
 					}
 				} else {
-					if(pricePercentage >= 10) {
+					if(pricePercentage >= 15) {
 						subject = pair + "永续合约价格大暴跌";
-					} else if(pricePercentage >= 5) {
+					} else if(pricePercentage >= 10) {
 						subject = pair + "永续合约价格暴跌";
-					}else if(pricePercentage >= 3) {
+					}else if(pricePercentage >= 5) {
 						subject = pair + "永续合约价格大跌";
 					}
 				}
@@ -660,11 +660,11 @@ public class KlinesServiceImpl implements KlinesService {
 						subject = pair + "永续合约价格大涨";
 					}
 				} else {
-					if(pricePercentage >= 10) {
+					if(pricePercentage >= 15) {
 						subject = pair + "永续合约价格大暴涨";
-					} else if(pricePercentage >= 5) {
+					} else if(pricePercentage >= 10) {
 						subject = pair + "永续合约价格暴涨";
-					}else if(pricePercentage >= 3) {
+					}else if(pricePercentage >= 5) {
 						subject = pair + "永续合约价格大涨";
 					}
 				}
