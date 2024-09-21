@@ -2,25 +2,28 @@ package com.bugbycode.module;
 
 public enum Inerval {
 
-	INERVAL_5M(5,"5m"),
+	INERVAL_5M(5,"5m","5分钟"),
 
-	INERVAL_15M(15,"15m"),
+	INERVAL_15M(15,"15m","15分钟"),
 	
-	INERVAL_1H(1,"1h"),
+	INERVAL_1H(1,"1h","1小时"),
 	
-	INERVAL_4H(1,"4h"),
+	INERVAL_4H(1,"4h","4小时"),
 	
-	INERVAL_1D(1,"1d"),
+	INERVAL_1D(1,"1d","日线"),
 	
-	INERVAL_1W(1,"1w");
+	INERVAL_1W(1,"1w","周线");
 	
 	private int number;
 	
 	private String descption;
 	
-	private Inerval(int number,String descption) {
+	private String memo;
+	
+	private Inerval(int number,String descption,String memo) {
 		this.number = number;
 		this.descption = descption;
+		this.memo = memo;
 	}
 
 	public int getNumber() {
@@ -29,5 +32,9 @@ public enum Inerval {
 
 	public String getDescption() {
 		return descption;
+	}
+
+	public String getMemo() {
+		return memo;
 	}
 }

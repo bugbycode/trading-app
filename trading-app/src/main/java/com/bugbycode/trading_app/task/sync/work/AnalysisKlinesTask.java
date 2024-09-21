@@ -41,26 +41,26 @@ public class AnalysisKlinesTask implements Runnable{
                 return;
             }
             //查询15分钟级别k线信息
-            List<Klines> klines_list_1h = klinesRepository.findByPair(pair, Inerval.INERVAL_1H.getDescption());
-            if(CollectionUtils.isEmpty(klines_list_1h)){
-                logger.info("无法获取" + pair + "交易对1小时级别K线信息");
+            List<Klines> klines_list_15m = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
+            if(CollectionUtils.isEmpty(klines_list_15m)){
+                logger.info("无法获取" + pair + "交易对15分钟级别K线信息");
                 return;
             }
 
             //斐波那契回撤分析
-            //klinesService.futuresFibMonitor(klines_list_1d, klines_list_1h);
+            //klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
             
             //涨跌分析
-            //klinesService.futuresRiseAndFall(klines_list_1h);
+            //klinesService.futuresRiseAndFall(klines_list_15m);
 
             //EMA指标分析
-            klinesService.futuresEMAMonitor(klines_list_1h);
+            //klinesService.futuresEMAMonitor(klines_list_15m);
 
             //EMA指标涨跌判断
-            klinesService.futuresEmaRiseAndFall(klines_list_1h);
+            //klinesService.futuresEmaRiseAndFall(klines_list_15m);
 
             //标志性高低点分析
-            //klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_1h);
+            klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);

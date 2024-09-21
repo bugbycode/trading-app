@@ -51,7 +51,7 @@ public class FromBinancePullKlinesTask {
 	 * 
 	 * @throws Exception
 	 */
-	@Scheduled(cron = "5 0 * * * ?")
+	@Scheduled(cron = "5 0/15 * * * ?")
 	public void continuousKlines() throws Exception {
 		
 		logger.info("FromBinancePullKlinesTask start.");
