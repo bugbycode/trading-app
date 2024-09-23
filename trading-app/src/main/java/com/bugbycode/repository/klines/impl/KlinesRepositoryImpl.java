@@ -42,13 +42,13 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 
     @Override
     public Klines findOneByStartTime(long startTime,String pair, String interval) {
-        return template.findOne(Query.query(Criteria.where("startTime").is(startTime)
-        .and("pair").is(pair).and("interval").is(interval)), Klines.class);
+        return template.findOne(Query.query(Criteria.where("pair").is(pair)
+        .and("startTime").is(startTime).and("interval").is(interval)), Klines.class);
     }
 
     @Override
     public void remove(long startTime,String pair, String interval) {
-        template.remove(Query.query(Criteria.where("startTime").is(startTime).and("pair").is(pair)
+        template.remove(Query.query(Criteria.where("pair").is(pair).and("startTime").is(startTime)
         .and("interval").is(interval)), Klines.class);
     }
 
