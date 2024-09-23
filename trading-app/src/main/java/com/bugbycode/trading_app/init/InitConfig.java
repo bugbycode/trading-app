@@ -1,7 +1,6 @@
 package com.bugbycode.trading_app.init;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +17,6 @@ import com.bugbycode.module.EmailAuth;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
-import com.bugbycode.trading_app.task.sync.work.SyncKlinesTask;
 import com.util.StringUtil;
 
 import jakarta.annotation.Resource;
@@ -78,15 +76,6 @@ public class InitConfig implements ApplicationRunner {
 		}
 		
 		AppConfig.setEmailAuth(emailAuthList);
-		
-		for(String pair : AppConfig.PAIRS) {
-			pair = pair.trim();
-			if(StringUtil.isEmpty(pair)) {
-				continue;
-			}
-			new SyncKlinesTask(pair, new Date(), klinesService, klinesRepository).run();
-		}
-		
 	}
 
 	@Bean("restTemplate")
