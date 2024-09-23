@@ -75,6 +75,12 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String result = restTemplate.getForObject(url, String.class);
 		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+		}
+		
 		return CommandUtil.format(pair, result, interval);
 	}
 
@@ -327,14 +333,16 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		//昨日K线信息
 		Klines lastDayKlines = PriceUtil.getLastKlines(klinesList);
+		//最后一根k线
+		Klines lastHitKlines = PriceUtil.getLastKlines(klinesList_hit);
 		
 		String pair = lastDayKlines.getPair();
 		
-		if(lastDayKlines.isDownlead()){
+		if(lastDayKlines.isDownlead() && !lastDayKlines.isContains(lastHitKlines)){
 			lconicLowPriceList.add(lastDayKlines);
 		}
 		
-		if(lastDayKlines.isUplead()){
+		if(lastDayKlines.isUplead() && !lastDayKlines.isContains(lastHitKlines)){
 			lconicHighPriceList.add(lastDayKlines);
 		}
 		
