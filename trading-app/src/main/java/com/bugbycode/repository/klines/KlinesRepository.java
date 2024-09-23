@@ -72,4 +72,31 @@ public interface KlinesRepository {
      * @return
      */
     public Klines findById(String _id);
+    
+    /**
+     * 根据交易对名称分页查询所有k线信息
+     * @param pair 交易对
+     * @param interval 时间级别
+	 * @param skip 起始记录
+	 * @param limit 查询条数
+     * @return
+     */
+    public List<Klines> findByPair(String pair,String interval,long skip,int limit);
+    
+    /**
+     * 统计总条数
+     * @param pair 交易对
+     * @param interval 时间级别
+     * @return
+     */
+    public long count(String pair,String interval);
+    
+    /**
+     * 查询最新的一部分k线信息
+     * @param pair 交易对
+     * @param interval 时间级别
+     * @param limit 查询条数
+     * @return
+     */
+    public List<Klines> findLastKlinesByPair(String pair,String interval,int limit);
 }

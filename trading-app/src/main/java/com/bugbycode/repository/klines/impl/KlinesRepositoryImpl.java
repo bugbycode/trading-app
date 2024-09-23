@@ -1,5 +1,6 @@
 package com.bugbycode.repository.klines.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -153,5 +154,25 @@ public class KlinesRepositoryImpl implements KlinesRepository{
     public Klines findById(String _id) {
         return template.findOne(Query.query(Criteria.where("_id").is(_id)), Klines.class);
     }
+
+	@Override
+	public List<Klines> findByPair(String pair, String interval, long skip, int limit) {
+		return template.find(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval))
+	            .with(Sort.by(Sort.Direction.ASC,"startTime")).skip(skip).limit(limit), Klines.class);
+	}
+
+	@Override
+	public long count(String pair, String interval) {
+		return template.count(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval)).with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
+	}
+
+	@Override
+	public List<Klines> findLastKlinesByPair(String pair, String interval, int limit) {
+		long count = count(pair, interval);
+		if(count > 0) {
+			return findByPair(pair, interval, count - limit, limit);
+		}
+		return new ArrayList<Klines>();
+	}
 
 }

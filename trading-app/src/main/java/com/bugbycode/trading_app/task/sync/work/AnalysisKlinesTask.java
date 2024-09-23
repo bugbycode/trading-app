@@ -35,25 +35,25 @@ public class AnalysisKlinesTask implements Runnable{
     public void run() {
         try {
             //查询日线级别K线信息
-            List<Klines> klines_list_1d = klinesRepository.findByPair(pair, Inerval.INERVAL_1D.getDescption());
+            List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),5000);
             if(CollectionUtils.isEmpty(klines_list_1d)){
                 logger.info("无法获取" + pair + "交易对日线级别K线信息");
                 return;
             }
             
             if(!klinesRepository.checkData(klines_list_1d)) {
-            	klines_list_1d = klinesRepository.findByPair(pair, Inerval.INERVAL_1D.getDescption());
+            	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),5000);
             }
             
             //查询15分钟级别k线信息
-            List<Klines> klines_list_15m = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
+            List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),5000);
             if(CollectionUtils.isEmpty(klines_list_15m)){
                 logger.info("无法获取" + pair + "交易对15分钟级别K线信息");
                 return;
             }
             
             if(!klinesRepository.checkData(klines_list_15m)) {
-            	klines_list_15m = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
+            	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),5000);
             }
 
             //斐波那契回撤分析
