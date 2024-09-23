@@ -5,7 +5,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
-import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
 import com.util.KlinesUtil;
@@ -32,15 +31,12 @@ public class SyncKlinesTask implements Runnable{
 
     private KlinesRepository klinesRepository;
 
-    private WorkTaskPool analysisWorkTaskPool;
-
     public SyncKlinesTask(String pair,Date now, KlinesService klinesService,
-        KlinesRepository klinesRepository,WorkTaskPool analysisWorkTaskPool){
+        KlinesRepository klinesRepository){
         this.pair = pair;
         this.now = now;
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
-        this.analysisWorkTaskPool = analysisWorkTaskPool;
     }
 
     @Override
@@ -98,12 +94,6 @@ public class SyncKlinesTask implements Runnable{
 
             if(lastKlines_15m != null){
                 startTime = lastKlines_15m.getEndTime() + 1;
-                if(klines_list_15m_db.size() > 3000){
-                    Klines last_15m_klines = ku_15m.removeFirst();
-                    klinesRepository.remove(last_15m_klines.getStartTime(), pair, Inerval.INERVAL_15M.getDescption());
-                    logger.info(pair + "交易对15分钟级别数据库中已超过3000条，将删除最旧的一条k线数据");
-                    //logger.info(last_15m_klines);
-                }
             } else {
                 startTime = startTime_15m.getTime();
             }
@@ -117,9 +107,6 @@ public class SyncKlinesTask implements Runnable{
 
                 klinesRepository.insert(klines_list_15m);
             }
-
-            //开始分析k线
-            this.analysisWorkTaskPool.add(new AnalysisKlinesTask(pair,klinesService,klinesRepository));
 
         } catch (Exception e) {
             logger.error("同步" + pair + "交易对K线信息时出现异常", e);
