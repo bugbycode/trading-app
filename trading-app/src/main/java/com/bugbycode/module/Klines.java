@@ -184,6 +184,15 @@ public class Klines {
     	return klines0 != null && klines0.getStartTime() == this.getStartTime();
     }
 	
+    /**
+     * 判断是否包含
+     * @param klines0
+     * @return
+     */
+    public boolean isContains(Klines klines0) {
+    	return klines0 != null && klines0.getPair().equals(this.getPair())
+    			&& this.getStartTime() <= klines0.getStartTime() && this.getEndTime() > klines0.getStartTime();
+    }
 	
 	@Override
 	public String toString() {
