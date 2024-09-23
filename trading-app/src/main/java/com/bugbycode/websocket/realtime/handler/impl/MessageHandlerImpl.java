@@ -38,7 +38,7 @@ public class MessageHandlerImpl implements MessageHandler{
 			client.subCount();
 			logger.info(kline);
 			klinesRepository.insert(kline);
-			if(kline.getInervalType() != Inerval.INERVAL_1D) {
+			if(kline.getInervalType() == Inerval.INERVAL_15M) {
 				analysisWorkTaskPool.add(new AnalysisKlinesTask(kline.getPair(), klinesService, klinesRepository));
 			}
 		};
