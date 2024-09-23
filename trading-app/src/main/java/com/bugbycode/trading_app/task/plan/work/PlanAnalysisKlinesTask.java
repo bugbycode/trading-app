@@ -18,9 +18,9 @@ import com.util.StringUtil;
 /**
  * 交易计划分析任务
  */
-public class AnalysisKlinesTask implements Runnable {
+public class PlanAnalysisKlinesTask implements Runnable {
 
-	private final Logger logger = LogManager.getLogger(AnalysisKlinesTask.class);
+	private final Logger logger = LogManager.getLogger(PlanAnalysisKlinesTask.class);
 	
 	private TradingPlan plan;
 	
@@ -30,7 +30,7 @@ public class AnalysisKlinesTask implements Runnable {
 	
 	private TradingPlanService tradingPlanService;
 	
-	public AnalysisKlinesTask(TradingPlan plan, Klines hitKlines,KlinesService klinesService,
+	public PlanAnalysisKlinesTask(TradingPlan plan, Klines hitKlines,KlinesService klinesService,
 			TradingPlanService tradingPlanService) {
 		this.plan = plan;
 		this.hitKlines = hitKlines;
