@@ -41,7 +41,9 @@ public class AnalysisKlinesTask implements Runnable{
                 return;
             }
             
-            klinesRepository.checkData(klines_list_1d);
+            if(!klinesRepository.checkData(klines_list_1d)) {
+            	klines_list_1d = klinesRepository.findByPair(pair, Inerval.INERVAL_1D.getDescption());
+            }
             
             //查询15分钟级别k线信息
             List<Klines> klines_list_15m = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
@@ -50,7 +52,9 @@ public class AnalysisKlinesTask implements Runnable{
                 return;
             }
             
-            klinesRepository.checkData(klines_list_15m);
+            if(!klinesRepository.checkData(klines_list_15m)) {
+            	klines_list_15m = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
+            }
 
             //斐波那契回撤分析
             //klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
