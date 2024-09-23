@@ -1,5 +1,8 @@
 package com.bugbycode.trading_app.task.sync;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +50,21 @@ public class SyncFuturesLastDayKlinesWebSocketTask {
 		Inerval inerval = Inerval.INERVAL_1D;
 		
 		CoinPairSet set = new CoinPairSet(inerval);
-		
+		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
 		for(String coin : AppConfig.PAIRS) {
 			set.add(coin);
 			if(set.isFull()) {
-				new PerpetualWebSocketClientEndpoint(set, messageHandler, klinesService, klinesRepository, analysisWorkTaskPool);
+				coinList.add(set);
 				set = new CoinPairSet(inerval);
 			}
+		}
+		
+		if(!set.isEmpty()) {
+			coinList.add(set);
+		}
+		
+		for(CoinPairSet s : coinList) {
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, analysisWorkTaskPool);
 		}
 		
 		logger.info("SyncFuturesLastDayKlinesWebSocketTask end.");

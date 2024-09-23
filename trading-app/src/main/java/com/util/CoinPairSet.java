@@ -47,6 +47,10 @@ public class CoinPairSet extends HashSet<String> {
 		return this.size() == 10;
 	}
 
+	public boolean isEmpty() {
+		return this.size() == 0;
+	}
+	
 	@Override
 	public void clear() {
 		super.clear();
