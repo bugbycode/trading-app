@@ -1,10 +1,10 @@
 package com.bugbycode.trading_app.init;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -15,11 +15,13 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.EmailAuth;
+import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
-import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoint;
-import com.bugbycode.websocket.realtime.handler.MessageHandler;
-import com.util.CoinPairSet;
+import com.bugbycode.trading_app.task.sync.work.SyncKlinesTask;
 import com.util.StringUtil;
+
+import jakarta.annotation.Resource;
 
 @Component
 @Configuration
@@ -49,8 +51,11 @@ public class InitConfig implements ApplicationRunner {
 	@Value("${email.recipient}")
 	private Set<String> recipient;//收件人
 	
-	@Autowired
-	private MessageHandler messageHandler;
+	@Resource
+	private KlinesRepository klinesRepository;
+	
+	@Resource
+	private KlinesService klinesService;
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
@@ -73,15 +78,15 @@ public class InitConfig implements ApplicationRunner {
 		}
 		
 		AppConfig.setEmailAuth(emailAuthList);
-		/*
-		CoinPairSet set = new CoinPairSet();
-		for(String coin : pair) {
-			if(set.isFull()) {
-				new PerpetualWebSocketClientEndpoint(set.getStreamName(), messageHandler);
-				set.clear();
+		
+		for(String pair : AppConfig.PAIRS) {
+			pair = pair.trim();
+			if(StringUtil.isEmpty(pair)) {
+				continue;
 			}
-			set.add(coin);
-		}*/
+			new SyncKlinesTask(pair, new Date(), klinesService, klinesRepository).run();
+		}
+		
 	}
 
 	@Bean("restTemplate")
