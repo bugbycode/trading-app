@@ -60,6 +60,7 @@ public class SyncKlinesTask implements Runnable{
             
             if(lastDayKlines != null && lastDayKlines.getStartTime() >= lastDayStartTimeDate.getTime()){
                 logger.info(pair + "交易对日线级别k线已是最新数据");
+                return;
             } else {
                 
                 long startTime = lastDayKlines == null ? firstDayStartTime.getTime() : lastDayKlines.getEndTime() + 1;
