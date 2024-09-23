@@ -67,7 +67,10 @@ public class KlinesRepositoryImpl implements KlinesRepository{
     @Override
     public void insert(List<Klines> list) {
         if(!CollectionUtils.isEmpty(list)){
-            template.insertAll(list);
+            //template.insertAll(list);
+        	for(Klines k : list) {
+        		insert(k);
+        	}
         }
     }
 
@@ -110,6 +113,21 @@ public class KlinesRepositoryImpl implements KlinesRepository{
                 	isYnc = true;
                 }
                 
+                if(isYnc) {
+                	result = false;
+                	List<Klines> data = klinesService.continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
+                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() + "条数据");
+                	insert(data);
+                }
+            }
+            
+            for(int index = 0;index < list.size();index++){
+                if(index == list.size() - 1){
+                    continue;
+                }
+                Klines current = list.get(index);
+                Klines next = list.get(index + 1);
+                
                 //判断重复
                 if(current.getStartTime() == next.getStartTime()){
                     logger.info("查询到重复K线信息：" + current);
@@ -119,11 +137,6 @@ public class KlinesRepositoryImpl implements KlinesRepository{
                         remove(_id);
                         logger.info("重复k线已从数据库中删除");
                     }
-                }
-                
-                if(isYnc) {
-                	List<Klines> data = klinesService.continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
-                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() + "条数据");
                 }
             }
             
