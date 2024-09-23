@@ -17,7 +17,7 @@ import com.bugbycode.websocket.realtime.handler.MessageHandler;
 import com.util.CoinPairSet;
 
 /**
- * 连接websocket订阅永续合约k线定时任务
+ * 连接websocket订阅永续合约k线15分钟级别定时任务
  */
 @Configuration
 @EnableScheduling
