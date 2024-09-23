@@ -37,4 +37,14 @@ public enum Inerval {
 	public String getMemo() {
 		return memo;
 	}
+	
+	public static Inerval resolve(String des) {
+		Inerval[] arr = values();
+		for(int index = 0; index < arr.length; index++) {
+			if(arr[index].getDescption().equals(des)) {
+				return arr[index];
+			}
+		}
+		throw new RuntimeException("k线级别信息错误");
+	}
 }

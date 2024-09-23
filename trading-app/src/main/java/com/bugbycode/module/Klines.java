@@ -125,6 +125,10 @@ public class Klines {
 	public String getInterval(){
 		return this.interval;
 	}
+	
+	public Inerval getInervalType() {
+		return Inerval.resolve(this.interval);
+	}
 
 	/**
 	 * 是否出现上引线

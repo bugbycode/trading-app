@@ -28,6 +28,20 @@ public class DateFormatUtil {
 		return c.get(Calendar.HOUR_OF_DAY);
 	}
 	
+	public static int getMinute(long time) {
+		Date date = new Date(time);
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		return c.get(Calendar.MINUTE);
+	}
+	
+	public static int getSecond(long time) {
+		Date date = new Date(time);
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		return c.get(Calendar.SECOND);
+	}
+	
 	public static String format(Date date) {
 		return sdf.get().format(date);
 	}

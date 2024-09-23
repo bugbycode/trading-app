@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.service.klines.KlinesService;
 import com.util.KlinesComparator;
 import com.util.StringUtil;
 
@@ -25,6 +27,9 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 
     @Resource
 	private MongoOperations template;
+    
+    @Resource
+    private KlinesService klinesService;
 
     @Override
     public void insert(Klines klines) {
@@ -71,12 +76,40 @@ public class KlinesRepositoryImpl implements KlinesRepository{
         boolean result = true;
         if(!CollectionUtils.isEmpty(list)){
             list.sort(new KlinesComparator());
+            
+            long parentSubTime = 0;
+            
             for(int index = 0;index < list.size();index++){
                 if(index == list.size() - 1){
                     continue;
                 }
                 Klines current = list.get(index);
                 Klines next = list.get(index + 1);
+
+                long currentSubTime = next.getStartTime() - current.getEndTime();
+                
+                if(parentSubTime == 0) {
+                    parentSubTime = currentSubTime;
+                }
+                
+                boolean isYnc = false;
+                long startTime = 0;
+                long endTime = 0;
+                //前两根k线之间有缺失数据
+                if(parentSubTime > currentSubTime) {
+                	
+                	Klines parent = list.get(index - 1);
+                	startTime = parent.getEndTime();
+                	endTime = current.getStartTime();
+                	isYnc = true;
+                }//后两根k线之间有缺失数据 
+                else if(parentSubTime < currentSubTime) {
+                	
+                	startTime = current.getEndTime();
+                	endTime = next.getStartTime();
+                	isYnc = true;
+                }
+                
                 //判断重复
                 if(current.getStartTime() == next.getStartTime()){
                     logger.info("查询到重复K线信息：" + current);
@@ -87,7 +120,13 @@ public class KlinesRepositoryImpl implements KlinesRepository{
                         logger.info("重复k线已从数据库中删除");
                     }
                 }
+                
+                if(isYnc) {
+                	List<Klines> data = klinesService.continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
+                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() + "条数据");
+                }
             }
+            
         }
         return result;
     }

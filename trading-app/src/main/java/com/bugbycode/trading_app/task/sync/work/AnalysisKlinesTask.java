@@ -40,12 +40,17 @@ public class AnalysisKlinesTask implements Runnable{
                 logger.info("无法获取" + pair + "交易对日线级别K线信息");
                 return;
             }
+            
+            klinesRepository.checkData(klines_list_1d);
+            
             //查询15分钟级别k线信息
             List<Klines> klines_list_15m = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
             if(CollectionUtils.isEmpty(klines_list_15m)){
                 logger.info("无法获取" + pair + "交易对15分钟级别K线信息");
                 return;
             }
+            
+            klinesRepository.checkData(klines_list_15m);
 
             //斐波那契回撤分析
             //klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
