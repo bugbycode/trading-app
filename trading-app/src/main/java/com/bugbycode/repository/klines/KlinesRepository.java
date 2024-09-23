@@ -54,9 +54,9 @@ public interface KlinesRepository {
     public List<Klines> findByPairAndGtStartTime(String pair,long startTime,String interval);
 
     /**
-     * 校验K线是否出现重复
+     * 校验K线是否出现重复或缺失
      * @param list k线集合
-     * @return true 表示没有重复 false 表示出现重复k线
+     * @return true 表示没有重复或缺失 false 表示出现重复或缺失k线
      */
     public boolean checkData(List<Klines> list);
 

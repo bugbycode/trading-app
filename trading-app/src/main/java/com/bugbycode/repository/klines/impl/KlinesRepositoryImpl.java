@@ -15,6 +15,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
+import com.util.DateFormatUtil;
 import com.util.KlinesComparator;
 import com.util.StringUtil;
 
@@ -95,7 +96,6 @@ public class KlinesRepositoryImpl implements KlinesRepository{
                     parentSubTime = currentSubTime;
                 }
                 
-                boolean isYnc = false;
                 long startTime = 0;
                 long endTime = 0;
                 //前两根k线之间有缺失数据
@@ -104,19 +104,19 @@ public class KlinesRepositoryImpl implements KlinesRepository{
                 	Klines parent = list.get(index - 1);
                 	startTime = parent.getEndTime();
                 	endTime = current.getStartTime();
-                	isYnc = true;
-                }//后两根k线之间有缺失数据 
+                	
+                }//后两根k线之间有缺失数据
                 else if(parentSubTime < currentSubTime) {
                 	
                 	startTime = current.getEndTime();
                 	endTime = next.getStartTime();
-                	isYnc = true;
                 }
                 
-                if(isYnc) {
+                if(startTime < endTime && endTime - startTime > 60000) {
                 	result = false;
                 	List<Klines> data = klinesService.continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
-                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() + "条数据");
+                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
+                				+ "条数据，缺失时间段：" + DateFormatUtil.format(startTime) + " ~ " + DateFormatUtil.format(endTime));
                 	insert(data);
                 }
             }
