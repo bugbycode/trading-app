@@ -182,22 +182,25 @@ public class PriceUtil {
 		double lowPrice = kl.getLowPrice();
 		double hightPrice = kl.getHighPrice();
 		
-		while(offset >= 0) {
-			Klines tmp = klinesList.get(offset--);
+		while(offset >= 1) {
+			Klines current = klinesList.get(offset--);
+			Klines parent = klinesList.get(offset);
+			if(lowPrice > current.getLowPrice()) {
+				lowPrice = current.getLowPrice();
+			}
+			if(hightPrice < current.getHighPrice()) {
+				hightPrice = current.getHighPrice();
+			}
 			if(isFall) {
-				if(tmp.isRise()) {
+				//终止下跌 当前k线为阳线且当前k线收盘价大于前一根k线开盘价
+				if(current.isRise() && current.getClosePrice() > parent.getOpenPrice()) {
 					break;
 				}
 			} else {
-				if(tmp.isFall()) {
+				//终止上涨 当前k线为阴线且当前k线收盘价小于前一根k线看盘加
+				if(current.isFall() && current.getClosePrice() < parent.getOpenPrice()) {
 					break;
 				}
-			}
-			if(lowPrice > tmp.getLowPrice()) {
-				lowPrice = tmp.getLowPrice();
-			}
-			if(hightPrice < tmp.getHighPrice()) {
-				hightPrice = tmp.getHighPrice();
 			}
 		}
 		if(kl.isFall()) {
