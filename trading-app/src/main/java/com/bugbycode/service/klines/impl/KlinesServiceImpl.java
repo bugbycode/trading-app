@@ -631,14 +631,14 @@ public class KlinesServiceImpl implements KlinesService {
 
 			String pair = currentKlines.getPair();
 					
-			String percentageStr = PriceUtil.formatDoubleDecimal(PriceUtil.getPriceFluctuationPercentage(klinesList, lastIndex), 2);
+			String percentageStr = PriceUtil.formatDoubleDecimal(PriceUtil.getPriceFluctuationPercentage(klinesList), 2);
 			
 			double pricePercentage = Double.valueOf(percentageStr);
 			
 			String text = "";//邮件内容
 			String subject = "";//邮件主题
 			String dateStr = DateFormatUtil.format(new Date());
-			if(currentKlines.isFall()) {//下跌
+			if(PriceUtil.isFall(klinesList)) {//下跌
 				
 				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT")) {
 					if(pricePercentage >= 5) {
@@ -658,7 +658,7 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 				}
 				
-			} else if(currentKlines.isRise()) {
+			} else if(PriceUtil.isRise(klinesList)) {
 				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT")) {
 					if(pricePercentage >= 5) {
 						subject = pair + "永续合约价格大暴涨";

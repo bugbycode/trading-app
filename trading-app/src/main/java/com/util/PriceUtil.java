@@ -169,41 +169,45 @@ public class PriceUtil {
 	/**
 	 * 获取涨跌幅百分比
 	 * @param klinesList
-	 * @param index
 	 * @return
 	 */
-	public static double getPriceFluctuationPercentage(List<Klines> klinesList,int index) {
+	public static double getPriceFluctuationPercentage(List<Klines> klinesList) {
 		
+		int index = klinesList.size() - 1;
 		int offset = index - 1;
 		
 		Klines kl = klinesList.get(index);
 		
-		boolean isFall = kl.isFall();
+		boolean isFall = isFall(klinesList);
 		double lowPrice = kl.getLowPrice();
 		double hightPrice = kl.getHighPrice();
 		
 		while(offset >= 1) {
 			Klines current = klinesList.get(offset--);
 			Klines parent = klinesList.get(offset);
+			if(isFall) {
+				if(isRise(current, parent)) {
+					if(hightPrice < current.getHighPrice()) {
+						hightPrice = current.getHighPrice();
+					}
+					break;
+				}
+			} else {
+				if(isFall(current, parent)) {
+					if(lowPrice > current.getLowPrice()) {
+						lowPrice = current.getLowPrice();
+					}
+					break;
+				}
+			}
 			if(lowPrice > current.getLowPrice()) {
 				lowPrice = current.getLowPrice();
 			}
 			if(hightPrice < current.getHighPrice()) {
 				hightPrice = current.getHighPrice();
 			}
-			if(isFall) {
-				//终止下跌 当前k线为阳线且当前k线收盘价大于前一根k线开盘价
-				if(current.isRise() && current.getClosePrice() > parent.getOpenPrice()) {
-					break;
-				}
-			} else {
-				//终止上涨 当前k线为阴线且当前k线收盘价小于前一根k线看盘加
-				if(current.isFall() && current.getClosePrice() < parent.getOpenPrice()) {
-					break;
-				}
-			}
 		}
-		if(kl.isFall()) {
+		if(isFall) {
 			return ((hightPrice - lowPrice) / hightPrice) * 100;
 		} else {
 			return ((hightPrice - lowPrice) / lowPrice) * 100;
@@ -948,5 +952,52 @@ public class PriceUtil {
     		}
     	}
     	return result;
+    }
+    
+    /**
+     * 判断是否为上涨
+     * @param list
+     * @return
+     */
+    public static boolean isRise(List<Klines> list) {
+    	if(!CollectionUtils.isEmpty(list)) {
+    		int size = list.size();
+    		if(size == 1) {
+    			return list.get(0).isRise();
+    		} else {
+    			KlinesUtil ku = new KlinesUtil(list);
+    			return isRise(ku.removeLast(), ku.removeLast());
+    		}
+    	}
+    	return true;
+    }
+    
+    /**
+     * 判断是否下跌
+     * @param list
+     * @return
+     */
+    public static boolean isFall(List<Klines> list) {
+    	return !isRise(list);
+    }
+    
+    /**
+     * 判断是否在上涨
+     * @param current 当前k线
+     * @param parent 前一根k线
+     * @return
+     */
+    public static boolean isRise(Klines current,Klines parent) {
+    	return current.getClosePrice() >= parent.getOpenPrice();
+    }
+    
+    /**
+     * 判断是否在下跌
+     * @param current 当前k线
+     * @param parent 前一根k线
+     * @return
+     */
+    public static boolean isFall(Klines current,Klines parent){
+    	return !isRise(current, parent);
     }
 }
