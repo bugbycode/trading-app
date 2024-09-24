@@ -63,7 +63,7 @@ public class AnalysisKlinesTask implements Runnable{
             //klinesService.futuresRiseAndFall(klines_list_15m);
 
             //EMA指标分析
-            klinesService.futuresEMAMonitor(klines_list_15m);
+            //klinesService.futuresEMAMonitor(klines_list_15m);
 
             //EMA指标涨跌判断
             klinesService.futuresEmaRiseAndFall(klines_list_15m);
