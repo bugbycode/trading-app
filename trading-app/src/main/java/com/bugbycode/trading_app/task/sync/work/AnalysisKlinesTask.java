@@ -69,9 +69,9 @@ public class AnalysisKlinesTask implements Runnable{
             //klinesService.futuresEmaRiseAndFall(klines_list_15m);
 
             //标志性高低点分析
-            //if("BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)) {
+            if("BTCUSDT".equals(pair) || "ETHUSDT".equals(pair)) {
                 klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
-            //}
+            }
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
