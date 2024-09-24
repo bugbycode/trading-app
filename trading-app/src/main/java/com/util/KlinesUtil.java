@@ -43,4 +43,8 @@ public class KlinesUtil {
 	public void resetFirstOffset() {
 		this.first_offset = 0;
 	}
+	
+	public boolean isEmpty() {
+		return this.first_offset == -1 || this.last_offset == -1;
+	}
 }
