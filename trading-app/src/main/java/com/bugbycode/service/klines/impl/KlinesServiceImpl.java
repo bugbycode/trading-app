@@ -649,11 +649,11 @@ public class KlinesServiceImpl implements KlinesService {
 						subject = pair + "永续合约价格大涨";
 					}
 				} else {
-					if(pricePercentage >= 15) {
+					if(pricePercentage >= 20) {
 						subject = pair + "永续合约价格大暴涨";
-					} else if(pricePercentage >= 10) {
+					} else if(pricePercentage >= 15) {
 						subject = pair + "永续合约价格暴涨";
-					}else if(pricePercentage >= 5) {
+					}else if(pricePercentage >= 10) {
 						subject = pair + "永续合约价格大涨";
 					}
 				}
