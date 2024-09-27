@@ -688,7 +688,7 @@ public class KlinesServiceImpl implements KlinesService {
 		String subject = "";
 		String text = "";
 		String dateStr = DateFormatUtil.format(new Date());
-		/*
+		
 		//开始上涨
 		if(parentKlines.getEma7() < parentKlines.getEma25() && 
 				lastKlines.getEma7() >= lastKlines.getEma25()) {
@@ -699,8 +699,8 @@ public class KlinesServiceImpl implements KlinesService {
 				lastKlines.getEma7() <= lastKlines.getEma25()) {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 		}
-		*/
 		
+		/*
 		//上涨判断
 		if(parentKlines.getEma25() < parentKlines.getEma99() && parentKlines.getEma7() < parentKlines.getEma99() 
 				&& parentKlines.getEma7() < parentKlines.getEma25() 
@@ -717,7 +717,7 @@ public class KlinesServiceImpl implements KlinesService {
 			if(lastKlines.getOpenPrice() > lastKlines.getEma7() && lastKlines.getClosePrice() < lastKlines.getEma7()) {
 				subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 			}
-		}
+		}*/
 		
 		text = lastKlines.toString() + "\n\n";
 		text += String.format("EMA7: %s, EMA25: %s, EMA99: %s ", PriceUtil.formatDoubleDecimal(lastKlines.getEma7(), decimalNum),
