@@ -707,7 +707,7 @@ public class KlinesServiceImpl implements KlinesService {
 		String subject = "";
 		String text = "";
 		String dateStr = DateFormatUtil.format(new Date());
-		
+		/*
 		//开始上涨
 		if(parentKlines.getEma7() < parentKlines.getEma25() && 
 				lastKlines.getEma7() >= lastKlines.getEma25()) {
@@ -717,6 +717,25 @@ public class KlinesServiceImpl implements KlinesService {
 		else if(parentKlines.getEma7() > parentKlines.getEma25() && 
 				lastKlines.getEma7() <= lastKlines.getEma25()) {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
+		}
+		*/
+		
+		//上涨判断
+		if(parentKlines.getEma25() < parentKlines.getEma99() && parentKlines.getEma7() < parentKlines.getEma99() 
+				&& parentKlines.getEma7() < parentKlines.getEma25() 
+				&& parentKlines.getOpenPrice() < parentKlines.getEma7() && parentKlines.getClosePrice() < parentKlines.getEma7()) {
+			//价格强势信号
+			if(lastKlines.getOpenPrice() < lastKlines.getEma7() && lastKlines.getClosePrice() > lastKlines.getEma7()) {
+				subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
+			}
+		}//下跌判断 
+		else if(parentKlines.getEma25() > parentKlines.getEma99() && parentKlines.getEma7() > parentKlines.getEma99()
+				&& parentKlines.getEma7() > parentKlines.getEma25()
+				&& parentKlines.getOpenPrice() > parentKlines.getEma7() && parentKlines.getClosePrice() > parentKlines.getEma7()) {
+			//价格颓势信号
+			if(lastKlines.getOpenPrice() > lastKlines.getEma7() && lastKlines.getClosePrice() < lastKlines.getEma7()) {
+				subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
+			}
 		}
 		
 		text = lastKlines.toString() + "\n\n";

@@ -656,7 +656,10 @@ public class PriceUtil {
         double initialSMA = 0.0;
 
         int period = type.getValue(); 
-        
+        int size = size(klinesList);
+        if(period > size) {
+        	period = size;
+        }
         // 计算初始的SMA作为第一个EMA的起始点
         for (int i = 0; i < period; i++) {
         	initialSMA += klinesList.get(i).getClosePrice();
@@ -999,5 +1002,15 @@ public class PriceUtil {
      */
     public static boolean isFall(Klines current,Klines parent){
     	return !isRise(current, parent);
+    }
+    
+    /**
+     * 获取大小
+     * 
+     * @param list
+     * @return
+     */
+    public static int size(List<Klines> list) {
+    	return list == null ? 0 : list.size();
     }
 }
