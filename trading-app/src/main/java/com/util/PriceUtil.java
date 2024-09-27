@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +19,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.HighOrLowHitPrice;
+import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 
 public class PriceUtil {
@@ -1013,4 +1017,67 @@ public class PriceUtil {
     public static int size(List<Klines> list) {
     	return list == null ? 0 : list.size();
     }
+    
+    /**
+     * 
+     * 15分钟k线合成1小时
+     * 
+     * @param list_15m
+     * @return
+     */
+    public static List<Klines> to1HFor15MKlines(List<Klines> list_15m){
+    	
+    	KlinesComparator kc = new KlinesComparator();
+    	List<Klines> list_1h = new ArrayList<Klines>();
+    	
+    	if(!CollectionUtils.isEmpty(list_15m)) {
+    		
+			list_15m.sort(kc);
+			
+    		Map<String,List<Klines>> klinesMap = new HashMap<String, List<Klines>>();
+    		
+    		for(Klines kl_15m : list_15m) {
+    			if(kl_15m.getInervalType() != Inerval.INERVAL_15M) {
+    				throw new RuntimeException("将15分钟级别k线合成1小时级别k线时出现错误，错误信息：传入的k线不是15分钟级别");
+    			}
+    			
+    			String key = DateFormatUtil.format_yyyy_mm_dd_HH_00_00(new Date(kl_15m.getStartTime()));
+    			List<Klines> kl_temp = klinesMap.get(key);
+    			if(kl_temp == null) {
+    	    		kl_temp = new ArrayList<Klines>();
+    	    		klinesMap.put(key, kl_temp);
+    			}
+    			
+				kl_temp.add(kl_15m);
+    			
+    		}
+    		
+    		Set<String> keySet = klinesMap.keySet();
+    		for(String key : keySet) {
+    			List<Klines> kl_temp = klinesMap.get(key);
+    			kl_temp.sort(kc);
+    			list_1h.add(parse15To1h(kl_temp));
+    		}
+    	}
+		list_1h.sort(kc);
+    	return list_1h;
+    }
+
+	private static Klines parse15To1h(List<Klines> list_15m){
+		KlinesUtil ku = new KlinesUtil(list_15m);
+		Klines highKlines = ku.getMax();
+		Klines lowKlines = ku.getMin();
+		Klines firstKlines = ku.getFirst();
+		Klines lastKlines = ku.getLast();
+		double openPrice = firstKlines.getOpenPrice();
+		double closePrice = lastKlines.getClosePrice();
+		double highPrice = highKlines.getHighPrice();
+		double lowPrice = lowKlines.getLowPrice();
+		long startTime = firstKlines.getStartTime();
+		long endTime = lastKlines.getEndTime();
+		String pair = firstKlines.getPair();
+		int decimalNum = firstKlines.getDecimalNum();
+		String inerval = Inerval.INERVAL_1H.getDescption();
+		return new Klines(pair, startTime, openPrice, highPrice, lowPrice, closePrice, endTime, inerval, decimalNum);
+	}
 }
