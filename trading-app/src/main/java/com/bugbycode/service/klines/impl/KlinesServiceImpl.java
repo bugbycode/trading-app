@@ -28,6 +28,8 @@ import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.service.klines.KlinesService;
+import com.bugbycode.trading_app.pool.WorkTaskPool;
+import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
@@ -46,6 +48,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private HighOrLowHitPriceRepository highOrLowHitPriceRepository;
+	
+	@Autowired
+	private WorkTaskPool emailWorkTaskPool;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -235,33 +240,9 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	public void sendEmail(String subject,String text,FibInfo fibInfo) {
-		if(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
-			
-			if(!ObjectUtils.isEmpty(fibInfo)) {
-				text += "\n\n" + fibInfo.toString();
-			}
-			
-			logger.info("邮件主题：" + subject);
-			logger.info("邮件内容：" + text);
-			
-			Result<ResultCode, Exception> result = EmailUtil.send(subject, text);
-			
-			switch (result.getResult()) {
-			case ERROR:
-				
-				Exception ex = result.getErr();
-				
-				logger.info("邮件发送失败！失败原因：" + ex.getLocalizedMessage());
-				
-				break;
-				
-			default:
-				
-				logger.info("邮件发送成功！");
-				
-				break;
-			}
-		}
+		
+		emailWorkTaskPool.add(new SendMailTask(subject, text, fibInfo));
+		
 	}
 
 	@Override

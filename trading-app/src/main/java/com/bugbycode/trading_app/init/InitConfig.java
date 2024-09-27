@@ -82,4 +82,9 @@ public class InitConfig implements ApplicationRunner {
 	public WorkTaskPool analysisWorkTaskPool(){
 		return new WorkTaskPool("AnalysisTaskPool", 1);
 	}
+	
+	@Bean
+	public WorkTaskPool emailWorkTaskPool() {
+		return new WorkTaskPool("EmailWorkTaskPool", 1);
+	}
 }
