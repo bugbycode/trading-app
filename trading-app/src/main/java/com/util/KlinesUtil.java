@@ -47,4 +47,20 @@ public class KlinesUtil {
 	public boolean isEmpty() {
 		return this.first_offset == -1 || this.last_offset == -1;
 	}
+	
+	public Klines getMax() {
+		return isEmpty() ? null : PriceUtil.getMaxPriceKLine(list);
+	}
+	
+	public Klines getMin() {
+		return isEmpty() ? null : PriceUtil.getMinPriceKLine(list);
+	}
+	
+	public Klines getFirst() {
+		return isEmpty() ? null : list.get(first_offset);
+	}
+	
+	public Klines getLast() {
+		return isEmpty() ? null : list.get(last_offset);
+	}
 }
