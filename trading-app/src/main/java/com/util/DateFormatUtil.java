@@ -15,6 +15,8 @@ public class DateFormatUtil {
 	
 	private static final ThreadLocal<SimpleDateFormat> sdf_yyyy_mm_dd_HH_mm_00 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:00"));
 	
+	private static final ThreadLocal<SimpleDateFormat> sdf_yyyy_mm_dd_HH_00_00 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:00:00"));
+	
 	private static final ThreadLocal<SimpleDateFormat> sdf_yyyy_mm_dd = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 	
 	public static String format(long time) {
@@ -60,6 +62,10 @@ public class DateFormatUtil {
 	
 	public static String format_yyyy_mm_dd_HH_mm_00(Date date) {
 		return sdf_yyyy_mm_dd_HH_mm_00.get().format(date);
+	}
+	
+	public static String format_yyyy_mm_dd_HH_00_00(Date date) {
+		return sdf_yyyy_mm_dd_HH_00_00.get().format(date);
 	}
 	
 	public static Date parse(String date) throws ParseException {
