@@ -621,7 +621,7 @@ public class KlinesServiceImpl implements KlinesService {
 			String dateStr = DateFormatUtil.format(new Date());
 			if(PriceUtil.isFall(klinesList)) {//下跌
 				
-				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT")) {
+				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
 					if(pricePercentage >= 5) {
 						subject = pair + "永续合约价格大暴跌";
 					} else if(pricePercentage >= 3) {
@@ -640,7 +640,7 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				
 			} else if(PriceUtil.isRise(klinesList)) {
-				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT")) {
+				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
 					if(pricePercentage >= 5) {
 						subject = pair + "永续合约价格大暴涨";
 					} else if(pricePercentage >= 3) {
