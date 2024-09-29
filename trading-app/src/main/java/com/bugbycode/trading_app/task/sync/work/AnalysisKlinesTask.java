@@ -60,7 +60,7 @@ public class AnalysisKlinesTask implements Runnable{
 
             //斐波那契回撤分析
             //klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
-            
+            /*
             Klines last15m = PriceUtil.getLastKlines(klines_list_15m);
             
             int minute = DateFormatUtil.getMinute(last15m.getEndTime());
@@ -72,13 +72,13 @@ public class AnalysisKlinesTask implements Runnable{
             } else {
                 //涨跌分析
                 klinesService.futuresRiseAndFall(klines_list_15m);
-            }
+            }*/
 
             //EMA指标分析
-            //klinesService.futuresEMAMonitor(klines_list_15m);
+            klinesService.futuresEMAMonitor(klines_list_15m);
 
             //EMA指标涨跌判断
-            //klinesService.futuresEmaRiseAndFall(klines_list_15m);
+            klinesService.futuresEmaRiseAndFall(klines_list_15m);
 
             //标志性高低点分析
             //klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
