@@ -136,13 +136,16 @@ public class FibInfo {
 		int len = codes.length;
 		
 		//[Lv1] [LONG]：1(0.1361400),0.786(0.1460696),0.66(0.1519160),0.618(0.1538648),0.5(0.1593400),0.382(0.1648152),0.236(0.1715896),0(0.1825400)
+		
+		StringBuffer formatBufBefor = new StringBuffer();
+		
 		StringBuffer formatBuf = new StringBuffer();
 
-		formatBuf.append("[");
-		formatBuf.append(this.getLevel().getLabel());
-		formatBuf.append("] [");
-		formatBuf.append(this.getQuotationMode().getLabel());
-		formatBuf.append("]: ");
+		formatBufBefor.append("[");
+		formatBufBefor.append(this.getLevel().getLabel());
+		formatBufBefor.append("] [");
+		formatBufBefor.append(this.getQuotationMode().getLabel());
+		formatBufBefor.append("]: ");
 		
 		StringBuffer extensionBuffer = new StringBuffer();
 		
@@ -168,7 +171,7 @@ public class FibInfo {
 			}
 		}
 		
-		return formatBuf.toString() + "\nExtension: " + extensionBuffer.toString();
+		return formatBufBefor.toString() + formatBuf.toString() + "\n\nExtension: " + extensionBuffer.toString();
 	}
     
     
