@@ -10,7 +10,9 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
+import com.util.DateFormatUtil;
 import com.util.EmailUtil;
+import com.util.PriceUtil;
 
 /**
  * 分析K线任务
@@ -56,13 +58,22 @@ public class AnalysisKlinesTask implements Runnable{
             	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),5000);
             }
 
-            //List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(klines_list_15m);
+            Klines last15m = PriceUtil.getLastKlines(klines_list_15m);
+            
+            int minute = DateFormatUtil.getMinute(last15m.getEndTime());
+            
+            List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(klines_list_15m);
             
             //斐波那契回撤分析
-            klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
+            //klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
             
-            //涨跌分析
-            //klinesService.futuresRiseAndFall(klines_list_15m);
+            if(minute == 59) {
+                //涨跌分析
+                klinesService.futuresRiseAndFall(klines_list_1h);
+            } else {
+                //涨跌分析
+                klinesService.futuresRiseAndFall(klines_list_15m);
+            }
 
             //EMA指标分析
             //klinesService.futuresEMAMonitor(klines_list_15m);
