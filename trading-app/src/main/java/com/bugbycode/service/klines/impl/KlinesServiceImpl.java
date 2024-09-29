@@ -319,11 +319,11 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String pair = lastDayKlines.getPair();
 		
-		if(lastDayKlines.isDownlead() && !lastDayKlines.isContains(lastHitKlines)){
+		if(!lastDayKlines.isContains(lastHitKlines)){
 			lconicLowPriceList.add(lastDayKlines);
 		}
 		
-		if(lastDayKlines.isUplead() && !lastDayKlines.isContains(lastHitKlines)){
+		if(!lastDayKlines.isContains(lastHitKlines)){
 			lconicHighPriceList.add(lastDayKlines);
 		}
 		
