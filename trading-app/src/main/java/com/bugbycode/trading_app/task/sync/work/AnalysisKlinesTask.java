@@ -10,9 +10,7 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
-import com.util.DateFormatUtil;
 import com.util.EmailUtil;
-import com.util.PriceUtil;
 
 /**
  * 分析K线任务
@@ -59,13 +57,13 @@ public class AnalysisKlinesTask implements Runnable{
             }
             
             //斐波那契回撤分析
-            //klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
+            klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
             
             //涨跌分析
             //klinesService.futuresRiseAndFall(klines_list_15m);
 
             //EMA指标分析
-            klinesService.futuresEMAMonitor(klines_list_15m);
+            //klinesService.futuresEMAMonitor(klines_list_15m);
 
             //EMA指标涨跌判断
             //klinesService.futuresEmaRiseAndFall(klines_list_15m);
