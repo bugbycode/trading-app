@@ -199,7 +199,7 @@ public class FibInfo {
 			}
 		}
 		
-		return formatBufBefor.toString() + formatBuf.toString() + "\n\nExtension: " + extensionBuffer.toString();
+		return formatBuf.toString() + "\nExtension: " + extensionBuffer.toString();
 	}
     
     
