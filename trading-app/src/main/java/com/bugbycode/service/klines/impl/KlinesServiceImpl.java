@@ -692,13 +692,15 @@ public class KlinesServiceImpl implements KlinesService {
 		//开始上涨
 		if(parentKlines.getEma25() < parentKlines.getEma99() && parentKlines.getEma7() < parentKlines.getEma25() && parentKlines.getOpenPrice() < parentKlines.getEma7()
 				&& parentKlines.getClosePrice() > parentKlines.getEma7() && 
-				((lastKlines.getOpenPrice() > lastKlines.getEma7() && lastKlines.getClosePrice() > lastKlines.getEma7()) || lastKlines.isRise())) {
+				((lastKlines.getOpenPrice() > lastKlines.getEma7() && lastKlines.getClosePrice() > lastKlines.getEma7()) || lastKlines.isRise())
+				&& lastKlines.getHighPrice() < lastKlines.getEma99()) {
 			subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
 		}
 		//开始下跌
 		else if(parentKlines.getEma25() > parentKlines.getEma99() && parentKlines.getEma7() > parentKlines.getEma25() && parentKlines.getOpenPrice() > parentKlines.getEma7()
 				&& parentKlines.getClosePrice() < parentKlines.getEma7() && 
-				((lastKlines.getOpenPrice() < lastKlines.getEma7() && lastKlines.getClosePrice() < lastKlines.getEma7()) || lastKlines.isFall())) {
+				((lastKlines.getOpenPrice() < lastKlines.getEma7() && lastKlines.getClosePrice() < lastKlines.getEma7()) || lastKlines.isFall())
+				&& lastKlines.getLowPrice() > lastKlines.getEma99()) {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 		}
 		//金叉
