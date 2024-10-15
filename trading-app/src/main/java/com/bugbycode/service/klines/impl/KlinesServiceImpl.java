@@ -669,6 +669,53 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 		}
 	}
+	
+	/**
+	 * 判断上涨
+	 * @param lastKlines
+	 * @param parentKlines
+	 * @return 
+	 */
+	private boolean checkEmaRise(Klines lastKlines,Klines parentKlines) {
+		//k线主体开盘价或收盘价 最高价最低价 
+		double parentBodyHighPrice = 0;
+		double parentBodyLowPrice = 0;
+		double parentHighPrice = parentKlines.getHighPrice();
+		double parentLowPrice = parentKlines.getLowPrice();
+		if(parentKlines.isFall()) {
+			parentBodyHighPrice = parentKlines.getOpenPrice();
+			parentBodyLowPrice = parentKlines.getClosePrice();
+		} else if(parentKlines.isRise()) {
+			parentBodyLowPrice = parentKlines.getOpenPrice();
+			parentBodyHighPrice = parentKlines.getClosePrice();
+		}
+		
+		return parentKlines.getEma7() < parentKlines.getEma25() && parentKlines.getEma25() < parentKlines.getEma99() 
+				&& parentHighPrice < parentKlines.getEma7() && lastKlines.getClosePrice() > parentBodyHighPrice;
+	}
+	
+	/**
+	 * 判断下跌
+	 * @param lastKlines
+	 * @param parentKlines
+	 * @return
+	 */
+	private boolean checkEmaFall(Klines lastKlines,Klines parentKlines) {
+		//k线主体开盘价或收盘价 最高价最低价 
+		double parentBodyHighPrice = 0;
+		double parentBodyLowPrice = 0;
+		double parentHighPrice = parentKlines.getHighPrice();
+		double parentLowPrice = parentKlines.getLowPrice();
+		if(parentKlines.isFall()) {
+			parentBodyHighPrice = parentKlines.getOpenPrice();
+			parentBodyLowPrice = parentKlines.getClosePrice();
+		} else if(parentKlines.isRise()) {
+			parentBodyLowPrice = parentKlines.getOpenPrice();
+			parentBodyHighPrice = parentKlines.getClosePrice();
+		}
+		return parentKlines.getEma7() > parentKlines.getEma25() && parentKlines.getEma25() > parentKlines.getEma99() 
+				&& parentLowPrice > parentKlines.getEma7() && lastKlines.getClosePrice() < parentBodyLowPrice;
+	}
 
 	@Override
 	public void futuresEmaRiseAndFall(List<Klines> klinesList) {
@@ -680,7 +727,8 @@ public class KlinesServiceImpl implements KlinesService {
 		KlinesUtil ku = new KlinesUtil(klinesList);
 		Klines lastKlines = ku.removeLast();
 		Klines parentKlines = ku.removeLast();
-
+		Klines parentNextKlines = ku.removeLast();
+		
 		String pair = lastKlines.getPair();
 		
 		int decimalNum = lastKlines.getDecimalNum();
@@ -689,6 +737,17 @@ public class KlinesServiceImpl implements KlinesService {
 		String text = "";
 		String dateStr = DateFormatUtil.format(new Date());
 		
+		//开始上涨
+		if(!checkEmaRise(parentKlines,parentNextKlines) && checkEmaRise(lastKlines,parentKlines)) {
+			subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
+		}
+		//开始下跌
+		else if(!checkEmaFall(parentKlines,parentNextKlines) && checkEmaFall(lastKlines,parentKlines)) {
+			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
+		}
+		
+		//强势 颓势信号
+		/*
 		//开始上涨
 		if(parentKlines.getEma25() < parentKlines.getEma99() && parentKlines.getEma7() < parentKlines.getEma25() && parentKlines.getOpenPrice() < parentKlines.getEma7()
 				&& parentKlines.getClosePrice() > parentKlines.getEma7() && 
@@ -702,7 +761,7 @@ public class KlinesServiceImpl implements KlinesService {
 				((lastKlines.getOpenPrice() < lastKlines.getEma7() && lastKlines.getClosePrice() < lastKlines.getEma7()) || lastKlines.isFall())
 				&& lastKlines.getLowPrice() > lastKlines.getEma99()) {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
-		}
+		}*/
 		//金叉
 		/*
 		//开始上涨
