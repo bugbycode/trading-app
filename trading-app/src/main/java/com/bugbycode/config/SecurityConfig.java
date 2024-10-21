@@ -1,5 +1,7 @@
 package com.bugbycode.config;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -43,7 +45,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
     	
-    	http.anonymous(any -> any.disable())
+    	http.cors(cors -> {
+    		//解决跨域问题
+    		cors.configurationSource(request -> {
+                var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                corsConfig.setAllowedOrigins(List.of("http://localhost:5173"));  // 允许的来源
+                corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfig.setAllowedHeaders(List.of("*"));
+                corsConfig.setAllowCredentials(true);  // 允许携带凭证（如 Cookies）
+                return corsConfig;
+    		});
+    	})
+    	
+    	.anonymous(any -> any.disable())
     	
     	.csrf(csrf -> csrf.disable())
     	
@@ -56,7 +70,8 @@ public class SecurityConfig {
     			)
     	.formLogin((form) -> {
     		form.successHandler(new LoginSuccessHandler())
-    		.failureHandler(new LoginFailHandler());
+    		.failureHandler(new LoginFailHandler())
+    		.permitAll();
     	}).logout(Customizer.withDefaults());
     	
     	return http.build();
