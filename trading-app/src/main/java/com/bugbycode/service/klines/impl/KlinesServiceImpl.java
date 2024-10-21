@@ -691,7 +691,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		return parentKlines.getEma7() < parentKlines.getEma25() && parentKlines.getEma25() < parentKlines.getEma99() 
-				&& parentHighPrice < parentKlines.getEma7() && lastKlines.getClosePrice() > parentBodyHighPrice;
+				&& parentBodyHighPrice < parentKlines.getEma7() && lastKlines.getClosePrice() > parentBodyHighPrice;
 	}
 	
 	/**
@@ -714,7 +714,7 @@ public class KlinesServiceImpl implements KlinesService {
 			parentBodyHighPrice = parentKlines.getClosePrice();
 		}
 		return parentKlines.getEma7() > parentKlines.getEma25() && parentKlines.getEma25() > parentKlines.getEma99() 
-				&& parentLowPrice > parentKlines.getEma7() && lastKlines.getClosePrice() < parentBodyLowPrice;
+				&& parentBodyLowPrice > parentKlines.getEma7() && lastKlines.getClosePrice() < parentBodyLowPrice;
 	}
 
 	@Override
@@ -736,7 +736,7 @@ public class KlinesServiceImpl implements KlinesService {
 		String subject = "";
 		String text = "";
 		String dateStr = DateFormatUtil.format(new Date());
-		
+		/*
 		//开始上涨
 		if(!checkEmaRise(parentKlines,parentNextKlines) && checkEmaRise(lastKlines,parentKlines)) {
 			subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
@@ -745,7 +745,7 @@ public class KlinesServiceImpl implements KlinesService {
 		else if(!checkEmaFall(parentKlines,parentNextKlines) && checkEmaFall(lastKlines,parentKlines)) {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 		}
-		
+		*/
 		//强势 颓势信号
 		/*
 		//开始上涨
@@ -763,7 +763,7 @@ public class KlinesServiceImpl implements KlinesService {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 		}*/
 		//金叉
-		/*
+		
 		//开始上涨
 		if(parentKlines.getEma7() < parentKlines.getEma25() && 
 				lastKlines.getEma7() >= lastKlines.getEma25()) {
@@ -774,7 +774,7 @@ public class KlinesServiceImpl implements KlinesService {
 				lastKlines.getEma7() <= lastKlines.getEma25()) {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 		}
-		*/
+		
 		/*
 		//上涨判断
 		if(parentKlines.getEma25() < parentKlines.getEma99() && parentKlines.getEma7() < parentKlines.getEma99() 

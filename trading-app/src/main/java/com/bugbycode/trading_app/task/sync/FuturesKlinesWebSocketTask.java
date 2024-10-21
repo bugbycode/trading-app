@@ -22,8 +22,8 @@ import com.util.CoinPairSet;
 /**
  * 连接websocket订阅永续合约k线15分钟级别定时任务
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class FuturesKlinesWebSocketTask {
 	
 	private final Logger logger = LogManager.getLogger(FuturesKlinesWebSocketTask.class);

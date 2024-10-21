@@ -22,8 +22,8 @@ import com.util.CoinPairSet;
 /**
  * 连接websocket订阅永续合约k线日线级别定时任务
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class SyncFuturesLastDayKlinesWebSocketTask {
 
 	private final Logger logger = LogManager.getLogger(SyncFuturesLastDayKlinesWebSocketTask.class);

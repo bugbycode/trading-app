@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.bugbycode.config.AppConfig;
@@ -97,5 +98,54 @@ public class FileUtil {
 			}
 		}
 		return buffer.toString();
+	}
+	
+	public static List<String> readFileText(String path) {
+		
+		File file = new File(path);
+		
+		File f = new File(AppConfig.CACHE_PATH);
+		if(!f.isDirectory()) {
+			f.mkdirs();
+		}
+		
+		FileInputStream fis = null;
+		InputStreamReader isr = null;
+		BufferedReader br = null;
+		//StringBuffer buffer = new StringBuffer();
+		List<String> result = new ArrayList<String>();
+		if(file.exists()) {
+			try {
+				fis = new FileInputStream(file);
+				isr = new InputStreamReader(fis, "UTF-8");
+				br = new BufferedReader(isr);
+				String line = null;
+				while((line = br.readLine()) != null) {
+					//buffer.append(line);
+					result.add(line);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if(br != null) {
+						br.close();
+					}
+					if(isr != null) {
+						isr.close();
+					}
+					if(fis != null) {
+						fis.close();
+					}
+				}catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return result;
 	}
 }
