@@ -18,6 +18,13 @@ public interface ShapeRepository {
 	public List<ShapeInfo> query(String owner,String symbol);
 	
 	/**
+	 * 根据创建者查询图纸信息
+	 * @param owner 创建者
+	 * @return
+	 */
+	public List<ShapeInfo> query(String owner);
+	
+	/**
 	 * 创建图纸
 	 * @param info 图纸信息
 	 * @return id 返回数据库唯一标识

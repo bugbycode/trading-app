@@ -9,19 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bugbycode.module.user.User;
+import com.bugbycode.webapp.controller.base.BaseController;
 
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class UserController extends BaseController{
 
 	private final Logger logger = LogManager.getLogger(UserController.class);
 	
 	@GetMapping("/userInfo")
 	public User userInfo() {
-		
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		user.setPassword("");
-		
-		return user;
+		return getUserInfo();
 	}
 }

@@ -28,6 +28,11 @@ public class ShapeRepositoryImpl implements ShapeRepository {
 	}
 
 	@Override
+	public List<ShapeInfo> query(String owner) {
+		return template.find(Query.query(Criteria.where("owner").is(owner)), ShapeInfo.class);
+	}
+
+	@Override
 	public String insert(ShapeInfo info) {
 		ShapeInfo result = template.insert(info);
 		return result == null ? null : result.getId();
