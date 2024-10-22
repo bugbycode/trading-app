@@ -14,6 +14,7 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.webapp.controller.base.BaseController;
+import com.util.StringUtil;
 
 import jakarta.annotation.Resource;
 
@@ -43,6 +44,7 @@ public class ShapeController extends BaseController{
 		if(dbShape == null || !dbShape.getOwner().equals(getUserInfo().getUsername())) {
 			throw new AccessDeniedException("无权访问");
 		}
+		info.setOwner(dbShape.getOwner());
 		shapeRepository.update(info);
 		return info;
 	}
