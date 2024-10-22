@@ -63,7 +63,7 @@ public class SecurityConfig {
     	
     	.authorizeHttpRequests(authorize -> authorize
     			
-    			.requestMatchers("/user/userInfo","/shape/**").hasAnyRole("LOGIN")
+    			.requestMatchers("/user/userInfo","/shape/**","/pairs/getPairs").hasAnyRole("LOGIN")
     			
     	        .anyRequest().authenticated()
     	        
