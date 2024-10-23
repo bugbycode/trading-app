@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -26,10 +28,13 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
+import com.bugbycode.module.ShapeInfo;
+import com.bugbycode.module.shape.ShapeType;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
+import com.bugbycode.trading_app.task.email.ShapeSendMailTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.EmailUtil;
@@ -802,6 +807,86 @@ public class KlinesServiceImpl implements KlinesService {
 		//logger.info(text);
 		
 		sendEmail(subject, text, null);
+	}
+
+	@Override
+	public void horizontalRay(Klines klines, ShapeInfo info) {
+		//价格坐标
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		if(pointsJsonArray.length() > 0) {
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			double price = points.getDouble("price");
+			long time = points.getLong("time");
+			
+			String dateStr = DateFormatUtil.format(new Date());
+			String subject = String.format("%s永续合约价格已到达%s %s", klines.getPair(), PriceUtil.formatDoubleDecimal(price,klines.getDecimalNum()),dateStr);
+			String text = String.format("%s永续合约水平射线价格坐标：%s，水平射线时间坐标：%s，当前价格：%s", 
+					klines.getPair(),PriceUtil.formatDoubleDecimal(price,klines.getDecimalNum()),
+					DateFormatUtil.format(time * 1000),PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+			
+			if(hitPrice(klines, price)) {
+				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
+		}
+	}
+	
+	/**
+	 * 判断价格是否到达预期的价格
+	 * @param klines 当前k线
+	 * @param price 预期的价格
+	 * @return
+	 */
+	private boolean hitPrice(Klines klines,double price) {
+		boolean result = false;
+		if(klines.getHighPrice() >= price && klines.getLowPrice() <= price) {
+			result = true;
+		}
+		return result;
+	}
+
+	@Override
+	public void rectangle(Klines klines, ShapeInfo info) {
+		//价格坐标
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		if(pointsJsonArray.length() > 1) {
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			double price0 = points.getDouble("price");
+			//long time0 = points.getLong("time");
+			
+			JSONObject points1 = pointsJsonArray.getJSONObject(1);
+			double price1 = points1.getDouble("price");
+			//long time1 = points1.getLong("time");
+			
+			String upOrLowStr = "";
+			
+			if(hitPrice(klines, price0)) {
+				upOrLowStr = price0 > price1 ? "上" : "下";
+				String dateStr = DateFormatUtil.format(new Date());
+				String subject = String.format("%s永续合约价格已到达盘整区%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),dateStr);
+				String text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+				
+				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
+			
+			if(hitPrice(klines, price1)) {
+				upOrLowStr = price1 > price0 ? "上" : "下";
+				String dateStr = DateFormatUtil.format(new Date());
+				String subject = String.format("%s永续合约价格已到达盘整区%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),dateStr);
+				String text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+				
+				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
+			
+			
+		}
 	}
 	
 }

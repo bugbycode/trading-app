@@ -22,7 +22,14 @@ public interface ShapeRepository {
 	 * @param owner 创建者
 	 * @return
 	 */
-	public List<ShapeInfo> query(String owner);
+	public List<ShapeInfo> queryByOwner(String owner);
+	
+	/**
+	 * 根据交易对查询图纸信息
+	 * @param symbol 交易对
+	 * @return
+	 */
+	public List<ShapeInfo> queryBySymbol(String symbol);
 	
 	/**
 	 * 创建图纸
@@ -49,4 +56,11 @@ public interface ShapeRepository {
 	 * @param info 图纸信息
 	 */
 	public void update(ShapeInfo info);
+	
+	/**
+	 * 查询所有图纸信息
+	 * @return
+	 */
+	public List<ShapeInfo> query();
+	
 }

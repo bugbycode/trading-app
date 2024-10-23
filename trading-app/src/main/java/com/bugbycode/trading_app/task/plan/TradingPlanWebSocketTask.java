@@ -25,8 +25,8 @@ import com.util.PlanPairSet;
 /**
  * 交易计划任务
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class TradingPlanWebSocketTask {
 
 	private final Logger logger = LogManager.getLogger(TradingPlanWebSocketTask.class);

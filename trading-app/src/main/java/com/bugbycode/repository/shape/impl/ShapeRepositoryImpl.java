@@ -28,8 +28,13 @@ public class ShapeRepositoryImpl implements ShapeRepository {
 	}
 
 	@Override
-	public List<ShapeInfo> query(String owner) {
+	public List<ShapeInfo> queryByOwner(String owner) {
 		return template.find(Query.query(Criteria.where("owner").is(owner)), ShapeInfo.class);
+	}
+	
+	@Override
+	public List<ShapeInfo> queryBySymbol(String symbol) {
+		return template.find(Query.query(Criteria.where("symbol").is(symbol)), ShapeInfo.class);
 	}
 
 	@Override
@@ -51,6 +56,11 @@ public class ShapeRepositoryImpl implements ShapeRepository {
 	@Override
 	public void update(ShapeInfo info) {
 		template.save(info);
+	}
+
+	@Override
+	public List<ShapeInfo> query() {
+		return template.findAll(ShapeInfo.class);
 	}
 
 }

@@ -72,4 +72,47 @@ public class EmailUtil {
         
 		return new Result<ResultCode, Exception>(code, ex);
 	}
+	
+	public static Result<ResultCode, Exception> send(String subject,String text,String rec)  {
+		
+		ResultCode code = ResultCode.SUCCESS;
+		
+		Exception ex = null;
+		
+		Properties props = new Properties();
+        props.put("mail.smtp.host", AppConfig.SMTP_HOST);
+        props.put("mail.smtp.port", AppConfig.SMTP_PORT);
+        props.put("mail.smtp.auth", true);
+        props.put("mail.smtp.starttls.enable", true);
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        
+        EmailAuth emailAuth = AppConfig.getEmailAuth();
+        
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(emailAuth.getUser(), emailAuth.getPassword());
+            }
+        });
+        
+        try {
+        	MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(emailAuth.getUser(),"TRADE-BOT"));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(rec));
+            
+            message.setSubject(subject);
+            message.setText(text);
+            
+            Transport.send(message);
+            
+        } catch (UnsupportedEncodingException e) {
+        	ex = e;
+        	code = ResultCode.ERROR;
+		} catch (MessagingException e) {
+			ex = e;
+			code = ResultCode.ERROR;
+		}
+        
+        AppConfig.nexEmailAuth();
+		return new Result<ResultCode, Exception>(code, ex);
+	}
 }

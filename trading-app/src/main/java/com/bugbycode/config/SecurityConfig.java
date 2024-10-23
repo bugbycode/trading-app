@@ -45,7 +45,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
     	
-    	http.cors(cors -> {
+    	http/*.cors(cors -> {
     		//解决跨域问题
     		cors.configurationSource(request -> {
                 var corsConfig = new org.springframework.web.cors.CorsConfiguration();
@@ -55,7 +55,7 @@ public class SecurityConfig {
                 corsConfig.setAllowCredentials(true);  // 允许携带凭证（如 Cookies）
                 return corsConfig;
     		});
-    	})
+    	})*/
     	
     	.anonymous(any -> any.disable())
     	

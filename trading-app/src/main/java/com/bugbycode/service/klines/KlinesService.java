@@ -6,6 +6,7 @@ import java.util.List;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
+import com.bugbycode.module.ShapeInfo;
 
 public interface KlinesService {
 	
@@ -116,5 +117,19 @@ public interface KlinesService {
 	 * @param fibInfo 斐波那契回撤指标
 	 */
 	public void sendEmail(String subject,String text,FibInfo fibInfo);
+	
+	/**
+	 * 水平射线绘图分析
+	 * @param klines 当前k线信息
+	 * @param info 绘图信息
+	 */
+	public void horizontalRay(Klines klines,ShapeInfo info);
+	
+	/**
+	 * 盘整区（矩形）绘图分析
+	 * @param klines 当前k线信息
+	 * @param info 绘图信息
+	 */
+	public void rectangle(Klines klines,ShapeInfo info);
 	
 }

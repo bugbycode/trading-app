@@ -2,6 +2,8 @@ package com.bugbycode.module;
 
 import org.springframework.data.annotation.Id;
 
+import com.bugbycode.module.shape.ShapeType;
+
 /**
  * 图纸信息类
  */
@@ -68,5 +70,8 @@ public class ShapeInfo {
 		this.properties = properties;
 	}
 	
+	public ShapeType getShapeType() {
+		return ShapeType.resolve(this.shape);
+	}
 	
 }

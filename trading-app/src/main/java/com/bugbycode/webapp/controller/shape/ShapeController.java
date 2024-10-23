@@ -28,7 +28,7 @@ public class ShapeController extends BaseController{
 	@GetMapping("/getAllShapeInfo")
 	public List<ShapeInfo> getAllShapeInfo(){
 		User user = getUserInfo();
-		return shapeRepository.query(user.getUsername());
+		return shapeRepository.queryByOwner(user.getUsername());
 	}
 	
 	@PostMapping("/saveShapeInfo")
