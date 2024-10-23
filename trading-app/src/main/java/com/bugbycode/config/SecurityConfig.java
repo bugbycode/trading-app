@@ -45,17 +45,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
     	
-    	http/*.cors(cors -> {
-    		//解决跨域问题
-    		cors.configurationSource(request -> {
-                var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                corsConfig.setAllowedOrigins(List.of("http://localhost:5173"));  // 允许的来源
-                corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                corsConfig.setAllowedHeaders(List.of("*"));
-                corsConfig.setAllowCredentials(true);  // 允许携带凭证（如 Cookies）
-                return corsConfig;
-    		});
-    	})*/
+    	http
     	
     	.anonymous(any -> any.disable())
     	
@@ -63,8 +53,7 @@ public class SecurityConfig {
     	
     	.authorizeHttpRequests(authorize -> authorize
     			
-    			.requestMatchers("/user/userInfo","/shape/**","/pairs/getPairs").hasAnyRole("LOGIN")
-    			
+    			.requestMatchers("/shape/**","/pairs/getPairs","/user/userInfo").hasAnyRole("LOGIN")
     	        .anyRequest().authenticated()
     	        
     			)
