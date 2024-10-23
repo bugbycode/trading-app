@@ -45,9 +45,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
     	
-    	http
-    	
-    	.anonymous(any -> any.disable())
+    	http.anonymous(any -> any.disable())
     	
     	.csrf(csrf -> csrf.disable())
     	
