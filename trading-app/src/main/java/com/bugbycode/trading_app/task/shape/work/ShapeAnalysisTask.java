@@ -36,10 +36,12 @@ public class ShapeAnalysisTask implements Runnable{
 			ShapeType type = info.getShapeType();
 			logger.info(klines.getPair() + " " + type.getMemo());
 			//平行射线
-			if(type == ShapeType.LineToolHorzRay) {
+			if(type == ShapeType.LINE_TOOL_HORZ_RAY) {
 				klinesService.horizontalRay(klines, info);
-			} else if(type == ShapeType.LineToolRectangle) {
+			} else if(type == ShapeType.LINE_TOOL_RECTANGLE) {
 				klinesService.rectangle(klines, info);
+			} else if(type == ShapeType.LINE_TOOL_RAY) {
+				klinesService.ray(klines, info);
 			}
 		} catch (Exception e) {
 			logger.error("执行绘图分析任务时出现异常", e);

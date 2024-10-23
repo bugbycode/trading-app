@@ -41,6 +41,7 @@ import com.util.EmailUtil;
 import com.util.KlinesComparator;
 import com.util.KlinesUtil;
 import com.util.PriceUtil;
+import com.util.StraightLineUtil;
 import com.util.StringUtil;
 
 @Service("klinesService")
@@ -886,6 +887,39 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 			
 			
+		}
+	}
+	
+	@Override
+	public void ray(Klines klines, ShapeInfo info) {
+		//价格坐标
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		if(pointsJsonArray.length() > 1) {
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			double price0 = points.getDouble("price");
+			long time0 = points.getLong("time");
+			
+			JSONObject points1 = pointsJsonArray.getJSONObject(1);
+			double price1 = points1.getDouble("price");
+			long time1 = points1.getLong("time");
+			
+			StraightLineUtil util = new StraightLineUtil(time0 * 1000, price0, time1 * 1000, price1);
+			double resultPrice = util.calculateLineYvalue(klines.getStartTime());
+			
+			String dateStr = DateFormatUtil.format(new Date());
+			String subject = String.format("%s永续合约价格已到达趋势线价格%s附近 %s", klines.getPair(), PriceUtil.formatDoubleDecimal(resultPrice,klines.getDecimalNum()),dateStr);
+			String text = String.format("%s永续合约射线价格坐标1：%s，时间坐标1：%s，价格坐标2：%s，时间坐标2：%s，当前价格：%s，趋势线价格：%s", 
+					klines.getPair(),
+					PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
+					DateFormatUtil.format(time0 * 1000),
+					PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
+					DateFormatUtil.format(time1 * 1000),
+					PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()),
+					PriceUtil.formatDoubleDecimal(resultPrice,klines.getDecimalNum()));
+			logger.info(text);
+			if(hitPrice(klines, resultPrice)) {
+				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
 		}
 	}
 	

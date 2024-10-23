@@ -132,4 +132,10 @@ public interface KlinesService {
 	 */
 	public void rectangle(Klines klines,ShapeInfo info);
 	
+	/**
+	 * 射线绘图分析
+	 * @param klines 当前k线信息
+	 * @param info 绘图信息
+	 */
+	public void ray(Klines klines,ShapeInfo info);
 }
