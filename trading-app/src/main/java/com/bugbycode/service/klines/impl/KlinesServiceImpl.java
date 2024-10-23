@@ -922,5 +922,69 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 		}
 	}
+
+	@Override
+	public void parallelChannel(Klines klines, ShapeInfo info) {
+		//价格坐标
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		if(pointsJsonArray.length() > 2) {
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			double price0 = points.getDouble("price");
+			long time0 = points.getLong("time");
+			
+			JSONObject points1 = pointsJsonArray.getJSONObject(1);
+			double price1 = points1.getDouble("price");
+			long time1 = points1.getLong("time");
+			
+			JSONObject points2 = pointsJsonArray.getJSONObject(2);
+			double price2 = points2.getDouble("price");
+			long time2 = points2.getLong("time");
+			
+			StraightLineUtil util = new StraightLineUtil(time0 * 1000, price0, time1 * 1000, price1, time2 * 1000, price2);
+			
+			double line0Price = util.calculateLineYvalue(klines.getStartTime());
+			double line1Price = util.calculateLineYvalueForb2(klines.getStartTime());
+			
+			String upOrLowStr = "";
+			
+			//logger.info(String.format("价格1：%s，价格2：%s，时间：%s", line0Price,line1Price,DateFormatUtil.format(klines.getStartTime())));
+			
+			//第一条直线
+			if(hitPrice(klines, line0Price)) {
+				upOrLowStr = line0Price > line1Price ? "上" : "下";
+				String dateStr = DateFormatUtil.format(new Date());
+				String subject = String.format("%s永续合约价格已到达平行通道%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(line0Price,klines.getDecimalNum()),dateStr);
+				String text = String.format("%s永续合约平行通道价格坐标1：%s，时间坐标1：%s，价格坐标2：%s，时间坐标2：%s，价格坐标3：%s，时间坐标3：%s，，当前价格：%s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
+						DateFormatUtil.format(time0 * 1000),
+						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
+						DateFormatUtil.format(time1 * 1000),
+						PriceUtil.formatDoubleDecimal(price2,klines.getDecimalNum()),
+						DateFormatUtil.format(time2 * 1000),
+						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+				
+				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
+			
+			//第二条直线
+			if(hitPrice(klines, line1Price)) {
+				upOrLowStr = line1Price > line0Price ? "上" : "下";
+				String dateStr = DateFormatUtil.format(new Date());
+				String subject = String.format("%s永续合约价格已到达平行通道%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(line1Price,klines.getDecimalNum()),dateStr);
+				String text = String.format("%s永续合约平行通道价格坐标1：%s，时间坐标1：%s，价格坐标2：%s，时间坐标2：%s，价格坐标3：%s，时间坐标3：%s，，当前价格：%s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
+						DateFormatUtil.format(time0 * 1000),
+						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
+						DateFormatUtil.format(time1 * 1000),
+						PriceUtil.formatDoubleDecimal(price2,klines.getDecimalNum()),
+						DateFormatUtil.format(time2 * 1000),
+						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+				
+				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
+		}
+	}
 	
 }
