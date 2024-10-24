@@ -44,6 +44,8 @@ public class ShapeAnalysisTask implements Runnable{
 				klinesService.ray(klines, info);
 			} else if(type == ShapeType.LINE_TOOL_PARALLEL_CHANNEL) {
 				klinesService.parallelChannel(klines, info);
+			} else if(type == ShapeType.LINE_TOOL_TRIANGLE_PATTERN) {
+				klinesService.trianglePattern(klines, info);
 			}
 		} catch (Exception e) {
 			logger.error("执行绘图分析任务时出现异常", e);

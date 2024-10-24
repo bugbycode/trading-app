@@ -29,7 +29,6 @@ import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
-import com.bugbycode.module.shape.ShapeType;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
@@ -983,6 +982,117 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
 				
 				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
+		}
+	}
+
+	@Override
+	public void trianglePattern(Klines klines, ShapeInfo info) {
+		String dateStr = DateFormatUtil.format(new Date());
+		//价格坐标 A B C D 四个点
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		if(pointsJsonArray.length() > 3) {
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			//A点坐标
+			double price0 = points.getDouble("price");
+			long time0 = points.getLong("time");
+			
+			//B点坐标
+			JSONObject points1 = pointsJsonArray.getJSONObject(1);
+			double price1 = points1.getDouble("price");
+			long time1 = points1.getLong("time");
+			
+			//C点坐标
+			JSONObject points2 = pointsJsonArray.getJSONObject(2);
+			double price2 = points2.getDouble("price");
+			long time2 = points2.getLong("time");
+			
+			//D点坐标
+			JSONObject points3 = pointsJsonArray.getJSONObject(3);
+			double price3 = points3.getDouble("price");
+			long time3 = points3.getLong("time");
+			
+			//初始化AC、BD两条直线
+			StraightLineUtil util = new StraightLineUtil(time0 * 1000, price0, time1 * 1000, price1, time2 * 1000, price2, time3 * 1000, price3);
+			
+
+			String parallelChannelOrTrianglePattern = "";
+			String upOrLowStr = "";
+			
+			//相交或平行两种情况
+			//相交
+			if(util.isIntersect()) {
+				parallelChannelOrTrianglePattern = "三角形";
+				//两条直线相交的时间
+				long intersectTime = util.getIntersectXValue();
+				logger.info(String.format("三角形AC和BD两条直线相交时间：%s", DateFormatUtil.format(intersectTime)));
+				//正常绘图 相交时间应在ABCD四个点之后 否则不做分析
+				if(!(intersectTime > time0 && intersectTime > time1 && intersectTime > time2 && intersectTime > time3)) {
+					return;
+				}
+				//如果k线在相交时间之后则不做分析
+				if(klines.getStartTime() > intersectTime) {
+					return;
+				}
+				
+			} else {//平行
+				parallelChannelOrTrianglePattern = "平行通道";
+				logger.info("AC与BD两条直线平行，绘图分析为平行通道");
+			}
+			
+			//两条直线当前对应的价格
+			//第一条直线 AC
+			double acPrice = util.calculateLineYvalue(klines.getStartTime());
+			//第二条直线 BD
+			double bdPrice = util.calculateLine2Yvalue(klines.getStartTime());
+			
+			logger.info(String.format("AC价格：%s，BD价格：%s，当前价格：%s", 
+					PriceUtil.formatDoubleDecimal(acPrice,klines.getDecimalNum()),
+					PriceUtil.formatDoubleDecimal(bdPrice,klines.getDecimalNum()),
+					PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum())));
+			
+
+			String subject = "";
+			String text = "";
+			
+			//k线经过ac直线时
+			if(hitPrice(klines, acPrice)) {
+				upOrLowStr = acPrice > bdPrice ? "上" : "下";
+				subject = String.format("%s永续合约价格到达%s%s边缘%s %s", 
+						klines.getPair(), 
+						parallelChannelOrTrianglePattern, 
+						upOrLowStr,
+						PriceUtil.formatDoubleDecimal(acPrice,klines.getDecimalNum()),
+						dateStr);
+			}
+			
+			if(hitPrice(klines, bdPrice)) {
+				upOrLowStr = bdPrice > acPrice ? "上" : "下";
+				subject = String.format("%s永续合约价格到达%s%s边缘%s %s", 
+						klines.getPair(), 
+						parallelChannelOrTrianglePattern, 
+						upOrLowStr,
+						PriceUtil.formatDoubleDecimal(bdPrice,klines.getDecimalNum()),
+						dateStr);
+			}
+			
+			text = String.format("%s永续合约%sA点时间坐标：%s，A点价格坐标：%s，B点时间坐标：%s，B点价格坐标：%s，C点时间坐标：%s，C点价格坐标：%s，D点时间坐标：%s，D点价格坐标：%s"
+					+ "，当前价格：%s", 
+					klines.getPair(),
+					parallelChannelOrTrianglePattern,
+					DateFormatUtil.format(time0 * 1000),
+					PriceUtil.formatDoubleDecimal(price0, klines.getDecimalNum()),
+					DateFormatUtil.format(time1 * 1000),
+					PriceUtil.formatDoubleDecimal(price1, klines.getDecimalNum()),
+					DateFormatUtil.format(time2 * 1000),
+					PriceUtil.formatDoubleDecimal(price2, klines.getDecimalNum()),
+					DateFormatUtil.format(time3 * 1000),
+					PriceUtil.formatDoubleDecimal(price3, klines.getDecimalNum()),
+					PriceUtil.formatDoubleDecimal(klines.getClosePrice(), klines.getDecimalNum())
+					);
+			
+			if(StringUtil.isNotEmpty(subject)) {
+				this.emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
 			}
 		}
 	}

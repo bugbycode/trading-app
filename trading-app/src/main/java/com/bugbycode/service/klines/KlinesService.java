@@ -145,4 +145,11 @@ public interface KlinesService {
 	 * @param info 绘图信息
 	 */
 	public void parallelChannel(Klines klines,ShapeInfo info);
+	
+	/**
+	 * 三角形绘图分析
+	 * @param klines 当前k线信息
+	 * @param info 绘图信息
+	 */
+	public void trianglePattern(Klines klines,ShapeInfo info);
 }
