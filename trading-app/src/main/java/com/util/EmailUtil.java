@@ -78,15 +78,15 @@ public class EmailUtil {
 		ResultCode code = ResultCode.SUCCESS;
 		
 		Exception ex = null;
+        
+        EmailAuth emailAuth = AppConfig.getEmailAuth();
 		
 		Properties props = new Properties();
-        props.put("mail.smtp.host", AppConfig.SMTP_HOST);
-        props.put("mail.smtp.port", AppConfig.SMTP_PORT);
+        props.put("mail.smtp.host", emailAuth.getHost());
+        props.put("mail.smtp.port", emailAuth.getPort());
         props.put("mail.smtp.auth", true);
         props.put("mail.smtp.starttls.enable", true);
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-        
-        EmailAuth emailAuth = AppConfig.getEmailAuth();
         
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
