@@ -5,5 +5,8 @@ spring:
     mongodb:
       url: mongodb://trading:trading@localhost:27017
       database: trading
+binance: 
+  baseUrl: 
+    websocket: wss://fstream.binancefuture.com
 loggin: 
   config: classpath:log4j2.xml
