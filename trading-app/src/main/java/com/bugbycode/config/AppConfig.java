@@ -34,15 +34,13 @@ public class AppConfig {
 		
 		EMAIL_AUTH_USE_OFFSET++;
 		
-		if(EMAIL_AUTH_USE_OFFSET == EMAIL_AUTH.size()) {
+		if(EMAIL_AUTH_USE_OFFSET >= EMAIL_AUTH.size()) {
 			EMAIL_AUTH_USE_OFFSET = 0;
 		}
 		
 	}
 	
 	public static void setEmailAuth(List<EmailAuth> authList) {
-		if(EMAIL_AUTH == null) {
-			EMAIL_AUTH = authList;
-		}
+		EMAIL_AUTH = authList;
 	}
 }

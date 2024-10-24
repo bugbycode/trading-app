@@ -51,7 +51,9 @@ public class SecurityConfig {
     	
     	.authorizeHttpRequests(authorize -> authorize
     			
-    			.requestMatchers("/shape/**","/pairs/getPairs","/user/userInfo").hasAnyRole("LOGIN")
+    			.requestMatchers("/shape/**",
+    					"/user/userInfo",
+    					"/tradingview/**").hasAnyRole("LOGIN")
     	        .anyRequest().authenticated()
     	        
     			)
