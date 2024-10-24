@@ -25,6 +25,10 @@ public class EmailAuth implements Serializable {
 	
 	private int port;
 	
+	public EmailAuth() {
+		
+	}
+
 	public EmailAuth(String user, String password) {
 		this.user = user;
 		this.password = password;
