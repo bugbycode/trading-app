@@ -18,7 +18,7 @@ public enum ShapeType {
 	/**
 	 * 平行通道
 	 */
-	LINE_TOOL_PARALLEL_CHANNEL("LineToolParallelChannel","trend_line","平行通道"),
+	LINE_TOOL_PARALLEL_CHANNEL("LineToolParallelChannel","parallel_channel","平行通道"),
 	
 	/**
 	 * 水平射线
