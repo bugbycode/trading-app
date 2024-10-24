@@ -1,5 +1,6 @@
 package com.bugbycode.trading_app.init;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -7,15 +8,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 
 @Component
 @Configuration
 public class InitConfig implements ApplicationRunner {
 	
+	@Value("${binance.baseUrl.websocket}")
+	private String websocketBaseUrl; 
+	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		
+		AppConfig.WEBSOCKET_URL = websocketBaseUrl;
 	}
 
 	@Bean("restTemplate")

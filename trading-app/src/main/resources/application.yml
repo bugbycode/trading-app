@@ -7,6 +7,6 @@ spring:
       database: trading
 binance: 
   baseUrl: 
-    websocket: wss://fstream.binancefuture.com
+    websocket: wss://fstream.binance.com
 loggin: 
   config: classpath:log4j2.xml
