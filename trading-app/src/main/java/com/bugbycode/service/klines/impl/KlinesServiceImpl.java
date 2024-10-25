@@ -1096,5 +1096,65 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 		}
 	}
+
+	@Override
+	public void riskRewardLong(Klines klines, ShapeInfo info) {
+		//价格坐标
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		JSONObject propertiesJson = new JSONObject(info.getProperties());
+		if(pointsJsonArray.length() > 0) {
+			
+			String dateStr = DateFormatUtil.format(new Date());
+			
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			
+			double price = points.getDouble("price");//开仓价
+			//long time = points.getLong("time");
+			
+			double n = 100 * Math.pow(10, klines.getDecimalNum() - 2);
+			double stopLevel = propertiesJson.getDouble("stopLevel") / n;//止损金额
+			double profitLevel = propertiesJson.getDouble("profitLevel") / n;//止盈金额
+			
+			if(hitPrice(klines, price)) {
+				String subject = String.format("%s永续合约(%s)做多交易计划 %s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
+						dateStr);
+				String text = StringUtil.formatLongMessage(klines.getPair(), price, price - stopLevel, price + profitLevel, klines.getDecimalNum());
+				this.emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
+			
+		}
+	}
+
+	@Override
+	public void riskRewardShort(Klines klines, ShapeInfo info) {
+		//价格坐标
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		JSONObject propertiesJson = new JSONObject(info.getProperties());
+		if(pointsJsonArray.length() > 0) {
+			
+			String dateStr = DateFormatUtil.format(new Date());
+			
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			
+			double price = points.getDouble("price");//开仓价
+			//long time = points.getLong("time");
+			
+			double n = 100 * Math.pow(10, klines.getDecimalNum() - 2);
+			double stopLevel = propertiesJson.getDouble("stopLevel") / n;//止损金额
+			double profitLevel = propertiesJson.getDouble("profitLevel") / n;//止盈金额
+			
+			if(hitPrice(klines, price)) {
+				String subject = String.format("%s永续合约(%s)做空交易计划 %s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
+						dateStr);
+				String text = StringUtil.formatLongMessage(klines.getPair(), price, price + stopLevel, price - profitLevel, klines.getDecimalNum());
+				this.emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+			}
+			
+		}
+	}
 	
 }

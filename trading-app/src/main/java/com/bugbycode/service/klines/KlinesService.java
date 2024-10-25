@@ -152,4 +152,18 @@ public interface KlinesService {
 	 * @param info 绘图信息
 	 */
 	public void trianglePattern(Klines klines,ShapeInfo info);
+	
+	/**
+	 * 做多交易计划
+	 * @param klines 当前k线信息
+	 * @param info 绘图信息
+	 */
+	public void riskRewardLong(Klines klines,ShapeInfo info);
+	
+	/**
+	 * 做空交易计划
+	 * @param klines 当前k线信息
+	 * @param info 绘图信息
+	 */
+	public void riskRewardShort(Klines klines,ShapeInfo info);
 }
