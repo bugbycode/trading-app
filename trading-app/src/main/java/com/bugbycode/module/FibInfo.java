@@ -83,6 +83,19 @@ public class FibInfo {
 	
 	/**
 	 * 
+	 * @param fib1 斐波那契回撤起始价
+	 * @param fib0 斐波那契回撤结束价
+	 * @param decimalPoint
+	 */
+	public FibInfo(double fib1,double fib0,int decimalPoint,FibLevel level) {
+		this.high = fib1;
+		this.low = fib0;
+		this.decimalPoint = decimalPoint;
+		this.level = level;
+	}
+	
+	/**
+	 * 
 	 * @param kline1 最低价k线
 	 * @param kline2 最高价k线
 	 * @param decimalPoint 保留小数点个数
@@ -128,10 +141,10 @@ public class FibInfo {
 	 * @return
 	 */
     public double calculateFibonacciRetracement(double low, double high, double fibonacciLevel) {
-        
+        /*
     	if (fibonacciLevel < FibCode.FIB0.getValue() || fibonacciLevel > FibCode.FIB4_764.getValue()) {
             throw new IllegalArgumentException("参数不合法。");
-        }
+        }*/
 
         // 计算斐波那契水平（从高到低）
         //return low + fibonacciLevel * range;
@@ -168,7 +181,7 @@ public class FibInfo {
 		StringBuffer formatBufBefor = new StringBuffer();
 		
 		StringBuffer formatBuf = new StringBuffer();
-
+		
 		formatBufBefor.append("[");
 		formatBufBefor.append(this.getLevel().getLabel());
 		formatBufBefor.append("] [");
@@ -199,7 +212,7 @@ public class FibInfo {
 			}
 		}
 		
-		return formatBuf.toString() + "\nExtension: " + extensionBuffer.toString();
+		return formatBufBefor.toString() + formatBuf.toString() + "\n\nExtension: " + extensionBuffer.toString();
 	}
     
     

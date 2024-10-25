@@ -1156,5 +1156,39 @@ public class KlinesServiceImpl implements KlinesService {
 			
 		}
 	}
+
+	@Override
+	public void fibRetracement(Klines klines, ShapeInfo info) {
+		//价格坐标
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		JSONObject propertiesJson = new JSONObject(info.getProperties());
+		if(pointsJsonArray.length() > 1) {
+			
+			String dateStr = DateFormatUtil.format(new Date());
+			
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			JSONObject points2 = pointsJsonArray.getJSONObject(1);
+			double fib1Price = points.getDouble("price");
+			double fib0Price = points2.getDouble("price");
+			
+			FibInfo fib = new FibInfo(fib1Price, fib0Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
+			
+			for(int index = 0;index < 12;index++) {
+				JSONObject levelObj = propertiesJson.getJSONObject("level" + (index + 1));
+				boolean visible = levelObj.getBoolean("visible");
+				double coeff = levelObj.getDouble("coeff");
+				double price = fib.getFibValue(coeff);
+				if(visible && hitPrice(klines, price)) {
+					String subject = String.format("%s永续合约价格已到达%s(%s) %s",
+							klines.getPair(),
+							coeff,
+							PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
+							dateStr);
+					String text = fib.toString();
+					this.emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				}
+			}
+		}
+	}
 	
 }

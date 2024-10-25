@@ -166,4 +166,11 @@ public interface KlinesService {
 	 * @param info 绘图信息
 	 */
 	public void riskRewardShort(Klines klines,ShapeInfo info);
+	
+	/**
+	 * 斐波那契回撤绘图分析
+	 * @param klines
+	 * @param info
+	 */
+	public void fibRetracement(Klines klines,ShapeInfo info);
 }
