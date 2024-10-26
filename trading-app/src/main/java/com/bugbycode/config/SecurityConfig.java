@@ -52,7 +52,7 @@ public class SecurityConfig {
     	.authorizeHttpRequests(authorize -> authorize
     			
     			.requestMatchers("/shape/**",
-    					"/user/userInfo",
+    					"/user/**",
     					"/tradingview/**").hasAnyRole("LOGIN")
     	        .anyRequest().authenticated()
     	        
