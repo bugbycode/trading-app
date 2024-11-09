@@ -44,9 +44,13 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public void updateUserInfo(String username, int subscribeAi) {
+	public void updateUserSubscribeInfo(String username,User user) {
 		Update update = new Update();
-		update.set("subscribeAi", subscribeAi);
+		update.set("emaMonitor", user.getEmaMonitor());
+		update.set("emaRiseAndFall", user.getEmaRiseAndFall());
+		update.set("fibMonitor", user.getFibMonitor());
+		update.set("highOrLowMonitor", user.getHighOrLowMonitor());
+		update.set("riseAndFallMonitor", user.getRiseAndFallMonitor());
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 

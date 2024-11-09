@@ -34,11 +34,11 @@ public interface UserRepository {
 	public void deleteByUsername(String username);
 	
 	/**
-	 * 修改用户信息 不包含修改密码
+	 * 修改用户行情订阅设置信息
 	 * @param username 用户名
-	 * @param subscribeAi 是否订阅AI分析
+	 * @param user 
 	 */
-	public void updateUserInfo(String username,int subscribeAi);
+	public void updateUserSubscribeInfo(String username,User user);
 	
 	/**
 	 * 根据订阅AI分析状态查询所有用户

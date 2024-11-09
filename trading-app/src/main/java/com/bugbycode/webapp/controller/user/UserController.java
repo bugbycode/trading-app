@@ -8,6 +8,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -61,8 +62,8 @@ public class UserController extends BaseController{
 		return json.toString();
 	}
 	
-	@PostMapping("/changeSubscribeAi/{subscribeAi}")
-	public String changeSubscribeAi(@PathVariable("subscribeAi") int subscribeAi) {
+	@PostMapping("/changeSubscribeAi")
+	public String changeSubscribeAi(@RequestBody User data) {
 		ResultCode code = ResultCode.SUCCESS;
 		User user = getUserInfo();
 		
@@ -71,13 +72,9 @@ public class UserController extends BaseController{
 			throw new AccessDeniedException("无权访问");
 		}
 		
-		if(!(subscribeAi == 0 || subscribeAi == 1)) {
-			throw new AccessDeniedException("无权访问");
-		}
+		user.copyAIInfo(data);
 		
-		userRepository.updateUserInfo(user.getUsername(), subscribeAi);
-		
-		user.setSubscribeAi(subscribeAi);
+		userRepository.updateUserSubscribeInfo(user.getUsername(), data);
 		
 		JSONObject json = new JSONObject();
 		
