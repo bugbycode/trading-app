@@ -496,7 +496,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(ObjectUtils.isEmpty(secondFibHightKlines) || ObjectUtils.isEmpty(secondFibLowKlines)) {
 			logger.debug("无法计算出" + pair + "第二级别斐波那契回撤信息");
 			
-			sendFib0Email(fibInfo, klinesList_hit);
+			//sendFib0Email(fibInfo, klinesList_hit);
 			
 			return;
 		}
@@ -538,7 +538,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(ObjectUtils.isEmpty(thirdFibHightKlines) || ObjectUtils.isEmpty(thirdFibLowKlines)) {
 			logger.debug("无法计算出" + pair + "第三级别斐波那契回撤信息");
 			
-			sendFib0Email(secondFibInfo, klinesList_hit);
+			//sendFib0Email(secondFibInfo, klinesList_hit);
 			
 			return;
 		}
@@ -560,7 +560,7 @@ public class KlinesServiceImpl implements KlinesService {
 			break;
 		}
 		
-		sendFib0Email(thirdFibInfo, klinesList_hit);
+		//sendFib0Email(thirdFibInfo, klinesList_hit);
 	}
 
 	@Override
