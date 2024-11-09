@@ -26,6 +26,8 @@ public class User implements UserDetails {
 	
 	private String password;
 	
+	private int subscribeAi = 0;//是否订阅AI分析 0：否 1：是
+	
 	public String getId() {
 		return id;
 	}
@@ -57,5 +59,13 @@ public class User implements UserDetails {
 		Set<GrantedAuthority> roleSet = new HashSet<GrantedAuthority>();
 		roleSet.add(new SimpleGrantedAuthority("ROLE_LOGIN"));
 		return roleSet;
+	}
+
+	public int getSubscribeAi() {
+		return subscribeAi;
+	}
+
+	public void setSubscribeAi(int subscribeAi) {
+		this.subscribeAi = subscribeAi;
 	}
 }

@@ -1,7 +1,5 @@
 package com.bugbycode.config;
 
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -14,14 +12,11 @@ import org.springframework.security.authentication.DefaultAuthenticationEventPub
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.bugbycode.handler.LoginFailHandler;
 import com.bugbycode.handler.LoginSuccessHandler;
-import com.bugbycode.repository.user.UserRepository;
-import com.bugbycode.service.user.impl.UserDetailsManager;
 import com.util.MD5Util;
 
 @Order(0)
@@ -31,11 +26,6 @@ public class SecurityConfig {
 	
 	private final Logger logger = LogManager.getLogger(SecurityConfig.class);
 
-	@Bean
-	public UserDetailsService userDetailsService(UserRepository userRepository,PasswordEncoder passwordEncoder) {
-		return new UserDetailsManager(userRepository,passwordEncoder);
-	}
-	
     @Bean
     @ConditionalOnMissingBean(AuthenticationEventPublisher.class)
     public DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher(ApplicationEventPublisher delegate) { 
@@ -60,7 +50,7 @@ public class SecurityConfig {
     	.formLogin((form) -> {
     		form.successHandler(new LoginSuccessHandler())
     		.failureHandler(new LoginFailHandler())
-    		.loginPage("/web#/login")
+    		.loginPage("/web")
     		.loginProcessingUrl("/login")
     		.permitAll();
     	}).logout(Customizer.withDefaults());

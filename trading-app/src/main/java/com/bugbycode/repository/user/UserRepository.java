@@ -19,14 +19,22 @@ public interface UserRepository {
 	public String insert(User user);
 	
 	/**
-	 * 修改用户信息
-	 * @param user
+	 * 修改用户密码
+	 * @param username
+	 * @param password
 	 */
-	public void update(User user);
+	public void updatePassword(String username,String password);
 	
 	/**
 	 * 根据用户名删除用户信息
 	 * @param username
 	 */
 	public void deleteByUsername(String username);
+	
+	/**
+	 * 修改用户信息 不包含修改密码
+	 * @param username 用户名
+	 * @param subscribeAi 是否订阅AI分析
+	 */
+	public void updateUserInfo(String username,int subscribeAi);
 }
