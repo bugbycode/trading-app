@@ -8,5 +8,6 @@ spring:
 binance: 
   baseUrl: 
     websocket: wss://fstream.binance.com
+    rest: https://fapi.binance.com
 loggin: 
   config: classpath:log4j2.xml
