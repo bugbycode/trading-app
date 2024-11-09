@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService{
 	public User loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.queryByUsername(username);
 		if(user == null) {
-			throw new UsernameNotFoundException("user not fond.");
+			throw new UsernameNotFoundException("用户不存在");
 		}
 		if(StringUtil.isNotEmpty(user.getPassword())) {
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
