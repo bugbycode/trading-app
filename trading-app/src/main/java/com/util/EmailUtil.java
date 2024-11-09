@@ -97,12 +97,30 @@ public class EmailUtil {
         try {
         	MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(emailAuth.getUser(),"TRADE-BOT"));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(rec));
+            
+            int sendIndex = 0;
+            if(StringUtil.isNotEmpty(rec)) {
+                String regex = ",";
+                if(rec.indexOf(regex) != -1) {
+                	String[] recs = rec.split(regex);
+                	for(String rc : recs) {
+                		if(StringUtil.isNotEmpty(rc)) {
+                    		message.addRecipient(Message.RecipientType.TO, new InternetAddress(rc));
+                            sendIndex++;
+                		}
+                	}
+                } else {
+                    message.addRecipient(Message.RecipientType.TO, new InternetAddress(rec));
+                    sendIndex++;
+                }
+            }
             
             message.setSubject(subject);
             message.setText(text);
             
-            Transport.send(message);
+            if(sendIndex > 0) {
+                Transport.send(message);
+            }
             
         } catch (UnsupportedEncodingException e) {
         	ex = e;

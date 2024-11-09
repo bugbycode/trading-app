@@ -1,5 +1,7 @@
 package com.bugbycode.service.user.impl;
 
+import java.util.List;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,5 +32,18 @@ public class UserServiceImpl implements UserService{
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
 		}
 		return user;
+	}
+
+	@Override
+	public String getSubscribeAiUserEmail() {
+		List <User> userList = userRepository.queryAllUserBySubscribeAi(1);
+		StringBuffer buff = new StringBuffer();
+		for(User user : userList) {
+			if(buff.length() > 0) {
+				buff.append(",");
+			}
+			buff.append(user.getUsername());
+		}
+		return buff.toString();
 	}
 }

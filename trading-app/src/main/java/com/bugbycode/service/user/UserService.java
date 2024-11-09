@@ -7,5 +7,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  */
 public interface UserService extends UserDetailsService{
 
-	
+	/**
+	 * 获取所有订阅分析的邮箱账号信息
+	 * @return
+	 */
+	public String getSubscribeAiUserEmail();
 }

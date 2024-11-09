@@ -18,9 +18,13 @@ public class InitConfig implements ApplicationRunner {
 	@Value("${binance.baseUrl.websocket}")
 	private String websocketBaseUrl; 
 	
+	@Value("${binance.baseUrl.rest}")
+	private String restBaseUrl; 
+	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		AppConfig.WEBSOCKET_URL = websocketBaseUrl;
+		AppConfig.REST_BASE_URL = restBaseUrl;
 	}
 
 	@Bean("restTemplate")

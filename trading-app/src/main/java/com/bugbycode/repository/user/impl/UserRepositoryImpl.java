@@ -1,5 +1,7 @@
 package com.bugbycode.repository.user.impl;
 
+import java.util.List;
+
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -46,6 +48,11 @@ public class UserRepositoryImpl implements UserRepository {
 		Update update = new Update();
 		update.set("subscribeAi", subscribeAi);
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
+	}
+
+	@Override
+	public List<User> queryAllUserBySubscribeAi(int subscribeAi) {
+		return template.find(Query.query(Criteria.where("subscribeAi").is(subscribeAi)), User.class);
 	}
 
 	

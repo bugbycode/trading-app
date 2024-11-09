@@ -1,5 +1,7 @@
 package com.bugbycode.repository.user;
 
+import java.util.List;
+
 import com.bugbycode.module.user.User;
 
 public interface UserRepository {
@@ -37,4 +39,11 @@ public interface UserRepository {
 	 * @param subscribeAi 是否订阅AI分析
 	 */
 	public void updateUserInfo(String username,int subscribeAi);
+	
+	/**
+	 * 根据订阅AI分析状态查询所有用户
+	 * @param subscribeAi
+	 * @return
+	 */
+	public List<User> queryAllUserBySubscribeAi(int subscribeAi);
 }

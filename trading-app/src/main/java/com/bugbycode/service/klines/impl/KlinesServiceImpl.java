@@ -26,17 +26,14 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
-import com.bugbycode.module.Result;
-import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.service.klines.KlinesService;
+import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
-import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.email.ShapeSendMailTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
-import com.util.EmailUtil;
 import com.util.KlinesComparator;
 import com.util.KlinesUtil;
 import com.util.PriceUtil;
@@ -53,6 +50,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private HighOrLowHitPriceRepository highOrLowHitPriceRepository;
+	
+	@Autowired
+	private UserService userDetailsService;
 	
 	@Autowired
 	private WorkTaskPool emailWorkTaskPool;
@@ -246,7 +246,14 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	public void sendEmail(String subject,String text,FibInfo fibInfo) {
 		
-		emailWorkTaskPool.add(new SendMailTask(subject, text, fibInfo));
+		if(!ObjectUtils.isEmpty(fibInfo)) {
+			text += "\n\n" + fibInfo.toString();
+		}
+		
+		String recEmail = userDetailsService.getSubscribeAiUserEmail();
+	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
+			emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
+	 	}
 		
 	}
 
@@ -413,31 +420,10 @@ public class KlinesServiceImpl implements KlinesService {
 			
 		}
 		
-		if(StringUtil.isNotEmpty(subject)) {
-			
-			text += "\n\n" + dateStr;
-			
-			logger.info("邮件主题：" + subject);
-			logger.info("邮件内容：" + text);
-			
-			Result<ResultCode, Exception> result = EmailUtil.send(subject, text);
-			
-			switch (result.getResult()) {
-			case ERROR:
-				
-				Exception ex = result.getErr();
-				
-				logger.info("邮件发送失败！失败原因：" + ex.getLocalizedMessage());
-				
-				break;
-				
-			default:
-				
-				logger.info("邮件发送成功！");
-				
-				break;
-			}
-		}
+		String recEmail = userDetailsService.getSubscribeAiUserEmail();
+	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
+			emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
+	 	}
 	}
 
 	@Override
@@ -602,8 +588,11 @@ public class KlinesServiceImpl implements KlinesService {
 		 	text += String.format("EMA7: %s, EMA25: %s, EMA99: %s ", PriceUtil.formatDoubleDecimal(lastKlines.getEma7(), decimalNum),
 		 			PriceUtil.formatDoubleDecimal(lastKlines.getEma25(), decimalNum),
 		 			PriceUtil.formatDoubleDecimal(lastKlines.getEma99(), decimalNum));
-					
-			sendEmail(subject, text, null);
+			
+		 	String recEmail = userDetailsService.getSubscribeAiUserEmail();
+		 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
+				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
+		 	}
 		}
 	}
 
@@ -806,7 +795,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		//logger.info(text);
 		
-		sendEmail(subject, text, null);
+		String recEmail = userDetailsService.getSubscribeAiUserEmail();
+	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
+			emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
+	 	}
 	}
 
 	@Override
