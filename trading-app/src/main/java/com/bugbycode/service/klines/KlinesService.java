@@ -114,9 +114,9 @@ public interface KlinesService {
 	 * 发送邮件
 	 * @param subject 主题
 	 * @param text 内容
-	 * @param fibInfo 斐波那契回撤指标
+	 * @param recEmail 收件人信息
 	 */
-	public void sendEmail(String subject,String text,FibInfo fibInfo);
+	public void sendEmail(String subject,String text,String recEmail);
 	
 	/**
 	 * 水平射线绘图分析

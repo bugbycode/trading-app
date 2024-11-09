@@ -41,9 +41,37 @@ public interface UserRepository {
 	public void updateUserSubscribeInfo(String username,User user);
 	
 	/**
-	 * 根据订阅AI分析状态查询所有用户
-	 * @param subscribeAi
+	 * 根据订阅价格回撤状态查询所有用户
+	 * @param fibMonitor
 	 * @return
 	 */
-	public List<User> queryAllUserBySubscribeAi(int subscribeAi);
+	public List<User> queryAllUserByFibMonitor(int fibMonitor);
+	
+	/**
+	 * 根据订阅行情波动状态查询所有用户
+	 * @param riseAndFallMonitor
+	 * @return
+	 */
+	public List<User> queryAllUserByRiseAndFallMonitor(int riseAndFallMonitor);
+	
+	/**
+	 * 根据订阅开仓机会状态查询所有用户
+	 * @param emaMonitor
+	 * @return
+	 */
+	public List<User> queryAllUserByEmaMonitor(int emaMonitor);
+	
+	/**
+	 * 根据订阅行情异动状态查询所有用户
+	 * @param emaRiseAndFall
+	 * @return
+	 */
+	public List<User> queryAllUserByEmaRiseAndFall(int emaRiseAndFall);
+	
+	/**
+	 * 根据订阅高低点位状态查询所有用户
+	 * @param highOrLowMonitor
+	 * @return
+	 */
+	public List<User> queryAllUserByHighOrLowMonitor(int highOrLowMonitor);
 }

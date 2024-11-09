@@ -34,9 +34,7 @@ public class UserServiceImpl implements UserService{
 		return user;
 	}
 
-	@Override
-	public String getSubscribeAiUserEmail() {
-		List <User> userList = userRepository.queryAllUserBySubscribeAi(1);
+	private String getSubscribeAiUserEmail(List <User> userList) {
 		StringBuffer buff = new StringBuffer();
 		for(User user : userList) {
 			if(buff.length() > 0) {
@@ -45,5 +43,35 @@ public class UserServiceImpl implements UserService{
 			buff.append(user.getUsername());
 		}
 		return buff.toString();
+	}
+
+	@Override
+	public String getFibMonitorUserEmail() {
+		List <User> userList = userRepository.queryAllUserByFibMonitor(1);
+		return getSubscribeAiUserEmail(userList);
+	}
+
+	@Override
+	public String getRiseAndFallMonitorUserEmail() {
+		List <User> userList = userRepository.queryAllUserByRiseAndFallMonitor(1);
+		return getSubscribeAiUserEmail(userList);
+	}
+
+	@Override
+	public String getEmaMonitorUserEmail() {
+		List <User> userList = userRepository.queryAllUserByEmaMonitor(1);
+		return getSubscribeAiUserEmail(userList);
+	}
+
+	@Override
+	public String getEmaRiseAndFallUserEmail() {
+		List <User> userList = userRepository.queryAllUserByEmaRiseAndFall(1);
+		return getSubscribeAiUserEmail(userList);
+	}
+
+	@Override
+	public String getHighOrLowMonitorUserEmail() {
+		List <User> userList = userRepository.queryAllUserByHighOrLowMonitor(1);
+		return getSubscribeAiUserEmail(userList);
 	}
 }

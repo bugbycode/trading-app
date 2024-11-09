@@ -8,8 +8,32 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface UserService extends UserDetailsService{
 
 	/**
-	 * 获取所有订阅分析的邮箱账号信息
+	 * 获取所有订阅价格回撤邮箱账号信息
 	 * @return
 	 */
-	public String getSubscribeAiUserEmail();
+	public String getFibMonitorUserEmail();
+	
+	/**
+	 * 获取所有订阅行情波动邮箱账号信息
+	 * @return
+	 */
+	public String getRiseAndFallMonitorUserEmail();
+	
+	/**
+	 * 获取所有订阅开仓机会邮箱账号信息
+	 * @return
+	 */
+	public String getEmaMonitorUserEmail();
+	
+	/**
+	 * 获取所有订阅行情异动邮箱账号信息
+	 * @return
+	 */
+	public String getEmaRiseAndFallUserEmail();
+	
+	/**
+	 * 获取所有订阅高低点位邮箱账号信息
+	 * @return
+	 */
+	public String getHighOrLowMonitorUserEmail();
 }

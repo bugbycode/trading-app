@@ -182,9 +182,12 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format(new Date()));
 				
 				String text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice, closePpositionCode);
-			
-				sendEmail(subject,text,fibInfo);
-
+				
+				text += "\r\n\r\n" + fibInfo.toString();
+				
+				String recEmail = userDetailsService.getFibMonitorUserEmail();
+				sendEmail(subject,text,recEmail);
+				
 				break;
 			}
 			
@@ -233,7 +236,11 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				String text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice, closePpositionCode);
 				
-				sendEmail(subject,text,fibInfo);
+
+				text += "\r\n\r\n" + fibInfo.toString();
+				
+				String recEmail = userDetailsService.getFibMonitorUserEmail();
+				sendEmail(subject,text,recEmail);
 				
 				break;
 			}
@@ -244,13 +251,8 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 	}
 	
-	public void sendEmail(String subject,String text,FibInfo fibInfo) {
+	public void sendEmail(String subject,String text,String recEmail) {
 		
-		if(!ObjectUtils.isEmpty(fibInfo)) {
-			text += "\n\n" + fibInfo.toString();
-		}
-		
-		String recEmail = userDetailsService.getSubscribeAiUserEmail();
 	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
 			emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
 	 	}
@@ -306,7 +308,12 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		if(StringUtil.isNotEmpty(subject)) {
-			sendEmail(subject, text, fibInfo);
+
+			text += "\r\n\r\n" + fibInfo.toString();
+			
+			String recEmail = userDetailsService.getFibMonitorUserEmail();
+			sendEmail(subject,text,recEmail);
+			
 		}
 	}
 
@@ -420,10 +427,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 		}
 		
-		String recEmail = userDetailsService.getSubscribeAiUserEmail();
-	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
-			emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
-	 	}
+		String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+	 	sendEmail(subject, text, recEmail);
 	}
 
 	@Override
@@ -589,10 +594,8 @@ public class KlinesServiceImpl implements KlinesService {
 		 			PriceUtil.formatDoubleDecimal(lastKlines.getEma25(), decimalNum),
 		 			PriceUtil.formatDoubleDecimal(lastKlines.getEma99(), decimalNum));
 			
-		 	String recEmail = userDetailsService.getSubscribeAiUserEmail();
-		 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
-				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
-		 	}
+		 	String recEmail = userDetailsService.getEmaMonitorUserEmail();
+		 	sendEmail(subject, text, recEmail);
 		}
 	}
 
@@ -659,7 +662,9 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				text = subject;
 				
-				sendEmail(subject, text, null);
+				String recEmail = userDetailsService.getRiseAndFallMonitorUserEmail();
+				
+				sendEmail(subject, text, recEmail);
 			}
 		}
 	}
@@ -670,7 +675,7 @@ public class KlinesServiceImpl implements KlinesService {
 	 * @param parentKlines
 	 * @return 
 	 */
-	private boolean checkEmaRise(Klines lastKlines,Klines parentKlines) {
+	/*private boolean checkEmaRise(Klines lastKlines,Klines parentKlines) {
 		//k线主体开盘价或收盘价 最高价最低价 
 		double parentBodyHighPrice = 0;
 		double parentBodyLowPrice = 0;
@@ -686,7 +691,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		return parentKlines.getEma7() < parentKlines.getEma25() && parentKlines.getEma25() < parentKlines.getEma99() 
 				&& parentBodyHighPrice < parentKlines.getEma7() && lastKlines.getClosePrice() > parentBodyHighPrice;
-	}
+	}*/
 	
 	/**
 	 * 判断下跌
@@ -694,7 +699,7 @@ public class KlinesServiceImpl implements KlinesService {
 	 * @param parentKlines
 	 * @return
 	 */
-	private boolean checkEmaFall(Klines lastKlines,Klines parentKlines) {
+	/*private boolean checkEmaFall(Klines lastKlines,Klines parentKlines) {
 		//k线主体开盘价或收盘价 最高价最低价 
 		double parentBodyHighPrice = 0;
 		double parentBodyLowPrice = 0;
@@ -709,7 +714,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		return parentKlines.getEma7() > parentKlines.getEma25() && parentKlines.getEma25() > parentKlines.getEma99() 
 				&& parentBodyLowPrice > parentKlines.getEma7() && lastKlines.getClosePrice() < parentBodyLowPrice;
-	}
+	}*/
 
 	@Override
 	public void futuresEmaRiseAndFall(List<Klines> klinesList) {
@@ -721,7 +726,7 @@ public class KlinesServiceImpl implements KlinesService {
 		KlinesUtil ku = new KlinesUtil(klinesList);
 		Klines lastKlines = ku.removeLast();
 		Klines parentKlines = ku.removeLast();
-		Klines parentNextKlines = ku.removeLast();
+		//Klines parentNextKlines = ku.removeLast();
 		
 		String pair = lastKlines.getPair();
 		
@@ -795,10 +800,9 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		//logger.info(text);
 		
-		String recEmail = userDetailsService.getSubscribeAiUserEmail();
-	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
-			emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
-	 	}
+		String recEmail = userDetailsService.getEmaRiseAndFallUserEmail();
+		
+	 	sendEmail(subject, text, recEmail);
 	}
 
 	@Override

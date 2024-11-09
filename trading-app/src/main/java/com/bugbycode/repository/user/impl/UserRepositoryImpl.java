@@ -55,8 +55,28 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public List<User> queryAllUserBySubscribeAi(int subscribeAi) {
-		return template.find(Query.query(Criteria.where("subscribeAi").is(subscribeAi)), User.class);
+	public List<User> queryAllUserByFibMonitor(int fibMonitor) {
+		return template.find(Query.query(Criteria.where("fibMonitor").is(fibMonitor)), User.class);
+	}
+
+	@Override
+	public List<User> queryAllUserByRiseAndFallMonitor(int riseAndFallMonitor) {
+		return template.find(Query.query(Criteria.where("riseAndFallMonitor").is(riseAndFallMonitor)), User.class);
+	}
+
+	@Override
+	public List<User> queryAllUserByEmaMonitor(int emaMonitor) {
+		return template.find(Query.query(Criteria.where("emaMonitor").is(emaMonitor)), User.class);
+	}
+
+	@Override
+	public List<User> queryAllUserByEmaRiseAndFall(int emaRiseAndFall) {
+		return template.find(Query.query(Criteria.where("emaRiseAndFall").is(emaRiseAndFall)), User.class);
+	}
+
+	@Override
+	public List<User> queryAllUserByHighOrLowMonitor(int highOrLowMonitor) {
+		return template.find(Query.query(Criteria.where("highOrLowMonitor").is(highOrLowMonitor)), User.class);
 	}
 
 	
