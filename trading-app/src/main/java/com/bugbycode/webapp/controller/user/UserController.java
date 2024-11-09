@@ -5,9 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,13 +51,38 @@ public class UserController extends BaseController{
 		} else if(!MD5Util.md5(oldPwd).equals(dbUser.getPassword())) {
 			json.put("message", "旧密码错误");
 		} else {
-			dbUser.setPassword(MD5Util.md5(newPwd));
-			userRepository.update(dbUser);
+			userRepository.updatePassword(user.getUsername(), newPwd);
 			code = ResultCode.SUCCESS;
 			json.put("message", "修改密码成功");
 		}
 		
 		json.put("code", code.getCode());
+		
+		return json.toString();
+	}
+	
+	@PostMapping("/changeSubscribeAi/{subscribeAi}")
+	public String changeSubscribeAi(@PathVariable("subscribeAi") int subscribeAi) {
+		ResultCode code = ResultCode.SUCCESS;
+		User user = getUserInfo();
+		
+		User dbUser = userRepository.queryByUsername(user.getUsername());
+		if(dbUser == null) {
+			throw new AccessDeniedException("无权访问");
+		}
+		
+		if(!(subscribeAi == 0 || subscribeAi == 1)) {
+			throw new AccessDeniedException("无权访问");
+		}
+		
+		userRepository.updateUserInfo(user.getUsername(), subscribeAi);
+		
+		user.setSubscribeAi(subscribeAi);
+		
+		JSONObject json = new JSONObject();
+		
+		json.put("code", code.getCode());
+		json.put("message", "修改成功");
 		
 		return json.toString();
 	}
