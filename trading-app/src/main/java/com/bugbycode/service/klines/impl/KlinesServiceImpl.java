@@ -871,7 +871,7 @@ public class KlinesServiceImpl implements KlinesService {
 			if(hitPrice(klines, price1)) {
 				upOrLowStr = price1 > price0 ? "上" : "下";
 				String dateStr = DateFormatUtil.format(new Date());
-				String subject = String.format("%s永续合约价格已到达盘整区%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),dateStr);
+				String subject = String.format("%s永续合约价格已到达盘整区%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),dateStr);
 				String text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
 						klines.getPair(),
 						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
