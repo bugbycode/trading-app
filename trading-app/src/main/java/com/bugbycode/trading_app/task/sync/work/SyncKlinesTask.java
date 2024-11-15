@@ -6,7 +6,6 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.util.DateFormatUtil;
-import com.util.EmailUtil;
 import com.util.KlinesUtil;
 
 import java.util.Date;
@@ -111,7 +110,6 @@ public class SyncKlinesTask implements Runnable{
 
         } catch (Exception e) {
             logger.error("同步" + pair + "交易对K线信息时出现异常", e);
-			EmailUtil.send("程序运行出现异常", "同步" + pair + "交易对K线信息时出现异常，异常信息：" + e.getLocalizedMessage());
         }
     }
     

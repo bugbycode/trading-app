@@ -31,7 +31,7 @@ import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
-import com.bugbycode.trading_app.task.email.ShapeSendMailTask;
+import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.KlinesComparator;
@@ -254,7 +254,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void sendEmail(String subject,String text,String recEmail) {
 		
 	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
-			emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, recEmail));
+			emailWorkTaskPool.add(new SendMailTask(subject, text, recEmail));
 	 	}
 		
 	}
@@ -821,7 +821,7 @@ public class KlinesServiceImpl implements KlinesService {
 					DateFormatUtil.format(time * 1000),PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
 			
 			if(hitPrice(klines, price)) {
-				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 		}
 	}
@@ -865,7 +865,7 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
 						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
 				
-				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 			
 			if(hitPrice(klines, price1)) {
@@ -878,7 +878,7 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
 						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
 				
-				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 			
 			
@@ -913,7 +913,7 @@ public class KlinesServiceImpl implements KlinesService {
 					PriceUtil.formatDoubleDecimal(resultPrice,klines.getDecimalNum()));
 			logger.info(text);
 			if(hitPrice(klines, resultPrice)) {
-				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 		}
 	}
@@ -959,7 +959,7 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format(time2 * 1000),
 						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
 				
-				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 			
 			//第二条直线
@@ -977,7 +977,7 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format(time2 * 1000),
 						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
 				
-				emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 		}
 	}
@@ -1088,7 +1088,7 @@ public class KlinesServiceImpl implements KlinesService {
 					);
 			
 			if(StringUtil.isNotEmpty(subject)) {
-				this.emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 		}
 	}
@@ -1117,7 +1117,7 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
 						dateStr);
 				String text = StringUtil.formatLongMessage(klines.getPair(), price, price - stopLevel, price + profitLevel, klines.getDecimalNum());
-				this.emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 			
 		}
@@ -1147,7 +1147,7 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
 						dateStr);
 				String text = StringUtil.formatLongMessage(klines.getPair(), price, price + stopLevel, price - profitLevel, klines.getDecimalNum());
-				this.emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
 			
 		}
@@ -1181,7 +1181,7 @@ public class KlinesServiceImpl implements KlinesService {
 							PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
 							dateStr);
 					String text = fib.toString();
-					this.emailWorkTaskPool.add(new ShapeSendMailTask(subject, text, info.getOwner()));
+					this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 				}
 			}
 		}

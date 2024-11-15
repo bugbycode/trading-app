@@ -7,7 +7,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.shape.ShapeType;
 import com.bugbycode.service.klines.KlinesService;
-import com.util.EmailUtil;
 
 /**
  * 绘图分析任务
@@ -55,7 +54,6 @@ public class ShapeAnalysisTask implements Runnable{
 			}
 		} catch (Exception e) {
 			logger.error("执行绘图分析任务时出现异常", e);
-			EmailUtil.send("程序运行出现异常", e.getLocalizedMessage());
 		}
 		logger.info("ShapeAnalysisTask run end.");
 	}

@@ -37,11 +37,15 @@ public class WorkTaskPool extends ThreadGroup {
 		this.notifyAll();
 	}
 
-	public synchronized Runnable getTask() throws InterruptedException {
+	public synchronized Runnable getTask() {
 		while(queue.isEmpty()) {
-			wait();
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				logger.error("WorkTaskPool error.",e);
+			}
 			if(this.isClosed) {
-				throw new InterruptedException("Thread pool closed.");
+				throw new RuntimeException("Thread pool closed.");
 			}
 		}
 		return this.queue.removeFirst();
@@ -58,13 +62,13 @@ public class WorkTaskPool extends ThreadGroup {
 
 		@Override
 		public void run() {
-			try {
-				while(!isClosed) {
-					Runnable task = getTask();
+			while(!isClosed) {
+				Runnable task = getTask();
+				try {
 					task.run();
+				}catch (Exception e) {
+					logger.error("Exception occurred while executing task in thread pool", e);
 				}
-			}catch (Exception e) {
-				logger.error(e.getLocalizedMessage());
 			}
 		}
 		

@@ -10,7 +10,6 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
-import com.util.EmailUtil;
 
 /**
  * 分析K线任务
@@ -73,7 +72,6 @@ public class AnalysisKlinesTask implements Runnable{
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
-			EmailUtil.send("程序运行出现异常", "分析" + pair + "交易对k线信息时出现异常，异常信息：" + e.getLocalizedMessage());
         }
     }
 

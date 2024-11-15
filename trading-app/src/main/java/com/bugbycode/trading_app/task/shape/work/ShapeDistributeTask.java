@@ -11,7 +11,6 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
-import com.util.EmailUtil;
 
 /**
  * 分发绘图任务
@@ -48,7 +47,6 @@ public class ShapeDistributeTask implements Runnable {
 			}
 		} catch (Exception e) {
 			logger.error("执行分发绘图任务时出现异常", e);
-			EmailUtil.send("程序运行出现异常", e.getLocalizedMessage());
 		}
 		logger.info("ShapeDistributeTask run end.");
 	}
