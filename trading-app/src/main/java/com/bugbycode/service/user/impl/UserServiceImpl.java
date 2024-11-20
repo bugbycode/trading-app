@@ -74,4 +74,10 @@ public class UserServiceImpl implements UserService{
 		List <User> userList = userRepository.queryAllUserByHighOrLowMonitor(1);
 		return getSubscribeAiUserEmail(userList);
 	}
+
+	@Override
+	public String getAllUserEmail() {
+		List <User> userList = userRepository.queryAllUser();
+		return getSubscribeAiUserEmail(userList);
+	}
 }

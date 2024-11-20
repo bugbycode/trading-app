@@ -36,4 +36,10 @@ public interface UserService extends UserDetailsService{
 	 * @return
 	 */
 	public String getHighOrLowMonitorUserEmail();
+	
+	/**
+	 * 获取所有用户邮箱信息 结果使用逗号分隔
+	 * @return
+	 */
+	public String getAllUserEmail();
 }

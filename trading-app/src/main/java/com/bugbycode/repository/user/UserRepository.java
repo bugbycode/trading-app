@@ -74,4 +74,10 @@ public interface UserRepository {
 	 * @return
 	 */
 	public List<User> queryAllUserByHighOrLowMonitor(int highOrLowMonitor);
+	
+	/**
+	 * 查询所有用户信息
+	 * @return
+	 */
+	public List<User> queryAllUser();
 }

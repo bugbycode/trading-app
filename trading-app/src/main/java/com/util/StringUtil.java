@@ -1,6 +1,7 @@
 package com.util;
 
 import java.util.Date;
+import java.util.Set;
 
 import com.bugbycode.module.EmailInfo;
 import com.bugbycode.module.FibCode;
@@ -123,5 +124,22 @@ public class StringUtil {
 			buff.append(arr[index]);
 		}
 		return buff.toString();
+	}
+	
+	/**
+	 * 检查set中是否包含pair
+	 * @param set
+	 * @param pair
+	 * @return
+	 */
+	public static boolean contains(Set<String> set,String pair) {
+		boolean result = false;
+		for(String coin : set) {
+			if(coin.equals(pair)) {
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 }

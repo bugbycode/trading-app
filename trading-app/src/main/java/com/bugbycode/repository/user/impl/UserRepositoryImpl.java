@@ -79,5 +79,10 @@ public class UserRepositoryImpl implements UserRepository {
 		return template.find(Query.query(Criteria.where("highOrLowMonitor").is(highOrLowMonitor)), User.class);
 	}
 
+	@Override
+	public List<User> queryAllUser() {
+		return template.findAll(User.class);
+	}
+
 	
 }
