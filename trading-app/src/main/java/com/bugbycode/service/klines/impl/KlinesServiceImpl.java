@@ -678,21 +678,22 @@ public class KlinesServiceImpl implements KlinesService {
 				if(isFall) {
 					//看涨吞没
 					if(lastKlines.getClosePrice() >= bodyHighPrice) {
-						subject = pair + "永续合约强势价格行为 ";
+						subject = pair + "永续合约强势价格行为 " + dateStr;
 					}
 				} else {//上涨情况
 					//看跌吞没
 					if(lastKlines.getClosePrice() <= bodyLowPrice) {
-						subject = pair + "永续合约颓势价格行为 ";
+						subject = pair + "永续合约颓势价格行为 " + dateStr;
 					}
 				}
 				
-				subject += dateStr;
-				text += percentageStr + "% " + dateStr;
-				
-				String recEmail = userDetailsService.getEmaMonitorUserEmail();
-				
-				sendEmail(subject, text, recEmail);
+				if(StringUtil.isNotEmpty(subject)) {
+					text += percentageStr + "% " + dateStr;
+					
+					String recEmail = userDetailsService.getEmaMonitorUserEmail();
+					
+					sendEmail(subject, text, recEmail);
+				}
 			}
 		}
 	}
