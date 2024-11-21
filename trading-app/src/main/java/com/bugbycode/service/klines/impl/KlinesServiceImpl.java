@@ -598,6 +598,104 @@ public class KlinesServiceImpl implements KlinesService {
 		 	sendEmail(subject, text, recEmail);
 		}
 	}
+	
+	@Override
+	public void declineAndStrengthCheck(List<Klines> klinesList) {
+		if(!CollectionUtils.isEmpty(klinesList)){
+			int lastIndex = klinesList.size() - 1;
+			Klines lastKlines = klinesList.remove(lastIndex);
+			if(CollectionUtils.isEmpty(klinesList)) {
+				return;
+			}
+			
+			Klines currentKlines = PriceUtil.getLastKlines(klinesList);
+
+			String pair = currentKlines.getPair();
+					
+			String percentageStr = PriceUtil.formatDoubleDecimal(PriceUtil.getPriceFluctuationPercentage(klinesList), 2);
+			
+			double pricePercentage = Double.valueOf(percentageStr);
+			
+			String text = "";//邮件内容
+			String subject = "";//邮件主题
+			String dateStr = DateFormatUtil.format(new Date());
+			
+			boolean isFall = false;
+			
+			if(PriceUtil.isFall(klinesList)) {//下跌
+				isFall = true;
+				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
+					if(pricePercentage >= 5) {
+						text = pair + "永续合约价格大暴跌";
+					} else if(pricePercentage >= 3) {
+						text = pair + "永续合约价格暴跌";
+					}else if(pricePercentage >= 1.5) {
+						text = pair + "永续合约价格大跌";
+					}
+				} else {
+					if(pricePercentage >= 15) {
+						text = pair + "永续合约价格大暴跌";
+					} else if(pricePercentage >= 10) {
+						text = pair + "永续合约价格暴跌";
+					}else if(pricePercentage >= 5) {
+						text = pair + "永续合约价格大跌";
+					}
+				}
+				
+			} else if(PriceUtil.isRise(klinesList)) {
+				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
+					if(pricePercentage >= 5) {
+						text = pair + "永续合约价格大暴涨";
+					} else if(pricePercentage >= 3) {
+						text = pair + "永续合约价格暴涨";
+					}else if(pricePercentage >= 1.5) {
+						text = pair + "永续合约价格大涨";
+					}
+				} else {
+					if(pricePercentage >= 15) {
+						text = pair + "永续合约价格大暴涨";
+					} else if(pricePercentage >= 10) {
+						text = pair + "永续合约价格暴涨";
+					}else if(pricePercentage >= 5) {
+						text = pair + "永续合约价格大涨";
+					}
+				}
+			}
+			
+			if(StringUtil.isNotEmpty(text)) {
+				double bodyHighPrice = 0;
+				double bodyLowPrice = 0;
+				
+				if(currentKlines.isFall()) {
+					bodyHighPrice = currentKlines.getOpenPrice();
+					bodyLowPrice = currentKlines.getClosePrice();
+				} else {
+					bodyLowPrice = currentKlines.getOpenPrice();
+					bodyHighPrice = currentKlines.getClosePrice();
+				}
+				
+				//下跌情况
+				if(isFall) {
+					//看涨吞没
+					if(lastKlines.getClosePrice() >= bodyHighPrice) {
+						subject = pair + "永续合约强势价格行为 ";
+					}
+				} else {//上涨情况
+					//看跌吞没
+					if(lastKlines.getClosePrice() <= bodyLowPrice) {
+						subject = pair + "永续合约颓势价格行为 ";
+					}
+				}
+				
+				subject += dateStr;
+				text += percentageStr + "% " + dateStr;
+				
+				String recEmail = userDetailsService.getEmaMonitorUserEmail();
+				
+				sendEmail(subject, text, recEmail);
+			}
+		}
+	}
 
 	@Override
 	public void futuresRiseAndFall(List<Klines> klinesList) {

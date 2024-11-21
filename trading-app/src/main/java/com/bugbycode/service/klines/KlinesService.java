@@ -96,6 +96,7 @@ public interface KlinesService {
 	 * EMA点位监控
 	 * @param klinesList
 	 */
+	@Deprecated
 	public void futuresEMAMonitor(List<Klines> klinesList);
 
 	/**
@@ -173,4 +174,10 @@ public interface KlinesService {
 	 * @param info
 	 */
 	public void fibRetracement(Klines klines,ShapeInfo info);
+	
+	/**
+	 * 检查是否出现颓势或强势价格行为
+	 * @param klinesList
+	 */
+	public void declineAndStrengthCheck(List<Klines> klinesList);
 }
