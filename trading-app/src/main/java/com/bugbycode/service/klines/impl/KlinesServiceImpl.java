@@ -679,10 +679,16 @@ public class KlinesServiceImpl implements KlinesService {
 					//看涨吞没
 					if(lastKlines.getClosePrice() >= bodyHighPrice) {
 						subject = pair + "永续合约强势价格行为 " + dateStr;
+					} else //前一根k线为阳线 当前k线为阴线且收盘价未创出新低 
+					if(currentKlines.isRise() && lastKlines.isFall() && lastKlines.getClosePrice() >= currentKlines.getLowPrice()) {
+						subject = pair + "永续合约强势价格行为 " + dateStr;
 					}
 				} else {//上涨情况
 					//看跌吞没
 					if(lastKlines.getClosePrice() <= bodyLowPrice) {
+						subject = pair + "永续合约颓势价格行为 " + dateStr;
+					} else //前一根k线为阴线 当前k线为阳线且收盘价未创出新高
+					if(currentKlines.isFall() && lastKlines.isRise() && lastKlines.getClosePrice() <= currentKlines.getHighPrice()) {
 						subject = pair + "永续合约颓势价格行为 " + dateStr;
 					}
 				}
