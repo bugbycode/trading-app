@@ -42,8 +42,8 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 			});
 		}
 		
-		logger.info(resultStr);
-		logger.info(pairs);
+		logger.debug(resultStr);
+		logger.debug(pairs);
 		return pairs;
 	}
 
