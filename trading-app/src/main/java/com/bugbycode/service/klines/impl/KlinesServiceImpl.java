@@ -179,7 +179,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
-			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
+			if(//PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
+					PriceUtil.checkFibHitPrice(klinesList_hit, fibInfo.getFibValue(code))
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
 					&& !PriceUtil.isObsoleteLong(fibInfo,hitLowKlines,codes,offset)) {//FIB1~startFibCode做多
 
@@ -241,8 +242,9 @@ public class KlinesServiceImpl implements KlinesService {
 
 			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
-			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit) && 
-					!PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
+			if(//PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit) 
+					PriceUtil.checkFibHitPrice(klinesList_hit, fibInfo.getFibValue(code))
+					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
 					&& !PriceUtil.isObsoleteShort(fibInfo,hitHighKlines,codes,offset)) {
 				
 				if(das.getVerify() && das.getLongOrShort() == QuotationMode.LONG) {
