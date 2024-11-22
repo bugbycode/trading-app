@@ -43,7 +43,7 @@ public class FibInfo {
 				takeProfit = FibCode.FIB382;
 				break;
 			default:
-				takeProfit = FibCode.FIB236;
+				takeProfit = FibCode.FIB382;
 				break;
 			}
 			

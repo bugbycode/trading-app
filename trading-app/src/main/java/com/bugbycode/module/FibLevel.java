@@ -6,7 +6,7 @@ package com.bugbycode.module;
 public enum FibLevel {
 
 	LEVEL_1(1,"Lv1",FibCode.FIB382),
-	LEVEL_2(1,"Lv2",FibCode.FIB618),
+	LEVEL_2(1,"Lv2",FibCode.FIB5),
 	LEVEL_3(1,"Lv3",FibCode.FIB618);
 
 	private int value;

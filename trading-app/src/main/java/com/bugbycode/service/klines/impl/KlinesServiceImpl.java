@@ -1,6 +1,7 @@
 package com.bugbycode.service.klines.impl;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ShapeInfo;
+import com.bugbycode.module.result.DeclineAndStrength;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
@@ -148,6 +150,11 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void openLong(FibInfo fibInfo, Klines afterLowKlines, List<Klines> klinesList_hit) {
 		
+		List<Klines> klinesList_hitBack = new ArrayList<Klines>();
+		klinesList_hitBack.addAll(klinesList_hit);
+		
+		DeclineAndStrength<Boolean,QuotationMode> das = verifyDeclineAndStrength(klinesList_hitBack);
+		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
 		List<Klines> todayKlinesList = PriceUtil.getTodayKlines(klinesList_hit);
@@ -172,21 +179,24 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
 			
-			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit) 
+			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
 					&& !PriceUtil.isObsoleteLong(fibInfo,hitLowKlines,codes,offset)) {//FIB1~startFibCode做多
 
-				String subject = String.format("%s永续合约%s(%s)[%s]做多机会 %s", pair, code.getDescription(),
-						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-						fibInfo.getLevel().getLabel(),
-						DateFormatUtil.format(new Date()));
-				
-				String text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice, closePpositionCode);
-				
-				text += "\r\n\r\n" + fibInfo.toString();
-				
-				String recEmail = userDetailsService.getFibMonitorUserEmail();
-				sendEmail(subject,text,recEmail);
+				if(das.getVerify() && das.getLongOrShort() == QuotationMode.SHORT) {
+					
+					String subject = String.format("%s永续合约%s(%s)[%s]做多机会 %s", pair, code.getDescription(),
+							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+							fibInfo.getLevel().getLabel(),
+							DateFormatUtil.format(new Date()));
+					
+					String text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice, closePpositionCode);
+					
+					text += "\r\n\r\n" + fibInfo.toString();
+					
+					String recEmail = userDetailsService.getFibMonitorUserEmail();
+					sendEmail(subject,text,recEmail);
+				}
 				
 				break;
 			}
@@ -200,6 +210,12 @@ public class KlinesServiceImpl implements KlinesService {
 
 	@Override
 	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
+		
+		List<Klines> klinesList_hitBack = new ArrayList<Klines>();
+		klinesList_hitBack.addAll(klinesList_hit);
+		
+		DeclineAndStrength<Boolean,QuotationMode> das = verifyDeclineAndStrength(klinesList_hitBack);
+		
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
@@ -229,18 +245,22 @@ public class KlinesServiceImpl implements KlinesService {
 					!PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
 					&& !PriceUtil.isObsoleteShort(fibInfo,hitHighKlines,codes,offset)) {
 				
-				String subject = String.format("%s永续合约%s(%s)[%s]做空机会 %s", pair, code.getDescription(),
-						PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-						fibInfo.getLevel().getLabel(),
-						DateFormatUtil.format(new Date()));
-				
-				String text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice, closePpositionCode);
-				
+				if(das.getVerify() && das.getLongOrShort() == QuotationMode.LONG) {
 
-				text += "\r\n\r\n" + fibInfo.toString();
-				
-				String recEmail = userDetailsService.getFibMonitorUserEmail();
-				sendEmail(subject,text,recEmail);
+					String subject = String.format("%s永续合约%s(%s)[%s]做空机会 %s", pair, code.getDescription(),
+							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+							fibInfo.getLevel().getLabel(),
+							DateFormatUtil.format(new Date()));
+					
+					String text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice, closePpositionCode);
+					
+
+					text += "\r\n\r\n" + fibInfo.toString();
+					
+					String recEmail = userDetailsService.getFibMonitorUserEmail();
+					sendEmail(subject,text,recEmail);
+					
+				}
 				
 				break;
 			}
@@ -702,6 +722,112 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public DeclineAndStrength<Boolean,QuotationMode> verifyDeclineAndStrength(List<Klines> klinesList) {
+		boolean bol = false;
+		QuotationMode qm = null;
+		if(!CollectionUtils.isEmpty(klinesList)){
+			int lastIndex = klinesList.size() - 1;
+			Klines lastKlines = klinesList.remove(lastIndex);
+			if(CollectionUtils.isEmpty(klinesList)) {
+				return new DeclineAndStrength<Boolean,QuotationMode>(bol,qm);
+			}
+			
+			Klines currentKlines = PriceUtil.getLastKlines(klinesList);
+
+			String pair = currentKlines.getPair();
+					
+			String percentageStr = PriceUtil.formatDoubleDecimal(PriceUtil.getPriceFluctuationPercentage(klinesList), 2);
+			
+			double pricePercentage = Double.valueOf(percentageStr);
+			
+			String text = "";//邮件内容
+			String subject = "";//邮件主题
+			String dateStr = DateFormatUtil.format(new Date());
+			
+			boolean isFall = false;
+			
+			if(PriceUtil.isFall(klinesList)) {//下跌
+				isFall = true;
+				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
+					if(pricePercentage >= 5) {
+						text = pair + "永续合约价格大暴跌";
+					} else if(pricePercentage >= 3) {
+						text = pair + "永续合约价格暴跌";
+					}else if(pricePercentage >= 1.5) {
+						text = pair + "永续合约价格大跌";
+					}
+				} else {
+					if(pricePercentage >= 15) {
+						text = pair + "永续合约价格大暴跌";
+					} else if(pricePercentage >= 10) {
+						text = pair + "永续合约价格暴跌";
+					}else if(pricePercentage >= 5) {
+						text = pair + "永续合约价格大跌";
+					}
+				}
+				
+			} else if(PriceUtil.isRise(klinesList)) {
+				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
+					if(pricePercentage >= 5) {
+						text = pair + "永续合约价格大暴涨";
+					} else if(pricePercentage >= 3) {
+						text = pair + "永续合约价格暴涨";
+					}else if(pricePercentage >= 1.5) {
+						text = pair + "永续合约价格大涨";
+					}
+				} else {
+					if(pricePercentage >= 15) {
+						text = pair + "永续合约价格大暴涨";
+					} else if(pricePercentage >= 10) {
+						text = pair + "永续合约价格暴涨";
+					}else if(pricePercentage >= 5) {
+						text = pair + "永续合约价格大涨";
+					}
+				}
+			}
+			
+			if(StringUtil.isNotEmpty(text)) {
+				double bodyHighPrice = 0;
+				double bodyLowPrice = 0;
+				
+				if(currentKlines.isFall()) {
+					bodyHighPrice = currentKlines.getOpenPrice();
+					bodyLowPrice = currentKlines.getClosePrice();
+				} else {
+					bodyLowPrice = currentKlines.getOpenPrice();
+					bodyHighPrice = currentKlines.getClosePrice();
+				}
+				
+				//下跌情况
+				if(isFall) {
+					qm = QuotationMode.SHORT;
+					//看涨吞没
+					if(lastKlines.getClosePrice() >= bodyHighPrice) {
+						subject = pair + "永续合约强势价格行为 " + dateStr;
+					} else //前一根k线为阳线 当前k线为阴线且收盘价未创出新低 
+					if(currentKlines.isRise() && lastKlines.isFall() && lastKlines.getClosePrice() >= currentKlines.getLowPrice()) {
+						subject = pair + "永续合约强势价格行为 " + dateStr;
+					}
+				} else {//上涨情况
+					qm = QuotationMode.LONG;
+					//看跌吞没
+					if(lastKlines.getClosePrice() <= bodyLowPrice) {
+						subject = pair + "永续合约颓势价格行为 " + dateStr;
+					} else //前一根k线为阴线 当前k线为阳线且收盘价未创出新高
+					if(currentKlines.isFall() && lastKlines.isRise() && lastKlines.getClosePrice() <= currentKlines.getHighPrice()) {
+						subject = pair + "永续合约颓势价格行为 " + dateStr;
+					}
+				}
+				
+				if(StringUtil.isNotEmpty(subject)) {
+					bol = true;
+				}
+			}
+		}
+		return new DeclineAndStrength<Boolean,QuotationMode>(bol,qm);
 	}
 
 	@Override

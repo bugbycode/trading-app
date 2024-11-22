@@ -6,7 +6,9 @@ import java.util.List;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
+import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ShapeInfo;
+import com.bugbycode.module.result.DeclineAndStrength;
 
 public interface KlinesService {
 	
@@ -180,4 +182,11 @@ public interface KlinesService {
 	 * @param klinesList
 	 */
 	public void declineAndStrengthCheck(List<Klines> klinesList);
+	
+	/**
+	 * 验证是否出现颓势或强势价格行为
+	 * @param klinesList
+	 * @return
+	 */
+	public DeclineAndStrength<Boolean,QuotationMode> verifyDeclineAndStrength(List<Klines> klinesList);
 }
