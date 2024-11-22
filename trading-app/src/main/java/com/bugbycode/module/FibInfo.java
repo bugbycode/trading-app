@@ -42,6 +42,9 @@ public class FibInfo {
 			case FIB5:
 				takeProfit = FibCode.FIB382;
 				break;
+			case FIB382:
+				takeProfit = FibCode.FIB236;
+				break;
 			default:
 				takeProfit = FibCode.FIB382;
 				break;
@@ -68,8 +71,10 @@ public class FibInfo {
 			case FIB5:
 				takeProfit = FibCode.FIB382;
 				break;
-			default:
+			case FIB382:
 				takeProfit = FibCode.FIB236;
+			default:
+				takeProfit = FibCode.FIB382;
 				break;
 			}
 			break;
