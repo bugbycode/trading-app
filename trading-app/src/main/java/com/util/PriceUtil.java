@@ -1080,4 +1080,27 @@ public class PriceUtil {
 		String inerval = Inerval.INERVAL_1H.getDescption();
 		return new Klines(pair, startTime, openPrice, highPrice, lowPrice, closePrice, endTime, inerval, decimalNum);
 	}
+	
+	/**
+	 * 检查是否命中斐波那契回撤价格
+	 * @param list
+	 * @param hitPrice
+	 * @return
+	 */
+	public static boolean checkFibHitPrice(List<Klines> list,double hitPrice) {
+		KlinesUtil ku = new KlinesUtil(list);
+		Klines last = ku.removeLast();
+		Klines next = ku.removeLast();
+		return checkHitPrice(last,hitPrice) || checkHitPrice(next,hitPrice);
+	}
+	
+	/**
+	 * 检查k线是否命中目标价格
+	 * @param k
+	 * @param hitPrice
+	 * @return
+	 */
+	public static boolean checkHitPrice(Klines k,double hitPrice) {
+		return k == null ? false : (k.getLowPrice() <= hitPrice && k.getHighPrice() >= hitPrice);
+	}
 }
