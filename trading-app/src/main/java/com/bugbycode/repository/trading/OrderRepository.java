@@ -53,4 +53,16 @@ public interface OrderRepository {
 	 * @return
 	 */
 	public long countOpening(String pair,double openPrice,double takeProfit,double stopLoss,int longOrShort);
+	
+	/**
+	 * 统计盈利的订单数
+	 * @return
+	 */
+	public long countPositivePnlOrders();
+	
+	/**
+	 * 计算所有盈亏
+	 * @return
+	 */
+	public double sumPnl();
 }

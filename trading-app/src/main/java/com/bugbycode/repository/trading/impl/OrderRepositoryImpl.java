@@ -1,8 +1,12 @@
 package com.bugbycode.repository.trading.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -105,6 +109,20 @@ public class OrderRepositoryImpl implements OrderRepository {
 				.and("stopLoss").is(stopLoss).and("longOrShort").is(longOrShort)
 				), 
 				TradingOrder.class);
+	}
+
+	@Override
+	public long countPositivePnlOrders() {
+		return template.count(Query.query(Criteria.where("pnl").gt(0)), TradingOrder.class);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes", "null" })
+	@Override
+	public double sumPnl() {
+		Aggregation aggregation = Aggregation.newAggregation(Aggregation.group().sum("pnl").as("totalPnl"));
+		AggregationResults<Map> result = template.aggregate(aggregation, TradingOrder.class,Map.class);
+		Map<String,Double> map = result.getUniqueMappedResult();
+		return map.get("totalPnl");
 	}
 
 }
