@@ -43,7 +43,8 @@ public class SecurityConfig {
     			
     			.requestMatchers("/shape/**",
     					"/user/**",
-    					"/tradingview/**").hasAnyRole("LOGIN")
+    					"/tradingview/**",
+    					"/bot/**").hasAnyRole("LOGIN")
     	        .anyRequest().authenticated()
     	        
     			)
