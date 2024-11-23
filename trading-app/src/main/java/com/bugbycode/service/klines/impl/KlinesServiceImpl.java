@@ -25,11 +25,14 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.LongOrShortType;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.result.DeclineAndStrength;
+import com.bugbycode.module.trading.TradingOrder;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
+import com.bugbycode.repository.trading.OrderRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
@@ -58,6 +61,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private WorkTaskPool emailWorkTaskPool;
+	
+	@Autowired
+	private OrderRepository orderRepository;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -197,6 +203,17 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					String recEmail = userDetailsService.getFibMonitorUserEmail();
 					sendEmail(subject,text,recEmail);
+					
+					//if(orderRepository.countOpening(pair, currentPrice, fibInfo.getFibValue(closePpositionCode), 
+					//		PriceUtil.rectificationCutLossLongPrice(lowPrice), LongOrShortType.LONG.getValue()) == 0) {
+						//新建模拟仓位
+						double accountSize = 1000;//以1000美金持仓建仓
+						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
+						TradingOrder order = new TradingOrder(pair, currentPrice, fibInfo.getFibValue(closePpositionCode), 
+								PriceUtil.rectificationCutLossLongPrice(lowPrice), new Date().getTime(), LongOrShortType.LONG.getValue(), accountSize, coinSize);
+						orderRepository.insert(order);
+						logger.info(order);
+					//}
 				}
 				
 				break;
@@ -255,12 +272,22 @@ public class KlinesServiceImpl implements KlinesService {
 							DateFormatUtil.format(new Date()));
 					
 					String text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice, closePpositionCode);
-					
 
 					text += "\r\n\r\n" + fibInfo.toString();
 					
 					String recEmail = userDetailsService.getFibMonitorUserEmail();
 					sendEmail(subject,text,recEmail);
+					
+					//if(orderRepository.countOpening(pair, currentPrice, fibInfo.getFibValue(closePpositionCode), 
+					//		PriceUtil.rectificationCutLossShortPrice(hightPrice), LongOrShortType.SHORT.getValue()) == 0) {
+						//新建模拟仓位
+						double accountSize = 1000;//以1000美金持仓建仓
+						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
+						TradingOrder order = new TradingOrder(pair, currentPrice, fibInfo.getFibValue(closePpositionCode), 
+								PriceUtil.rectificationCutLossShortPrice(hightPrice), new Date().getTime(), LongOrShortType.SHORT.getValue(), accountSize, coinSize);
+						orderRepository.insert(order);
+						logger.info(order);
+					//};
 					
 				}
 				
@@ -1415,6 +1442,52 @@ public class KlinesServiceImpl implements KlinesService {
 							dateStr);
 					String text = fib.toString();
 					this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				}
+			}
+		}
+	}
+
+	@Override
+	public void closeOrder(Klines klines) {
+		List<TradingOrder> orderList = orderRepository.findAll(klines.getPair(), -1, -1, 0);
+		logger.info("共查询到" + klines.getPair() + "交易对订单数量：" + orderList.size());
+		if(!CollectionUtils.isEmpty(orderList)) {
+			for(TradingOrder o : orderList) {
+				logger.info(o);
+				double sl = o.getStopLoss();//止损
+				double tp = o.getTakeProfit();//止盈
+				LongOrShortType type = LongOrShortType.resolve(o.getLongOrShort());//持仓方向
+				//空头平仓
+				if(type == LongOrShortType.SHORT) {
+					double closePrice = 0;//平仓价
+					//止损 收盘价或最高价大于止损价
+					if(klines.getClosePrice() >= sl || klines.getHighPrice() >= sl) {
+						closePrice = klines.getClosePrice();
+					} else//止盈 收盘价或最低价小于止盈价
+					if(klines.getClosePrice() <= tp || klines.getLowPrice() <= tp){
+						closePrice = o.getTakeProfit();
+					}
+					if(closePrice > 0) {//平仓
+						//空头盈亏金额 = （开仓价 - 平仓价） * 持仓数量
+						double pnl = (o.getOpenPrice() - closePrice) * o.getCoinSize();
+						orderRepository.updateById(o.getId(), closePrice, new Date().getTime(), pnl);
+						logger.info("平仓" + o.getPair() + "空头仓位，收益金额：" + pnl);
+					}
+				} else if(type == LongOrShortType.LONG) {
+					double closePrice = 0;//平仓价
+					//止损 收盘价或最低价小于止损价
+					if(klines.getClosePrice() <= sl || klines.getHighPrice() <= sl) {
+						closePrice = klines.getClosePrice();
+					} else//止盈 收盘价或最高价大于止盈价
+					if(klines.getClosePrice() >= tp || klines.getLowPrice() >= tp){
+						closePrice = o.getTakeProfit();
+					}
+					if(closePrice > 0) {//平仓
+						//多头盈亏金额 = （平仓价 - 开仓价） * 持仓数量
+						double pnl = (o.getOpenPrice() - closePrice) * o.getCoinSize();
+						orderRepository.updateById(o.getId(), closePrice, new Date().getTime(), pnl);
+						logger.info("平仓" + o.getPair() + "多头仓位，收益金额：" + pnl);
+					}
 				}
 			}
 		}

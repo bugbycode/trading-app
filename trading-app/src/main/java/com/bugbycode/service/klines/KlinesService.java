@@ -189,4 +189,10 @@ public interface KlinesService {
 	 * @return
 	 */
 	public DeclineAndStrength<Boolean,QuotationMode> verifyDeclineAndStrength(List<Klines> klinesList);
+	
+	/**
+	 * 平仓
+	 * @param klines 当前k线
+	 */
+	public void closeOrder(Klines klines);
 }

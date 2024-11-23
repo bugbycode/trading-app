@@ -566,7 +566,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static double rectificationCutLossLongPrice(double price) {
-		return price - (price * 0.01);
+		return price - (price * 0.03);
 	}
 	
 	/**
@@ -575,7 +575,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static double rectificationCutLossShortPrice(double price) {
-		return price + (price * 0.01);
+		return price + (price * 0.03);
 	}
 	
 	
