@@ -25,7 +25,10 @@ public class BotController extends BaseController{
 		long countPnl = orderRepository.countPositivePnlOrders();
 		double sumPnl = orderRepository.sumPnl();
 		Map<String,String> result = new HashMap<String,String>();
-		result.put("winning", PriceUtil.formatDoubleDecimal((countPnl * 1.0) / total * 100, 2) + "%");
+		
+		double win = total == 0 ? 0 : (countPnl * 1.0) / total * 100;
+		
+		result.put("winning", PriceUtil.formatDoubleDecimal(win, 2) + "%");
 		result.put("pnl", PriceUtil.formatDoubleDecimal(sumPnl,2));
 		return result;
 	}
