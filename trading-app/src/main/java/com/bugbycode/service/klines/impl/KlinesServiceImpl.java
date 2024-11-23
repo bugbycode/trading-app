@@ -1449,8 +1449,8 @@ public class KlinesServiceImpl implements KlinesService {
 
 	@Override
 	public void closeOrder(Klines klines) {
-		List<TradingOrder> orderList = orderRepository.findAll(klines.getPair(), -1, -1, 0);
-		logger.info("共查询到" + klines.getPair() + "交易对订单数量：" + orderList.size());
+		List<TradingOrder> orderList = orderRepository.findAll(klines.getPair(), 0, -1, 0);
+		logger.info("共查询到" + klines.getPair() + "交易对未平仓订单数量：" + orderList.size());
 		if(!CollectionUtils.isEmpty(orderList)) {
 			for(TradingOrder o : orderList) {
 				logger.info(o);
