@@ -26,12 +26,14 @@ import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.LongOrShortType;
+import com.bugbycode.module.PriceFibInfo;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.result.DeclineAndStrength;
 import com.bugbycode.module.trading.TradingOrder;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
+import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.trading.OrderRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
@@ -64,6 +66,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private OrderRepository orderRepository;
+	
+	@Autowired
+	private KlinesRepository klinesRepository;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -203,17 +208,6 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					String recEmail = userDetailsService.getFibMonitorUserEmail();
 					sendEmail(subject,text,recEmail);
-					
-					//if(orderRepository.countOpening(pair, currentPrice, fibInfo.getFibValue(closePpositionCode), 
-					//		PriceUtil.rectificationCutLossLongPrice(lowPrice), LongOrShortType.LONG.getValue()) == 0) {
-						//新建模拟仓位
-						double accountSize = 1000;//以1000美金持仓建仓
-						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
-						TradingOrder order = new TradingOrder(pair, currentPrice, fibInfo.getFibValue(closePpositionCode), 
-								PriceUtil.rectificationCutLossLongPrice(lowPrice), new Date().getTime(), LongOrShortType.LONG.getValue(), accountSize, coinSize);
-						orderRepository.insert(order);
-						logger.info(order);
-					//}
 				}
 				
 				break;
@@ -277,18 +271,6 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					String recEmail = userDetailsService.getFibMonitorUserEmail();
 					sendEmail(subject,text,recEmail);
-					
-					//if(orderRepository.countOpening(pair, currentPrice, fibInfo.getFibValue(closePpositionCode), 
-					//		PriceUtil.rectificationCutLossShortPrice(hightPrice), LongOrShortType.SHORT.getValue()) == 0) {
-						//新建模拟仓位
-						double accountSize = 1000;//以1000美金持仓建仓
-						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
-						TradingOrder order = new TradingOrder(pair, currentPrice, fibInfo.getFibValue(closePpositionCode), 
-								PriceUtil.rectificationCutLossShortPrice(hightPrice), new Date().getTime(), LongOrShortType.SHORT.getValue(), accountSize, coinSize);
-						orderRepository.insert(order);
-						logger.info(order);
-					//};
-					
 				}
 				
 				break;
@@ -651,6 +633,9 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void declineAndStrengthCheck(List<Klines> klinesList) {
 		if(!CollectionUtils.isEmpty(klinesList)){
+			
+			PriceFibInfo info = PriceUtil.getPriceFibInfo(klinesList);
+			
 			int lastIndex = klinesList.size() - 1;
 			Klines lastKlines = klinesList.remove(lastIndex);
 			if(CollectionUtils.isEmpty(klinesList)) {
@@ -743,11 +728,37 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				
 				if(StringUtil.isNotEmpty(subject)) {
-					text += percentageStr + "% " + dateStr;
+					
+					Klines lowKlines = klinesRepository.findOneByStartTime(info.getLowKlinesTime(), pair, info.getInerval());
+					Klines highKlines = klinesRepository.findOneByStartTime(info.getHighKlinesTime(), pair, info.getInerval());
+					
+					FibInfo fib = new FibInfo(lowKlines, highKlines, highKlines.getDecimalNum(), FibLevel.LEVEL_1);
+					
+					text += subject + "\r\n" + fib.toString();
 					
 					String recEmail = userDetailsService.getEmaMonitorUserEmail();
 					
 					sendEmail(subject, text, recEmail);
+					
+					double currentPrice = lastKlines.getClosePrice();
+					double lowPrice = lowKlines.getLowPrice();
+					double highPrice = highKlines.getHighPrice();
+					
+					if(fib.getQuotationMode() == QuotationMode.SHORT) {
+						double accountSize = 1000;//以1000美金持仓建仓
+						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
+						TradingOrder order = new TradingOrder(pair, currentPrice, fib.getFibValue(FibCode.FIB618), 
+								PriceUtil.rectificationCutLossLongPrice(lowPrice), new Date().getTime(), LongOrShortType.LONG.getValue(), accountSize, coinSize);
+						orderRepository.insert(order);
+						logger.info(order);
+					} else if(fib.getQuotationMode() == QuotationMode.LONG) {
+						double accountSize = 1000;//以1000美金持仓建仓
+						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
+						TradingOrder order = new TradingOrder(pair, currentPrice, fib.getFibValue(FibCode.FIB618), 
+								PriceUtil.rectificationCutLossShortPrice(highPrice), new Date().getTime(), LongOrShortType.SHORT.getValue(), accountSize, coinSize);
+						orderRepository.insert(order);
+						logger.info(order);
+					}
 				}
 			}
 		}
@@ -1493,4 +1504,72 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 	}
 	
+	@Override
+    public boolean checkData(List<Klines> list) {
+        boolean result = true;
+        if(!CollectionUtils.isEmpty(list)){
+            list.sort(new KlinesComparator());
+            
+            long parentSubTime = 0;
+            
+            for(int index = 0;index < list.size();index++){
+                if(index == list.size() - 1){
+                    continue;
+                }
+                Klines current = list.get(index);
+                Klines next = list.get(index + 1);
+
+                long currentSubTime = next.getStartTime() - current.getEndTime();
+                
+                if(parentSubTime == 0) {
+                    parentSubTime = currentSubTime;
+                }
+                
+                long startTime = 0;
+                long endTime = 0;
+                //前两根k线之间有缺失数据
+                if(parentSubTime > currentSubTime) {
+                	
+                	Klines parent = list.get(index - 1);
+                	startTime = parent.getEndTime();
+                	endTime = current.getStartTime();
+                	
+                }//后两根k线之间有缺失数据
+                else if(parentSubTime < currentSubTime) {
+                	
+                	startTime = current.getEndTime();
+                	endTime = next.getStartTime();
+                }
+                
+                if(startTime < endTime && endTime - startTime > 60000) {
+                	result = false;
+                	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
+                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
+                				+ "条数据，缺失时间段：" + DateFormatUtil.format(startTime) + " ~ " + DateFormatUtil.format(endTime));
+                	klinesRepository.insert(data);
+                }
+            }
+            
+            for(int index = 0;index < list.size();index++){
+                if(index == list.size() - 1){
+                    continue;
+                }
+                Klines current = list.get(index);
+                Klines next = list.get(index + 1);
+                
+                //判断重复
+                if(current.getStartTime() == next.getStartTime()){
+                    logger.info("查询到重复K线信息：" + current);
+                    result = false;
+                    String _id = current.getId();
+                    if(StringUtil.isNotEmpty(_id)){
+                    	klinesRepository.remove(_id);
+                        logger.info("重复k线已从数据库中删除");
+                    }
+                }
+            }
+            
+        }
+        return result;
+    }
 }

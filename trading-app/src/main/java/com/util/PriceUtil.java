@@ -21,6 +21,7 @@ import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.PriceFibInfo;
 
 public class PriceUtil {
 	
@@ -168,6 +169,59 @@ public class PriceUtil {
 		BigDecimal bigDecimal = new BigDecimal(decimalFormat.format(number));
 		
 		return bigDecimal.toPlainString();
+	}
+	
+	/**
+	 * 获取价格回撤信息
+	 * @param klinesList
+	 * @return
+	 */
+	public static PriceFibInfo getPriceFibInfo(List<Klines> klinesList) {
+		
+		PriceFibInfo info = new PriceFibInfo();
+		
+		int index = klinesList.size() - 1;
+		int offset = index - 1;
+		
+		Klines kl = klinesList.get(index);
+		
+		info.setInerval(kl.getInterval());
+		
+		boolean isFall = isFall(klinesList);
+		double lowPrice = kl.getLowPrice();
+		double hightPrice = kl.getHighPrice();
+		
+		while(offset >= 1) {
+			Klines current = klinesList.get(offset--);
+			Klines parent = klinesList.get(offset);
+			if(isFall) {
+				if(isRise(current, parent)) {
+					if(hightPrice < current.getHighPrice()) {
+						hightPrice = current.getHighPrice();
+						info.setHighKlinesTime(current.getStartTime());
+					}
+					break;
+				}
+			} else {
+				if(isFall(current, parent)) {
+					if(lowPrice > current.getLowPrice()) {
+						lowPrice = current.getLowPrice();
+						info.setLowKlinesTime(current.getStartTime());
+					}
+					break;
+				}
+			}
+			if(lowPrice > current.getLowPrice()) {
+				lowPrice = current.getLowPrice();
+				info.setLowKlinesTime(current.getStartTime());
+			}
+			if(hightPrice < current.getHighPrice()) {
+				hightPrice = current.getHighPrice();
+				info.setHighKlinesTime(current.getStartTime());
+			}
+		}
+		
+		return info;
 	}
 	
 	/**

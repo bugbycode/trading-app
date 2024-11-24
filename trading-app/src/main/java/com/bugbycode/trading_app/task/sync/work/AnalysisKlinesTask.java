@@ -40,7 +40,7 @@ public class AnalysisKlinesTask implements Runnable{
                 return;
             }
             
-            if(!klinesRepository.checkData(klines_list_1d)) {
+            if(!klinesService.checkData(klines_list_1d)) {
             	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),5000);
             }
             
@@ -51,7 +51,7 @@ public class AnalysisKlinesTask implements Runnable{
                 return;
             }
             
-            if(!klinesRepository.checkData(klines_list_15m)) {
+            if(!klinesService.checkData(klines_list_15m)) {
             	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),5000);
             }
             
