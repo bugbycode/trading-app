@@ -34,4 +34,12 @@ public class PriceFibInfo {
 	public void setHighKlinesTime(long highKlinesTime) {
 		this.highKlinesTime = highKlinesTime;
 	}
+	
+	public boolean verifyData(double currentPrice,FibInfo fib) {
+		if(fib.getQuotationMode() == QuotationMode.LONG) {
+			return currentPrice >= fib.getFibValue(FibCode.FIB382);
+		} else {
+			return currentPrice <= fib.getFibValue(FibCode.FIB382);
+		}
+	}
 }

@@ -95,6 +95,14 @@ public interface KlinesService {
 	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 
 	/**
+	 * 日线级别斐波那契回撤点位监控
+	 * 
+	 * @param klinesList
+	 * @param klinesList_hit
+	 */
+	public void futuresFibInfoMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
+	
+	/**
 	 * EMA点位监控
 	 * @param klinesList
 	 */

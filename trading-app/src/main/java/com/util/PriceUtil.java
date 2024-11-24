@@ -178,18 +178,19 @@ public class PriceUtil {
 	 */
 	public static PriceFibInfo getPriceFibInfo(List<Klines> klinesList) {
 		
-		PriceFibInfo info = new PriceFibInfo();
-		
 		int index = klinesList.size() - 1;
 		int offset = index - 1;
 		
 		Klines kl = klinesList.get(index);
 		
-		info.setInerval(kl.getInterval());
-		
 		boolean isFall = isFall(klinesList);
 		double lowPrice = kl.getLowPrice();
 		double hightPrice = kl.getHighPrice();
+
+		PriceFibInfo info = new PriceFibInfo();
+		info.setLowKlinesTime(kl.getStartTime());
+		info.setHighKlinesTime(kl.getStartTime());
+		info.setInerval(kl.getInterval());
 		
 		while(offset >= 1) {
 			Klines current = klinesList.get(offset--);

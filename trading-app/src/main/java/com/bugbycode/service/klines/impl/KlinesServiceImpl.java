@@ -600,6 +600,11 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
+	public void futuresFibInfoMonitor(List<Klines> klinesList,List<Klines> klinesList_hit) {
+		
+	}
+	
+	@Override
 	public void futuresEMAMonitor(List<Klines> klinesList) {
 		if(!CollectionUtils.isEmpty(klinesList)){
 			PriceUtil.calculateEMAArray(klinesList, EMAType.EMA7);
@@ -744,14 +749,14 @@ public class KlinesServiceImpl implements KlinesService {
 					double lowPrice = lowKlines.getLowPrice();
 					double highPrice = highKlines.getHighPrice();
 					
-					if(fib.getQuotationMode() == QuotationMode.SHORT) {
+					if(fib.getQuotationMode() == QuotationMode.SHORT && info.verifyData(currentPrice, fib)) {
 						double accountSize = 1000;//以1000美金持仓建仓
 						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
 						TradingOrder order = new TradingOrder(pair, currentPrice, fib.getFibValue(FibCode.FIB618), 
 								PriceUtil.rectificationCutLossLongPrice(lowPrice), new Date().getTime(), LongOrShortType.LONG.getValue(), accountSize, coinSize);
 						orderRepository.insert(order);
 						logger.info(order);
-					} else if(fib.getQuotationMode() == QuotationMode.LONG) {
+					} else if(fib.getQuotationMode() == QuotationMode.LONG && info.verifyData(currentPrice, fib)) {
 						double accountSize = 1000;//以1000美金持仓建仓
 						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
 						TradingOrder order = new TradingOrder(pair, currentPrice, fib.getFibValue(FibCode.FIB618), 
