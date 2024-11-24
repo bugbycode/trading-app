@@ -639,13 +639,13 @@ public class KlinesServiceImpl implements KlinesService {
 	public void declineAndStrengthCheck(List<Klines> klinesList) {
 		if(!CollectionUtils.isEmpty(klinesList)){
 			
-			PriceFibInfo info = PriceUtil.getPriceFibInfo(klinesList);
-			
 			int lastIndex = klinesList.size() - 1;
 			Klines lastKlines = klinesList.remove(lastIndex);
 			if(CollectionUtils.isEmpty(klinesList)) {
 				return;
 			}
+			
+			PriceFibInfo info = PriceUtil.getPriceFibInfo(klinesList);
 			
 			Klines currentKlines = PriceUtil.getLastKlines(klinesList);
 
@@ -734,20 +734,23 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				if(StringUtil.isNotEmpty(subject)) {
 					
+					
+					double currentPrice = lastKlines.getClosePrice();
+					
 					Klines lowKlines = klinesRepository.findOneByStartTime(info.getLowKlinesTime(), pair, info.getInerval());
 					Klines highKlines = klinesRepository.findOneByStartTime(info.getHighKlinesTime(), pair, info.getInerval());
+					double lowPrice = lowKlines.getLowPrice();
+					double highPrice = highKlines.getHighPrice();
 					
 					FibInfo fib = new FibInfo(lowKlines, highKlines, highKlines.getDecimalNum(), FibLevel.LEVEL_1);
 					
-					text += subject + "\r\n" + fib.toString();
+					text += pricePercentage + "%" + "\r\n" + fib.toString();
 					
 					String recEmail = userDetailsService.getEmaMonitorUserEmail();
 					
-					sendEmail(subject, text, recEmail);
-					
-					double currentPrice = lastKlines.getClosePrice();
-					double lowPrice = lowKlines.getLowPrice();
-					double highPrice = highKlines.getHighPrice();
+					if(info.verifyData(currentPrice, fib)) {
+						sendEmail(subject, text, recEmail);
+					}
 					
 					if(fib.getQuotationMode() == QuotationMode.SHORT && info.verifyData(currentPrice, fib)) {
 						double accountSize = 1000;//以1000美金持仓建仓
