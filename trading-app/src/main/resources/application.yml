@@ -9,5 +9,6 @@ binance:
   baseUrl: 
     websocket: wss://fstream.binance.com
     rest: https://fapi.binance.com
+    websocketApi: wss://ws-fapi.binance.com/ws-fapi/v1
 loggin: 
   config: classpath:log4j2.xml
