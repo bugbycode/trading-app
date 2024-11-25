@@ -747,19 +747,34 @@ public class KlinesServiceImpl implements KlinesService {
 					text += pricePercentage + "%" + "\r\n" + fib.toString();
 					
 					String recEmail = userDetailsService.getEmaMonitorUserEmail();
-					
+					/*
 					if(info.verifyData(currentPrice, fib)) {
 						sendEmail(subject, text, recEmail);
-					}
+					}*/
 					
 					if(fib.getQuotationMode() == QuotationMode.SHORT && info.verifyData(currentPrice, fib)) {
+						
+						subject = String.format("%s永续合约做多交易机会 %s", pair, dateStr);
+						
+						text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice(lowPrice), fib.getFibValue(FibCode.FIB618), lastKlines.getDecimalNum());
+						
+						sendEmail(subject, text, recEmail);
+						
 						double accountSize = 1000;//以1000美金持仓建仓
 						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
 						TradingOrder order = new TradingOrder(pair, currentPrice, fib.getFibValue(FibCode.FIB618), 
 								PriceUtil.rectificationCutLossLongPrice(lowPrice), new Date().getTime(), LongOrShortType.LONG.getValue(), accountSize, coinSize);
 						orderRepository.insert(order);
+						
 						logger.info(order);
 					} else if(fib.getQuotationMode() == QuotationMode.LONG && info.verifyData(currentPrice, fib)) {
+						
+						subject = String.format("%s永续合约做空交易机会 %s", pair, dateStr);
+						
+						text = StringUtil.formatShortMessage(pair, currentPrice, fib.getFibValue(FibCode.FIB618), PriceUtil.rectificationCutLossShortPrice(highPrice), lastKlines.getDecimalNum());
+						
+						sendEmail(subject, text, recEmail);
+						
 						double accountSize = 1000;//以1000美金持仓建仓
 						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
 						TradingOrder order = new TradingOrder(pair, currentPrice, fib.getFibValue(FibCode.FIB618), 
