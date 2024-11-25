@@ -636,7 +636,11 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void declineAndStrengthCheck(List<Klines> klinesList) {
+	public void declineAndStrengthCheck(List<Klines> klinesListData) {
+		
+		List<Klines> klinesList = new ArrayList<Klines>();
+		klinesList.addAll(klinesListData);
+		
 		if(!CollectionUtils.isEmpty(klinesList)){
 			
 			int lastIndex = klinesList.size() - 1;
