@@ -16,7 +16,7 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 
 	@Override
 	public void handleMessage(String message) {
-		super.addMessage(message);
+		logger.info(message);
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 	}
 
 	@Override
-	public String buyOrSell(String symbol, Side side, PositionSide positionSide, double quantity) {
+	public void buyOrSell(String symbol, Side side, PositionSide positionSide, double quantity) {
 		//开仓
 		JSONObject buyOrSellData = new JSONObject();
 		//仓位信息
@@ -49,11 +49,10 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		
 		super.sendMessage(buyOrSellData.toString());
 		
-		return super.read();
 	}
 
 	@Override
-	public String takeProfit(String symbol, Side side,PositionSide positionSide, double quantity, double stopPrice) {
+	public void takeProfit(String symbol, Side side,PositionSide positionSide, double quantity, double stopPrice) {
 		//开仓
 		JSONObject buyOrSellData = new JSONObject();
 		//仓位信息
@@ -78,11 +77,10 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		
 		super.sendMessage(buyOrSellData.toString());
 		
-		return super.read();
 	}
 
 	@Override
-	public String stopMarket(String symbol, Side side, PositionSide positionSide, double quantity, double stopPrice) {
+	public void stopMarket(String symbol, Side side, PositionSide positionSide, double quantity, double stopPrice) {
 		//开仓
 		JSONObject buyOrSellData = new JSONObject();
 		//仓位信息
@@ -107,12 +105,6 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		
 		super.sendMessage(buyOrSellData.toString());
 		
-		return super.read();
-	}
-
-	@Override
-	public void notifyTask() {
-		super.notifyAllTask();
 	}
 
 }

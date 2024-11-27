@@ -67,7 +67,6 @@ public class TradingWebSocketClientEndpoint {
 
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-    	this.messageHandler.notifyTask();
         logger.info("websocket服务：" + AppConfig.WEBSOCKET_API_URL + "，已断开连接。");
     }
 

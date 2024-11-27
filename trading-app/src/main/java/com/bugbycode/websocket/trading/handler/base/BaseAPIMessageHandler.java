@@ -48,30 +48,7 @@ public abstract class BaseAPIMessageHandler {
 		data.put("signature", signature);
 	}
 	
-	protected synchronized String read() {
-		while (this.recvMessageQueue.isEmpty()) {
-			try {
-				wait();
-				if(this.client.isClosed()) {
-					throw new RuntimeException("Websocket连接已关闭");
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return this.recvMessageQueue.removeLast();
-	}
-	
-	protected synchronized void addMessage(String recv) {
-		this.recvMessageQueue.addFirst(recv);
-		this.notifyAllTask();
-	}
-	
 	protected void sendMessage(String message) {
 		this.client.sendMessage(message);
-	}
-	
-	protected synchronized void notifyAllTask() {
-		this.notifyAll();
 	}
 }

@@ -19,7 +19,7 @@ public interface APIMessageHandler {
 	 * @param quantity 下单数量 如：0.1BTC
 	 * @return
 	 */
-	public String buyOrSell(String symbol,Side side, PositionSide positionSide,double quantity);
+	public void buyOrSell(String symbol,Side side, PositionSide positionSide,double quantity);
 	
 	/**
 	 * 创建止盈单
@@ -30,7 +30,7 @@ public interface APIMessageHandler {
 	 * @param stopPrice 触发价
 	 * @return
 	 */
-	public String takeProfit(String symbol,Side side, PositionSide positionSide, double quantity,double stopPrice);
+	public void takeProfit(String symbol,Side side, PositionSide positionSide, double quantity,double stopPrice);
 	
 	/**
 	 * 创建止损单
@@ -41,8 +41,7 @@ public interface APIMessageHandler {
 	 * @param stopPrice 触发价
 	 * @return
 	 */
-	public String stopMarket(String symbol,Side side, PositionSide positionSide, double quantity,double stopPrice);
+	public void stopMarket(String symbol,Side side, PositionSide positionSide, double quantity,double stopPrice);
 	
-	public void notifyTask();
 	
 }
