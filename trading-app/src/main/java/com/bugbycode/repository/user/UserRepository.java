@@ -80,4 +80,12 @@ public interface UserRepository {
 	 * @return
 	 */
 	public List<User> queryAllUser();
+	
+	/**
+	 * 更新币安API密钥对
+	 * @param username 用户名
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 */
+	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey);
 }

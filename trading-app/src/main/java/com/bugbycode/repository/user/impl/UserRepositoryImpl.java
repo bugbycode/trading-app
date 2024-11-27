@@ -84,5 +84,13 @@ public class UserRepositoryImpl implements UserRepository {
 		return template.findAll(User.class);
 	}
 
+	@Override
+	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey) {
+		Update update = new Update();
+		update.set("binanceApiKey", binanceApiKey);
+		update.set("binanceSecretKey", binanceSecretKey);
+		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
+	}
+
 	
 }
