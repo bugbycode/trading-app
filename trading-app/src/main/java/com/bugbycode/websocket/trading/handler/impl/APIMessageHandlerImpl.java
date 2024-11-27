@@ -4,12 +4,14 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
+import com.bugbycode.module.Method;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
 import com.bugbycode.module.trading.Type;
 import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 import com.bugbycode.websocket.trading.handler.APIMessageHandler;
 import com.bugbycode.websocket.trading.handler.base.BaseAPIMessageHandler;
+import com.util.MethodDataUtil;
 import com.util.RandomUtil;
 
 public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIMessageHandler {
@@ -43,7 +45,7 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		buyOrSellParam.put("timestamp", new Date().getTime());
 		buyOrSellParam.put("type", Type.MARKET);
 		
-		generateSignature(buyOrSellParam);
+		MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
 		
 		logger.info(buyOrSellData.toString());
 		
@@ -71,7 +73,7 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		buyOrSellParam.put("timestamp", new Date().getTime());
 		buyOrSellParam.put("type", Type.TAKE_PROFIT_MARKET);
 		
-		generateSignature(buyOrSellParam);
+		MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
 		
 		logger.info(buyOrSellData.toString());
 		
@@ -99,12 +101,40 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		buyOrSellParam.put("timestamp", new Date().getTime());
 		buyOrSellParam.put("type", Type.STOP_MARKET);
 		
-		generateSignature(buyOrSellParam);
+		MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
 		
 		logger.info(buyOrSellData.toString());
 		
 		super.sendMessage(buyOrSellData.toString());
 		
+	}
+
+	@Override
+	public void balance() {
+		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.BALANCE);
+		JSONObject params = new JSONObject();
+		params.put("apiKey", apiKey);
+		params.put("timestamp", new Date().getTime());
+		
+		MethodDataUtil.generateSignature(params, secretKey);
+		
+		method.put("params", params);
+		
+		super.sendMessage(method.toString());
+	}
+
+	@Override
+	public void balance_v2() {
+		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.BALANCE_V2);
+		JSONObject params = new JSONObject();
+		params.put("apiKey", apiKey);
+		params.put("timestamp", new Date().getTime());
+		
+		MethodDataUtil.generateSignature(params, secretKey);
+		
+		method.put("params", params);
+		
+		super.sendMessage(method.toString());
 	}
 
 }

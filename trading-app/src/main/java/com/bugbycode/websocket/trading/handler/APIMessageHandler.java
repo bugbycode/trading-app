@@ -43,5 +43,13 @@ public interface APIMessageHandler {
 	 */
 	public void stopMarket(String symbol,Side side, PositionSide positionSide, double quantity,double stopPrice);
 	
+	/**
+	 * 账户余额 (USER_DATA)
+	 */
+	public void balance();
 	
+	/**
+	 * 账户余额V2 (USER_DATA)
+	 */
+	public void balance_v2();
 }
