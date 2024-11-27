@@ -85,10 +85,11 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey) {
+	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
+		update.set("autoTrade", autoTrade);
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 

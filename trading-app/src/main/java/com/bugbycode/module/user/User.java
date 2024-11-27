@@ -40,6 +40,8 @@ public class User implements UserDetails {
 	
 	private String binanceSecretKey;//币安 Secret Key
 	
+	private int autoTrade = 0; //是否启用自动交易 0：否 1：是
+	
 	public String getId() {
 		return id;
 	}
@@ -129,6 +131,14 @@ public class User implements UserDetails {
 		this.binanceSecretKey = binanceSecretKey;
 	}
 
+	public int getAutoTrade() {
+		return autoTrade;
+	}
+
+	public void setAutoTrade(int autoTrade) {
+		this.autoTrade = autoTrade;
+	}
+
 	public void copy(User user) {
 		this.setId(user.getId());
 		this.setUsername(user.getUsername());
@@ -138,6 +148,8 @@ public class User implements UserDetails {
 		this.setFibMonitor(user.getFibMonitor());
 		this.setEmaRiseAndFall(user.getEmaRiseAndFall());
 		this.setEmaMonitor(user.getEmaMonitor());
+		this.setBinanceApiKey(user.getBinanceApiKey());
+		this.setBinanceSecretKey(user.getBinanceSecretKey());
 	}
 	
 	public void copyAIInfo(User user) {

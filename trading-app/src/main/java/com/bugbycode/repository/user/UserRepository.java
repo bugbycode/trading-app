@@ -86,6 +86,7 @@ public interface UserRepository {
 	 * @param username 用户名
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
+	 * @param autoTrade
 	 */
-	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey);
+	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade);
 }

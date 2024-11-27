@@ -61,7 +61,9 @@ public class BinanceUserDataServiceImpl implements BinanceUserDataService{
 			}
 		} else if(result.has("error")){
 			JSONObject errorJson = result.getJSONObject("error");
-			throw new RuntimeException(errorJson.getInt("code") + ":" + errorJson.getString("msg"));
+			String message = errorJson.getInt("code") + ":" + errorJson.getString("msg");
+			logger.error(message);
+			//throw new RuntimeException(errorJson.getInt("code") + ":" + errorJson.getString("msg"));
 		}
 		
 		return blanceList;
@@ -102,7 +104,9 @@ public class BinanceUserDataServiceImpl implements BinanceUserDataService{
 			}
 		} else if(result.has("error")){
 			JSONObject errorJson = result.getJSONObject("error");
-			throw new RuntimeException(errorJson.getInt("code") + ":" + errorJson.getString("msg"));
+			String message = errorJson.getInt("code") + ":" + errorJson.getString("msg");
+			logger.error(message);
+			//throw new RuntimeException(errorJson.getInt("code") + ":" + errorJson.getString("msg"));
 		}
 		
 		return blanceList;
