@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
+import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 
 @Component
 @Configuration
@@ -49,5 +50,10 @@ public class InitConfig implements ApplicationRunner {
 	@Bean
 	public WorkTaskPool emailWorkTaskPool() {
 		return new WorkTaskPool("EmailWorkTaskPool", 1);
+	}
+	
+	@Bean
+	public TradingWebSocketClientEndpoint websocketApi() {
+		return new TradingWebSocketClientEndpoint(websocketApiBaseUrl);
 	}
 }

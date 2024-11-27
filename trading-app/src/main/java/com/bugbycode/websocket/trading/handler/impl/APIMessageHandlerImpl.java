@@ -8,23 +8,11 @@ import com.bugbycode.module.Method;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
 import com.bugbycode.module.trading.Type;
-import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 import com.bugbycode.websocket.trading.handler.APIMessageHandler;
-import com.bugbycode.websocket.trading.handler.base.BaseAPIMessageHandler;
 import com.util.MethodDataUtil;
 import com.util.RandomUtil;
 
-public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIMessageHandler {
-
-	@Override
-	public void handleMessage(String message) {
-		logger.info(message);
-	}
-
-	@Override
-	public void setClient(TradingWebSocketClientEndpoint client) {
-		super.setClient(client);
-	}
+public class APIMessageHandlerImpl implements APIMessageHandler{
 
 	@Override
 	public void buyOrSell(String symbol, Side side, PositionSide positionSide, double quantity) {
@@ -37,7 +25,7 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		JSONObject buyOrSellParam = new JSONObject();
 		buyOrSellData.put("params", buyOrSellParam);
 		//参数
-		buyOrSellParam.put("apiKey", this.client.getApiKey());
+		//buyOrSellParam.put("apiKey", this.client.getApiKey());
 		buyOrSellParam.put("symbol", symbol);
 		buyOrSellParam.put("side", side);
 		buyOrSellParam.put("positionSide", positionSide);
@@ -45,11 +33,11 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		buyOrSellParam.put("timestamp", new Date().getTime());
 		buyOrSellParam.put("type", Type.MARKET);
 		
-		MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
+		//MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
 		
-		logger.info(buyOrSellData.toString());
+		//logger.info(buyOrSellData.toString());
 		
-		super.sendMessage(buyOrSellData.toString());
+		//super.sendMessage(buyOrSellData);
 		
 	}
 
@@ -64,7 +52,7 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		JSONObject buyOrSellParam = new JSONObject();
 		buyOrSellData.put("params", buyOrSellParam);
 		//参数
-		buyOrSellParam.put("apiKey", this.client.getApiKey());
+		//buyOrSellParam.put("apiKey", this.client.getApiKey());
 		buyOrSellParam.put("symbol", symbol);
 		buyOrSellParam.put("side", side);
 		buyOrSellParam.put("positionSide", positionSide);
@@ -73,11 +61,11 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		buyOrSellParam.put("timestamp", new Date().getTime());
 		buyOrSellParam.put("type", Type.TAKE_PROFIT_MARKET);
 		
-		MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
+		//MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
 		
-		logger.info(buyOrSellData.toString());
+		//logger.info(buyOrSellData.toString());
 		
-		super.sendMessage(buyOrSellData.toString());
+		//super.sendMessage(buyOrSellData);
 		
 	}
 
@@ -92,7 +80,7 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		JSONObject buyOrSellParam = new JSONObject();
 		buyOrSellData.put("params", buyOrSellParam);
 		//参数
-		buyOrSellParam.put("apiKey", this.client.getApiKey());
+		//buyOrSellParam.put("apiKey", this.client.getApiKey());
 		buyOrSellParam.put("symbol", symbol);
 		buyOrSellParam.put("side", side);
 		buyOrSellParam.put("positionSide", positionSide);
@@ -101,40 +89,40 @@ public class APIMessageHandlerImpl extends BaseAPIMessageHandler implements APIM
 		buyOrSellParam.put("timestamp", new Date().getTime());
 		buyOrSellParam.put("type", Type.STOP_MARKET);
 		
-		MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
+		//MethodDataUtil.generateSignature(buyOrSellParam,this.client.getApiKey());
 		
-		logger.info(buyOrSellData.toString());
+		//logger.info(buyOrSellData.toString());
 		
-		super.sendMessage(buyOrSellData.toString());
+		//super.sendMessage(buyOrSellData);
 		
 	}
 
-	@Override
+	//@Override
 	public void balance() {
 		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.BALANCE);
 		JSONObject params = new JSONObject();
-		params.put("apiKey", apiKey);
+		//params.put("apiKey", apiKey);
 		params.put("timestamp", new Date().getTime());
 		
-		MethodDataUtil.generateSignature(params, secretKey);
+		//MethodDataUtil.generateSignature(params, secretKey);
 		
 		method.put("params", params);
 		
-		super.sendMessage(method.toString());
+		//super.sendMessage(method);
 	}
 
-	@Override
+	//@Override
 	public void balance_v2() {
 		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.BALANCE_V2);
 		JSONObject params = new JSONObject();
-		params.put("apiKey", apiKey);
+		//params.put("apiKey", apiKey);
 		params.put("timestamp", new Date().getTime());
 		
-		MethodDataUtil.generateSignature(params, secretKey);
+		//MethodDataUtil.generateSignature(params, secretKey);
 		
 		method.put("params", params);
 		
-		super.sendMessage(method.toString());
+		//super.sendMessage(method);
 	}
 
 }

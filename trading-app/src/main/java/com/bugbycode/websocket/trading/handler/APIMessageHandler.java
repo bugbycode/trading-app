@@ -2,13 +2,8 @@ package com.bugbycode.websocket.trading.handler;
 
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
-import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 
 public interface APIMessageHandler {
-	
-	public void setClient(TradingWebSocketClientEndpoint client);
-
-	public void handleMessage(String message);
 	
 	/**
 	 * 以市价开仓
