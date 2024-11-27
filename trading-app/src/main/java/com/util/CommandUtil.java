@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,10 +74,11 @@ public class CommandUtil {
 				for(int index = 0;index < jsonArr.length();index++) {
 					
 					JSONArray klJson = jsonArr.getJSONArray(index);
-					decimalNum = klJson.getString(1).substring(klJson.getString(1).indexOf(".") + 1).length();
+					//decimalNum = klJson.getString(1).substring(klJson.getString(1).indexOf(".") + 1).length();
+					decimalNum = new BigDecimal(klJson.getString(1)).scale();
 					Klines kl = new Klines(pair,klJson.getLong(0),
-							klJson.getDouble(1),klJson.getDouble(2),
-							klJson.getDouble(3),klJson.getDouble(4),
+							klJson.getString(1),klJson.getString(2),
+							klJson.getString(3),klJson.getString(4),
 							klJson.getLong(6),interval,decimalNum);
 					klinesList.add(kl);
 				};

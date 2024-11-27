@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -24,8 +22,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.PriceFibInfo;
 
 public class PriceUtil {
-	
-	private static final Logger logger = LogManager.getLogger(PriceUtil.class);
 	
 	public static double getMaxPrice(double[] arr) {
 		double result = arr[0];
@@ -102,7 +98,7 @@ public class PriceUtil {
 	public static Klines getMaxPriceKLine(List<Klines> klinesList) {
 		Klines result = klinesList.get(0);
 		for(int index = 1;index < klinesList.size();index++) {
-			if(result.getHighPrice() < klinesList.get(index).getHighPrice()) {
+			if(Double.valueOf(result.getHighPrice()) < Double.valueOf(klinesList.get(index).getHighPrice())) {
 				result = klinesList.get(index);
 			}
 		}
@@ -112,7 +108,7 @@ public class PriceUtil {
 	public static Klines getMinPriceKLine(List<Klines> klinesList) {
 		Klines result = klinesList.get(0);
 		for(int index = 1;index < klinesList.size();index++) {
-			if(result.getLowPrice() > klinesList.get(index).getLowPrice()) {
+			if(Double.valueOf(result.getLowPrice()) > Double.valueOf(klinesList.get(index).getLowPrice())) {
 				result = klinesList.get(index);
 			}
 		}
@@ -184,8 +180,8 @@ public class PriceUtil {
 		Klines kl = klinesList.get(index);
 		
 		boolean isFall = isFall(klinesList);
-		double lowPrice = kl.getLowPrice();
-		double hightPrice = kl.getHighPrice();
+		double lowPrice = Double.valueOf(kl.getLowPrice());
+		double hightPrice = Double.valueOf(kl.getHighPrice());
 
 		PriceFibInfo info = new PriceFibInfo();
 		info.setLowKlinesTime(kl.getStartTime());
@@ -197,27 +193,27 @@ public class PriceUtil {
 			Klines parent = klinesList.get(offset);
 			if(isFall) {
 				if(isRise(current, parent)) {
-					if(hightPrice < current.getHighPrice()) {
-						hightPrice = current.getHighPrice();
+					if(hightPrice < Double.valueOf(current.getHighPrice())) {
+						hightPrice = Double.valueOf(current.getHighPrice());
 						info.setHighKlinesTime(current.getStartTime());
 					}
 					break;
 				}
 			} else {
 				if(isFall(current, parent)) {
-					if(lowPrice > current.getLowPrice()) {
-						lowPrice = current.getLowPrice();
+					if(lowPrice > Double.valueOf(current.getLowPrice())) {
+						lowPrice = Double.valueOf(current.getLowPrice());
 						info.setLowKlinesTime(current.getStartTime());
 					}
 					break;
 				}
 			}
-			if(lowPrice > current.getLowPrice()) {
-				lowPrice = current.getLowPrice();
+			if(lowPrice > Double.valueOf(current.getLowPrice())) {
+				lowPrice = Double.valueOf(current.getLowPrice());
 				info.setLowKlinesTime(current.getStartTime());
 			}
-			if(hightPrice < current.getHighPrice()) {
-				hightPrice = current.getHighPrice();
+			if(hightPrice < Double.valueOf(current.getHighPrice())) {
+				hightPrice = Double.valueOf(current.getHighPrice());
 				info.setHighKlinesTime(current.getStartTime());
 			}
 		}
@@ -238,32 +234,32 @@ public class PriceUtil {
 		Klines kl = klinesList.get(index);
 		
 		boolean isFall = isFall(klinesList);
-		double lowPrice = kl.getLowPrice();
-		double hightPrice = kl.getHighPrice();
+		double lowPrice = Double.valueOf(kl.getLowPrice());
+		double hightPrice = Double.valueOf(kl.getHighPrice());
 		
 		while(offset >= 1) {
 			Klines current = klinesList.get(offset--);
 			Klines parent = klinesList.get(offset);
 			if(isFall) {
 				if(isRise(current, parent)) {
-					if(hightPrice < current.getHighPrice()) {
-						hightPrice = current.getHighPrice();
+					if(hightPrice < Double.valueOf(current.getHighPrice())) {
+						hightPrice = Double.valueOf(current.getHighPrice());
 					}
 					break;
 				}
 			} else {
 				if(isFall(current, parent)) {
-					if(lowPrice > current.getLowPrice()) {
-						lowPrice = current.getLowPrice();
+					if(lowPrice > Double.valueOf(current.getLowPrice())) {
+						lowPrice = Double.valueOf(current.getLowPrice());
 					}
 					break;
 				}
 			}
-			if(lowPrice > current.getLowPrice()) {
-				lowPrice = current.getLowPrice();
+			if(lowPrice > Double.valueOf(current.getLowPrice())) {
+				lowPrice = Double.valueOf(current.getLowPrice());
 			}
-			if(hightPrice < current.getHighPrice()) {
-				hightPrice = current.getHighPrice();
+			if(hightPrice < Double.valueOf(current.getHighPrice())) {
+				hightPrice = Double.valueOf(current.getHighPrice());
 			}
 		}
 		if(isFall) {
@@ -288,7 +284,7 @@ public class PriceUtil {
 			Klines next = null;//前一根k线
 			Klines tmp = klinesList.get(index);//当前k线
 			
-			if(lastDayKlines.getHighPrice() <= tmp.getHighPrice()) {
+			if(Double.valueOf(lastDayKlines.getHighPrice()) <= Double.valueOf(tmp.getHighPrice())) {
 				current = tmp;
 				
 				if(index < size - 1) {
@@ -297,7 +293,7 @@ public class PriceUtil {
 					next = current;
 				}
 				
-				if(current.getHighPrice() > next.getHighPrice()) {
+				if(Double.valueOf(current.getHighPrice()) > Double.valueOf(next.getHighPrice())) {
 					break;
 				}
 			}
@@ -333,8 +329,8 @@ public class PriceUtil {
 			Klines tmp = null;
 			for(Klines k : lconicHighPriceList) {
 				if(k.getStartTime() >  startTime && k.getStartTime() < endTime) {
-					if(k.getHighPrice() > fibHightKlines.getHighPrice()) {
-						if(ObjectUtils.isEmpty(tmp) || k.getHighPrice() > tmp.getHighPrice()) {
+					if(Double.valueOf(k.getHighPrice()) > Double.valueOf(fibHightKlines.getHighPrice())) {
+						if(tmp == null || Double.valueOf(k.getHighPrice()) > Double.valueOf(tmp.getHighPrice())) {
 							tmp = k;
 						}
 					}
@@ -363,7 +359,7 @@ public class PriceUtil {
 			Klines next = null;//前一根k线
 			Klines tmp = klinesList.get(index);//当前k线
 			
-			if(tmp.getLowPrice() <= lastDayKlines.getLowPrice()) {
+			if(Double.valueOf(tmp.getLowPrice()) <= Double.valueOf(lastDayKlines.getLowPrice())) {
 				current = tmp;
 				
 				if(index < size - 1) {
@@ -372,7 +368,7 @@ public class PriceUtil {
 					next = current;
 				}
 				
-				if(current.getLowPrice() < next.getLowPrice()) {
+				if(Double.valueOf(current.getLowPrice()) < Double.valueOf(next.getLowPrice())) {
 					break;
 				}
 			}
@@ -408,8 +404,8 @@ public class PriceUtil {
 			Klines tmp = null;
 			for(Klines k : lconicLowPriceList) {
 				if(k.getStartTime() >  startTime && k.getStartTime() < endTime) {
-					if(k.getLowPrice() < fibLowKlines.getLowPrice()) {
-						if(ObjectUtils.isEmpty(tmp) || k.getLowPrice() < tmp.getLowPrice()) {
+					if(Double.valueOf(k.getLowPrice()) < Double.valueOf(fibLowKlines.getLowPrice())) {
+						if(tmp == null || Double.valueOf(k.getLowPrice()) < Double.valueOf(tmp.getLowPrice())) {
 							tmp = k;
 						}
 					}
@@ -457,7 +453,7 @@ public class PriceUtil {
 		boolean result = false;
 
 		if(!ObjectUtils.isEmpty(afterLowKlines)) {
-			if(codeOffset > 0 && afterLowKlines.getLowPrice() <= fibInfo.getFibValue(codes[codeOffset - 1])) {
+			if(codeOffset > 0 && Double.valueOf(afterLowKlines.getLowPrice()) <= Double.valueOf(fibInfo.getFibValue(codes[codeOffset - 1]))) {
 				result = true;
 			}
 		}
@@ -477,7 +473,7 @@ public class PriceUtil {
 		boolean result = false;
 
 		if(!ObjectUtils.isEmpty(afterHighKlines)) {
-			if(codeOffset > 0 && afterHighKlines.getHighPrice() >= fibInfo.getFibValue(codes[codeOffset - 1])) {
+			if(codeOffset > 0 && Double.valueOf(afterHighKlines.getHighPrice()) >= fibInfo.getFibValue(codes[codeOffset - 1])) {
 				result = true;
 			}
 		}
@@ -495,9 +491,9 @@ public class PriceUtil {
 	 */
 	public static boolean isBreachLong(Klines current,double hitPrice) {
 		       //1. 开盘价、收盘价大于等于条件价且最低价小于等于条件价
-		return (current.getOpenPrice() >= hitPrice && current.getClosePrice() >= hitPrice && current.getLowPrice() <= hitPrice)
+		return (Double.valueOf(current.getOpenPrice()) >= hitPrice && Double.valueOf(current.getClosePrice()) >= hitPrice && Double.valueOf(current.getLowPrice()) <= hitPrice)
 				//2. 开盘价小于等于条件价 收盘价大于等于条件价
-				|| (current.getOpenPrice() <= hitPrice && current.getClosePrice() >= hitPrice);
+				|| (Double.valueOf(current.getOpenPrice()) <= hitPrice && Double.valueOf(current.getClosePrice()) >= hitPrice);
 	}
 	
 	/**
@@ -511,7 +507,7 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(list)) {
 			double hit = 0.0;
 			for(Klines klines : list) {
-				if(klines.getClosePrice() <= hitPrice) {
+				if(Double.valueOf(klines.getClosePrice()) <= hitPrice) {
 					hit++;
 				}
 			}
@@ -534,7 +530,7 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(list)) {
 			double hit = 0.0;
 			for(Klines klines : list) {
-				if(klines.getClosePrice() >= hitPrice) {
+				if(Double.valueOf(klines.getClosePrice()) >= hitPrice) {
 					hit++;
 				}
 			}
@@ -580,9 +576,9 @@ public class PriceUtil {
 	 */
 	public static boolean isBreachShort(Klines current,double hitPrice) {
 				//开盘价收盘价小于等于条件价且最高价大于等于条件价
-		return (current.getOpenPrice() <= hitPrice && current.getClosePrice() <= hitPrice && current.getHighPrice() >= hitPrice) ||
+		return (Double.valueOf(current.getOpenPrice()) <= hitPrice && Double.valueOf(current.getClosePrice()) <= hitPrice && Double.valueOf(current.getHighPrice()) >= hitPrice) ||
 			   //开盘价大于等于条件价、收盘价小于等于条件价
-				(current.getOpenPrice() >= hitPrice && current.getClosePrice() <= hitPrice);
+				(Double.valueOf(current.getOpenPrice()) >= hitPrice && Double.valueOf(current.getClosePrice()) <= hitPrice);
 	}
 	
 	public static FibKlinesData<List<Klines>,List<Klines>> getFibKlinesData(List<Klines> list){
@@ -599,14 +595,14 @@ public class PriceUtil {
 			Klines klines_parent = list.get(index - 1);
 			Klines klines_after = list.get(index + 1);
 			//判断是否为标志性高点
-			if(klines.getHighPrice() >= klines_parent.getHighPrice() 
-					&& klines.getHighPrice() >= klines_after.getHighPrice()){
+			if(Double.valueOf(klines.getHighPrice()) >= Double.valueOf(klines_parent.getHighPrice()) 
+					&& Double.valueOf(klines.getHighPrice()) >= Double.valueOf(klines_after.getHighPrice())){
 				lconicHighPriceList.add(klines);
 			}
 			
 			//判断是否为标志性低点
-			if(klines.getLowPrice() <= klines_parent.getLowPrice() 
-					&& klines.getLowPrice() <= klines_after.getLowPrice()){
+			if(Double.valueOf(klines.getLowPrice()) <= Double.valueOf(klines_parent.getLowPrice()) 
+					&& Double.valueOf(klines.getLowPrice()) <= Double.valueOf(klines_after.getLowPrice())){
 				lconicLowPriceList.add(klines);
 			}
 			index--;
@@ -653,7 +649,7 @@ public class PriceUtil {
 					continue;
 				}
 				
-				if(tmp.getLowPrice() < result.getLowPrice()) {
+				if(Double.valueOf(tmp.getLowPrice()) < Double.valueOf(result.getLowPrice())) {
 					result = tmp;
 				}
 			}
@@ -680,7 +676,7 @@ public class PriceUtil {
 					continue;
 				}
 				
-				if(tmp.getHighPrice() > result.getHighPrice()) {
+				if(Double.valueOf(tmp.getHighPrice()) > Double.valueOf(result.getHighPrice())) {
 					result = tmp;
 				}
 			}
@@ -721,7 +717,7 @@ public class PriceUtil {
         }
         // 计算初始的SMA作为第一个EMA的起始点
         for (int i = 0; i < period; i++) {
-        	initialSMA += klinesList.get(i).getClosePrice();
+        	initialSMA += Double.valueOf(klinesList.get(i).getClosePrice());
         }
         initialSMA /= period;
 
@@ -743,13 +739,13 @@ public class PriceUtil {
         for (int i = period; i < klinesList.size(); i++) {
         	switch (type) {
 			case EMA7:
-	        	klinesList.get(i).setEma7(calculateEMA(klinesList.get(i - 1).getEma7(), klinesList.get(i).getClosePrice(), period));
+	        	klinesList.get(i).setEma7(calculateEMA(klinesList.get(i - 1).getEma7(), Double.valueOf(klinesList.get(i).getClosePrice()), period));
 				break;
 			case EMA25:
-	        	klinesList.get(i).setEma25(calculateEMA(klinesList.get(i - 1).getEma25(), klinesList.get(i).getClosePrice(), period));
+	        	klinesList.get(i).setEma25(calculateEMA(klinesList.get(i - 1).getEma25(), Double.valueOf(klinesList.get(i).getClosePrice()), period));
 				break;
 			default:
-	        	klinesList.get(i).setEma99(calculateEMA(klinesList.get(i - 1).getEma99(), klinesList.get(i).getClosePrice(), period));
+	        	klinesList.get(i).setEma99(calculateEMA(klinesList.get(i - 1).getEma99(), Double.valueOf(klinesList.get(i).getClosePrice()), period));
 				break;
 			}
         }
@@ -770,8 +766,8 @@ public class PriceUtil {
 			double ema7 = klines.getEma7();
 			double ema25 = klines.getEma25();
 			double ema99 = klines.getEma99();
-			double closePrice = klines.getClosePrice();
-			double hightPrice = klines.getHighPrice();
+			double closePrice = Double.valueOf(klines.getClosePrice());
+			double hightPrice = Double.valueOf(klines.getHighPrice());
 			
 			//ema7、ema25小于ema99 收盘价小于ema99 最高价大于ema99
 			if(ema7 <= ema99 && ema25 <= ema99 && closePrice <= ema99 && hightPrice >= ema99){
@@ -796,8 +792,8 @@ public class PriceUtil {
 			double ema25 = klines.getEma25();
 			double ema99 = klines.getEma99();
 
-			double closePrice = klines.getClosePrice();
-			double lowPrice = klines.getLowPrice();
+			double closePrice = Double.valueOf(klines.getClosePrice());
+			double lowPrice = Double.valueOf(klines.getLowPrice());
 			//ema7、ema25 大于ema99 收盘价大于ema99 最低价小于ema99
 			if(ema7 >= ema99 && ema25 >= ema99 && closePrice >= ema99 && lowPrice <= ema99){
 				isOpenLong = true;
@@ -827,16 +823,16 @@ public class PriceUtil {
     		if(first == null || isConsolidationArea(tmp,highPrice,lowPrice)) {
     			
     			if(first == null) {
-    				highPrice = tmp.getHighPrice();
-        			lowPrice = tmp.getLowPrice();
+    				highPrice = Double.valueOf(tmp.getHighPrice());
+        			lowPrice = Double.valueOf(tmp.getLowPrice());
     			}
     			
-    			if(tmp.getHighPrice() > highPrice) {
-    				highPrice = tmp.getHighPrice();
+    			if(Double.valueOf(tmp.getHighPrice()) > highPrice) {
+    				highPrice = Double.valueOf(tmp.getHighPrice());
     			}
     			
-    			if(tmp.getLowPrice() < lowPrice) {
-    				lowPrice = tmp.getLowPrice();
+    			if(Double.valueOf(tmp.getLowPrice()) < lowPrice) {
+    				lowPrice = Double.valueOf(tmp.getLowPrice());
     			}
     			
     			first = tmp;
@@ -859,9 +855,9 @@ public class PriceUtil {
      */
     public static boolean isConsolidationArea(Klines klines,double highPrice,double lowPrice) {
     	boolean flag = false;
-    	if((klines.getOpenPrice() <= highPrice && klines.getOpenPrice() >= lowPrice && 
-    			klines.getClosePrice() <= highPrice && klines.getClosePrice() >= lowPrice)
-    			|| (klines.getHighPrice() >= highPrice && klines.getLowPrice() <= lowPrice)) {
+    	if((Double.valueOf(klines.getOpenPrice()) <= highPrice && Double.valueOf(klines.getOpenPrice()) >= lowPrice && 
+    			Double.valueOf(klines.getClosePrice()) <= highPrice && Double.valueOf(klines.getClosePrice()) >= lowPrice)
+    			|| (Double.valueOf(klines.getHighPrice()) >= highPrice && Double.valueOf(klines.getLowPrice()) <= lowPrice)) {
     		flag = true;
     	}
     	return flag;
@@ -924,7 +920,7 @@ public class PriceUtil {
     		if(tmp.getStartTime() == klines.getStartTime()) {
     			continue;
     		}
-    		if(tmp.getHighPrice() > klines.getHighPrice()) {
+    		if(Double.valueOf(tmp.getHighPrice()) > Double.valueOf(klines.getHighPrice())) {
     			result = true;
     			break;
     		}
@@ -946,7 +942,7 @@ public class PriceUtil {
     		if(tmp.getStartTime() == klines.getStartTime()) {
     			continue;
     		}
-    		if(tmp.getLowPrice() < klines.getLowPrice()) {
+    		if(Double.valueOf(tmp.getLowPrice()) < Double.valueOf(klines.getLowPrice())) {
     			result = true;
     			break;
     		}
@@ -963,7 +959,7 @@ public class PriceUtil {
     public static Klines getPositionHighKlines(List<Klines> list,List<Klines> klinesList_hit) {
     	Klines result = null;
     	for(Klines k : list) {
-    		double highPrice = k.getHighPrice();
+    		double highPrice = Double.valueOf(k.getHighPrice());
     		if((isLong(highPrice, klinesList_hit) || isShort(highPrice, klinesList_hit)) 
     				&& !checkHigherKlines(k, subList(k, list))) {
     			result = k;
@@ -982,7 +978,7 @@ public class PriceUtil {
     public static Klines getPositionLowKlines(List<Klines> list,List<Klines> klinesList_hit) {
     	Klines result = null;
     	for(Klines k : list) {
-    		double lowPrice = k.getLowPrice();
+    		double lowPrice = Double.valueOf(k.getLowPrice());
     		if((isLong(lowPrice, klinesList_hit) || isShort(lowPrice, klinesList_hit)) 
     				&& !checkLowerKlines(k, subList(k, list))) {
     			result = k;
@@ -1050,7 +1046,7 @@ public class PriceUtil {
      * @return
      */
     public static boolean isRise(Klines current,Klines parent) {
-    	return current.getClosePrice() >= parent.getOpenPrice();
+    	return Double.valueOf(current.getClosePrice()) >= Double.valueOf(parent.getOpenPrice());
     }
     
     /**
@@ -1124,10 +1120,10 @@ public class PriceUtil {
 		Klines lowKlines = ku.getMin();
 		Klines firstKlines = ku.getFirst();
 		Klines lastKlines = ku.getLast();
-		double openPrice = firstKlines.getOpenPrice();
-		double closePrice = lastKlines.getClosePrice();
-		double highPrice = highKlines.getHighPrice();
-		double lowPrice = lowKlines.getLowPrice();
+		String openPrice = firstKlines.getOpenPrice();
+		String closePrice = lastKlines.getClosePrice();
+		String highPrice = highKlines.getHighPrice();
+		String lowPrice = lowKlines.getLowPrice();
 		long startTime = firstKlines.getStartTime();
 		long endTime = lastKlines.getEndTime();
 		String pair = firstKlines.getPair();
@@ -1156,6 +1152,6 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static boolean checkHitPrice(Klines k,double hitPrice) {
-		return k == null ? false : (k.getLowPrice() <= hitPrice && k.getHighPrice() >= hitPrice);
+		return k == null ? false : (Double.valueOf(k.getLowPrice()) <= hitPrice && Double.valueOf(k.getHighPrice()) >= hitPrice);
 	}
 }

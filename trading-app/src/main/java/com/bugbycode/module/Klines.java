@@ -13,13 +13,13 @@ public class Klines {
 	
 	private long startTime; //开盘时间
 	
-	private double openPrice;//开盘价
+	private String openPrice;//开盘价
 	
-	private double highPrice;//最高价
+	private String highPrice;//最高价
 	
-	private double lowPrice;//最低价
+	private String lowPrice;//最低价
 	
-	private double closePrice;//收盘价
+	private String closePrice;//收盘价
 
 	private String interval;//时间级别
 	
@@ -33,8 +33,8 @@ public class Klines {
 	
 	private int decimalNum = 2;
 
-	public Klines(String pair,long startTime, double openPrice, double highPrice, double lowPrice, 
-			double closePrice, long endTime,String interval,int decimalNum) {
+	public Klines(String pair,long startTime, String openPrice, String highPrice, String lowPrice, 
+			String closePrice, long endTime,String interval,int decimalNum) {
 		this.pair = pair;
 		this.startTime = startTime;
 		this.openPrice = openPrice;
@@ -58,19 +58,19 @@ public class Klines {
 		return startTime;
 	}
 
-	public double getOpenPrice() {
+	public String getOpenPrice() {
 		return openPrice;
 	}
 
-	public double getHighPrice() {
+	public String getHighPrice() {
 		return highPrice;
 	}
 
-	public double getLowPrice() {
+	public String getLowPrice() {
 		return lowPrice;
 	}
 
-	public double getClosePrice() {
+	public String getClosePrice() {
 		return closePrice;
 	}
 
@@ -87,7 +87,9 @@ public class Klines {
 	 * @return
 	 */
 	public boolean isRise() {
-		return closePrice >= openPrice;
+		Double c = Double.valueOf(closePrice);
+		Double o = Double.valueOf(openPrice);
+		return c >= o;
 	}
 	
 	/**
@@ -136,16 +138,18 @@ public class Klines {
 	 * @return
 	 */
 	public boolean isUplead() {
+		
 		double leadlen = 0;//上引线长度
 		double bodylen = 0;//主体长度
 		if(this.isRise()) {//阳线
-			leadlen = this.getHighPrice() - this.getClosePrice();
-			bodylen = this.getClosePrice() - this.getOpenPrice();
+			leadlen = Double.valueOf(this.getHighPrice()) - Double.valueOf(this.getClosePrice());
+			bodylen = Double.valueOf(this.getClosePrice()) - Double.valueOf(this.getOpenPrice());
 		} else if(this.isFall()) {//阴线
-			leadlen = this.getHighPrice() - this.getOpenPrice();
-			bodylen = this.getOpenPrice() - this.getClosePrice();
+			leadlen = Double.valueOf(this.getHighPrice()) - Double.valueOf(this.getOpenPrice());
+			bodylen = Double.valueOf(this.getOpenPrice()) - Double.valueOf(this.getClosePrice());
 		}
 		return (bodylen == 0 && leadlen > 0) || (bodylen > 0 && leadlen / bodylen > 0.85) ;
+		
 	}
 	
 	/**
@@ -157,11 +161,11 @@ public class Klines {
 		double leadlen = 0;//下引线长度
 		double bodylen = 0;//主体长度
 		if(this.isRise()) {//阳线
-			leadlen = this.getOpenPrice() - this.getLowPrice();
-			bodylen = this.getClosePrice() - this.getOpenPrice();
+			leadlen = Double.valueOf(this.getOpenPrice()) - Double.valueOf(this.getLowPrice());
+			bodylen = Double.valueOf(this.getClosePrice()) - Double.valueOf(this.getOpenPrice());
 		} else if(this.isFall()) {//阴线
-			leadlen = this.getClosePrice() - this.getLowPrice();
-			bodylen = this.getOpenPrice() - this.getClosePrice();
+			leadlen = Double.valueOf(this.getClosePrice()) - Double.valueOf(this.getLowPrice());
+			bodylen = Double.valueOf(this.getOpenPrice()) - Double.valueOf(this.getClosePrice());
 		}
 		return (bodylen == 0 && leadlen > 0) || (bodylen > 0 && leadlen / bodylen > 0.85) ;
 	}
@@ -173,9 +177,9 @@ public class Klines {
 	 */
 	public double getPriceFluctuationPercentage() {
 		if(this.isFall()) {
-			return ((this.getHighPrice() - this.getLowPrice()) / this.getHighPrice()) * 100;
+			return ((Double.valueOf(this.getHighPrice()) - Double.valueOf(this.getLowPrice())) / Double.valueOf(this.getHighPrice())) * 100;
 		} else {
-			return ((this.getHighPrice() - this.getLowPrice()) / this.getLowPrice()) * 100;
+			return ((Double.valueOf(this.getHighPrice()) - Double.valueOf(this.getLowPrice())) / Double.valueOf(this.getLowPrice())) * 100;
 		}
 	}
 	

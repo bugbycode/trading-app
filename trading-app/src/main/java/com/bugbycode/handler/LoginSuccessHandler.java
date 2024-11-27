@@ -5,8 +5,6 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -19,8 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * 登录成功逻辑处理
  */
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
-
-	private final Logger logger = LogManager.getLogger(LoginSuccessHandler.class);
 	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

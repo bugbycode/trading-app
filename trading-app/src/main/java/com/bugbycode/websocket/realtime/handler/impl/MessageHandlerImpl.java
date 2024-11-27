@@ -1,5 +1,6 @@
 package com.bugbycode.websocket.realtime.handler.impl;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,10 +31,10 @@ public class MessageHandlerImpl implements MessageHandler{
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
-		int decimalNum = openPriceStr.substring(openPriceStr.indexOf(".") + 1).length();
+		int decimalNum = new BigDecimal(openPriceStr).scale();
 		
-		Klines kline = new Klines(result.getString("ps"), klinesJson.getLong("t"), klinesJson.getDouble("o"), 
-				klinesJson.getDouble("h"), klinesJson.getDouble("l"), klinesJson.getDouble("c"), klinesJson.getLong("T"),
+		Klines kline = new Klines(result.getString("ps"), klinesJson.getLong("t"), klinesJson.getString("o"), 
+				klinesJson.getString("h"), klinesJson.getString("l"), klinesJson.getString("c"), klinesJson.getLong("T"),
 				client.getCoinPairSet().getInerval().getDescption(), decimalNum);
 		
 		boolean finish = klinesJson.getBoolean("x");

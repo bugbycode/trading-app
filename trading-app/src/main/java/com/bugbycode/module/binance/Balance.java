@@ -4,11 +4,11 @@ public class Balance {
 	
 	private String accountAlias;// 账户唯一识别码
 	private String asset; // 资产
-	private double balance;//总余额
-	private double crossWalletBalance;//全仓余额
-	private double crossUnPnl;//全仓持仓未实现盈亏
-	private double availableBalance;//下单可用余额
-	private double maxWithdrawAmount;//最大可转出余额
+	private String balance;//总余额
+	private String crossWalletBalance;//全仓余额
+	private String crossUnPnl;//全仓持仓未实现盈亏
+	private String availableBalance;//下单可用余额
+	private String maxWithdrawAmount;//最大可转出余额
 	private boolean marginAvailable;//是否可用作联合保证金
 	private long updateTime;//
 	
@@ -24,34 +24,34 @@ public class Balance {
 	public void setAsset(String asset) {
 		this.asset = asset;
 	}
-	public double getBalance() {
+	public String getBalance() {
 		return balance;
 	}
-	public void setBalance(double balance) {
+	public void setBalance(String balance) {
 		this.balance = balance;
 	}
-	public double getCrossWalletBalance() {
+	public String getCrossWalletBalance() {
 		return crossWalletBalance;
 	}
-	public void setCrossWalletBalance(double crossWalletBalance) {
+	public void setCrossWalletBalance(String crossWalletBalance) {
 		this.crossWalletBalance = crossWalletBalance;
 	}
-	public double getCrossUnPnl() {
+	public String getCrossUnPnl() {
 		return crossUnPnl;
 	}
-	public void setCrossUnPnl(double crossUnPnl) {
+	public void setCrossUnPnl(String crossUnPnl) {
 		this.crossUnPnl = crossUnPnl;
 	}
-	public double getAvailableBalance() {
+	public String getAvailableBalance() {
 		return availableBalance;
 	}
-	public void setAvailableBalance(double availableBalance) {
+	public void setAvailableBalance(String availableBalance) {
 		this.availableBalance = availableBalance;
 	}
-	public double getMaxWithdrawAmount() {
+	public String getMaxWithdrawAmount() {
 		return maxWithdrawAmount;
 	}
-	public void setMaxWithdrawAmount(double maxWithdrawAmount) {
+	public void setMaxWithdrawAmount(String maxWithdrawAmount) {
 		this.maxWithdrawAmount = maxWithdrawAmount;
 	}
 	public boolean getMarginAvailable() {

@@ -108,11 +108,11 @@ public class FibInfo {
 	 */
 	public FibInfo(Klines kline1, Klines kline2,int decimalPoint,FibLevel level) {
 		if(kline1.getStartTime() < kline2.getStartTime()) {
-			this.high = kline1.getLowPrice();
-			this.low = kline2.getHighPrice();
+			this.high = Double.valueOf(kline1.getLowPrice());
+			this.low = Double.valueOf(kline2.getHighPrice());
 		} else {
-			this.high = kline2.getHighPrice();
-			this.low = kline1.getLowPrice();
+			this.high = Double.valueOf(kline2.getHighPrice());
+			this.low = Double.valueOf(kline1.getLowPrice());
 		}
 		this.decimalPoint = decimalPoint;
 		this.level = level;

@@ -14,7 +14,6 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.webapp.controller.base.BaseController;
-import com.util.StringUtil;
 
 import jakarta.annotation.Resource;
 

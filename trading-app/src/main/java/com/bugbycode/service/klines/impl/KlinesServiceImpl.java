@@ -173,9 +173,9 @@ public class KlinesServiceImpl implements KlinesService {
 		Klines hitLowKlines = CollectionUtils.isEmpty(todayKlinesList) ? null : PriceUtil.getMinPriceKLine(todayKlinesList);
 		
 		//开盘、收盘、最低、最高价格
-		double closePrice = hitKline.getClosePrice();
+		double closePrice = Double.valueOf(hitKline.getClosePrice());
 		//double openPrice = hitKline.getOpenPrice();
-		double lowPrice = hitKline.getLowPrice();
+		double lowPrice = Double.valueOf(hitKline.getLowPrice());
 		//double hightPrice = hitKline.getHighPrice();
 		double currentPrice = closePrice;
 		
@@ -236,10 +236,10 @@ public class KlinesServiceImpl implements KlinesService {
 		Klines hitHighKlines = CollectionUtils.isEmpty(todayKlinesList) ? null : PriceUtil.getMaxPriceKLine(todayKlinesList);
 		
 		//开盘、收盘、最低、最高价格
-		double closePrice = hitKline.getClosePrice();
+		double closePrice = Double.valueOf(hitKline.getClosePrice());
 		//double openPrice = hitKline.getOpenPrice();
 		//double lowPrice = hitKline.getLowPrice();
-		double hightPrice = hitKline.getHighPrice();
+		double hightPrice = Double.valueOf(hitKline.getHighPrice());
 		double currentPrice = closePrice;
 		
 		String pair = hitKline.getPair();
@@ -400,7 +400,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(!ObjectUtils.isEmpty(hitLowKlines)) {
 			
-			double lowPrice = hitLowKlines.getLowPrice();
+			double lowPrice = Double.valueOf(hitLowKlines.getLowPrice());
 			
 			HighOrLowHitPrice price = new HighOrLowHitPrice(pair, lowPrice, now.getTime());
 			highOrLowHitPriceRepository.insert(price);
@@ -432,7 +432,7 @@ public class KlinesServiceImpl implements KlinesService {
 				lastDayStr = "昨日最高价";
 			}
 			
-			double highPrice = hitHighKlines.getHighPrice();
+			double highPrice = Double.valueOf(hitHighKlines.getHighPrice());
 			
 			HighOrLowHitPrice price = new HighOrLowHitPrice(pair, highPrice, now.getTime());
 			highOrLowHitPriceRepository.insert(price);
@@ -710,28 +710,28 @@ public class KlinesServiceImpl implements KlinesService {
 				double bodyLowPrice = 0;
 				
 				if(currentKlines.isFall()) {
-					bodyHighPrice = currentKlines.getOpenPrice();
-					bodyLowPrice = currentKlines.getClosePrice();
+					bodyHighPrice = Double.valueOf(currentKlines.getOpenPrice());
+					bodyLowPrice = Double.valueOf(currentKlines.getClosePrice());
 				} else {
-					bodyLowPrice = currentKlines.getOpenPrice();
-					bodyHighPrice = currentKlines.getClosePrice();
+					bodyLowPrice = Double.valueOf(currentKlines.getOpenPrice());
+					bodyHighPrice = Double.valueOf(currentKlines.getClosePrice());
 				}
 				
 				//下跌情况
 				if(isFall) {
 					//看涨吞没
-					if(lastKlines.getClosePrice() >= bodyHighPrice) {
+					if(Double.valueOf(lastKlines.getClosePrice()) >= bodyHighPrice) {
 						subject = pair + "永续合约强势价格行为 " + dateStr;
 					} else //前一根k线为阳线 当前k线为阴线且收盘价未创出新低 
-					if(currentKlines.isRise() && lastKlines.isFall() && lastKlines.getClosePrice() >= currentKlines.getLowPrice()) {
+					if(currentKlines.isRise() && lastKlines.isFall() && Double.valueOf(lastKlines.getClosePrice()) >= Double.valueOf(currentKlines.getLowPrice())) {
 						subject = pair + "永续合约强势价格行为 " + dateStr;
 					}
 				} else {//上涨情况
 					//看跌吞没
-					if(lastKlines.getClosePrice() <= bodyLowPrice) {
+					if(Double.valueOf(lastKlines.getClosePrice()) <= bodyLowPrice) {
 						subject = pair + "永续合约颓势价格行为 " + dateStr;
 					} else //前一根k线为阴线 当前k线为阳线且收盘价未创出新高
-					if(currentKlines.isFall() && lastKlines.isRise() && lastKlines.getClosePrice() <= currentKlines.getHighPrice()) {
+					if(currentKlines.isFall() && lastKlines.isRise() && Double.valueOf(lastKlines.getClosePrice()) <= Double.valueOf(currentKlines.getHighPrice())) {
 						subject = pair + "永续合约颓势价格行为 " + dateStr;
 					}
 				}
@@ -739,12 +739,12 @@ public class KlinesServiceImpl implements KlinesService {
 				if(StringUtil.isNotEmpty(subject)) {
 					
 					
-					double currentPrice = lastKlines.getClosePrice();
+					double currentPrice = Double.valueOf(lastKlines.getClosePrice());
 					
 					Klines lowKlines = klinesRepository.findOneByStartTime(info.getLowKlinesTime(), pair, info.getInerval());
 					Klines highKlines = klinesRepository.findOneByStartTime(info.getHighKlinesTime(), pair, info.getInerval());
-					double lowPrice = lowKlines.getLowPrice();
-					double highPrice = highKlines.getHighPrice();
+					double lowPrice = Double.valueOf(lowKlines.getLowPrice());
+					double highPrice = Double.valueOf(highKlines.getHighPrice());
 					
 					FibInfo fib = new FibInfo(lowKlines, highKlines, highKlines.getDecimalNum(), FibLevel.LEVEL_1);
 					
@@ -861,30 +861,30 @@ public class KlinesServiceImpl implements KlinesService {
 				double bodyLowPrice = 0;
 				
 				if(currentKlines.isFall()) {
-					bodyHighPrice = currentKlines.getOpenPrice();
-					bodyLowPrice = currentKlines.getClosePrice();
+					bodyHighPrice = Double.valueOf(currentKlines.getOpenPrice());
+					bodyLowPrice = Double.valueOf(currentKlines.getClosePrice());
 				} else {
-					bodyLowPrice = currentKlines.getOpenPrice();
-					bodyHighPrice = currentKlines.getClosePrice();
+					bodyLowPrice = Double.valueOf(currentKlines.getOpenPrice());
+					bodyHighPrice = Double.valueOf(currentKlines.getClosePrice());
 				}
 				
 				//下跌情况
 				if(isFall) {
 					qm = QuotationMode.SHORT;
 					//看涨吞没
-					if(lastKlines.getClosePrice() >= bodyHighPrice) {
+					if(Double.valueOf(lastKlines.getClosePrice()) >= bodyHighPrice) {
 						subject = pair + "永续合约强势价格行为 " + dateStr;
 					} else //前一根k线为阳线 当前k线为阴线且收盘价未创出新低 
-					if(currentKlines.isRise() && lastKlines.isFall() && lastKlines.getClosePrice() >= currentKlines.getLowPrice()) {
+					if(currentKlines.isRise() && lastKlines.isFall() && Double.valueOf(lastKlines.getClosePrice()) >= Double.valueOf(currentKlines.getLowPrice())) {
 						subject = pair + "永续合约强势价格行为 " + dateStr;
 					}
 				} else {//上涨情况
 					qm = QuotationMode.LONG;
 					//看跌吞没
-					if(lastKlines.getClosePrice() <= bodyLowPrice) {
+					if(Double.valueOf(lastKlines.getClosePrice()) <= bodyLowPrice) {
 						subject = pair + "永续合约颓势价格行为 " + dateStr;
 					} else //前一根k线为阴线 当前k线为阳线且收盘价未创出新高
-					if(currentKlines.isFall() && lastKlines.isRise() && lastKlines.getClosePrice() <= currentKlines.getHighPrice()) {
+					if(currentKlines.isFall() && lastKlines.isRise() && Double.valueOf(lastKlines.getClosePrice()) <= Double.valueOf(currentKlines.getHighPrice())) {
 						subject = pair + "永续合约颓势价格行为 " + dateStr;
 					}
 				}
@@ -1116,7 +1116,7 @@ public class KlinesServiceImpl implements KlinesService {
 			String subject = String.format("%s永续合约价格已到达%s %s", klines.getPair(), PriceUtil.formatDoubleDecimal(price,klines.getDecimalNum()),dateStr);
 			String text = String.format("%s永续合约水平射线价格坐标：%s，水平射线时间坐标：%s，当前价格：%s", 
 					klines.getPair(),PriceUtil.formatDoubleDecimal(price,klines.getDecimalNum()),
-					DateFormatUtil.format(time * 1000),PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+					DateFormatUtil.format(time * 1000),klines.getClosePrice());
 			
 			if(hitPrice(klines, price)) {
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
@@ -1132,7 +1132,7 @@ public class KlinesServiceImpl implements KlinesService {
 	 */
 	private boolean hitPrice(Klines klines,double price) {
 		boolean result = false;
-		if(klines.getHighPrice() >= price && klines.getLowPrice() <= price) {
+		if(Double.valueOf(klines.getHighPrice()) >= price && Double.valueOf(klines.getLowPrice()) <= price) {
 			result = true;
 		}
 		return result;
@@ -1161,7 +1161,7 @@ public class KlinesServiceImpl implements KlinesService {
 						klines.getPair(),
 						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
 						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
-						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+						klines.getClosePrice());
 				
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
@@ -1174,7 +1174,7 @@ public class KlinesServiceImpl implements KlinesService {
 						klines.getPair(),
 						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
 						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
-						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+						klines.getClosePrice());
 				
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
@@ -1207,7 +1207,7 @@ public class KlinesServiceImpl implements KlinesService {
 					DateFormatUtil.format(time0 * 1000),
 					PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
 					DateFormatUtil.format(time1 * 1000),
-					PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()),
+					klines.getClosePrice(),
 					PriceUtil.formatDoubleDecimal(resultPrice,klines.getDecimalNum()));
 			logger.info(text);
 			if(hitPrice(klines, resultPrice)) {
@@ -1255,7 +1255,7 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format(time1 * 1000),
 						PriceUtil.formatDoubleDecimal(price2,klines.getDecimalNum()),
 						DateFormatUtil.format(time2 * 1000),
-						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+						klines.getClosePrice());
 				
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
@@ -1273,7 +1273,7 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format(time1 * 1000),
 						PriceUtil.formatDoubleDecimal(price2,klines.getDecimalNum()),
 						DateFormatUtil.format(time2 * 1000),
-						PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum()));
+						klines.getClosePrice());
 				
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 			}
@@ -1343,7 +1343,7 @@ public class KlinesServiceImpl implements KlinesService {
 			logger.info(String.format("AC价格：%s，BD价格：%s，当前价格：%s", 
 					PriceUtil.formatDoubleDecimal(acPrice,klines.getDecimalNum()),
 					PriceUtil.formatDoubleDecimal(bdPrice,klines.getDecimalNum()),
-					PriceUtil.formatDoubleDecimal(klines.getClosePrice(),klines.getDecimalNum())));
+					klines.getClosePrice()));
 			
 
 			String subject = "";
@@ -1382,7 +1382,7 @@ public class KlinesServiceImpl implements KlinesService {
 					PriceUtil.formatDoubleDecimal(price2, klines.getDecimalNum()),
 					DateFormatUtil.format(time3 * 1000),
 					PriceUtil.formatDoubleDecimal(price3, klines.getDecimalNum()),
-					PriceUtil.formatDoubleDecimal(klines.getClosePrice(), klines.getDecimalNum())
+					klines.getClosePrice()
 					);
 			
 			if(StringUtil.isNotEmpty(subject)) {
@@ -1499,10 +1499,10 @@ public class KlinesServiceImpl implements KlinesService {
 				if(type == LongOrShortType.SHORT) {
 					double closePrice = 0;//平仓价
 					//止损 收盘价或最高价大于止损价
-					if(klines.getClosePrice() >= sl || klines.getHighPrice() >= sl) {
-						closePrice = klines.getClosePrice();
+					if(Double.valueOf(klines.getClosePrice()) >= sl || Double.valueOf(klines.getHighPrice()) >= sl) {
+						closePrice = Double.valueOf(klines.getClosePrice());
 					} else//止盈 收盘价或最低价小于止盈价
-					if(klines.getClosePrice() <= tp || klines.getLowPrice() <= tp){
+					if(Double.valueOf(klines.getClosePrice()) <= tp || Double.valueOf(klines.getLowPrice()) <= tp){
 						closePrice = o.getTakeProfit();
 					}
 					if(closePrice > 0) {//平仓
@@ -1514,10 +1514,10 @@ public class KlinesServiceImpl implements KlinesService {
 				} else if(type == LongOrShortType.LONG) {
 					double closePrice = 0;//平仓价
 					//止损 收盘价或最低价小于止损价
-					if(klines.getClosePrice() <= sl || klines.getHighPrice() <= sl) {
-						closePrice = klines.getClosePrice();
+					if(Double.valueOf(klines.getClosePrice()) <= sl || Double.valueOf(klines.getHighPrice()) <= sl) {
+						closePrice = Double.valueOf(klines.getClosePrice());
 					} else//止盈 收盘价或最高价大于止盈价
-					if(klines.getClosePrice() >= tp || klines.getLowPrice() >= tp){
+					if(Double.valueOf(klines.getClosePrice()) >= tp || Double.valueOf(klines.getLowPrice()) >= tp){
 						closePrice = o.getTakeProfit();
 					}
 					if(closePrice > 0) {//平仓
