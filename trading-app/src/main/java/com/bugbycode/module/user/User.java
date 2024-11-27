@@ -36,6 +36,10 @@ public class User implements UserDetails {
 	
 	private int highOrLowMonitor = 0;//是否订阅标志性高低点监控 0：否 1：是
 	
+	private String binanceApiKey;//币安API key
+	
+	private String binanceSecretKey;//币安 Secret Key
+	
 	public String getId() {
 		return id;
 	}
@@ -107,6 +111,22 @@ public class User implements UserDetails {
 
 	public void setHighOrLowMonitor(int highOrLowMonitor) {
 		this.highOrLowMonitor = highOrLowMonitor;
+	}
+
+	public String getBinanceApiKey() {
+		return binanceApiKey;
+	}
+
+	public void setBinanceApiKey(String binanceApiKey) {
+		this.binanceApiKey = binanceApiKey;
+	}
+
+	public String getBinanceSecretKey() {
+		return binanceSecretKey;
+	}
+
+	public void setBinanceSecretKey(String binanceSecretKey) {
+		this.binanceSecretKey = binanceSecretKey;
 	}
 
 	public void copy(User user) {
