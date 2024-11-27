@@ -1,11 +1,18 @@
 package com.bugbycode.trading_app.init;
 
+import java.io.IOException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.config.AppConfig;
@@ -34,7 +41,9 @@ public class InitConfig implements ApplicationRunner {
 
 	@Bean("restTemplate")
 	public RestTemplate restTemplate() {
-		return new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.setErrorHandler(new HttpResponseErrorHandler());
+		return restTemplate;
 	}
 
 	@Bean
@@ -55,5 +64,21 @@ public class InitConfig implements ApplicationRunner {
 	@Bean
 	public TradingWebSocketClientEndpoint websocketApi() {
 		return new TradingWebSocketClientEndpoint(websocketApiBaseUrl);
+	}
+	
+	private class HttpResponseErrorHandler implements ResponseErrorHandler{
+		
+		private final Logger logger = LogManager.getLogger(HttpResponseErrorHandler.class);
+		
+		@Override
+		public boolean hasError(ClientHttpResponse response) throws IOException {
+			return response.getStatusCode().value() == HttpStatus.Series.CLIENT_ERROR.value() 
+		               || response.getStatusCode().value() == HttpStatus.Series.SERVER_ERROR.value();
+		}
+		
+		@Override
+		public void handleError(ClientHttpResponse response) throws IOException {
+			logger.error("Error response received with status code: " + response.getStatusCode());
+		}
 	}
 }
