@@ -162,4 +162,6 @@ public interface BinanceRestTradeService {
 	 * @param binanceSecretKey
 	 */
 	public List<Balance> balance_v2(String binanceApiKey,String binanceSecretKey);
+	
+	
 }

@@ -55,4 +55,12 @@ public interface BinanceWebsocketTradeService {
 	 */
 	public BinanceOrderInfo order_place(String binanceApiKey,String binanceSecretKey,String symbol,Side side,PositionSide ps,Type type,String newClientOrderId,
 			BigDecimal quantity,BigDecimal price,BigDecimal stopPrice,Boolean closePosition,WorkingType workingType);
+	
+	/**
+	 * 获取可下单余额
+	 * @param apiKey
+	 * @param secretKey
+	 * @return
+	 */
+	public String availableBalance(String apiKey, String secretKey, String asset);
 }

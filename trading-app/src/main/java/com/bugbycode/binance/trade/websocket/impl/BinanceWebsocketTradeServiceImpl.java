@@ -284,4 +284,17 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		return order;
 	}
 
+	@Override
+	public String availableBalance(String apiKey, String secretKey, String asset) {
+		List<Balance> list = balance(apiKey, secretKey);
+		Balance balance = null;
+		for(Balance bl : list) {
+			if(bl.getAsset().equals(asset)) {
+				balance = bl;
+				break;
+			}
+		}
+		return balance == null ? "0.0" : balance.getAvailableBalance();
+	}
+
 }
