@@ -1,13 +1,13 @@
-package com.bugbycode.binance.websocket.userdata;
+package com.bugbycode.binance.trade.websocket;
 
 import java.util.List;
 
 import com.bugbycode.module.binance.Balance;
 
 /**
- * 币安用户数据接口 USER_DATA
+ * 币安交易管理接口
  */
-public interface BinanceUserDataService {
+public interface BinanceWebsocketTradeService {
 
 	/**
 	 * 账户余额 (USER_DATA)

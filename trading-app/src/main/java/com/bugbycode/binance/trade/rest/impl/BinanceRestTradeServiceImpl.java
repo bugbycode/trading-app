@@ -1,4 +1,4 @@
-package com.bugbycode.binance.rest.trade.impl;
+package com.bugbycode.binance.trade.rest.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.bugbycode.binance.rest.trade.BinanceTradeService;
+import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.BinanceOrderInfo;
@@ -31,9 +31,9 @@ import com.util.StringUtil;
 import com.util.UrlQueryStringUtil;
 
 @Service("binanceTradeService")
-public class BinanceTradeServiceImpl implements BinanceTradeService {
+public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 
-	private final Logger logger = LogManager.getLogger(BinanceTradeServiceImpl.class);
+	private final Logger logger = LogManager.getLogger(BinanceRestTradeServiceImpl.class);
 	
 	@Autowired
 	private RestTemplate restTemplate;

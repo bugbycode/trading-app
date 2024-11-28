@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bugbycode.binance.websocket.userdata.BinanceUserDataService;
+import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.user.User;
@@ -30,7 +30,7 @@ public class UserController extends BaseController{
 	private UserRepository userRepository;
 	
 	@Autowired
-	private BinanceUserDataService binanceUserDataService;
+	private BinanceWebsocketTradeService binanceWebsocketTradeService;
 	
 	@GetMapping("/userInfo")
 	public User userInfo() {
@@ -91,7 +91,7 @@ public class UserController extends BaseController{
 	@GetMapping("/getBalance")
 	public List<Balance> getBalance(){
 		User user = getUserInfo();
-		return binanceUserDataService.balance(user.getBinanceApiKey(), user.getBinanceSecretKey());
+		return binanceWebsocketTradeService.balance(user.getBinanceApiKey(), user.getBinanceSecretKey());
 	}
 	
 	@PostMapping("/changeHmac")
@@ -107,7 +107,7 @@ public class UserController extends BaseController{
 		}
 		List<Balance> balanceList = new ArrayList<Balance>();
 		if(!(StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey()))){
-			balanceList = binanceUserDataService.balance(data.getBinanceApiKey(), data.getBinanceSecretKey());
+			balanceList = binanceWebsocketTradeService.balance(data.getBinanceApiKey(), data.getBinanceSecretKey());
 		}
 		
 		if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && data.getAutoTrade() == 0) {

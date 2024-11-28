@@ -1,4 +1,4 @@
-package com.bugbycode.binance.websocket.userdata.impl;
+package com.bugbycode.binance.trade.websocket.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,16 +11,16 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bugbycode.binance.websocket.userdata.BinanceUserDataService;
+import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.Method;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 import com.util.MethodDataUtil;
 
-@Service("binanceUserDataService")
-public class BinanceUserDataServiceImpl implements BinanceUserDataService{
+@Service("binanceWebsocketTradeService")
+public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeService {
 
-	private final Logger logger = LogManager.getLogger(BinanceUserDataServiceImpl.class);
+	private final Logger logger = LogManager.getLogger(BinanceWebsocketTradeServiceImpl.class);
 	
 	@Autowired
 	private TradingWebSocketClientEndpoint websocketApi;
@@ -111,6 +111,5 @@ public class BinanceUserDataServiceImpl implements BinanceUserDataService{
 		
 		return blanceList;
 	}
-	
 
 }

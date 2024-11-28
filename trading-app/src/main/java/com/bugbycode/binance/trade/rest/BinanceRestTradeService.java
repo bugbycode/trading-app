@@ -1,4 +1,4 @@
-package com.bugbycode.binance.rest.trade;
+package com.bugbycode.binance.trade.rest;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import com.bugbycode.module.binance.Result;
 /**
  * 币安交易管理接口
  */
-public interface BinanceTradeService {
+public interface BinanceRestTradeService {
 
 	/**
 	 * 更改持仓模式(TRADE)
