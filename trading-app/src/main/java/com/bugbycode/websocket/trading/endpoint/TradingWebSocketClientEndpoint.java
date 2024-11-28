@@ -134,7 +134,7 @@ public class TradingWebSocketClientEndpoint {
 				throw new RuntimeException("Websocket连接已断开");
 			}
 			try {
-				wait();
+				wait(3000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

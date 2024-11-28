@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.Method;
 import com.bugbycode.module.binance.Balance;
+import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 import com.util.MethodDataUtil;
 
@@ -110,6 +111,26 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		}
 		
 		return blanceList;
+	}
+
+	@Override
+	public PriceInfo getPrice(String symbol) {
+		PriceInfo info = null;
+		
+		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.TICKER_PRICE);
+		JSONObject params = new JSONObject();
+		params.put("symbol", symbol);
+		method.put("params", params);
+		
+		websocketApi.sendMessage(method);
+		
+		JSONObject result = websocketApi.read(method.getString("id"));
+		
+		if(result.getInt("status") == 200 && result.has("result")) {
+			JSONObject data = result.getJSONObject("result");
+			info = new PriceInfo(data.getString("symbol"), data.getString("price"), data.getLong("time"));
+		}
+		return info;
 	}
 
 }
