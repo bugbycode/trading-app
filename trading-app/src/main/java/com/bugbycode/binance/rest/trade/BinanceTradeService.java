@@ -1,4 +1,4 @@
-package com.bugbycode.binance.trade;
+package com.bugbycode.binance.rest.trade;
 
 import java.util.List;
 

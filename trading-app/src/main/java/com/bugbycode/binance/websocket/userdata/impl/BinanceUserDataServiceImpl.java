@@ -1,4 +1,4 @@
-package com.bugbycode.binance.userdata.impl;
+package com.bugbycode.binance.websocket.userdata.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,7 +11,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bugbycode.binance.userdata.BinanceUserDataService;
+import com.bugbycode.binance.websocket.userdata.BinanceUserDataService;
 import com.bugbycode.module.Method;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;

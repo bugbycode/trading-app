@@ -1,4 +1,4 @@
-package com.bugbycode.binance.userdata;
+package com.bugbycode.binance.websocket.userdata;
 
 import java.util.List;
 

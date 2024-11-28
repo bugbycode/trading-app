@@ -1,4 +1,4 @@
-package com.bugbycode.binance.trade.impl;
+package com.bugbycode.binance.rest.trade.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.bugbycode.binance.trade.BinanceTradeService;
+import com.bugbycode.binance.rest.trade.BinanceTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.BinanceOrderInfo;
