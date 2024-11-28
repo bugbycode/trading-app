@@ -64,4 +64,18 @@ public interface BinanceWebsocketTradeService {
 	 * @return
 	 */
 	public String availableBalance(String apiKey, String secretKey, String asset);
+	
+	/**
+	 * 合约市价开仓
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @param ps 持仓方向 LONG/SHORT
+	 * @param quantity 委托数量
+	 * @param stopLoss 止损价
+	 * @param takeProfit 止盈价
+	 * @return
+	 */
+	public List<BinanceOrderInfo> tradeMarket(String binanceApiKey,String binanceSecretKey,String symbol,PositionSide ps,
+			BigDecimal quantity,BigDecimal stopLoss,BigDecimal takeProfit);
 }

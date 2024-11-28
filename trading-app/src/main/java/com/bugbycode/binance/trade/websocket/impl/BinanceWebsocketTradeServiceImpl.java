@@ -227,10 +227,13 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		
 		method.put("params", params);
 		
+		logger.info(method);
+		
 		websocketApi.sendMessage(method);
 		
 		JSONObject result = websocketApi.read(method.getString("id"));
 		if(result.getInt("status") == 200 && result.has("result")) {
+			logger.info(result);
 			JSONObject o = result.getJSONObject("result");
 			if(o.has("avgPrice")) {
 				order.setAvgPrice(o.getString("avgPrice"));
@@ -279,7 +282,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				order.setGoodTillDate(o.getLong("goodTillDate"));
 			}
 		} else {
-			logger.error(result);
+			throw new RuntimeException(result.toString());
 		}
 		return order;
 	}
@@ -295,6 +298,52 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			}
 		}
 		return balance == null ? "0.0" : balance.getAvailableBalance();
+	}
+
+	@Override
+	public List<BinanceOrderInfo> tradeMarket(String binanceApiKey, String binanceSecretKey, String symbol,
+			PositionSide ps, BigDecimal quantity, BigDecimal stopLoss, BigDecimal takeProfit) {
+		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
+		if(ps == PositionSide.LONG) {//做多
+			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey, 
+			        symbol, Side.BUY, PositionSide.LONG, Type.MARKET, 
+			        null, quantity, null, 
+			        null, null, null);
+			
+			BinanceOrderInfo slOrder = order_place(binanceApiKey, binanceSecretKey, 
+			        symbol, Side.SELL, PositionSide.LONG, Type.STOP_MARKET, 
+			        null, new BigDecimal(order.getOrigQty()), null, 
+			        stopLoss, true, WorkingType.CONTRACT_PRICE);
+			
+			BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey, 
+			        symbol, Side.SELL, PositionSide.LONG, Type.TAKE_PROFIT_MARKET, 
+			        null, new BigDecimal(order.getOrigQty()), null, 
+			        takeProfit, true, WorkingType.CONTRACT_PRICE);
+			
+			orders.add(order);
+			orders.add(slOrder);
+			orders.add(tpOrder);
+			
+		} else {//做空
+			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey, 
+			        symbol, Side.SELL, PositionSide.SHORT, Type.MARKET, 
+			        null, quantity, null, 
+			        null, null, null);
+			
+			BinanceOrderInfo slOrder = order_place(binanceApiKey, binanceSecretKey, 
+			        symbol, Side.BUY, PositionSide.SHORT, Type.STOP_MARKET, 
+			        null, new BigDecimal(order.getOrigQty()), null, 
+			        stopLoss, true, WorkingType.CONTRACT_PRICE);
+			
+			BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey, 
+			        symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
+			        null, new BigDecimal(order.getOrigQty()), null, 
+			        takeProfit, true, WorkingType.CONTRACT_PRICE);
+			orders.add(order);
+			orders.add(slOrder);
+			orders.add(tpOrder);
+		}
+		return orders;
 	}
 
 }
