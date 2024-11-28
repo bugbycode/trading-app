@@ -444,6 +444,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("price", price);//委托价
 			params.put("stopPrice", stopPrice);//触发价
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
+			params.put("timeInForce", "GTE_GTC");
 		} else if(type == Type.STOP_MARKET) { //市价止损
 			params.put("symbol", symbol);
 			params.put("side", side);
@@ -455,6 +456,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("stopPrice", stopPrice);//触发价
 			params.put("closePosition", closePosition);//市价止损是否全部平仓
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
+			params.put("timeInForce", "GTE_GTC");
 		} else if(type == Type.TAKE_PROFIT) {//限价止盈
 			params.put("symbol", symbol);
 			params.put("side", side);
@@ -467,6 +469,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("price", price);//委托价格
 			params.put("stopPrice", stopPrice);//触发价
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
+			params.put("timeInForce", "GTE_GTC");
 		} else if(type == Type.TAKE_PROFIT_MARKET) {//市价止盈
 			params.put("symbol", symbol);
 			params.put("side", side);
@@ -479,6 +482,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("stopPrice", stopPrice);//触发价
 			params.put("closePosition", closePosition);//市价止损是否全部平仓
 			params.put("workingType", workingType);
+			params.put("timeInForce", "GTE_GTC");
 		}
 		params.put("timestamp", new Date().getTime());
 		
