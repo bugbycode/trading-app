@@ -1,6 +1,10 @@
 package com.bugbycode.service.user;
 
+import java.util.List;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
+
+import com.bugbycode.module.user.User;
 
 /**
  * 用户信息管理
@@ -42,4 +46,12 @@ public interface UserService extends UserDetailsService{
 	 * @return
 	 */
 	public String getAllUserEmail();
+	
+	/**
+	 * 根据自动交易启用状态查询所有关联用户信息
+	 * 
+	 * @param autoTrade
+	 * @return
+	 */
+	public List<User> queryByAutoTrade(int autoTrade);
 }

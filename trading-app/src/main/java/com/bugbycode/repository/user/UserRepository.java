@@ -89,4 +89,12 @@ public interface UserRepository {
 	 * @param autoTrade
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade);
+	
+	/**
+	 * 根据自动交易启用状态查询所有关联用户信息
+	 * 
+	 * @param autoTrade
+	 * @return
+	 */
+	public List<User> queryByAutoTrade(int autoTrade);
 }

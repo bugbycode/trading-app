@@ -93,5 +93,10 @@ public class UserRepositoryImpl implements UserRepository {
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
+	@Override
+	public List<User> queryByAutoTrade(int autoTrade) {
+		return template.find(Query.query(Criteria.where("autoTrade").is(autoTrade)), User.class);
+	}
+
 	
 }

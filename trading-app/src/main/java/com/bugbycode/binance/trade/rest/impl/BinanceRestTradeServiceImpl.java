@@ -28,6 +28,7 @@ import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.Leverage;
 import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.Result;
+import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
@@ -715,6 +716,45 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		}
 		
 		return blanceList;
+	}
+
+	@Override
+	public List<SymbolConfig> getSymbolConfig(String binanceApiKey, String binanceSecretKey, String symbol) {
+		
+		List<SymbolConfig> scList = new ArrayList<SymbolConfig>();
+		
+		String queryString = String.format("symbol=%s&timestamp=%s", symbol, new Date().getTime());
+		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		queryString += "&signature=" + signature;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-MBX-APIKEY", binanceApiKey);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		
+		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/symbolConfig?" + queryString, HttpMethod.GET, entity, String.class);
+		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
+		if(status == HttpStatus.OK) {
+			JSONArray array = new JSONArray(result.getBody());
+			array.forEach(obj -> {
+				JSONObject o = (JSONObject) obj;
+				SymbolConfig sc = new SymbolConfig(symbol, o.getString("marginType"), o.getBoolean("isAutoAddMargin"), o.getInt("leverage"), o.getString("maxNotionalValue"));
+				scList.add(sc);
+			});
+			return scList;
+		} else {
+			throw new RuntimeException(result.getBody());
+		}
+	}
+
+	@Override
+	public SymbolConfig getSymbolConfigBySymbol(String binanceApiKey, String binanceSecretKey, String symbol) {
+		List<SymbolConfig> scList = getSymbolConfig(binanceApiKey, binanceSecretKey, symbol);
+		for(SymbolConfig sc : scList) {
+			if(sc.getSymbol().equals(symbol)) {
+				return sc;
+			}
+		}
+		return null;
 	}
 
 }

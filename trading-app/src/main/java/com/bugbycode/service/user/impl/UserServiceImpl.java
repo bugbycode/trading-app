@@ -80,4 +80,9 @@ public class UserServiceImpl implements UserService{
 		List <User> userList = userRepository.queryAllUser();
 		return getSubscribeAiUserEmail(userList);
 	}
+
+	@Override
+	public List<User> queryByAutoTrade(int autoTrade) {
+		return userRepository.queryByAutoTrade(autoTrade);
+	}
 }

@@ -8,10 +8,30 @@ public enum MarginType {
 	/**
 	 * 逐仓
 	 */
-	ISOLATED,
+	ISOLATED("ISOLATED"),
 	
 	/**
 	 * 全仓
 	 */
-	CROSSED
+	CROSSED("ISOLATED");
+
+	private String value;
+	
+	MarginType(String value) {
+		this.value = value;
+	}
+	
+	public String value() {
+		return this.value;
+	}
+	
+	public static MarginType resolve(String value) {
+		MarginType[] arr = values();
+		for(MarginType type : arr) {
+			if(type.value().equals(value)) {
+				return type;
+			}
+		}
+		return ISOLATED;
+	}
 }

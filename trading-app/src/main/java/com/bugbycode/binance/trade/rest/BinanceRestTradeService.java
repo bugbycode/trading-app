@@ -8,6 +8,7 @@ import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.Leverage;
 import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.Result;
+import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
@@ -163,5 +164,22 @@ public interface BinanceRestTradeService {
 	 */
 	public List<Balance> balance_v2(String binanceApiKey,String binanceSecretKey);
 	
+	/**
+	 * 交易对配置 (USER_DATA) 查询交易对上的基础配置
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol
+	 * @return
+	 */
+	public List<SymbolConfig> getSymbolConfig(String binanceApiKey,String binanceSecretKey,String symbol);
+	
+	/**
+	 * 交易对配置 (USER_DATA) 查询交易对上的基础配置
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol
+	 * @return
+	 */
+	public SymbolConfig getSymbolConfigBySymbol(String binanceApiKey,String binanceSecretKey,String symbol);
 	
 }
