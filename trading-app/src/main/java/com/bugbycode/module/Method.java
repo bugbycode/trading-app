@@ -1,5 +1,8 @@
 package com.bugbycode.module;
 
+/**
+ * Websocket api方法枚举信息
+ */
 public enum Method {
 	
 	/**
@@ -15,7 +18,12 @@ public enum Method {
 	/**
 	 * 最新价格
 	 */
-	TICKER_PRICE("ticker.price");
+	TICKER_PRICE("ticker.price"),
+	
+	/**
+	 * 下单 (TRADE)
+	 */
+	ORDER_PLACE("order.place");
 
 	private String value;
 	
