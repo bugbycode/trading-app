@@ -60,6 +60,7 @@ public interface BinanceWebsocketTradeService {
 	 * 获取可下单余额
 	 * @param apiKey
 	 * @param secretKey
+	 * @param asset 资产类型 如：USDT、BTC
 	 * @return
 	 */
 	public String availableBalance(String apiKey, String secretKey, String asset);
