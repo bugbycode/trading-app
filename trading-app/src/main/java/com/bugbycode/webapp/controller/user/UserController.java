@@ -118,6 +118,9 @@ public class UserController extends BaseController{
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
 			user.setAutoTrade(data.getAutoTrade());
+			user.setBaseStepSize(data.getBaseStepSize());
+			user.setLeverage(data.getLeverage());
+			user.setPositionValue(data.getPositionValue());
 			
 			json.put("message", "修改成功");
 		} else if(!CollectionUtils.isEmpty(balanceList)) {
@@ -127,6 +130,9 @@ public class UserController extends BaseController{
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
 			user.setAutoTrade(data.getAutoTrade());
+			user.setBaseStepSize(data.getBaseStepSize());
+			user.setLeverage(data.getLeverage());
+			user.setPositionValue(data.getPositionValue());
 			
 			json.put("message", "修改成功");
 		} else {
