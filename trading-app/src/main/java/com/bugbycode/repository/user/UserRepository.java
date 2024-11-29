@@ -86,9 +86,13 @@ public interface UserRepository {
 	 * @param username 用户名
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
-	 * @param autoTrade
+	 * @param autoTrade 是否开启自动交易
+	 * @param baseStepSize 名义价值倍数
+	 * @param leverage 杠杆倍数
+	 * @param positionValue 持仓价值
 	 */
-	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade);
+	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
+			int baseStepSize,int leverage,int positionValue);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

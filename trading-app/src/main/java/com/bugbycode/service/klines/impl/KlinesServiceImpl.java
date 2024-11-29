@@ -811,12 +811,6 @@ public class KlinesServiceImpl implements KlinesService {
 										}
 									}
 									
-									String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
-									if(Double.valueOf(availableBalanceStr) < 10) {
-										logger.info("用户" + u.getUsername() + "可下单金额小于10USDT");
-										continue;
-									}
-									
 									List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
 									if(!CollectionUtils.isEmpty(orderList)) {
 										logger.info("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
@@ -835,38 +829,64 @@ public class KlinesServiceImpl implements KlinesService {
 									}
 									
 									int leverage = sc.getLeverage();
+									
 									logger.info(pair + "当前杠杆倍数：" + leverage + "倍");
-									if(leverage != 10) {
+									if(leverage != u.getLeverage()) {
 										logger.info("开始修改" + pair + "杠杆倍数");
-										binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, 10);
+										binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, u.getLeverage());
 									}
+									
 									PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
+									
 									if(priceInfo == null) {
 										continue;
 									}
 									
-									int decimalNum = new BigDecimal(priceInfo.getPrice()).scale();
+									int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
 									
 									//最少下单数量
 									String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
 									
-									if(Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) > 50) {
-										logger.info("最少下单数量仓位价值超过50USDT");
+									BigDecimal quantity = new BigDecimal(quantityNum);
+									quantity = quantity.multiply(new BigDecimal(u.getBaseStepSize()));
+									
+									//持仓价值
+									double order_value = Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice());
+									
+									if(order_value > u.getPositionValue()) {
+										logger.info("最少下单数量仓位价值超过" + u.getPositionValue() + "USDT");
 										return;
 									}
 									
-									BigDecimal quantity = new BigDecimal(quantityNum);
+									String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
+									if(Double.valueOf(availableBalanceStr) < (order_value * 2)) {
+										logger.info("用户" + u.getUsername() + "可下单金额小于" + (order_value * 2) + "USDT");
+										continue;
+									}
+									
 									BigDecimal stopLoss = new BigDecimal(
 											PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v2(Double.valueOf(priceInfo.getPrice())),decimalNum));
 									BigDecimal takeProfit = new BigDecimal(
 											PriceUtil.formatDoubleDecimal(fib.getFibValue(FibCode.FIB618),decimalNum)
 													);
 									
-									binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
+									List<BinanceOrderInfo> orders = binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
 									
 									String subject_ = pair + "多头仓位已下单完成 " + dateStr;
 									String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
 											fib.getFibValue(FibCode.FIB618), decimalNum);
+									
+									StringBuffer buf = new StringBuffer();
+									orders.forEach(o -> {
+										buf.append(o.getRequestData());
+										buf.append("\r\n");
+										buf.append(o.getResponseData());
+										buf.append("\r\n");
+									});
+									
+									if(buf.length() > 0) {
+										text_ += "\r\n" + buf.toString();
+									}
 									
 									sendEmail(subject_, text_, tradeUserEmail);
 								} catch (Exception e) {
@@ -914,12 +934,6 @@ public class KlinesServiceImpl implements KlinesService {
 										}
 									}
 									
-									String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
-									if(Double.valueOf(availableBalanceStr) < 10) {
-										logger.info("用户" + u.getUsername() + "可下单金额小于10USDT");
-										continue;
-									}
-									
 									List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
 									if(!CollectionUtils.isEmpty(orderList)) {
 										logger.info("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
@@ -941,26 +955,39 @@ public class KlinesServiceImpl implements KlinesService {
 									
 									logger.info(pair + "当前杠杆倍数：" + leverage + "倍");
 									
-									if(leverage != 10) {
+									if(leverage != u.getLeverage()) {
 										logger.info("开始修改" + pair + "杠杆倍数");
-										binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, 10);
+										binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, u.getLeverage());
 									}
+									
 									PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
+									
 									if(priceInfo == null) {
 										continue;
 									}
 									
-									int decimalNum = new BigDecimal(priceInfo.getPrice()).scale();
+									int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
 									
 									//最少下单数量
 									String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
 									
-									if(Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) > 50) {
-										logger.info("最少下单数量仓位价值超过50USDT");
+									BigDecimal quantity = new BigDecimal(quantityNum);
+									quantity = quantity.multiply(new BigDecimal(u.getBaseStepSize()));
+									
+									//持仓价值
+									double order_value = Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice());
+									
+									if(order_value > u.getPositionValue()) {
+										logger.info("最少下单数量仓位价值超过" + u.getPositionValue() + "USDT");
 										return;
 									}
 									
-									BigDecimal quantity = new BigDecimal(quantityNum);
+									String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
+									if(Double.valueOf(availableBalanceStr) < (order_value * 2)) {
+										logger.info("用户" + u.getUsername() + "可下单金额小于" + (order_value * 2) + "USDT");
+										continue;
+									}
+									
 									BigDecimal stopLoss = new BigDecimal(
 											PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v2(Double.valueOf(priceInfo.getPrice())), decimalNum)
 													);
@@ -968,11 +995,23 @@ public class KlinesServiceImpl implements KlinesService {
 											PriceUtil.formatDoubleDecimal(fib.getFibValue(FibCode.FIB618),decimalNum)
 													);
 									
-									binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
+									List<BinanceOrderInfo> orders = binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 									
 									String subject_ = pair + "空头仓位已下单完成 " + dateStr;
 									String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
 											fib.getFibValue(FibCode.FIB618), decimalNum);
+									
+									StringBuffer buf = new StringBuffer();
+									orders.forEach(o -> {
+										buf.append(o.getRequestData());
+										buf.append("\r\n");
+										buf.append(o.getResponseData());
+										buf.append("\r\n");
+									});
+									
+									if(buf.length() > 0) {
+										text_ += "\r\n" + buf.toString();
+									}
 									
 									sendEmail(subject_, text_, tradeUserEmail);
 								} catch (Exception e) {

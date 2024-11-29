@@ -42,6 +42,12 @@ public class User implements UserDetails {
 	
 	private int autoTrade = 0; //是否启用自动交易 0：否 1：是
 	
+	private int baseStepSize = 1;//名义价值倍数
+	
+	private int leverage = 10;//杠杆倍数
+	
+	private int positionValue = 50;//持仓价值
+	
 	public String getId() {
 		return id;
 	}
@@ -137,6 +143,30 @@ public class User implements UserDetails {
 
 	public void setAutoTrade(int autoTrade) {
 		this.autoTrade = autoTrade;
+	}
+
+	public int getBaseStepSize() {
+		return baseStepSize;
+	}
+
+	public void setBaseStepSize(int baseStepSize) {
+		this.baseStepSize = baseStepSize;
+	}
+
+	public int getLeverage() {
+		return leverage;
+	}
+
+	public void setLeverage(int leverage) {
+		this.leverage = leverage;
+	}
+
+	public int getPositionValue() {
+		return positionValue;
+	}
+
+	public void setPositionValue(int positionValue) {
+		this.positionValue = positionValue;
 	}
 
 	public void copy(User user) {

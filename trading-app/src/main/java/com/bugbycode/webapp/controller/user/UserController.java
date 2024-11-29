@@ -112,7 +112,8 @@ public class UserController extends BaseController{
 		
 		if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && data.getAutoTrade() == 0) {
 			
-			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade());
+			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade(),
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -120,7 +121,8 @@ public class UserController extends BaseController{
 			
 			json.put("message", "修改成功");
 		} else if(!CollectionUtils.isEmpty(balanceList)) {
-			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade());
+			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade(),
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());

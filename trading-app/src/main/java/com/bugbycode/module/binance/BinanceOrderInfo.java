@@ -63,6 +63,10 @@ public class BinanceOrderInfo {
 	private String activatePrice;// 跟踪止损激活价格, 仅`TRAILING_STOP_MARKET` 订单返回此字段
 	
 	private String priceRate;// 跟踪止损回调比例, 仅`TRAILING_STOP_MARKET` 订单返回此字段
+	
+	private String requestData;//下单请求数据
+	
+	private String responseData;//下单响应数据
 
 	public String getId() {
 		return id;
@@ -286,6 +290,22 @@ public class BinanceOrderInfo {
 
 	public void setPriceRate(String priceRate) {
 		this.priceRate = priceRate;
+	}
+
+	public String getRequestData() {
+		return requestData;
+	}
+
+	public void setRequestData(String requestData) {
+		this.requestData = requestData;
+	}
+
+	public String getResponseData() {
+		return responseData;
+	}
+
+	public void setResponseData(String responseData) {
+		this.responseData = responseData;
 	}
 	
 }
