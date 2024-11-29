@@ -647,6 +647,26 @@ public class PriceUtil {
 		return price + (price * 0.06);
 	}
 	
+	/**
+	 * 修正多头止损价 V3
+	 * @param price 参考价
+	 * @param cutLoss 止损百分比值
+	 * @return
+	 */
+	public static double rectificationCutLossLongPrice_v3(double price,int cutLoss) {
+		return price - (price * (cutLoss * 0.01));
+	}
+	
+	/**
+	 * 修正空头止损价 V3
+	 * @param price 参考价
+	 * @param cutLoss 止损百分比值
+	 * @return
+	 */
+	public static double rectificationCutLossShortPrice_v3(double price,int cutLoss) {
+		return price + (price * (cutLoss * 0.01));
+	}
+	
 	
 	/**
 	 * 获取起始k线之后的最低价k线信息

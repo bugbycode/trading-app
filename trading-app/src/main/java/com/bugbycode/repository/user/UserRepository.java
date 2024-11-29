@@ -90,9 +90,10 @@ public interface UserRepository {
 	 * @param baseStepSize 名义价值倍数
 	 * @param leverage 杠杆倍数
 	 * @param positionValue 持仓价值
+	 * @param cutLoss 止损比例
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue);
+			int baseStepSize,int leverage,int positionValue,int cutLoss);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

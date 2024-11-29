@@ -86,7 +86,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue) {
+			int baseStepSize,int leverage,int positionValue, int cutLoss) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
@@ -94,6 +94,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("baseStepSize", baseStepSize);
 		update.set("leverage", leverage);
 		update.set("positionValue", positionValue);
+		update.set("cutLoss", cutLoss);
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 

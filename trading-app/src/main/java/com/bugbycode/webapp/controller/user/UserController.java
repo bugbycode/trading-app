@@ -113,7 +113,7 @@ public class UserController extends BaseController{
 		if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && data.getAutoTrade() == 0) {
 			
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue());
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -121,11 +121,12 @@ public class UserController extends BaseController{
 			user.setBaseStepSize(data.getBaseStepSize());
 			user.setLeverage(data.getLeverage());
 			user.setPositionValue(data.getPositionValue());
+			user.setCutLoss(data.getCutLoss());
 			
 			json.put("message", "修改成功");
 		} else if(!CollectionUtils.isEmpty(balanceList)) {
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue());
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -133,6 +134,7 @@ public class UserController extends BaseController{
 			user.setBaseStepSize(data.getBaseStepSize());
 			user.setLeverage(data.getLeverage());
 			user.setPositionValue(data.getPositionValue());
+			user.setCutLoss(data.getCutLoss());
 			
 			json.put("message", "修改成功");
 		} else {
