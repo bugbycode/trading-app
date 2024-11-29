@@ -78,4 +78,11 @@ public interface BinanceWebsocketTradeService {
 	 */
 	public List<BinanceOrderInfo> tradeMarket(String binanceApiKey,String binanceSecretKey,String symbol,PositionSide ps,
 			BigDecimal quantity,BigDecimal stopLoss,BigDecimal takeProfit);
+	
+	/**
+	 * 获取市价单最少下单数量
+	 * @param symbol 交易对
+	 * @return
+	 */
+	public String getMarketMinQuantity(String symbol);
 }

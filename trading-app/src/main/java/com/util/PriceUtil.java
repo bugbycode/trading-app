@@ -629,6 +629,24 @@ public class PriceUtil {
 		return price + (price * 0.03);
 	}
 	
+	/**
+	 * 修正多头止损价 V2
+	 * @param price
+	 * @return
+	 */
+	public static double rectificationCutLossLongPrice_v2(double price) {
+		return price - (price * 0.06);
+	}
+	
+	/**
+	 * 修正空头止损价 V2
+	 * @param price
+	 * @return
+	 */
+	public static double rectificationCutLossShortPrice_v2(double price) {
+		return price + (price * 0.06);
+	}
+	
 	
 	/**
 	 * 获取起始k线之后的最低价k线信息

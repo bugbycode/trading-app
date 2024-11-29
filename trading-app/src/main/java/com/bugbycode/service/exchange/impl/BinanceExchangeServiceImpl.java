@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 
 @Service("binanceExchangeService")
@@ -35,8 +36,30 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 					JSONObject symbolJson = (JSONObject) item;
 					String contractType = symbolJson.getString("contractType");
 					String status = symbolJson.getString("status");
+					String symbol = symbolJson.getString("symbol");
+					JSONArray filters = symbolJson.getJSONArray("filters");
 					if("PERPETUAL".equals(contractType) && "TRADING".equals(status)) {
-						pairs.add(symbolJson.getString("symbol"));
+						pairs.add(symbol);
+						SymbolExchangeInfo info = new SymbolExchangeInfo();
+						info.setSymbol(symbol);
+						
+						filters.forEach(filter -> {
+							JSONObject f = (JSONObject) filter;
+							String filterType = f.getString("filterType");
+							if("LOT_SIZE".equals(filterType)) {//限价单交易规则
+								info.setLot_stepSize(f.getDouble("stepSize"));
+								info.setLot_minQty(f.getDouble("minQty"));
+								info.setLot_maxQty(f.getDouble("maxQty"));
+							} else if("MARKET_LOT_SIZE".equals(filterType)) {//市价单交易规则
+								info.setLot_market_stepSize(f.getDouble("stepSize"));
+								info.setLot_market_minQty(f.getDouble("minQty"));
+								info.setLot_market_maxQty(f.getDouble("maxQty"));
+							} else if("MIN_NOTIONAL".equals(filterType)) {//最小名义价值
+								info.setMin_notional(f.getDouble("notional"));
+							}
+						});
+						
+						AppConfig.SYMBOL_EXCHANGE_INFO.put(symbol, info);
 					}
 				}
 			});

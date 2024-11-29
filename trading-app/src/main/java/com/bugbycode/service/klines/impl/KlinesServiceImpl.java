@@ -32,10 +32,12 @@ import com.bugbycode.module.LongOrShortType;
 import com.bugbycode.module.PriceFibInfo;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.PriceInfo;
+import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.result.DeclineAndStrength;
 import com.bugbycode.module.trading.PositionSide;
@@ -795,6 +797,20 @@ public class KlinesServiceImpl implements KlinesService {
 								String binanceSecretKey = u.getBinanceSecretKey();
 								String tradeUserEmail = u.getUsername();
 								try {
+									
+									boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
+									logger.info("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
+									if(!dualSidePosition) {
+										logger.info("开始修改持仓模式为双向持仓");
+										Result result = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey, true);
+										if(result.getResult() == ResultCode.SUCCESS) {
+											logger.info("修改持仓模式成功");
+										} else {
+											logger.info("修改持仓模式失败，失败原因：" + result.getMsg());
+											sendEmail("修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
+										}
+									}
+									
 									String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 									if(Double.valueOf(availableBalanceStr) < 10) {
 										logger.info("用户" + u.getUsername() + "可下单金额小于10USDT");
@@ -808,12 +824,20 @@ public class KlinesServiceImpl implements KlinesService {
 									}
 									
 									SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
+									
 									MarginType marginType = MarginType.resolve(sc.getMarginType());
+									
+									logger.info(pair + "当前保证金模式：" + marginType);
+									
 									if(marginType != MarginType.ISOLATED) {
+										logger.info("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 										binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 									}
+									
 									int leverage = sc.getLeverage();
+									logger.info(pair + "当前杠杆倍数：" + leverage + "倍");
 									if(leverage != 10) {
+										logger.info("开始修改" + pair + "杠杆倍数");
 										binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, 10);
 									}
 									PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -821,15 +845,28 @@ public class KlinesServiceImpl implements KlinesService {
 										continue;
 									}
 									
-									BigDecimal quantity = new BigDecimal(PriceUtil.formatDoubleDecimal(11 / Double.valueOf(priceInfo.getPrice()), lastKlines.getDecimalNum()));
-									BigDecimal stopLoss = new BigDecimal(PriceUtil.rectificationCutLossLongPrice(fib.getFibValue(FibCode.FIB0)));
-									BigDecimal takeProfit = new BigDecimal(fib.getFibValue(FibCode.FIB618));
+									int decimalNum = new BigDecimal(priceInfo.getPrice()).scale();
+									
+									//最少下单数量
+									String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
+									
+									if(Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) > 50) {
+										logger.info("最少下单数量仓位价值超过50USDT");
+										return;
+									}
+									
+									BigDecimal quantity = new BigDecimal(quantityNum);
+									BigDecimal stopLoss = new BigDecimal(
+											PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v2(Double.valueOf(priceInfo.getPrice())),decimalNum));
+									BigDecimal takeProfit = new BigDecimal(
+											PriceUtil.formatDoubleDecimal(fib.getFibValue(FibCode.FIB618),decimalNum)
+													);
 									
 									binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
 									
 									String subject_ = pair + "多头仓位已下单完成 " + dateStr;
 									String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
-											fib.getFibValue(FibCode.FIB618), lastKlines.getDecimalNum());
+											fib.getFibValue(FibCode.FIB618), decimalNum);
 									
 									sendEmail(subject_, text_, tradeUserEmail);
 								} catch (Exception e) {
@@ -863,6 +900,20 @@ public class KlinesServiceImpl implements KlinesService {
 								String binanceSecretKey = u.getBinanceSecretKey();
 								String tradeUserEmail = u.getUsername();
 								try {
+									
+									boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
+									logger.info("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
+									if(!dualSidePosition) {
+										logger.info("开始修改持仓模式为双向持仓");
+										Result result = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey, true);
+										if(result.getResult() == ResultCode.SUCCESS) {
+											logger.info("修改持仓模式成功");
+										} else {
+											logger.info("修改持仓模式失败，失败原因：" + result.getMsg());
+											sendEmail("修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
+										}
+									}
+									
 									String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 									if(Double.valueOf(availableBalanceStr) < 10) {
 										logger.info("用户" + u.getUsername() + "可下单金额小于10USDT");
@@ -876,12 +927,22 @@ public class KlinesServiceImpl implements KlinesService {
 									}
 									
 									SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
+									
 									MarginType marginType = MarginType.resolve(sc.getMarginType());
+
+									logger.info(pair + "当前保证金模式：" + marginType);
+									
 									if(marginType != MarginType.ISOLATED) {
+										logger.info("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 										binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 									}
+									
 									int leverage = sc.getLeverage();
+									
+									logger.info(pair + "当前杠杆倍数：" + leverage + "倍");
+									
 									if(leverage != 10) {
+										logger.info("开始修改" + pair + "杠杆倍数");
 										binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, 10);
 									}
 									PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -889,15 +950,29 @@ public class KlinesServiceImpl implements KlinesService {
 										continue;
 									}
 									
-									BigDecimal quantity = new BigDecimal(PriceUtil.formatDoubleDecimal(11 / Double.valueOf(priceInfo.getPrice()), lastKlines.getDecimalNum()));
-									BigDecimal stopLoss = new BigDecimal(PriceUtil.rectificationCutLossShortPrice(fib.getFibValue(FibCode.FIB0)));
-									BigDecimal takeProfit = new BigDecimal(fib.getFibValue(FibCode.FIB618));
+									int decimalNum = new BigDecimal(priceInfo.getPrice()).scale();
+									
+									//最少下单数量
+									String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
+									
+									if(Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) > 50) {
+										logger.info("最少下单数量仓位价值超过50USDT");
+										return;
+									}
+									
+									BigDecimal quantity = new BigDecimal(quantityNum);
+									BigDecimal stopLoss = new BigDecimal(
+											PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v2(Double.valueOf(priceInfo.getPrice())), decimalNum)
+													);
+									BigDecimal takeProfit = new BigDecimal(
+											PriceUtil.formatDoubleDecimal(fib.getFibValue(FibCode.FIB618),decimalNum)
+													);
 									
 									binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 									
 									String subject_ = pair + "空头仓位已下单完成 " + dateStr;
 									String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
-											fib.getFibValue(FibCode.FIB618), lastKlines.getDecimalNum());
+											fib.getFibValue(FibCode.FIB618), decimalNum);
 									
 									sendEmail(subject_, text_, tradeUserEmail);
 								} catch (Exception e) {

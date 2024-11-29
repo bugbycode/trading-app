@@ -1,9 +1,13 @@
 package com.bugbycode.config;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.bugbycode.module.EmailAuth;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 
 public class AppConfig {
 	
@@ -26,6 +30,9 @@ public class AppConfig {
 	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
 	
 	private static int EMAIL_AUTH_USE_OFFSET = 0;//邮件认证使用
+	
+	//交易对交易规则
+	public static Map<String,SymbolExchangeInfo> SYMBOL_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, SymbolExchangeInfo>());
 	
 	public static EmailAuth getEmailAuth() {
 		return EMAIL_AUTH.get(EMAIL_AUTH_USE_OFFSET);

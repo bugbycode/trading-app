@@ -13,7 +13,7 @@ public enum MarginType {
 	/**
 	 * 全仓
 	 */
-	CROSSED("ISOLATED");
+	CROSSED("CROSSED");
 
 	private String value;
 	

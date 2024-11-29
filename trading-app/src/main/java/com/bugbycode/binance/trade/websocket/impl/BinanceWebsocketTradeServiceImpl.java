@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Method;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.PriceInfo;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
@@ -282,7 +284,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				order.setGoodTillDate(o.getLong("goodTillDate"));
 			}
 		} else {
-			throw new RuntimeException(result.toString());
+			throw new RuntimeException(type + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString());
 		}
 		return order;
 	}
@@ -344,6 +346,16 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			orders.add(tpOrder);
 		}
 		return orders;
+	}
+
+	@Override
+	public String getMarketMinQuantity(String symbol) {
+		PriceInfo price = getPrice(symbol);
+		SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(symbol);
+		if(info == null) {
+			return "0";
+		}
+		return info.getMarketMinQuantity(Double.valueOf(price.getPrice()));
 	}
 
 }
