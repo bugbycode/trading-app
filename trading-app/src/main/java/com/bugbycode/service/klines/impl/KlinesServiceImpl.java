@@ -312,7 +312,7 @@ public class KlinesServiceImpl implements KlinesService {
 								//计算预计盈利百分比
 								double profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
 								//盈利太少则不做交易
-								if(profitPercent < u.getProfit()) {
+								if((profitPercent * 100) < u.getProfit()) {
 									logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
 									return;
 								}
@@ -501,7 +501,7 @@ public class KlinesServiceImpl implements KlinesService {
 								//计算预计盈利百分比
 								double profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
 								//盈利太少则不做交易
-								if(profitPercent < u.getProfit()) {
+								if((profitPercent * 100) < u.getProfit()) {
 									logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
 									return;
 								}
