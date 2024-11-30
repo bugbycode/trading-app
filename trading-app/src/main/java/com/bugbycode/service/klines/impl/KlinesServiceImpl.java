@@ -309,11 +309,23 @@ public class KlinesServiceImpl implements KlinesService {
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(fibInfo.getTakeProfit(offset, codes)),decimalNum)
 												);
 								
+								//计算预计盈利百分比
+								double profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+								//盈利太少则不做交易
+								if(profitPercent < 0.028) {
+									logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+									return;
+								}
+								
 								List<BinanceOrderInfo> orders = binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
 								
 								String subject_ = pair + "多头仓位已下单完成 " + dateStr;
 								String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
 										fibInfo.getFibValue(fibInfo.getTakeProfit(offset, codes)), decimalNum);
+								
+								text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
+								
+								text_ += "\r\n" + fibInfo.toString();
 								
 								StringBuffer buf = new StringBuffer();
 								orders.forEach(o -> {
@@ -484,11 +496,23 @@ public class KlinesServiceImpl implements KlinesService {
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(fibInfo.getTakeProfit(offset, codes)),decimalNum)
 												);
 								
+								//计算预计盈利百分比
+								double profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+								//盈利太少则不做交易
+								if(profitPercent < 0.028) {
+									logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+									return;
+								}
+								
 								List<BinanceOrderInfo> orders = binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 								
 								String subject_ = pair + "空头仓位已下单完成 " + dateStr;
 								String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
 										fibInfo.getFibValue(fibInfo.getTakeProfit(offset, codes)), decimalNum);
+								
+								text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
+								
+								text_ += "\r\n" + fibInfo.toString();
 								
 								StringBuffer buf = new StringBuffer();
 								orders.forEach(o -> {
