@@ -50,6 +50,8 @@ public class User implements UserDetails {
 	
 	private int cutLoss = 3;//止损比例
 	
+	private int profit = 3;//收益筛选
+	
 	public String getId() {
 		return id;
 	}
@@ -177,6 +179,14 @@ public class User implements UserDetails {
 
 	public void setCutLoss(int cutLoss) {
 		this.cutLoss = cutLoss;
+	}
+
+	public int getProfit() {
+		return profit;
+	}
+
+	public void setProfit(int profit) {
+		this.profit = profit;
 	}
 
 	public void copy(User user) {

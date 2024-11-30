@@ -99,6 +99,14 @@ public class UserController extends BaseController{
 		ResultCode code = ResultCode.SUCCESS;
 		JSONObject json = new JSONObject();
 		
+		if(data.getCutLoss() == 0) {
+			data.setCutLoss(3);
+		}
+		
+		if(data.getProfit() == 0) {
+			data.setProfit(3);
+		}
+		
 		User user = getUserInfo();
 		
 		User dbUser = userRepository.queryByUsername(user.getUsername());
@@ -113,7 +121,7 @@ public class UserController extends BaseController{
 		if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && data.getAutoTrade() == 0) {
 			
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss());
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -122,11 +130,12 @@ public class UserController extends BaseController{
 			user.setLeverage(data.getLeverage());
 			user.setPositionValue(data.getPositionValue());
 			user.setCutLoss(data.getCutLoss());
+			user.setProfit(data.getProfit());
 			
 			json.put("message", "修改成功");
 		} else if(!CollectionUtils.isEmpty(balanceList)) {
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss());
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -135,6 +144,7 @@ public class UserController extends BaseController{
 			user.setLeverage(data.getLeverage());
 			user.setPositionValue(data.getPositionValue());
 			user.setCutLoss(data.getCutLoss());
+			user.setProfit(data.getProfit());
 			
 			json.put("message", "修改成功");
 		} else {
