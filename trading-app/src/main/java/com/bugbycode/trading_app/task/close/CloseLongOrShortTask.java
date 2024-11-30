@@ -24,13 +24,13 @@ public class CloseLongOrShortTask implements Runnable {
 
 	@Override
 	public void run() {
-		logger.info("CloseLongOrShortTask.run() start.");
+		//logger.info("CloseLongOrShortTask.run() start.");
 		try {
 			klinesService.closeOrder(klines);
 		}catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		logger.info("CloseLongOrShortTask.run() end.");
+		//logger.info("CloseLongOrShortTask.run() end.");
 	}
 
 }

@@ -317,7 +317,9 @@ public class KlinesServiceImpl implements KlinesService {
 									return;
 								}
 								
-								List<BinanceOrderInfo> orders = binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
+								//List<BinanceOrderInfo> orders = binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
+								
+								binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
 								
 								String subject_ = pair + "多头仓位已下单完成 " + dateStr;
 								String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
@@ -326,7 +328,7 @@ public class KlinesServiceImpl implements KlinesService {
 								text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 								
 								text_ += "\r\n" + fibInfo.toString();
-								
+								/*
 								StringBuffer buf = new StringBuffer();
 								orders.forEach(o -> {
 									buf.append(o.getRequestData());
@@ -337,7 +339,7 @@ public class KlinesServiceImpl implements KlinesService {
 								
 								if(buf.length() > 0) {
 									text_ += "\r\n" + buf.toString();
-								}
+								}*/
 								
 								sendEmail(subject_, text_, tradeUserEmail);
 							} catch (Exception e) {
@@ -504,7 +506,9 @@ public class KlinesServiceImpl implements KlinesService {
 									return;
 								}
 								
-								List<BinanceOrderInfo> orders = binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
+								//List<BinanceOrderInfo> orders = binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
+								
+								binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 								
 								String subject_ = pair + "空头仓位已下单完成 " + dateStr;
 								String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
@@ -513,7 +517,7 @@ public class KlinesServiceImpl implements KlinesService {
 								text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 								
 								text_ += "\r\n" + fibInfo.toString();
-								
+								/*
 								StringBuffer buf = new StringBuffer();
 								orders.forEach(o -> {
 									buf.append(o.getRequestData());
@@ -524,7 +528,7 @@ public class KlinesServiceImpl implements KlinesService {
 								
 								if(buf.length() > 0) {
 									text_ += "\r\n" + buf.toString();
-								}
+								}*/
 								
 								sendEmail(subject_, text_, tradeUserEmail);
 							} catch (Exception e) {
@@ -1750,10 +1754,9 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void closeOrder(Klines klines) {
 		List<TradingOrder> orderList = orderRepository.findAll(klines.getPair(), 0, -1, 0);
-		logger.info("共查询到" + klines.getPair() + "交易对未平仓订单数量：" + orderList.size());
 		if(!CollectionUtils.isEmpty(orderList)) {
 			for(TradingOrder o : orderList) {
-				logger.info(o);
+				//logger.info(o);
 				double sl = o.getStopLoss();//止损
 				double tp = o.getTakeProfit();//止盈
 				LongOrShortType type = LongOrShortType.resolve(o.getLongOrShort());//持仓方向
@@ -1771,7 +1774,6 @@ public class KlinesServiceImpl implements KlinesService {
 						//空头盈亏金额 = （开仓价 - 平仓价） * 持仓数量
 						double pnl = (o.getOpenPrice() - closePrice) * o.getCoinSize();
 						orderRepository.updateById(o.getId(), closePrice, new Date().getTime(), pnl);
-						logger.info("平仓" + o.getPair() + "空头仓位，收益金额：" + pnl);
 					}
 				} else if(type == LongOrShortType.LONG) {
 					double closePrice = 0;//平仓价
@@ -1786,7 +1788,6 @@ public class KlinesServiceImpl implements KlinesService {
 						//多头盈亏金额 = （平仓价 - 开仓价） * 持仓数量
 						double pnl = (o.getOpenPrice() - closePrice) * o.getCoinSize();
 						orderRepository.updateById(o.getId(), closePrice, new Date().getTime(), pnl);
-						logger.info("平仓" + o.getPair() + "多头仓位，收益金额：" + pnl);
 					}
 				}
 			}
