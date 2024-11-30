@@ -87,6 +87,34 @@ public class FibInfo {
 	}
 	
 	/**
+	 * 止盈点位
+	 * @param offset
+	 * @param codes
+	 * @return
+	 */
+	public FibCode getTakeProfit(int offset,FibCode[] codes) {
+		int index = offset;
+		FibCode current = codes[index];
+		if(this.level == FibLevel.LEVEL_1) {//1级回撤
+			if(current == FibCode.FIB66 || current == FibCode.FIB786) {
+				index += 2;
+			} else {
+				index++;
+			}
+		} else { // 2级 或 3级回撤
+			if(current == FibCode.FIB66 || current == FibCode.FIB786) {
+				index += 3;
+			} else if(current == FibCode.FIB5) {//0.5 ~ 0.382
+				index++;
+			} else {
+				index += 2;
+			}
+		}
+		
+		return codes[index];
+	}
+	
+	/**
 	 * 
 	 * @param fib1 斐波那契回撤起始价
 	 * @param fib0 斐波那契回撤结束价

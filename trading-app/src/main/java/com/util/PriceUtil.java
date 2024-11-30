@@ -1192,4 +1192,32 @@ public class PriceUtil {
 	public static boolean checkHitPrice(Klines k,double hitPrice) {
 		return k == null ? false : (Double.valueOf(k.getLowPrice()) <= hitPrice && Double.valueOf(k.getHighPrice()) >= hitPrice);
 	}
+	
+	/**
+	 * 计算价格上涨幅度
+	 * @param price1 
+	 * @param price2 
+	 * @return
+	 */
+	public static double getRiseFluctuationPercentage(double price1,double price2) {
+		if(price1 > price2) {
+			return (price1 - price2) / price2;
+		} else {
+			return (price2 - price1) / price1;
+		}
+	}
+	
+	/**
+	 * 计算价格下跌幅度
+	 * @param price1 
+	 * @param price2 
+	 * @return
+	 */
+	public static double getFallFluctuationPercentage(double price1,double price2) {
+		if(price1 > price2) {
+			return (price1 - price2) / price1;
+		} else {
+			return (price2 - price1) / price2;
+		}
+	}
 }
