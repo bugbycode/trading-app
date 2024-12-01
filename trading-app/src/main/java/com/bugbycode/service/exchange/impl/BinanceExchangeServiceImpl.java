@@ -1,5 +1,6 @@
 package com.bugbycode.service.exchange.impl;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +15,11 @@ import org.springframework.web.client.RestTemplate;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.service.exchange.BinanceExchangeService;
+import com.bugbycode.service.user.UserService;
+import com.bugbycode.trading_app.pool.WorkTaskPool;
+import com.bugbycode.trading_app.task.email.SendMailTask;
+import com.util.DateFormatUtil;
+import com.util.StringUtil;
 
 @Service("binanceExchangeService")
 public class BinanceExchangeServiceImpl implements BinanceExchangeService {
@@ -22,6 +28,12 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 	
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private UserService userDetailsService;
+	
+	@Autowired
+	private WorkTaskPool emailWorkTaskPool;
 	
 	@Override
 	public Set<String> exchangeInfo() {
@@ -60,6 +72,21 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 						});
 						
 						AppConfig.SYMBOL_EXCHANGE_INFO.put(symbol, info);
+					}
+					
+					//待上市代币
+					if("PENDING_TRADING".equals(status)) {
+						if(!StringUtil.contains(AppConfig.PENDING_TRADING_SET, symbol)) {
+							
+							AppConfig.PENDING_TRADING_SET.add(symbol);
+							
+							String dateStr = DateFormatUtil.format(new Date());
+							String recEmail = userDetailsService.getAllUserEmail();
+							
+							String text = String.format("币安即将上市%s %s", symbol, dateStr);
+							
+							emailWorkTaskPool.add(new SendMailTask(text, text, recEmail));
+						}
 					}
 				}
 			});

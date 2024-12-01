@@ -2,6 +2,7 @@ package com.bugbycode.config;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +18,12 @@ public class AppConfig {
 	
 	public static String WEBSOCKET_API_URL;
 	
-	public static Set<String> PAIRS;
+	//public static Set<String> PAIRS;
+	
+	/**
+	 * 待上市代币
+	 */
+	public static Set<String> PENDING_TRADING_SET = new HashSet<String>();
 	
 	private static List<EmailAuth> EMAIL_AUTH;//邮件认证信息
 	
