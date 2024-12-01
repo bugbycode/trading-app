@@ -97,7 +97,7 @@ public interface UserRepository {
 	 * @param autoTradeType 自动交易参考指标 取值参考泛型 com.bugbycode.module.binance.AutoTradeType
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue,int cutLoss,int profit,int autoTradeType);
+			int baseStepSize,int leverage,int positionValue,int cutLoss,double profit,int autoTradeType);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息
