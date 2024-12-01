@@ -390,7 +390,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						//止盈点位
-						FibCode takeProfitCode = FibCode.FIB618;
+						FibCode takeProfitCode = FibCode.FIB5;
 						
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
@@ -527,7 +527,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						//止盈点位
-						FibCode takeProfitCode = FibCode.FIB618;
+						FibCode takeProfitCode = FibCode.FIB5;
 						
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
