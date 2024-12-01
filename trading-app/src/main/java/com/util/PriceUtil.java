@@ -13,13 +13,17 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import com.bugbycode.module.EMAType;
+import com.bugbycode.module.EmaTrade;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibKlinesData;
+import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.PriceFibInfo;
+import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.SortType;
 
 public class PriceUtil {
 	
@@ -1116,7 +1120,7 @@ public class PriceUtil {
      */
     public static List<Klines> to1HFor15MKlines(List<Klines> list_15m){
     	
-    	KlinesComparator kc = new KlinesComparator();
+    	KlinesComparator kc = new KlinesComparator(SortType.ASC);
     	List<Klines> list_1h = new ArrayList<Klines>();
     	
     	if(!CollectionUtils.isEmpty(list_15m)) {
@@ -1219,5 +1223,101 @@ public class PriceUtil {
 		} else {
 			return (price2 - price1) / price2;
 		}
+	}
+	
+	/**
+	 * 根据EMA指标分析计算斐波那契回撤信息
+	 * @param list
+	 * @return
+	 */
+	public static FibInfo getFibInfoForEma(List<Klines> klinesList) {
+		
+		List<Klines> list = new ArrayList<Klines>();
+		list.addAll(klinesList);
+		
+		calculateEMAArray(list, EMAType.EMA7);
+		calculateEMAArray(list, EMAType.EMA25);
+		calculateEMAArray(list, EMAType.EMA99);
+		
+		EmaTrade et = getTradingBehavior(list);
+		
+		int lastIndex = list.size() - 1;
+		
+		List<Klines> fibKlines = new ArrayList<Klines>();
+		
+		KlinesComparator kc_asc = new KlinesComparator(SortType.ASC);
+		
+		fibKlines.sort(kc_asc);
+		
+		for(int index = lastIndex; index >= 0; index--) {
+			Klines current = list.get(index);
+			fibKlines.add(current);
+			if(et == EmaTrade.LONG && verifyLtEma99(current)) {
+				break;
+			} else if(et == EmaTrade.SHORT && verifyGtEma99(current)) {
+				break;
+			}
+		}
+		
+		Klines fib1Klines = null;
+		Klines fib0Klines = null;
+		
+		FibInfo fibInfo = null;
+		
+		if(et == EmaTrade.LONG) {
+			fib1Klines = getMaxPriceKLine(fibKlines);
+			fibKlines = subList(fib1Klines, list);
+			fib0Klines = getMinPriceKLine(fibKlines);
+			fibInfo = new FibInfo(Double.valueOf(fib1Klines.getHighPrice()), Double.valueOf(fib0Klines.getLowPrice()), fib0Klines.getDecimalNum(), FibLevel.LEVEL_1);
+		} else if(et == EmaTrade.SHORT) {
+			fib1Klines = getMinPriceKLine(fibKlines);
+			fibKlines = subList(fib1Klines, list);
+			fib0Klines = getMaxPriceKLine(fibKlines);
+			fibInfo = new FibInfo(Double.valueOf(fib0Klines.getHighPrice()), Double.valueOf(fib1Klines.getLowPrice()), fib0Klines.getDecimalNum(), FibLevel.LEVEL_1);
+		}
+		
+		return fibInfo;
+	}
+	
+	/**
+	 * 判断交易行为 LONG/SHORT
+	 * @param list
+	 * @return
+	 */
+	public static EmaTrade getTradingBehavior(List<Klines> list) {
+		calculateEMAArray(list, EMAType.EMA7);
+		calculateEMAArray(list, EMAType.EMA25);
+		calculateEMAArray(list, EMAType.EMA99);
+		
+		EmaTrade result = EmaTrade.NOTHING;
+		
+		KlinesUtil ku = new KlinesUtil(list);
+		Klines last = ku.getLast();
+		
+		if(verifyGtEma99(last)) {
+			result = EmaTrade.LONG;
+		} else if(verifyLtEma99(last)) {
+			result = EmaTrade.SHORT;
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 判断k线EMA7 EMA25是否在EMA99之上
+	 * @param k
+	 * @return
+	 */
+	public static boolean verifyGtEma99(Klines k) {
+		return k.getEma7() >= k.getEma99() && k.getEma25() >= k.getEma99();
+	}
+	
+	/**
+	 * 判断k线EMA7 EMA25是否在EMA99之下
+	 * @param k
+	 * @return
+	 */
+	public static boolean verifyLtEma99(Klines k) {
+		return k.getEma7() <= k.getEma99() && k.getEma25() <= k.getEma99();
 	}
 }

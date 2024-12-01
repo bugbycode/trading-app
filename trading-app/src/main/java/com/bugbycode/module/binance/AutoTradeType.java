@@ -10,7 +10,12 @@ public enum AutoTradeType {
 	/**
 	 * 价格行为
 	 */
-	PRICE_ACTION(1,"价格行为");
+	PRICE_ACTION(1,"价格行为"),
+	
+	/**
+	 * EMA指标
+	 */
+	EMA_INDEX(2,"EMA指标");
 
 	private int value;
 	

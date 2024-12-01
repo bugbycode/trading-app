@@ -3,7 +3,6 @@ package com.bugbycode.service.klines;
 import java.util.Date;
 import java.util.List;
 
-import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;

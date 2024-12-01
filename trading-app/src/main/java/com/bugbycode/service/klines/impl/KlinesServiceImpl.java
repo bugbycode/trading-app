@@ -34,6 +34,7 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
+import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.BinanceOrderInfo;
@@ -394,6 +395,8 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
+						} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
+							takeProfitCode = FibCode.FIB618;
 						}
 						
 						BigDecimal stopLoss = new BigDecimal(
@@ -416,7 +419,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						String subject_ = pair + "多头仓位已下单完成 " + dateStr;
 						String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
-								fibInfo.getFibValue(fibInfo.getTakeProfit(offset, codes)), decimalNum);
+								fibInfo.getFibValue(takeProfitCode), decimalNum);
 						
 						text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 						
@@ -531,6 +534,8 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
+						} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
+							takeProfitCode = FibCode.FIB618;
 						}
 						
 						BigDecimal stopLoss = new BigDecimal(
@@ -554,7 +559,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						String subject_ = pair + "空头仓位已下单完成 " + dateStr;
 						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
-								fibInfo.getFibValue(fibInfo.getTakeProfit(offset, codes)), decimalNum);
+								fibInfo.getFibValue(takeProfitCode), decimalNum);
 						
 						text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 						
@@ -656,7 +661,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 	@Override
 	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit) {
-		KlinesComparator kc = new KlinesComparator();
+		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		Date now = new Date();
 
 		Date lastDayEndTime = DateFormatUtil.getEndTime(DateFormatUtil.getHours(now.getTime()));
@@ -1308,8 +1313,14 @@ public class KlinesServiceImpl implements KlinesService {
 	}*/
 
 	@Override
-	public void futuresEmaRiseAndFall(List<Klines> klinesList) {
-
+	public void futuresEmaRiseAndFall(List<Klines> list) {
+		
+		List<Klines> klinesList = new ArrayList<Klines>();
+		klinesList.addAll(list);
+		
+		KlinesComparator kc_asc = new KlinesComparator(SortType.ASC);
+		klinesList.sort(kc_asc);
+		
 		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA7);
 		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA25);
 		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA99);
@@ -1326,32 +1337,6 @@ public class KlinesServiceImpl implements KlinesService {
 		String subject = "";
 		String text = "";
 		String dateStr = DateFormatUtil.format(new Date());
-		/*
-		//开始上涨
-		if(!checkEmaRise(parentKlines,parentNextKlines) && checkEmaRise(lastKlines,parentKlines)) {
-			subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
-		}
-		//开始下跌
-		else if(!checkEmaFall(parentKlines,parentNextKlines) && checkEmaFall(lastKlines,parentKlines)) {
-			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
-		}
-		*/
-		//强势 颓势信号
-		/*
-		//开始上涨
-		if(parentKlines.getEma25() < parentKlines.getEma99() && parentKlines.getEma7() < parentKlines.getEma25() && parentKlines.getOpenPrice() < parentKlines.getEma7()
-				&& parentKlines.getClosePrice() > parentKlines.getEma7() && 
-				((lastKlines.getOpenPrice() > lastKlines.getEma7() && lastKlines.getClosePrice() > lastKlines.getEma7()) || lastKlines.isRise())
-				&& lastKlines.getHighPrice() < lastKlines.getEma99()) {
-			subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
-		}
-		//开始下跌
-		else if(parentKlines.getEma25() > parentKlines.getEma99() && parentKlines.getEma7() > parentKlines.getEma25() && parentKlines.getOpenPrice() > parentKlines.getEma7()
-				&& parentKlines.getClosePrice() < parentKlines.getEma7() && 
-				((lastKlines.getOpenPrice() < lastKlines.getEma7() && lastKlines.getClosePrice() < lastKlines.getEma7()) || lastKlines.isFall())
-				&& lastKlines.getLowPrice() > lastKlines.getEma99()) {
-			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
-		}*/
 		//金叉
 		
 		//开始上涨
@@ -1365,37 +1350,34 @@ public class KlinesServiceImpl implements KlinesService {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 		}
 		
-		/*
-		//上涨判断
-		if(parentKlines.getEma25() < parentKlines.getEma99() && parentKlines.getEma7() < parentKlines.getEma99() 
-				&& parentKlines.getEma7() < parentKlines.getEma25() 
-				&& parentKlines.getOpenPrice() < parentKlines.getEma7() && parentKlines.getClosePrice() < parentKlines.getEma7()) {
-			//价格强势信号
-			if(lastKlines.getOpenPrice() < lastKlines.getEma7() && lastKlines.getClosePrice() > lastKlines.getEma7()) {
-				subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
-			}
-		}//下跌判断 
-		else if(parentKlines.getEma25() > parentKlines.getEma99() && parentKlines.getEma7() > parentKlines.getEma99()
-				&& parentKlines.getEma7() > parentKlines.getEma25()
-				&& parentKlines.getOpenPrice() > parentKlines.getEma7() && parentKlines.getClosePrice() > parentKlines.getEma7()) {
-			//价格颓势信号
-			if(lastKlines.getOpenPrice() > lastKlines.getEma7() && lastKlines.getClosePrice() < lastKlines.getEma7()) {
-				subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
-			}
-		}*/
-		
 		text = lastKlines.toString() + "\n\n";
 		text += String.format("EMA7: %s, EMA25: %s, EMA99: %s ", PriceUtil.formatDoubleDecimal(lastKlines.getEma7(), decimalNum),
 				PriceUtil.formatDoubleDecimal(lastKlines.getEma25(), decimalNum),
 				PriceUtil.formatDoubleDecimal(lastKlines.getEma99(), decimalNum));
 		
-		//logger.info(text);
-		
 		String recEmail = userDetailsService.getEmaRiseAndFallUserEmail();
 		
 	 	sendEmail(subject, text, recEmail);
+	 	
+	 	double closePrice = Double.valueOf(lastKlines.getClosePrice());
+	 	double lowPrice = Double.valueOf(lastKlines.getLowPrice());
+	 	double highPrice = Double.valueOf(lastKlines.getHighPrice());
+	 	double ema99 = lastKlines.getEma99();
+	 	
+	 	//判断回踩ema99 情况
+	 	if((closePrice >= ema99 && lowPrice <= ema99) || (closePrice <= ema99 && highPrice >= ema99)) {
+	 		FibInfo fibInfo = PriceUtil.getFibInfoForEma(klinesList);
+	 		if(fibInfo != null) {
+		 		QuotationMode mode = fibInfo.getQuotationMode();
+		 		if(mode == QuotationMode.LONG) {
+		 			marketPalce(pair, PositionSide.SHORT, 0, fibInfo, AutoTradeType.EMA_INDEX);
+		 		} else {
+		 			marketPalce(pair, PositionSide.LONG, 0, fibInfo, AutoTradeType.EMA_INDEX);
+		 		}
+	 		}
+	 	}
 	}
-
+	
 	@Override
 	public void horizontalRay(Klines klines, ShapeInfo info) {
 		//价格坐标
@@ -1825,7 +1807,7 @@ public class KlinesServiceImpl implements KlinesService {
     public boolean checkData(List<Klines> list) {
         boolean result = true;
         if(!CollectionUtils.isEmpty(list)){
-            list.sort(new KlinesComparator());
+            list.sort(new KlinesComparator(SortType.ASC));
             
             long parentSubTime = 0;
             
