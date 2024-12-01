@@ -122,7 +122,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 		Aggregation aggregation = Aggregation.newAggregation(Aggregation.group().sum("pnl").as("totalPnl"));
 		AggregationResults<Map> result = template.aggregate(aggregation, TradingOrder.class,Map.class);
 		Map<String,Double> map = result.getUniqueMappedResult();
-		return map.get("totalPnl");
+		return map == null ? 0 : map.get("totalPnl");
 	}
 
 }

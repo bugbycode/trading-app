@@ -342,6 +342,12 @@ public class KlinesServiceImpl implements KlinesService {
 								}*/
 								
 								sendEmail(subject_, text_, tradeUserEmail);
+								
+								//仓位统计
+								TradingOrder to = new TradingOrder(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), stopLoss.doubleValue(), 
+										new Date().getTime(), LongOrShortType.LONG.getValue(), order_value, quantity.doubleValue());
+								orderRepository.insert(to);
+								
 							} catch (Exception e) {
 								sendEmail("创建" + pair + "多头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
 								logger.error(e.getMessage(), e);
@@ -531,6 +537,11 @@ public class KlinesServiceImpl implements KlinesService {
 								}*/
 								
 								sendEmail(subject_, text_, tradeUserEmail);
+								
+								//仓位统计
+								TradingOrder to = new TradingOrder(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), stopLoss.doubleValue(), 
+										new Date().getTime(), LongOrShortType.SHORT.getValue(), order_value, quantity.doubleValue());
+								orderRepository.insert(to);
 							} catch (Exception e) {
 								sendEmail("创建" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
 								logger.error(e.getMessage(), e);
@@ -1027,14 +1038,13 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						sendEmail(subject, text, recEmail);
 						
+						/*
 						double accountSize = 1000;//以1000美金持仓建仓
 						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
 						TradingOrder order = new TradingOrder(pair, currentPrice, fib.getFibValue(FibCode.FIB618), 
 								PriceUtil.rectificationCutLossLongPrice(lowPrice), new Date().getTime(), LongOrShortType.LONG.getValue(), accountSize, coinSize);
 						orderRepository.insert(order);
-						
-						logger.info(order);
-						
+						*/
 						
 					} else if(fib.getQuotationMode() == QuotationMode.LONG && info.verifyData(currentPrice, fib)) {
 						
@@ -1044,13 +1054,13 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						sendEmail(subject, text, recEmail);
 						
+						/*
 						double accountSize = 1000;//以1000美金持仓建仓
 						double coinSize = accountSize / currentPrice;//持仓数量 = 持仓金额 / 开仓价格
 						TradingOrder order = new TradingOrder(pair, currentPrice, fib.getFibValue(FibCode.FIB618), 
 								PriceUtil.rectificationCutLossShortPrice(highPrice), new Date().getTime(), LongOrShortType.SHORT.getValue(), accountSize, coinSize);
 						orderRepository.insert(order);
-						logger.info(order);
-						
+						*/
 					}
 				}
 			}
