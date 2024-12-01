@@ -27,7 +27,6 @@ public class MessageHandlerImpl implements MessageHandler{
 	@Override
 	public void handleMessage(String message, PerpetualWebSocketClientEndpoint client, KlinesService klinesService, 
 			KlinesRepository klinesRepository,WorkTaskPool analysisWorkTaskPool) {
-		//logger.info(message);
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
@@ -40,7 +39,7 @@ public class MessageHandlerImpl implements MessageHandler{
 		boolean finish = klinesJson.getBoolean("x");
 		
 		if(finish) {
-			
+			logger.debug(message);
 			client.subCount();
 			
 			//15分钟k线分析
@@ -58,7 +57,6 @@ public class MessageHandlerImpl implements MessageHandler{
 		};
 		
 		if(client.coinCount() == 0) {
-			logger.info(client.getStreamName() + "订阅结束，关闭websocket连接");
 			client.close();
 		}
 	}

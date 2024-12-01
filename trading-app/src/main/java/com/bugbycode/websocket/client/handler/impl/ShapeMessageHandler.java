@@ -42,7 +42,7 @@ public class ShapeMessageHandler implements MessageHandler {
 	
 	@Override
 	public void handleMessage(String message) {
-		//logger.info(message);
+		logger.debug(message);
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
@@ -57,7 +57,7 @@ public class ShapeMessageHandler implements MessageHandler {
 		if(finish) {
 			client.subCount();
 			
-			logger.info(kline);
+			logger.debug(kline);
 			
 			this.workTaskPool.add(new ShapeDistributeTask(kline, klinesService, shapeRepository,analysisWorkTaskPool));
 		}

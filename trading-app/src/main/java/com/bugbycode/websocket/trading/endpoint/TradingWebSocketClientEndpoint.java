@@ -49,7 +49,7 @@ public class TradingWebSocketClientEndpoint {
 	public void connectToServer() throws RuntimeException {
 		if(isClosed()) {
 	    	try {
-				logger.info("开始连接websocket服务：" + baseUrl);
+				logger.debug("开始连接websocket服务：" + baseUrl);
 				this.container.connectToServer(this, new URI(baseUrl));
 				waitOpen();
 			} catch (Exception e) {
@@ -63,13 +63,13 @@ public class TradingWebSocketClientEndpoint {
         this.session = session;
         this.recvMessageQueue = new LinkedList<String>();
         this.reqTimeMap = new Hashtable<String, Long>();
-        logger.info("连接websocket服务：" + baseUrl + "成功。");
+        logger.debug("连接websocket服务：" + baseUrl + "成功。");
         notifyAllTask();
     }
 
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        logger.info("websocket服务：" + baseUrl + "，已断开连接。");
+        logger.debug("websocket服务：" + baseUrl + "，已断开连接。");
         notifyAllTask();
     }
 
