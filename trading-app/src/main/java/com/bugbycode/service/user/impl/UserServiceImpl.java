@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.bugbycode.module.binance.AutoTrade;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.user.UserService;
@@ -82,7 +84,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public List<User> queryByAutoTrade(int autoTrade) {
-		return userRepository.queryByAutoTrade(autoTrade);
+	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType) {
+		return userRepository.queryByAutoTrade(autoTrade,autoTradeType);
 	}
 }

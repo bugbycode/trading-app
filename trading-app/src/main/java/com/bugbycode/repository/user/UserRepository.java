@@ -2,6 +2,8 @@ package com.bugbycode.repository.user;
 
 import java.util.List;
 
+import com.bugbycode.module.binance.AutoTrade;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.user.User;
 
 public interface UserRepository {
@@ -92,9 +94,10 @@ public interface UserRepository {
 	 * @param positionValue 持仓价值
 	 * @param cutLoss 止损比例
 	 * @param profit 收益筛选
+	 * @param autoTradeType 自动交易参考指标 取值参考泛型 com.bugbycode.module.binance.AutoTradeType
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue,int cutLoss,int profit);
+			int baseStepSize,int leverage,int positionValue,int cutLoss,int profit,int autoTradeType);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息
@@ -102,5 +105,5 @@ public interface UserRepository {
 	 * @param autoTrade
 	 * @return
 	 */
-	public List<User> queryByAutoTrade(int autoTrade);
+	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType);
 }

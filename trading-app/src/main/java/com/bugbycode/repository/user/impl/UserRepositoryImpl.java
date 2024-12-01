@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.bugbycode.module.binance.AutoTrade;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.util.MD5Util;
@@ -86,7 +88,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue, int cutLoss,int profit) {
+			int baseStepSize,int leverage,int positionValue, int cutLoss,int profit,int autoTradeType) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
@@ -96,12 +98,17 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("positionValue", positionValue);
 		update.set("cutLoss", cutLoss);
 		update.set("profit", profit);
+		update.set("autoTradeType", autoTradeType);
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
 	@Override
-	public List<User> queryByAutoTrade(int autoTrade) {
-		return template.find(Query.query(Criteria.where("autoTrade").is(autoTrade)), User.class);
+	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType) {
+		return template.find(
+				
+				Query.query(Criteria.where("autoTrade").is(autoTrade.value()).and("autoTradeType").is(autoTradeType.value())), 
+				
+				User.class);
 	}
 
 	

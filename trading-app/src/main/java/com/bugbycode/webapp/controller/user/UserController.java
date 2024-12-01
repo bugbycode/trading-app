@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.ResultCode;
+import com.bugbycode.module.binance.AutoTrade;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
@@ -99,6 +101,9 @@ public class UserController extends BaseController{
 		ResultCode code = ResultCode.SUCCESS;
 		JSONObject json = new JSONObject();
 		
+		AutoTrade autoTrade = AutoTrade.valueOf(data.getAutoTrade());
+		AutoTradeType autoTradeType = AutoTradeType.valueOf(data.getAutoTradeType());
+		
 		if(data.getCutLoss() == 0) {
 			data.setCutLoss(3);
 		}
@@ -118,33 +123,35 @@ public class UserController extends BaseController{
 			balanceList = binanceWebsocketTradeService.balance(data.getBinanceApiKey(), data.getBinanceSecretKey());
 		}
 		
-		if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && data.getAutoTrade() == 0) {
+		if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && autoTrade == AutoTrade.CLOSE) {
 			
-			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit());
+			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
-			user.setAutoTrade(data.getAutoTrade());
+			user.setAutoTrade(autoTrade.value());
 			user.setBaseStepSize(data.getBaseStepSize());
 			user.setLeverage(data.getLeverage());
 			user.setPositionValue(data.getPositionValue());
 			user.setCutLoss(data.getCutLoss());
 			user.setProfit(data.getProfit());
+			user.setAutoTradeType(autoTradeType.value());
 			
 			json.put("message", "修改成功");
 		} else if(!CollectionUtils.isEmpty(balanceList)) {
-			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), data.getAutoTrade(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit());
+			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
-			user.setAutoTrade(data.getAutoTrade());
+			user.setAutoTrade(autoTrade.value());
 			user.setBaseStepSize(data.getBaseStepSize());
 			user.setLeverage(data.getLeverage());
 			user.setPositionValue(data.getPositionValue());
 			user.setCutLoss(data.getCutLoss());
 			user.setProfit(data.getProfit());
+			user.setAutoTradeType(autoTradeType.value());
 			
 			json.put("message", "修改成功");
 		} else {

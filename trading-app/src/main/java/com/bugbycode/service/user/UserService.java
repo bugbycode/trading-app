@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.bugbycode.module.binance.AutoTrade;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.user.User;
 
 /**
@@ -50,8 +52,9 @@ public interface UserService extends UserDetailsService{
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息
 	 * 
-	 * @param autoTrade
+	 * @param autoTrade 是否开启自动交易
+	 * @param autoTradeType 自动交易参考指标
 	 * @return
 	 */
-	public List<User> queryByAutoTrade(int autoTrade);
+	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType);
 }

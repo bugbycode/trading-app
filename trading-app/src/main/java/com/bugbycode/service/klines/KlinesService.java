@@ -3,12 +3,15 @@ package com.bugbycode.service.klines;
 import java.util.Date;
 import java.util.List;
 
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ShapeInfo;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.result.DeclineAndStrength;
+import com.bugbycode.module.trading.PositionSide;
 
 public interface KlinesService {
 	
@@ -202,4 +205,14 @@ public interface KlinesService {
      * @return true 表示没有重复或缺失 false 表示出现重复或缺失k线
      */
     public boolean checkData(List<Klines> list);
+    
+    /**
+     * 市价交易
+     * @param pair 交易对
+     * @param ps 持仓方向 LONG / SHORT 
+     * @param offset 当前所处斐波那契回撤点位索引
+     * @param fibInfo 斐波那契回撤点位信息
+     * @param autoTradeType 自动交易参考指标
+     */
+    public void marketPalce(String pair,PositionSide ps,int offset, FibInfo fibInfo, AutoTradeType autoTradeType);
 }
