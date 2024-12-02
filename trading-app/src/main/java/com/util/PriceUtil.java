@@ -1273,7 +1273,7 @@ public class PriceUtil {
 			fib1Klines = getMinPriceKLine(fibKlines);
 			fibKlines = subList(fib1Klines, list);
 			fib0Klines = getMaxPriceKLine(fibKlines);
-			fibInfo = new FibInfo(Double.valueOf(fib0Klines.getHighPrice()), Double.valueOf(fib1Klines.getLowPrice()), fib0Klines.getDecimalNum(), FibLevel.LEVEL_1);
+			fibInfo = new FibInfo(Double.valueOf(fib1Klines.getLowPrice()), Double.valueOf(fib0Klines.getHighPrice()), fib0Klines.getDecimalNum(), FibLevel.LEVEL_1);
 		}
 		
 		return fibInfo;
