@@ -123,7 +123,10 @@ public class UserController extends BaseController{
 			balanceList = binanceWebsocketTradeService.balance(data.getBinanceApiKey(), data.getBinanceSecretKey());
 		}
 		
-		if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && autoTrade == AutoTrade.CLOSE) {
+		if(StringUtil.isEmpty(data.getPassword()) || !dbUser.getPassword().equals(MD5Util.md5(data.getPassword()))) {
+			json.put("message", "密码不正确");
+			code = ResultCode.ERROR;
+		} else if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && autoTrade == AutoTrade.CLOSE) {
 			
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
 					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value());
