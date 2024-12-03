@@ -1367,8 +1367,7 @@ public class KlinesServiceImpl implements KlinesService {
 	 	double ema99 = lastKlines.getEma99();
 	 	
 	 	//判断回踩ema99 情况
-	 	if((closePrice >= ema99 && lowPrice <= ema99 && PriceUtil.verifyGtEma99(lastKlines)) 
-	 			|| (closePrice <= ema99 && highPrice >= ema99 && PriceUtil.verifyLtEma99(lastKlines))) {
+	 	if((closePrice >= ema99 && lowPrice <= ema99) || (closePrice <= ema99 && highPrice >= ema99)) {
 	 		FibInfo fibInfo = PriceUtil.getFibInfoForEma(klinesList);
 	 		if(fibInfo != null) {
 		 		QuotationMode mode = fibInfo.getQuotationMode();
