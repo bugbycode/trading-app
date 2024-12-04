@@ -1384,7 +1384,8 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void futuresConsolidationAreaMonitor(List<Klines> klinesList, List<Klines> hitKlinesList) {
-		ConsolidationAreaUtil cau = new ConsolidationAreaUtil(hitKlinesList);
+		String dateStr = DateFormatUtil.format(new Date());
+		ConsolidationAreaUtil cau = new ConsolidationAreaUtil(klinesList);
 		//获取盘整区信息
 		ConsolidationArea area =cau.getConsolidationArea();
 		if(area.isEmpty()) {
@@ -1395,11 +1396,44 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		double areaHighPrice = area.getHighPriceDoubleValue();
 		double areaLowPrice = area.getLowPriceDoubleValue();
+		
 		Klines current = PriceUtil.getLastKlines(hitKlinesList);
+		String pair = current.getPair();
 		double hightPrice = current.getHighPriceDoubleValue();
 		double lowPrice = current.getLowPriceDoubleValue();
 		//double openPrice = current.getOpenPriceDoubleValue();
 		double closePrice = current.getClosePriceDoubleValue();
+		
+		PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
+		if(priceInfo == null) {
+			return;
+		}
+		
+		String subject = "";
+		String text = "";
+		
+		String recEmail = userDetailsService.getAreaMonitorUserEmail();
+		
+		//订阅信息
+		if(hitPrice(current, areaLowPrice)) {
+			subject = String.format("%s永续合约价格已到达盘整区下边缘%s %s", pair, areaLowPrice, dateStr);
+			text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+					pair,
+					PriceUtil.formatDoubleDecimal(areaLowPrice,current.getDecimalNum()),
+					PriceUtil.formatDoubleDecimal(areaHighPrice,current.getDecimalNum()),
+					priceInfo.getPrice());
+			sendEmail(subject, text, recEmail);
+		} 
+		
+		if(hitPrice(current, areaHighPrice)) {
+			subject = String.format("%s永续合约价格已到达盘整区上边缘%s %s", pair, areaHighPrice, dateStr);
+			text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+					pair,
+					PriceUtil.formatDoubleDecimal(areaLowPrice,current.getDecimalNum()),
+					PriceUtil.formatDoubleDecimal(areaHighPrice,current.getDecimalNum()),
+					priceInfo.getPrice());
+			sendEmail(subject, text, recEmail);
+		}
 		
 		//做多
 		if(closePrice >= areaLowPrice && lowPrice <= areaLowPrice) {
