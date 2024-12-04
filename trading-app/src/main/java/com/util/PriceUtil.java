@@ -1320,4 +1320,21 @@ public class PriceUtil {
 	public static boolean verifyLtEma99(Klines k) {
 		return k.getEma7() <= k.getEma99() && k.getEma25() <= k.getEma99();
 	}
+	
+	/**
+	 * 判断list中是否包含klines
+	 * @param list
+	 * @param klines
+	 * @return
+	 */
+	public static boolean contains(List<Klines> list, Klines klines) {
+		if(!CollectionUtils.isEmpty(list)) {
+			for(Klines k : list) {
+				if(k.isEquals(klines)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

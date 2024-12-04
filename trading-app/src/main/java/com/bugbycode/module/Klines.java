@@ -61,17 +61,33 @@ public class Klines {
 	public String getOpenPrice() {
 		return openPrice;
 	}
+	
+	public double getOpenPriceDoubleValue() {
+		return Double.valueOf(openPrice);
+	}
 
 	public String getHighPrice() {
 		return highPrice;
 	}
 
+	public double getHighPriceDoubleValue() {
+		return Double.valueOf(highPrice);
+	}
+	
 	public String getLowPrice() {
 		return lowPrice;
+	}
+	
+	public double getLowPriceDoubleValue() {
+		return Double.valueOf(lowPrice);
 	}
 
 	public String getClosePrice() {
 		return closePrice;
+	}
+	
+	public double getClosePriceDoubleValue() {
+		return Double.valueOf(closePrice);
 	}
 
 	public long getEndTime() {
@@ -200,6 +216,50 @@ public class Klines {
     public boolean isContains(Klines klines0) {
     	return klines0 != null && klines0.getPair().equals(this.getPair())
     			&& this.getStartTime() <= klines0.getStartTime() && this.getEndTime() > klines0.getStartTime();
+    }
+    
+    /**
+     * 获取k线实体部分最高价
+     * @return
+     */
+    public String getBodyHighPrice() {
+    	String bodyHighPrice = null;
+    	if(this.isRise()) {
+    		bodyHighPrice = this.getClosePrice();
+    	} else {
+    		bodyHighPrice = this.getOpenPrice();
+    	}
+    	return bodyHighPrice;
+    }
+    
+    /**
+     * 获取k线实体部分最高价
+     * @return
+     */
+    public double getBodyHighPriceDoubleValue() {
+    	return Double.valueOf(getBodyHighPrice());
+    }
+    
+    /**
+     * 获取k线实体部分最低价
+     * @return
+     */
+    public String getBodyLowPrice() {
+    	String bodyLowPrice = null;
+    	if(this.isRise()) {
+    		bodyLowPrice = this.getOpenPrice();
+    	} else {
+    		bodyLowPrice = this.getClosePrice();
+    	}
+    	return bodyLowPrice;
+    }
+    
+    /**
+     * 获取k线实体部分最低价
+     * @return
+     */
+    public double getBodyLowPriceDoubleValue() {
+    	return Double.valueOf(getBodyLowPrice());
     }
 	
 	@Override
