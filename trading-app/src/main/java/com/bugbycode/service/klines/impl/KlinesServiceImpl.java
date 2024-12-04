@@ -35,6 +35,7 @@ import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.area.ConsolidationArea;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.BinanceOrderInfo;
@@ -54,6 +55,7 @@ import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.util.CommandUtil;
+import com.util.ConsolidationAreaUtil;
 import com.util.DateFormatUtil;
 import com.util.KlinesComparator;
 import com.util.KlinesUtil;
@@ -1378,6 +1380,35 @@ public class KlinesServiceImpl implements KlinesService {
 		 		}
 	 		}
 	 	}
+	}
+	
+	@Override
+	public void futuresConsolidationAreaMonitor(List<Klines> klinesList, List<Klines> hitKlinesList) {
+		ConsolidationAreaUtil cau = new ConsolidationAreaUtil(hitKlinesList);
+		//获取盘整区信息
+		ConsolidationArea area =cau.getConsolidationArea();
+		if(area.isEmpty()) {
+			return;
+		}
+		
+		logger.info(area);
+		
+		double areaHighPrice = area.getHighPriceDoubleValue();
+		double areaLowPrice = area.getLowPriceDoubleValue();
+		Klines current = PriceUtil.getLastKlines(hitKlinesList);
+		double hightPrice = current.getHighPriceDoubleValue();
+		double lowPrice = current.getLowPriceDoubleValue();
+		//double openPrice = current.getOpenPriceDoubleValue();
+		double closePrice = current.getClosePriceDoubleValue();
+		
+		//做多
+		if(closePrice >= areaLowPrice && lowPrice <= areaLowPrice) {
+			
+		}
+		//做空
+		if(closePrice <= areaHighPrice && hightPrice >= areaHighPrice) {
+			
+		}
 	}
 	
 	@Override

@@ -78,6 +78,13 @@ public interface UserRepository {
 	public List<User> queryAllUserByHighOrLowMonitor(int highOrLowMonitor);
 	
 	/**
+	 * 根据订阅盘整区间状态查询所有用户
+	 * @param areaMonitor
+	 * @return
+	 */
+	public List<User> queryAllUserByAreaMonitor(int areaMonitor);
+	
+	/**
 	 * 查询所有用户信息
 	 * @return
 	 */

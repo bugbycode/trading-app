@@ -78,6 +78,12 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
+	public String getAreaMonitorUserEmail() {
+		List <User> userList = userRepository.queryAllUserByAreaMonitor(1);
+		return getSubscribeAiUserEmail(userList);
+	}
+	
+	@Override
 	public String getAllUserEmail() {
 		List <User> userList = userRepository.queryAllUser();
 		return getSubscribeAiUserEmail(userList);

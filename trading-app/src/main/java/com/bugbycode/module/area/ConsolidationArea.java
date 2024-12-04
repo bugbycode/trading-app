@@ -177,7 +177,7 @@ public class ConsolidationArea {
 	
 	@Override
 	public String toString() {
-		return "最高价：" + getHighPrice() + "，最低价：" + getLowPrice() + 
+		return "交易对：" + getHighKlines().getPair() + "，最高价：" + getHighPrice() + "，最低价：" + getLowPrice() + 
 				"，最高价K线开盘时间：" + DateFormatUtil.format(getHighKlinesStartTime()) + 
 				"，最低价K线开盘时间：" + DateFormatUtil.format(getLowKlinesStartTime()) + 
 				"，盘整区起始开盘时间：" + DateFormatUtil.format(getStartKlinesStartTime()) + 

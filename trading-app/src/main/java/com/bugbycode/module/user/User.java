@@ -36,6 +36,8 @@ public class User implements UserDetails {
 	
 	private int highOrLowMonitor = 0;//是否订阅标志性高低点监控 0：否 1：是
 	
+	private int areaMonitor = 0;//是否订阅盘整区监控 0：否 1：是
+	
 	private String binanceApiKey;//币安API key
 	
 	private String binanceSecretKey;//币安 Secret Key
@@ -127,6 +129,14 @@ public class User implements UserDetails {
 		this.highOrLowMonitor = highOrLowMonitor;
 	}
 
+	public int getAreaMonitor() {
+		return areaMonitor;
+	}
+
+	public void setAreaMonitor(int areaMonitor) {
+		this.areaMonitor = areaMonitor;
+	}
+
 	public String getBinanceApiKey() {
 		return binanceApiKey;
 	}
@@ -208,6 +218,7 @@ public class User implements UserDetails {
 		this.setFibMonitor(user.getFibMonitor());
 		this.setEmaRiseAndFall(user.getEmaRiseAndFall());
 		this.setEmaMonitor(user.getEmaMonitor());
+		this.setAreaMonitor(user.getAreaMonitor());
 		this.setBinanceApiKey(user.getBinanceApiKey());
 		this.setBinanceSecretKey(user.getBinanceSecretKey());
 	}
@@ -218,5 +229,6 @@ public class User implements UserDetails {
 		this.setFibMonitor(user.getFibMonitor());
 		this.setEmaRiseAndFall(user.getEmaRiseAndFall());
 		this.setEmaMonitor(user.getEmaMonitor());
+		this.setAreaMonitor(user.getAreaMonitor());
 	}
 }

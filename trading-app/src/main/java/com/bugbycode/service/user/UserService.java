@@ -44,6 +44,12 @@ public interface UserService extends UserDetailsService{
 	public String getHighOrLowMonitorUserEmail();
 	
 	/**
+	 * 获取所有订阅盘整区间邮箱账号信息
+	 * @return
+	 */
+	public String getAreaMonitorUserEmail();
+	
+	/**
 	 * 获取所有用户邮箱信息 结果使用逗号分隔
 	 * @return
 	 */

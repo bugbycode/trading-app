@@ -53,6 +53,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("fibMonitor", user.getFibMonitor());
 		update.set("highOrLowMonitor", user.getHighOrLowMonitor());
 		update.set("riseAndFallMonitor", user.getRiseAndFallMonitor());
+		update.set("areaMonitor", user.getAreaMonitor());
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
@@ -79,6 +80,11 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public List<User> queryAllUserByHighOrLowMonitor(int highOrLowMonitor) {
 		return template.find(Query.query(Criteria.where("highOrLowMonitor").is(highOrLowMonitor)), User.class);
+	}
+	
+	@Override
+	public List<User> queryAllUserByAreaMonitor(int areaMonitor) {
+		return template.find(Query.query(Criteria.where("areaMonitor").is(areaMonitor)), User.class);
 	}
 
 	@Override

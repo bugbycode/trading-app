@@ -15,7 +15,12 @@ public enum AutoTradeType {
 	/**
 	 * EMA指标
 	 */
-	EMA_INDEX(2,"EMA指标");
+	EMA_INDEX(2,"EMA指标"),
+	
+	/**
+	 * 盘整区间
+	 */
+	AREA_INDEX(3, "盘整区间");
 
 	private int value;
 	
