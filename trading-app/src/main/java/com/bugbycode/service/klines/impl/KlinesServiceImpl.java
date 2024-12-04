@@ -342,6 +342,8 @@ public class KlinesServiceImpl implements KlinesService {
 							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
 						} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 							takeProfitCode = FibCode.FIB618;
+						} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
+							takeProfitCode = FibCode.FIB618;
 						}
 						
 						BigDecimal stopLoss = new BigDecimal(
@@ -479,6 +481,8 @@ public class KlinesServiceImpl implements KlinesService {
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
 						} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
+							takeProfitCode = FibCode.FIB618;
+						} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 							takeProfitCode = FibCode.FIB618;
 						}
 						
@@ -1392,7 +1396,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		logger.info(area);
+		//logger.info(area);
 		
 		double areaHighPrice = area.getHighPriceDoubleValue();
 		double areaLowPrice = area.getLowPriceDoubleValue();
@@ -1437,11 +1441,13 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		//做多
 		if(closePrice >= areaLowPrice && lowPrice <= areaLowPrice) {
-			
+			FibInfo fibInfo = new FibInfo(hightPrice, areaLowPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
+			marketPalce(pair, PositionSide.LONG, 0, fibInfo, AutoTradeType.AREA_INDEX);
 		}
 		//做空
 		if(closePrice <= areaHighPrice && hightPrice >= areaHighPrice) {
-			
+			FibInfo fibInfo = new FibInfo(areaLowPrice, hightPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
+			marketPalce(pair, PositionSide.SHORT, 0, fibInfo, AutoTradeType.AREA_INDEX);
 		}
 	}
 	
