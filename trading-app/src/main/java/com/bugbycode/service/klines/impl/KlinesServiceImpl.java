@@ -335,7 +335,7 @@ public class KlinesServiceImpl implements KlinesService {
 						int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
 						
 						//止盈点位
-						FibCode takeProfitCode = FibCode.FIB5;
+						FibCode takeProfitCode = FibCode.FIB618;
 						
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
@@ -475,7 +475,7 @@ public class KlinesServiceImpl implements KlinesService {
 						int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
 						
 						//止盈点位
-						FibCode takeProfitCode = FibCode.FIB5;
+						FibCode takeProfitCode = FibCode.FIB618;
 						
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
