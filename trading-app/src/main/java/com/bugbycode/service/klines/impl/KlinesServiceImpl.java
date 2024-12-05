@@ -564,8 +564,8 @@ public class KlinesServiceImpl implements KlinesService {
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 						
 						String subject_ = pair + "空头仓位已下单完成 " + dateStr;
-						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
-								fibInfo.getFibValue(takeProfitCode), decimalNum);
+						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), fibInfo.getFibValue(takeProfitCode), 
+								stopLoss.doubleValue(), decimalNum);
 						
 						text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 						
