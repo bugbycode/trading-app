@@ -1387,59 +1387,30 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void futuresConsolidationAreaMonitor(List<Klines> klinesList, List<Klines> hitKlinesList) {
-		
-		Date now = new Date();
-		
 		String dateStr = DateFormatUtil.format(new Date());
-		
-		List<Klines> day_klines_list = new ArrayList<Klines>();
-		day_klines_list.addAll(klinesList);
-		day_klines_list.sort(new KlinesComparator(SortType.ASC));
-		
-		//当天开始时间 即：开盘时间
-		Date todayStartTime = DateFormatUtil.getTodayStartTime(now);
-		Date now_date = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(now));
-		if(now_date.getTime() == todayStartTime.getTime()) {//当前时间为当天开盘时间则将时间向前推早一天
-			now = DateFormatUtil.getStartTimeBySetDay(now, -1);
-			todayStartTime = DateFormatUtil.getTodayStartTime(now);
-			day_klines_list.remove(day_klines_list.size() - 1);
-		}
-		
-		ConsolidationAreaUtil cau = new ConsolidationAreaUtil(day_klines_list);
-		
+		ConsolidationAreaUtil cau = new ConsolidationAreaUtil(klinesList);
 		//获取盘整区信息
 		ConsolidationArea area =cau.getConsolidationArea();
 		if(area.isEmpty()) {
 			return;
 		}
 		
-		Klines current = PriceUtil.getLastKlines(hitKlinesList);
-		String pair = current.getPair();
-		
-		//盘整区之后开始时间
-		Date startTime = DateFormatUtil.getStartTimeBySetDay(new Date(area.getEndKlinesStartTime()), 1);
+		//logger.info(area);
 		
 		double areaHighPrice = area.getHighPriceDoubleValue();
 		double areaLowPrice = area.getLowPriceDoubleValue();
-		/*
+		
+		Klines current = PriceUtil.getLastKlines(hitKlinesList);
+		String pair = current.getPair();
 		double hightPrice = current.getHighPriceDoubleValue();
 		double lowPrice = current.getLowPriceDoubleValue();
-		double openPrice = current.getOpenPriceDoubleValue();
+		//double openPrice = current.getOpenPriceDoubleValue();
 		double closePrice = current.getClosePriceDoubleValue();
-		*/
+		
 		PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 		if(priceInfo == null) {
 			return;
 		}
-		
-		//盘整区之后的所有15分钟级别k线信息
-		List<Klines> list_15m = klinesRepository.findByPairAndGtStartTime(pair, startTime.getTime(), Inerval.INERVAL_15M.getDescption());
-		
-		//最高价k线信息
-		Klines high = PriceUtil.getMaxPriceKLine(list_15m);
-		List<Klines> afterKlinesList = PriceUtil.subList(high, list_15m);
-		//最低k线信息
-		Klines low = PriceUtil.getMinPriceKLine(afterKlinesList);
 		
 		String subject = "";
 		String text = "";
@@ -1448,44 +1419,34 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		//订阅信息
 		if(hitPrice(current, areaLowPrice)) {
-			//做多
-			double l = low.getLowPriceDoubleValue() < areaLowPrice ? low.getLowPriceDoubleValue() : areaLowPrice;
-			FibInfo fibInfo = new FibInfo(areaHighPrice, l, current.getDecimalNum(), FibLevel.LEVEL_1);
-			
-			if(priceInfo.getPriceDoubleValue() <= fibInfo.getFibValue(FibCode.FIB236)) {
-				marketPalce(pair, PositionSide.LONG, 0, fibInfo, AutoTradeType.AREA_INDEX);
-			}
-			
 			subject = String.format("%s永续合约价格已到达盘整区下边缘%s %s", pair, areaLowPrice, dateStr);
 			text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
 					pair,
 					PriceUtil.formatDoubleDecimal(areaLowPrice,current.getDecimalNum()),
 					PriceUtil.formatDoubleDecimal(areaHighPrice,current.getDecimalNum()),
 					priceInfo.getPrice());
-			
-			text += "\r\n" +  fibInfo.toString();
-			
 			sendEmail(subject, text, recEmail);
 		} 
 		
 		if(hitPrice(current, areaHighPrice)) {
-			//做空
-			double h = high.getBodyHighPriceDoubleValue() > areaHighPrice ? high.getBodyHighPriceDoubleValue() : areaHighPrice;
-			FibInfo fibInfo = new FibInfo(areaLowPrice, h, current.getDecimalNum(), FibLevel.LEVEL_1);
-			
-			if(priceInfo.getPriceDoubleValue() >= fibInfo.getFibValue(FibCode.FIB236)) {
-				marketPalce(pair, PositionSide.SHORT, 0, fibInfo, AutoTradeType.AREA_INDEX);
-			}
-			
 			subject = String.format("%s永续合约价格已到达盘整区上边缘%s %s", pair, areaHighPrice, dateStr);
 			text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
 					pair,
 					PriceUtil.formatDoubleDecimal(areaLowPrice,current.getDecimalNum()),
 					PriceUtil.formatDoubleDecimal(areaHighPrice,current.getDecimalNum()),
 					priceInfo.getPrice());
-			
-			text += "\r\n" +  fibInfo.toString();
 			sendEmail(subject, text, recEmail);
+		}
+		
+		//做多
+		if(closePrice >= areaLowPrice && lowPrice <= areaLowPrice) {
+			FibInfo fibInfo = new FibInfo(areaHighPrice, areaLowPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
+			marketPalce(pair, PositionSide.LONG, 0, fibInfo, AutoTradeType.AREA_INDEX);
+		}
+		//做空
+		if(closePrice <= areaHighPrice && hightPrice >= areaHighPrice) {
+			FibInfo fibInfo = new FibInfo(areaLowPrice, areaHighPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
+			marketPalce(pair, PositionSide.SHORT, 0, fibInfo, AutoTradeType.AREA_INDEX);
 		}
 	}
 	
