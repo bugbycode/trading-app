@@ -1,5 +1,7 @@
 package com.bugbycode.module.binance;
 
+import java.math.BigDecimal;
+
 /**
  * 价格信息
  */
@@ -27,6 +29,14 @@ public class PriceInfo {
 
 	public String getPrice() {
 		return price;
+	}
+	
+	public double getPriceDoubleValue() {
+		return Double.valueOf(price);
+	}
+	
+	public BigDecimal getPriceBigDecimalValue() {
+		return new BigDecimal(price);
 	}
 
 	public void setPrice(String price) {

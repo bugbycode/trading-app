@@ -68,8 +68,12 @@ public class DateFormatUtil {
 		return sdf_yyyy_mm_dd_HH_00_00.get().format(date);
 	}
 	
-	public static Date parse(String date) throws ParseException {
-		return sdf.get().parse(date);
+	public static Date parse(String date) {
+		try {
+			return sdf.get().parse(date);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -187,7 +191,7 @@ public class DateFormatUtil {
 		Date lastDayEndTimeDate = DateFormatUtil.getEndTime(hours);
 		try {
 			return parse(format_yyyy_mm_dd_08_00_00(lastDayEndTimeDate));
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e.getLocalizedMessage());
 		}
 	}
