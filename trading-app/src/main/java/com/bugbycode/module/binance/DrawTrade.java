@@ -6,7 +6,7 @@ package com.bugbycode.module.binance;
 public enum DrawTrade {
 
 	OPEN(1,"开启"),
-	CLOSE(1,"开启");
+	CLOSE(0,"关闭");
 
 	private int value;
 	

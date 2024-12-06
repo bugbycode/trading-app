@@ -12,6 +12,7 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.result.DeclineAndStrength;
 import com.bugbycode.module.trading.PositionSide;
+import com.bugbycode.module.user.User;
 
 public interface KlinesService {
 	
@@ -217,11 +218,13 @@ public interface KlinesService {
      * 市价交易
      * @param pair 交易对
      * @param ps 持仓方向 LONG / SHORT 
+     * @param stopLossDoubleValue 止损价 fibInfo为null时使用
+     * @param takeProfitDoubleValue 止盈价 fibInfo为null时使用
      * @param offset 当前所处斐波那契回撤点位索引
      * @param fibInfo 斐波那契回撤点位信息
      * @param autoTradeType 自动交易参考指标
      */
-    public void marketPalce(String pair,PositionSide ps,int offset, FibInfo fibInfo, AutoTradeType autoTradeType);
+    public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, FibInfo fibInfo, AutoTradeType autoTradeType);
     
     /**
      * 获取最新k线收盘价

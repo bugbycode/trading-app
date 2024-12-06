@@ -20,7 +20,12 @@ public enum AutoTradeType {
 	/**
 	 * 盘整区间
 	 */
-	AREA_INDEX(3, "盘整区间");
+	AREA_INDEX(3, "盘整区间"),
+	
+	/**
+	 * 画线交易
+	 */
+	DEFAULT(4, "画线交易");
 
 	private int value;
 	

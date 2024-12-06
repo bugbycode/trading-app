@@ -38,6 +38,7 @@ import com.bugbycode.module.area.ConsolidationArea;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.BinanceOrderInfo;
+import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.binance.Result;
@@ -48,6 +49,7 @@ import com.bugbycode.module.trading.TradingOrder;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.repository.trading.OrderRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
@@ -90,6 +92,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private BinanceWebsocketTradeService binanceWebsocketTradeService;
+	
+	@Autowired
+	private ShapeRepository shapeRepository;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -232,7 +237,7 @@ public class KlinesServiceImpl implements KlinesService {
 					sendEmail(subject,text,recEmail);
 					
 					//市价做多
-					marketPalce(pair,PositionSide.LONG, offset, fibInfo, AutoTradeType.FIB_RET);
+					marketPlace(pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET);
 					
 				}
 				
@@ -300,7 +305,7 @@ public class KlinesServiceImpl implements KlinesService {
 					sendEmail(subject,text,recEmail);
 					
 					//市价做空
-					marketPalce(pair, PositionSide.SHORT, offset,  fibInfo, AutoTradeType.FIB_RET);
+					marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
 				}
 				
 				break;
@@ -313,12 +318,17 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void marketPalce(String pair,PositionSide ps,int offset, FibInfo fibInfo, AutoTradeType autoTradeType) {
+	public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, FibInfo fibInfo, AutoTradeType autoTradeType) {
 		FibCode[] codes = FibCode.values();
 		if(ps == PositionSide.LONG) {//做多
 			//只做U本位(USDT)合约
 			if(pair.endsWith("USDT")) {
-				List<User> userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
+				List<User> userList = null;
+				if(autoTradeType == AutoTradeType.DEFAULT) {
+					userList = userDetailsService.queryByDrawTrade(DrawTrade.OPEN);
+				} else {
+					userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
+				}
 				for(User u : userList) {
 					String binanceApiKey = u.getBinanceApiKey();
 					String binanceSecretKey = u.getBinanceSecretKey();
@@ -334,29 +344,41 @@ public class KlinesServiceImpl implements KlinesService {
 
 						int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
 						
-						//止盈点位
-						FibCode takeProfitCode = FibCode.FIB618;
-						
-						if(autoTradeType == AutoTradeType.FIB_RET) {
-							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
-						} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
-							takeProfitCode = FibCode.FIB618;
-						} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-							takeProfitCode = FibCode.FIB618;
+						BigDecimal stopLoss = null;
+						BigDecimal takeProfit = null;
+
+						if(fibInfo == null) {//自定义止盈止损
+							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossDoubleValue, decimalNum));
+							takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(takeProfitDoubleValue , decimalNum));
+						} else {
+							
+							//止盈点位
+							FibCode takeProfitCode = FibCode.FIB618;
+							
+							if(autoTradeType == AutoTradeType.FIB_RET) {
+								takeProfitCode = fibInfo.getTakeProfit(offset, codes);
+							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
+								takeProfitCode = FibCode.FIB618;
+							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
+								takeProfitCode = FibCode.FIB618;
+							}
+							
+							stopLoss = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()),decimalNum));
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+											);
 						}
-						
-						BigDecimal stopLoss = new BigDecimal(
-								PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()),decimalNum));
-						BigDecimal takeProfit = new BigDecimal(
-								PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-										);
 						
 						//计算预计盈利百分比
 						double profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-						//盈利太少则不做交易
-						if((profitPercent * 100) < u.getProfit()) {
-							logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
-							continue;
+						
+						if(fibInfo != null) {
+							//盈利太少则不做交易
+							if((profitPercent * 100) < u.getProfit()) {
+								logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+								continue;
+							}
 						}
 						
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
@@ -421,23 +443,13 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						String subject_ = pair + "多头仓位已下单完成 " + dateStr;
 						String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
-								fibInfo.getFibValue(takeProfitCode), decimalNum);
+								takeProfit.doubleValue(), decimalNum);
 						
 						text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 						
-						text_ += "\r\n" + fibInfo.toString();
-						/*
-						StringBuffer buf = new StringBuffer();
-						orders.forEach(o -> {
-							buf.append(o.getRequestData());
-							buf.append("\r\n");
-							buf.append(o.getResponseData());
-							buf.append("\r\n");
-						});
-						
-						if(buf.length() > 0) {
-							text_ += "\r\n" + buf.toString();
-						}*/
+						if(fibInfo != null) {
+							text_ += "\r\n" + fibInfo.toString();
+						}
 						
 						sendEmail(subject_, text_, tradeUserEmail);
 						
@@ -458,7 +470,12 @@ public class KlinesServiceImpl implements KlinesService {
 		} else {
 			//只做U本位(USDT)合约
 			if(pair.endsWith("USDT")) {
-				List<User> userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
+				List<User> userList = null;
+				if(autoTradeType == AutoTradeType.DEFAULT) {
+					userList = userDetailsService.queryByDrawTrade(DrawTrade.OPEN);
+				} else {
+					userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
+				}
 				for(User u : userList) {
 					String binanceApiKey = u.getBinanceApiKey();
 					String binanceSecretKey = u.getBinanceSecretKey();
@@ -474,30 +491,41 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
 						
-						//止盈点位
-						FibCode takeProfitCode = FibCode.FIB618;
-						
-						if(autoTradeType == AutoTradeType.FIB_RET) {
-							takeProfitCode = fibInfo.getTakeProfit(offset, codes);
-						} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
-							takeProfitCode = FibCode.FIB618;
-						} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-							takeProfitCode = FibCode.FIB618;
+						BigDecimal stopLoss = null;
+						BigDecimal takeProfit = null; 
+
+						if(fibInfo == null) {//自定义止盈止损
+							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossDoubleValue, decimalNum));
+							takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(takeProfitDoubleValue , decimalNum));
+						} else {
+							//止盈点位
+							FibCode takeProfitCode = FibCode.FIB618;
+							
+							if(autoTradeType == AutoTradeType.FIB_RET) {
+								takeProfitCode = fibInfo.getTakeProfit(offset, codes);
+							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
+								takeProfitCode = FibCode.FIB618;
+							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
+								takeProfitCode = FibCode.FIB618;
+							}
+							
+							stopLoss = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum)
+											);
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+											);
 						}
-						
-						BigDecimal stopLoss = new BigDecimal(
-								PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum)
-										);
-						BigDecimal takeProfit = new BigDecimal(
-								PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-										);
 						
 						//计算预计盈利百分比
 						double profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-						//盈利太少则不做交易
-						if((profitPercent * 100) < u.getProfit()) {
-							logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
-							continue;
+						
+						if(fibInfo != null) {
+							//盈利太少则不做交易
+							if((profitPercent * 100) < u.getProfit()) {
+								logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+								continue;
+							}
 						}
 
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
@@ -563,24 +591,14 @@ public class KlinesServiceImpl implements KlinesService {
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 						
 						String subject_ = pair + "空头仓位已下单完成 " + dateStr;
-						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), fibInfo.getFibValue(takeProfitCode), 
+						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
 								stopLoss.doubleValue(), decimalNum);
 						
 						text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 						
-						text_ += "\r\n" + fibInfo.toString();
-						/*
-						StringBuffer buf = new StringBuffer();
-						orders.forEach(o -> {
-							buf.append(o.getRequestData());
-							buf.append("\r\n");
-							buf.append(o.getResponseData());
-							buf.append("\r\n");
-						});
-						
-						if(buf.length() > 0) {
-							text_ += "\r\n" + buf.toString();
-						}*/
+						if(fibInfo != null) {
+							text_ += "\r\n" + fibInfo.toString();
+						}
 						
 						sendEmail(subject_, text_, tradeUserEmail);
 						
@@ -589,7 +607,6 @@ public class KlinesServiceImpl implements KlinesService {
 								new Date().getTime(), LongOrShortType.SHORT.getValue(), order_value, quantity.doubleValue());
 						orderRepository.insert(to);
 						
-						//Thread.sleep(500);
 					} catch (Exception e) {
 						sendEmail("创建" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
 						logger.error(e.getMessage(), e);
@@ -1078,7 +1095,7 @@ public class KlinesServiceImpl implements KlinesService {
 						sendEmail(subject, text, recEmail);
 						
 						//市价做多
-						marketPalce(pair, PositionSide.LONG, 0, fib, AutoTradeType.PRICE_ACTION);
+						marketPlace(pair, PositionSide.LONG, 0, 0, 0, fib, AutoTradeType.PRICE_ACTION);
 						
 					} else if(fib.getQuotationMode() == QuotationMode.LONG && info.verifyData(currentPrice, fib)) {
 						
@@ -1089,7 +1106,7 @@ public class KlinesServiceImpl implements KlinesService {
 						sendEmail(subject, text, recEmail);
 						
 						//市价做空
-						marketPalce(pair, PositionSide.SHORT, 0, fib, AutoTradeType.PRICE_ACTION);
+						marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fib, AutoTradeType.PRICE_ACTION);
 					}
 				}
 			}
@@ -1377,9 +1394,9 @@ public class KlinesServiceImpl implements KlinesService {
 	 		if(fibInfo != null) {
 		 		QuotationMode mode = fibInfo.getQuotationMode();
 		 		if(mode == QuotationMode.LONG) {
-		 			marketPalce(pair, PositionSide.SHORT, 0, fibInfo, AutoTradeType.EMA_INDEX);
+		 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX);
 		 		} else {
-		 			marketPalce(pair, PositionSide.LONG, 0, fibInfo, AutoTradeType.EMA_INDEX);
+		 			marketPlace(pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX);
 		 		}
 	 		}
 	 	}
@@ -1441,12 +1458,12 @@ public class KlinesServiceImpl implements KlinesService {
 		//做多
 		if(closePrice >= areaLowPrice && lowPrice <= areaLowPrice) {
 			FibInfo fibInfo = new FibInfo(areaHighPrice, areaLowPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
-			marketPalce(pair, PositionSide.LONG, 0, fibInfo, AutoTradeType.AREA_INDEX);
+			marketPlace(pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
 		}
 		//做空
 		if(closePrice <= areaHighPrice && hightPrice >= areaHighPrice) {
 			FibInfo fibInfo = new FibInfo(areaLowPrice, areaHighPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
-			marketPalce(pair, PositionSide.SHORT, 0, fibInfo, AutoTradeType.AREA_INDEX);
+			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
 		}
 	}
 	
@@ -1756,13 +1773,23 @@ public class KlinesServiceImpl implements KlinesService {
 			double stopLevel = propertiesJson.getDouble("stopLevel") / n;//止损金额
 			double profitLevel = propertiesJson.getDouble("profitLevel") / n;//止盈金额
 			
+			String pair = klines.getPair();
+			
 			if(hitPrice(klines, price)) {
 				String subject = String.format("%s永续合约(%s)做多交易计划 %s", 
 						klines.getPair(),
 						PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
 						dateStr);
-				String text = StringUtil.formatLongMessage(klines.getPair(), price, price - stopLevel, price + profitLevel, klines.getDecimalNum());
+				
+				double stopLossDoubleValue = price - stopLevel;
+				double takeProfitDoubleValue = price + profitLevel;
+				
+				String text = StringUtil.formatLongMessage(klines.getPair(), price, stopLossDoubleValue, takeProfitDoubleValue, klines.getDecimalNum());
 				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				
+				marketPlace(pair, PositionSide.LONG, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT);
+				
+				shapeRepository.deleteById(info.getId());
 			}
 			
 		}
@@ -1786,13 +1813,23 @@ public class KlinesServiceImpl implements KlinesService {
 			double stopLevel = propertiesJson.getDouble("stopLevel") / n;//止损金额
 			double profitLevel = propertiesJson.getDouble("profitLevel") / n;//止盈金额
 			
+			String pair = klines.getPair();
+			
 			if(hitPrice(klines, price)) {
 				String subject = String.format("%s永续合约(%s)做空交易计划 %s", 
 						klines.getPair(),
 						PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
 						dateStr);
-				String text = StringUtil.formatLongMessage(klines.getPair(), price, price + stopLevel, price - profitLevel, klines.getDecimalNum());
+				
+				double stopLossDoubleValue = price + stopLevel;
+				double takeProfitDoubleValue = price - profitLevel;
+				
+				String text = StringUtil.formatLongMessage(klines.getPair(), price, stopLossDoubleValue, takeProfitDoubleValue, klines.getDecimalNum());
 				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				
+				marketPlace(pair, PositionSide.SHORT, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT);
+				
+				shapeRepository.deleteById(info.getId());
 			}
 			
 		}
