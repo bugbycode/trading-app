@@ -2,6 +2,8 @@ package com.bugbycode.webapp.controller.shape;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,12 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.ShapeInfo;
-import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.user.User;
-import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.webapp.controller.base.BaseController;
@@ -26,6 +25,8 @@ import jakarta.annotation.Resource;
 @RequestMapping("/shape")
 public class ShapeController extends BaseController{
 
+	private final Logger logger = LogManager.getLogger(ShapeController.class);
+	
 	@Resource
 	private ShapeRepository shapeRepository;
 	
@@ -42,9 +43,12 @@ public class ShapeController extends BaseController{
 	public ShapeInfo saveShapeInfo(@RequestBody ShapeInfo info) {
 		info.setOwner(getUserInfo().getUsername());
 		
-		info.setPrice(klinesService.getClosePrice(info.getPrice(), Inerval.INERVAL_15M));
+		String price = klinesService.getClosePrice(info.getSymbol(), Inerval.INERVAL_15M);
+		
+		info.setPrice(price);
 		
 		shapeRepository.insert(info);
+		
 		return info;
 	}
 	
@@ -55,8 +59,9 @@ public class ShapeController extends BaseController{
 			throw new AccessDeniedException("无权访问");
 		}
 		
-		info.setPrice(klinesService.getClosePrice(info.getPrice(), Inerval.INERVAL_15M));
+		String price = klinesService.getClosePrice(info.getSymbol(), Inerval.INERVAL_15M);
 		
+		info.setPrice(price);
 		info.setOwner(dbShape.getOwner());
 		shapeRepository.update(info);
 		return info;
