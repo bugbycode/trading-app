@@ -21,6 +21,8 @@ public class ShapeInfo {
 	private String points;//绘图坐标信息 [{price:0.1,time:1701698287},...]
 	
 	private String properties;//图纸渲染属性 如：颜色、用户是否可编辑、描述信息等构成的json
+	
+	private String price = "0";//图纸创建时最新价格
 
 	public String getId() {
 		return id;
@@ -72,6 +74,14 @@ public class ShapeInfo {
 	
 	public ShapeType getShapeType() {
 		return ShapeType.resolve(this.shape);
+	}
+
+	public String getPrice() {
+		return price;
+	}
+
+	public void setPrice(String price) {
+		this.price = price;
 	}
 	
 }

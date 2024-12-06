@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.ShapeInfo;
+import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.webapp.controller.base.BaseController;
@@ -24,6 +26,9 @@ public class ShapeController extends BaseController{
 	@Resource
 	private ShapeRepository shapeRepository;
 	
+	@Resource
+	private BinanceWebsocketTradeService binanceWebsocketTradeService;
+	
 	@GetMapping("/getAllShapeInfo")
 	public List<ShapeInfo> getAllShapeInfo(){
 		User user = getUserInfo();
@@ -33,6 +38,12 @@ public class ShapeController extends BaseController{
 	@PostMapping("/saveShapeInfo")
 	public ShapeInfo saveShapeInfo(@RequestBody ShapeInfo info) {
 		info.setOwner(getUserInfo().getUsername());
+		
+		PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(info.getSymbol());
+		if(priceInfo != null) {
+			info.setPrice(priceInfo.getPrice());
+		}
+		
 		shapeRepository.insert(info);
 		return info;
 	}
