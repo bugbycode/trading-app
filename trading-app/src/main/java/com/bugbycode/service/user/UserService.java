@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
+import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.user.User;
 
 /**
@@ -63,4 +64,11 @@ public interface UserService extends UserDetailsService{
 	 * @return
 	 */
 	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType);
+	
+	/**
+	 * 根据画线交易启用状态查询所有关联用户信息
+	 * @param drawTrade 是否开启画线交易
+	 * @return
+	 */
+	public List<User> queryByDrawTrade(DrawTrade drawTrade);
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
+import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.util.MD5Util;
@@ -94,7 +95,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue, int cutLoss,double profit,int autoTradeType) {
+			int baseStepSize,int leverage,int positionValue, int cutLoss,double profit,int autoTradeType,int drawTrade) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
@@ -105,6 +106,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("cutLoss", cutLoss);
 		update.set("profit", profit);
 		update.set("autoTradeType", autoTradeType);
+		update.set("drawTrade", drawTrade);
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
@@ -113,6 +115,15 @@ public class UserRepositoryImpl implements UserRepository {
 		return template.find(
 				
 				Query.query(Criteria.where("autoTrade").is(autoTrade.value()).and("autoTradeType").is(autoTradeType.value())), 
+				
+				User.class);
+	}
+
+	@Override
+	public List<User> queryByDrawTrade(DrawTrade drawTrade) {
+		return template.find(
+				
+				Query.query(Criteria.where("drawTrade").is(drawTrade.getValue())), 
 				
 				User.class);
 	}

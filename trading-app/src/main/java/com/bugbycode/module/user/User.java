@@ -44,6 +44,8 @@ public class User implements UserDetails {
 	
 	private int autoTrade = 0; //是否启用自动交易 0：否 1：是
 	
+	private int drawTrade = 0; //是否启用画线交易 0：否 1：是
+	
 	private int autoTradeType = 0; //自动交易参考指标 取值参考泛型 com.bugbycode.module.binance.AutoTradeType
 	
 	private int baseStepSize = 1;//名义价值倍数
@@ -159,6 +161,14 @@ public class User implements UserDetails {
 
 	public void setAutoTrade(int autoTrade) {
 		this.autoTrade = autoTrade;
+	}
+
+	public int getDrawTrade() {
+		return drawTrade;
+	}
+
+	public void setDrawTrade(int drawTrade) {
+		this.drawTrade = drawTrade;
 	}
 
 	public int getBaseStepSize() {

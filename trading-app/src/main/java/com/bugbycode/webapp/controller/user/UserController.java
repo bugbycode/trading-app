@@ -18,6 +18,7 @@ import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.Balance;
+import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.webapp.controller.base.BaseController;
@@ -103,7 +104,8 @@ public class UserController extends BaseController{
 		
 		AutoTrade autoTrade = AutoTrade.valueOf(data.getAutoTrade());
 		AutoTradeType autoTradeType = AutoTradeType.valueOf(data.getAutoTradeType());
-		
+		DrawTrade drawTrade = DrawTrade.valueOf(data.getDrawTrade());
+				
 		if(data.getCutLoss() == 0) {
 			data.setCutLoss(3);
 		}
@@ -129,7 +131,8 @@ public class UserController extends BaseController{
 		} else if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && autoTrade == AutoTrade.CLOSE) {
 			
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value());
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
+					drawTrade.getValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -140,11 +143,13 @@ public class UserController extends BaseController{
 			user.setCutLoss(data.getCutLoss());
 			user.setProfit(data.getProfit());
 			user.setAutoTradeType(autoTradeType.value());
+			user.setDrawTrade(drawTrade.getValue());
 			
 			json.put("message", "修改成功");
 		} else if(!CollectionUtils.isEmpty(balanceList)) {
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value());
+					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
+					drawTrade.getValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -155,6 +160,7 @@ public class UserController extends BaseController{
 			user.setCutLoss(data.getCutLoss());
 			user.setProfit(data.getProfit());
 			user.setAutoTradeType(autoTradeType.value());
+			user.setDrawTrade(drawTrade.getValue());
 			
 			json.put("message", "修改成功");
 		} else {

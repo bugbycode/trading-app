@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
+import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.user.User;
 
 public interface UserRepository {
@@ -102,9 +103,10 @@ public interface UserRepository {
 	 * @param cutLoss 止损比例
 	 * @param profit 收益筛选
 	 * @param autoTradeType 自动交易参考指标 取值参考泛型 com.bugbycode.module.binance.AutoTradeType
+	 * @param drawTrade 是否开启画线交易
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue,int cutLoss,double profit,int autoTradeType);
+			int baseStepSize,int leverage,int positionValue,int cutLoss,double profit,int autoTradeType,int drawTrade);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息
@@ -113,4 +115,11 @@ public interface UserRepository {
 	 * @return
 	 */
 	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType);
+	
+	/**
+	 * 根据画线交易启用状态查询所有关联用户信息
+	 * @param drawTrade 是否开启画线交易
+	 * @return
+	 */
+	public List<User> queryByDrawTrade(DrawTrade drawTrade);
 }

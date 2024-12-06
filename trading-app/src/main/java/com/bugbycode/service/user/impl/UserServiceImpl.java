@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
+import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.user.UserService;
@@ -92,5 +93,10 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType) {
 		return userRepository.queryByAutoTrade(autoTrade,autoTradeType);
+	}
+
+	@Override
+	public List<User> queryByDrawTrade(DrawTrade drawTrade) {
+		return userRepository.queryByDrawTrade(drawTrade);
 	}
 }
