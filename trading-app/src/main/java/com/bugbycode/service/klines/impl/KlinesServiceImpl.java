@@ -1943,4 +1943,14 @@ public class KlinesServiceImpl implements KlinesService {
         }
         return result;
     }
+
+	@Override
+	public String getClosePrice(String pair, Inerval inerval) {
+		String price = "0";
+		List<Klines> list = klinesRepository.findLastKlinesByPair(pair, inerval.getDescption(), 1);
+		if(!CollectionUtils.isEmpty(list)) {
+			price = list.get(0).getClosePrice();
+		}
+		return price;
+	}
 }

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.bugbycode.module.FibInfo;
+import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
@@ -221,4 +222,12 @@ public interface KlinesService {
      * @param autoTradeType 自动交易参考指标
      */
     public void marketPalce(String pair,PositionSide ps,int offset, FibInfo fibInfo, AutoTradeType autoTradeType);
+    
+    /**
+     * 获取最新k线收盘价
+     * @param pair 交易对
+     * @param inerval 时间级别
+     * @return
+     */
+    public String getClosePrice(String pair,Inerval inerval);
 }

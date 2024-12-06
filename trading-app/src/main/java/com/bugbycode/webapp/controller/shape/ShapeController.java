@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
+import com.bugbycode.module.Inerval;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.user.User;
+import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
+import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.webapp.controller.base.BaseController;
 
 import jakarta.annotation.Resource;
@@ -27,7 +30,7 @@ public class ShapeController extends BaseController{
 	private ShapeRepository shapeRepository;
 	
 	@Resource
-	private BinanceWebsocketTradeService binanceWebsocketTradeService;
+	private KlinesService klinesService;
 	
 	@GetMapping("/getAllShapeInfo")
 	public List<ShapeInfo> getAllShapeInfo(){
@@ -39,10 +42,7 @@ public class ShapeController extends BaseController{
 	public ShapeInfo saveShapeInfo(@RequestBody ShapeInfo info) {
 		info.setOwner(getUserInfo().getUsername());
 		
-		PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(info.getSymbol());
-		if(priceInfo != null) {
-			info.setPrice(priceInfo.getPrice());
-		}
+		info.setPrice(klinesService.getClosePrice(info.getPrice(), Inerval.INERVAL_15M));
 		
 		shapeRepository.insert(info);
 		return info;
@@ -54,6 +54,9 @@ public class ShapeController extends BaseController{
 		if(dbShape == null || !dbShape.getOwner().equals(getUserInfo().getUsername())) {
 			throw new AccessDeniedException("无权访问");
 		}
+		
+		info.setPrice(klinesService.getClosePrice(info.getPrice(), Inerval.INERVAL_15M));
+		
 		info.setOwner(dbShape.getOwner());
 		shapeRepository.update(info);
 		return info;
