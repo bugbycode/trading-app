@@ -1475,7 +1475,7 @@ public class KlinesServiceImpl implements KlinesService {
 			JSONObject points = pointsJsonArray.getJSONObject(0);
 			double price = points.getDouble("price");
 			long time = points.getLong("time");
-			double createPrice = info.getPriceDoubleValue();
+			//double createPrice = info.getPriceDoubleValue();
 			
 			String dateStr = DateFormatUtil.format(new Date());
 			String subject = String.format("%s永续合约价格已到达%s %s", klines.getPair(), PriceUtil.formatDoubleDecimal(price,klines.getDecimalNum()),dateStr);
@@ -1495,13 +1495,15 @@ public class KlinesServiceImpl implements KlinesService {
 					double highValue = klines.getHighPriceDoubleValue() > high.getHighPriceDoubleValue() ? klines.getHighPriceDoubleValue() : high.getHighPriceDoubleValue();
 					double lowValue = klines.getLowPriceDoubleValue() < low.getLowPriceDoubleValue() ? klines.getLowPriceDoubleValue() : low.getLowPriceDoubleValue();
 					
-					if(createPrice < price) {//做空
+					LongOrShortType type = LongOrShortType.resolve(info.getLongOrShortType());
+					
+					if(type == LongOrShortType.SHORT) {//做空
 						FibInfo fibInfo = new FibInfo(lowValue, highValue, klines.getDecimalNum(), FibLevel.LEVEL_1);
 						//logger.info(fibInfo);
 						marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
 					}
 					
-					if(createPrice > price) { // 做多
+					if(type == LongOrShortType.LONG) { // 做多
 						FibInfo fibInfo = new FibInfo(highValue, lowValue, klines.getDecimalNum(), FibLevel.LEVEL_1);
 						//logger.info(fibInfo);
 						marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
