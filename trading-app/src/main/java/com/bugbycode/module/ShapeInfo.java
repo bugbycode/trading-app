@@ -84,4 +84,8 @@ public class ShapeInfo {
 		this.price = price;
 	}
 	
+	public double getPriceDoubleValue() {
+		return Double.valueOf(price);
+	}
+	
 }
