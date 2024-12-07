@@ -63,4 +63,11 @@ public interface ShapeRepository {
 	 */
 	public List<ShapeInfo> query();
 	
+	/**
+	 * 修改持仓方向（水平射线使用）
+	 * @param id
+	 * @param longOrShortType
+	 */
+	public void updateLongOrShortTypeById(String id, int longOrShortType);
+	
 }

@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import com.bugbycode.module.ShapeInfo;
@@ -61,6 +62,13 @@ public class ShapeRepositoryImpl implements ShapeRepository {
 	@Override
 	public List<ShapeInfo> query() {
 		return template.findAll(ShapeInfo.class);
+	}
+
+	@Override
+	public void updateLongOrShortTypeById(String id, int longOrShortType) {
+		Update update = new Update();
+		update.set("longOrShortType", longOrShortType);
+		template.updateMulti(Query.query(Criteria.where("id").is(id)), update, ShapeInfo.class);
 	}
 
 }

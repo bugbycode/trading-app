@@ -24,6 +24,8 @@ public class ShapeInfo {
 	
 	private String price = "0";//图纸创建时最新价格
 
+	private int longOrShortType;//做多或做空 水平射线使用 0：空 1：多
+	
 	public String getId() {
 		return id;
 	}
@@ -86,6 +88,14 @@ public class ShapeInfo {
 	
 	public double getPriceDoubleValue() {
 		return Double.valueOf(price);
+	}
+
+	public int getLongOrShortType() {
+		return longOrShortType;
+	}
+
+	public void setLongOrShortType(int longOrShortType) {
+		this.longOrShortType = longOrShortType;
 	}
 	
 }
