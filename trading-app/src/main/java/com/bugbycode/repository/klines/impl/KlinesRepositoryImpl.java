@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 
@@ -92,6 +93,13 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 			return findByPair(pair, interval, count - limit, limit);
 		}
 		return new ArrayList<Klines>();
+	}
+
+	@Override
+	public List<Klines> findByTimeLimit(String pair, Inerval inerval, long startTime, long endTime) {
+		Criteria c = Criteria.where("pair").is(pair).and("interval").is(inerval.getDescption()).and("startTime").gte(startTime).and("startTime").lte(endTime);
+		Query q = Query.query(c);
+		return template.find(q, Klines.class);
 	}
 
 }

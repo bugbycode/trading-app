@@ -2,6 +2,7 @@ package com.bugbycode.repository.klines;
 
 import java.util.List;
 
+import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 
 public interface KlinesRepository {
@@ -92,4 +93,14 @@ public interface KlinesRepository {
      * @return
      */
     public List<Klines> findLastKlinesByPair(String pair,String interval,int limit);
+    
+    /**
+     * 根据时间段查询k线信息(根据开盘时间匹配)
+     * @param pair 交易对
+     * @param inerval 时间级别
+     * @param startTime 起始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    public List<Klines> findByTimeLimit(String pair,Inerval inerval,long startTime, long endTime);
 }
