@@ -82,6 +82,10 @@ public class ShapeInfo {
 	public ShapeType getShapeType() {
 		return ShapeType.resolve(this.shape);
 	}
+	
+	public String getShapeTypeMemo() {
+		return getShapeType().getMemo();
+	}
 
 	public String getPrice() {
 		return price;
@@ -120,10 +124,10 @@ public class ShapeInfo {
 	}
 	
 	public String getFormatCreateTime() {
-		return DateFormatUtil.format(createTime);
+		return createTime == 0 ? "" : DateFormatUtil.format(createTime);
 	}
 	
 	public String getFormatUpdateTime() {
-		return DateFormatUtil.format(updateTime);
+		return updateTime == 0 ? "" : DateFormatUtil.format(updateTime);
 	}
 }
