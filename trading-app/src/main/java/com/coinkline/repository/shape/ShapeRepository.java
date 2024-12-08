@@ -70,4 +70,24 @@ public interface ShapeRepository {
 	 */
 	public void updateLongOrShortTypeById(String id, int longOrShortType);
 	
+	/**
+	 * 自定义条件分页查询图纸信息
+	 * 
+	 * @param owner 创建者
+	 * @param symbol 交易对
+	 * @param skip 起始记录数
+	 * @param limit 每页条数
+	 * @return
+	 */
+	public List<ShapeInfo> query(String owner,String symbol,long skip,int limit);
+	
+	/**
+	 * 自定义条件统计总记录数
+	 * 
+	 * @param owner
+	 * @param symbol
+	 * @return
+	 */
+	public long count(String owner,String symbol);
+	
 }

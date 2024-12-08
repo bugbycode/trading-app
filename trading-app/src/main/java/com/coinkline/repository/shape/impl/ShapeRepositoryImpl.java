@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.coinkline.module.ShapeInfo;
 import com.coinkline.repository.shape.ShapeRepository;
+import com.util.StringUtil;
 
 import jakarta.annotation.Resource;
 
@@ -69,6 +71,37 @@ public class ShapeRepositoryImpl implements ShapeRepository {
 		Update update = new Update();
 		update.set("longOrShortType", longOrShortType);
 		template.updateMulti(Query.query(Criteria.where("id").is(id)), update, ShapeInfo.class);
+	}
+
+	@Override
+	public List<ShapeInfo> query(String owner, String symbol, long skip, int limit) {
+		Criteria c = Criteria.where("owner").is(owner);
+		
+		if(StringUtil.isNotEmpty(symbol)) {
+			c.and("symbol").regex(symbol, "i");
+		}
+		
+		Query q = Query.query(c);
+		
+		q.with(Sort.by(Sort.Direction.DESC,"createTime"));
+		
+		q.skip(skip);
+		q.limit(limit);
+		
+		return template.find(q, ShapeInfo.class);
+	}
+
+	@Override
+	public long count(String owner, String symbol) {
+		Criteria c = Criteria.where("owner").is(owner);
+		
+		if(StringUtil.isNotEmpty(symbol)) {
+			c.and("symbol").regex(symbol, "i");
+		}
+		
+		Query q = Query.query(c);
+		
+		return template.count(q, ShapeInfo.class);
 	}
 
 }

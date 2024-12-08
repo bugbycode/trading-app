@@ -1,5 +1,6 @@
 package com.coinkline.webapp.controller.shape;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coinkline.module.Inerval;
@@ -21,7 +23,9 @@ import com.coinkline.module.ShapeInfo;
 import com.coinkline.module.user.User;
 import com.coinkline.repository.shape.ShapeRepository;
 import com.coinkline.service.klines.KlinesService;
+import com.coinkline.service.shape.ShapeService;
 import com.coinkline.webapp.controller.base.BaseController;
+import com.util.page.SearchResult;
 
 import jakarta.annotation.Resource;
 
@@ -33,6 +37,9 @@ public class ShapeController extends BaseController{
 	
 	@Resource
 	private ShapeRepository shapeRepository;
+	
+	@Resource
+	private ShapeService shapeService;
 	
 	@Resource
 	private KlinesService klinesService;
@@ -48,7 +55,7 @@ public class ShapeController extends BaseController{
 		info.setOwner(getUserInfo().getUsername());
 		
 		String price = klinesService.getClosePrice(info.getSymbol(), Inerval.INERVAL_15M);
-		
+		info.setCreateTime(new Date().getTime());
 		info.setPrice(price);
 		
 		//价格坐标
@@ -82,7 +89,8 @@ public class ShapeController extends BaseController{
 		String price = klinesService.getClosePrice(info.getSymbol(), Inerval.INERVAL_15M);
 		
 		info.setPrice(price);
-		
+		info.setCreateTime(dbShape.getCreateTime());
+		info.setUpdateTime(new Date().getTime());
 		info.setLongOrShortType(dbShape.getLongOrShortType());
 		
 		info.setOwner(dbShape.getOwner());
@@ -119,5 +127,17 @@ public class ShapeController extends BaseController{
 		json.put("code", code.getCode());
 		
 		return json.toString();
+	}
+	
+	@GetMapping("/query")
+	public SearchResult<ShapeInfo> query(
+			@RequestParam(defaultValue = "",name = "symbol")
+			String symbol,
+			@RequestParam(defaultValue = "0",name = "startIndex") 
+			long skip,
+			@RequestParam(defaultValue = "10",name = "limit")
+			int limit){
+		User user = getUserInfo();
+		return shapeService.query(user.getUsername(), symbol, skip, limit);
 	}
 }
