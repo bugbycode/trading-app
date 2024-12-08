@@ -3,7 +3,7 @@ package com.util;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import com.bugbycode.module.Inerval;
+import com.coinkline.module.Inerval;
 
 public class CoinPairSet extends HashSet<String> {
 

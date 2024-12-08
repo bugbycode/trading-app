@@ -12,18 +12,18 @@ import java.util.Set;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import com.bugbycode.module.EMAType;
-import com.bugbycode.module.EmaTrade;
-import com.bugbycode.module.FibCode;
-import com.bugbycode.module.FibInfo;
-import com.bugbycode.module.FibKlinesData;
-import com.bugbycode.module.FibLevel;
-import com.bugbycode.module.HighOrLowHitPrice;
-import com.bugbycode.module.Inerval;
-import com.bugbycode.module.Klines;
-import com.bugbycode.module.PriceFibInfo;
-import com.bugbycode.module.QuotationMode;
-import com.bugbycode.module.SortType;
+import com.coinkline.module.EMAType;
+import com.coinkline.module.EmaTrade;
+import com.coinkline.module.FibCode;
+import com.coinkline.module.FibInfo;
+import com.coinkline.module.FibKlinesData;
+import com.coinkline.module.FibLevel;
+import com.coinkline.module.HighOrLowHitPrice;
+import com.coinkline.module.Inerval;
+import com.coinkline.module.Klines;
+import com.coinkline.module.PriceFibInfo;
+import com.coinkline.module.QuotationMode;
+import com.coinkline.module.SortType;
 
 public class PriceUtil {
 	

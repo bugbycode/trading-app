@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.bugbycode.module.Klines;
+import com.coinkline.module.Klines;
 
 public class KlinesUtil {
 

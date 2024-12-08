@@ -10,10 +10,10 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import com.bugbycode.config.AppConfig;
-import com.bugbycode.module.EmailAuth;
-import com.bugbycode.module.Result;
-import com.bugbycode.module.ResultCode;
+import com.coinkline.config.AppConfig;
+import com.coinkline.module.EmailAuth;
+import com.coinkline.module.Result;
+import com.coinkline.module.ResultCode;
 
 public class EmailUtil {
 	
