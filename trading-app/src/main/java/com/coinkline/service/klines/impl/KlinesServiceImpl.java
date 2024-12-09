@@ -1413,6 +1413,8 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		//logger.info(area);
+		//最后一根k线
+		Klines lastDay = PriceUtil.getLastKlines(klinesList);
 		
 		double areaHighPrice = area.getHighPriceDoubleValue();
 		double areaLowPrice = area.getLowPriceDoubleValue();
@@ -1455,11 +1457,35 @@ public class KlinesServiceImpl implements KlinesService {
 			sendEmail(subject, text, recEmail);
 		}
 		
+		//盘整区之后开始时间
+		Date startTime = DateFormatUtil.getStartTimeBySetDay(new Date(area.getEndKlinesStartTime()), 1);
+		
+		//反弹测试盘整区底部情况 做空
+		if(hitPrice(current, areaLowPrice) && area.isLte(lastDay)) {
+			//盘整区之后的所有15分钟级别k线信息
+			List<Klines> list_15m = klinesRepository.findByPairAndGtStartTime(pair, startTime.getTime(), Inerval.INERVAL_15M.getDescption());
+			Klines high = PriceUtil.getMaxPriceKLine(list_15m);
+			Klines low = PriceUtil.getMinPriceKLine(list_15m);
+			//从低到高拉斐波那契回撤
+			FibInfo fibInfo = new FibInfo(low.getLowPriceDoubleValue(), high.getHighPriceDoubleValue(), current.getDecimalNum(), FibLevel.LEVEL_1);
+			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
+		} else 
 		//做多
 		if(closePrice >= areaLowPrice && lowPrice <= areaLowPrice) {
 			FibInfo fibInfo = new FibInfo(areaHighPrice, areaLowPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
 			marketPlace(pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
 		}
+		
+		//回踩盘整区上方情况 做多
+		if(hitPrice(current, areaHighPrice) && area.isGte(lastDay)) {
+			//盘整区之后的所有15分钟级别k线信息
+			List<Klines> list_15m = klinesRepository.findByPairAndGtStartTime(pair, startTime.getTime(), Inerval.INERVAL_15M.getDescption());
+			Klines high = PriceUtil.getMaxPriceKLine(list_15m);
+			Klines low = PriceUtil.getMinPriceKLine(list_15m);
+			//从高到低拉斐波那契回撤
+			FibInfo fibInfo = new FibInfo(high.getHighPriceDoubleValue(), low.getLowPriceDoubleValue(), current.getDecimalNum(), FibLevel.LEVEL_1);
+			marketPlace(pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
+		} else 
 		//做空
 		if(closePrice <= areaHighPrice && hightPrice >= areaHighPrice) {
 			FibInfo fibInfo = new FibInfo(areaLowPrice, areaHighPrice, current.getDecimalNum(), FibLevel.LEVEL_1);

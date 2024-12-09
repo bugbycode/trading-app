@@ -175,6 +175,24 @@ public class ConsolidationArea {
 		return list.get(list.size() - 1).getStartTime();
 	}
 	
+	/**
+	 * 盘整区是否在该k线下方
+	 * @param k
+	 * @return
+	 */
+	public boolean isGte(Klines k) {
+		return this.getHighPriceDoubleValue() <= k.getBodyLowPriceDoubleValue();
+	}
+	
+	/**
+	 * 盘整区是否在该k线上方
+	 * @param k
+	 * @return
+	 */
+	public boolean isLte(Klines k) {
+		return this.getLowPriceDoubleValue() >= k.getBodyHighPriceDoubleValue();
+	}
+	
 	@Override
 	public String toString() {
 		return "交易对：" + getHighKlines().getPair() + "，最高价：" + getHighPrice() + "，最低价：" + getLowPrice() + 
