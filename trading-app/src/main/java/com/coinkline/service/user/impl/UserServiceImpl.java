@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService{
 		return user;
 	}
 
-	private String getSubscribeAiUserEmail(List <User> userList) {
+	public String getSubscribeAiUserEmail(List <User> userList) {
 		StringBuffer buff = new StringBuffer();
 		for(User user : userList) {
 			if(buff.length() > 0) {

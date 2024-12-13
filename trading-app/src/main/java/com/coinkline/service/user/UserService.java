@@ -71,4 +71,6 @@ public interface UserService extends UserDetailsService{
 	 * @return
 	 */
 	public List<User> queryByDrawTrade(DrawTrade drawTrade);
+	
+	public String getSubscribeAiUserEmail(List <User> userList);
 }
