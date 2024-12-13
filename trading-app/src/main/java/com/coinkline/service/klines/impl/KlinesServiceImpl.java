@@ -51,6 +51,7 @@ import com.coinkline.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.coinkline.repository.klines.KlinesRepository;
 import com.coinkline.repository.shape.ShapeRepository;
 import com.coinkline.repository.trading.OrderRepository;
+import com.coinkline.repository.user.UserRepository;
 import com.coinkline.service.klines.KlinesService;
 import com.coinkline.service.user.UserService;
 import com.coinkline.trading_app.pool.WorkTaskPool;
@@ -63,6 +64,8 @@ import com.util.KlinesUtil;
 import com.util.PriceUtil;
 import com.util.StraightLineUtil;
 import com.util.StringUtil;
+
+import jakarta.annotation.Resource;
 
 @Service("klinesService")
 public class KlinesServiceImpl implements KlinesService {
@@ -77,6 +80,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private UserService userDetailsService;
+	
+	@Resource
+	private UserRepository userRepository;
 	
 	@Autowired
 	private WorkTaskPool emailWorkTaskPool;
@@ -1395,19 +1401,32 @@ public class KlinesServiceImpl implements KlinesService {
 	 	double highPrice = Double.valueOf(lastKlines.getHighPrice());
 	 	double ema99 = lastKlines.getEma99();
 	 	
-	 	String recEmail = userDetailsService.getEmaRiseAndFallUserEmail();
+	 	//String recEmail = userDetailsService.getEmaRiseAndFallUserEmail();
+	 	
+	 	List<User> uList = userRepository.queryAllUserByEmaRiseAndFall(1);
+	 	List<User> emailUserList = new ArrayList<User>();
 	 	
 	 	//判断回踩ema99 情况
 	 	if((closePrice >= ema99 && lowPrice <= ema99) || (closePrice <= ema99 && highPrice >= ema99)) {
 	 		FibInfo fibInfo = PriceUtil.getFibInfoForEma(klinesList);
 	 		if(fibInfo != null) {
 	 			
-	 			double percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(FibCode.FIB618));
-				String percentStr = PriceUtil.formatDoubleDecimal(percent * 100, 2);
-				
 		 		QuotationMode mode = fibInfo.getQuotationMode();
 		 		
 		 		if(mode == QuotationMode.LONG) {
+
+		 			double percent = PriceUtil.getFallFluctuationPercentage(closePrice, fibInfo.getFibValue(FibCode.FIB618)) * 100;
+					String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+					
+					if(!CollectionUtils.isEmpty(uList)) {
+						for(User u : uList) {
+							if(percent >= u.getProfit()) {
+								emailUserList.add(u);
+							}
+						}
+					}
+					
+					String recEmail = userDetailsService.getSubscribeAiUserEmail(emailUserList);
 		 			
 		 			subject = String.format("%s永续合约做空交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
 					
@@ -1421,6 +1440,19 @@ public class KlinesServiceImpl implements KlinesService {
 					
 		 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX);
 		 		} else {
+		 			
+		 			double percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(FibCode.FIB618)) * 100;
+					String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+					
+					if(!CollectionUtils.isEmpty(uList)) {
+						for(User u : uList) {
+							if(percent >= u.getProfit()) {
+								emailUserList.add(u);
+							}
+						}
+					}
+					
+					String recEmail = userDetailsService.getSubscribeAiUserEmail(emailUserList);
 		 			
 		 			subject = String.format("%s永续合约做多交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
 					
