@@ -1091,7 +1091,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					if(fib.getQuotationMode() == QuotationMode.SHORT && info.verifyData(currentPrice, fib)) {
 						
-						subject = String.format("%s永续合约做多交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+						subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 						
 						text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice(lowPrice), fib.getFibValue(FibCode.FIB618), lastKlines.getDecimalNum());
 						
@@ -1104,7 +1104,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 					} else if(fib.getQuotationMode() == QuotationMode.LONG && info.verifyData(currentPrice, fib)) {
 						
-						subject = String.format("%s永续合约做空交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+						subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 						
 						text = StringUtil.formatShortMessage(pair, currentPrice, fib.getFibValue(FibCode.FIB618), PriceUtil.rectificationCutLossShortPrice(highPrice), lastKlines.getDecimalNum());
 
@@ -1358,18 +1358,18 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		KlinesUtil ku = new KlinesUtil(klinesList);
 		Klines lastKlines = ku.removeLast();
-		Klines parentKlines = ku.removeLast();
+		//Klines parentKlines = ku.removeLast();
 		//Klines parentNextKlines = ku.removeLast();
 		
 		String pair = lastKlines.getPair();
 		
-		int decimalNum = lastKlines.getDecimalNum();
+		//int decimalNum = lastKlines.getDecimalNum();
 		
 		String subject = "";
 		String text = "";
 		String dateStr = DateFormatUtil.format(new Date());
 		//金叉
-		
+		/*
 		//开始上涨
 		if(parentKlines.getEma7() < parentKlines.getEma25() && 
 				lastKlines.getEma7() >= lastKlines.getEma25()) {
@@ -1389,20 +1389,49 @@ public class KlinesServiceImpl implements KlinesService {
 		String recEmail = userDetailsService.getEmaRiseAndFallUserEmail();
 		
 	 	sendEmail(subject, text, recEmail);
-	 	
+	 	*/
 	 	double closePrice = Double.valueOf(lastKlines.getClosePrice());
 	 	double lowPrice = Double.valueOf(lastKlines.getLowPrice());
 	 	double highPrice = Double.valueOf(lastKlines.getHighPrice());
 	 	double ema99 = lastKlines.getEma99();
 	 	
+	 	String recEmail = userDetailsService.getEmaRiseAndFallUserEmail();
+	 	
 	 	//判断回踩ema99 情况
 	 	if((closePrice >= ema99 && lowPrice <= ema99) || (closePrice <= ema99 && highPrice >= ema99)) {
 	 		FibInfo fibInfo = PriceUtil.getFibInfoForEma(klinesList);
 	 		if(fibInfo != null) {
+	 			
+	 			double percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(FibCode.FIB618));
+				String percentStr = PriceUtil.formatDoubleDecimal(percent * 100, 2);
+				
 		 		QuotationMode mode = fibInfo.getQuotationMode();
+		 		
 		 		if(mode == QuotationMode.LONG) {
+		 			
+		 			subject = String.format("%s永续合约做空交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+					
+					text = StringUtil.formatShortMessage(pair, closePrice, fibInfo.getFibValue(FibCode.FIB618), PriceUtil.rectificationCutLossShortPrice(highPrice), lastKlines.getDecimalNum());
+
+					text += "，预计盈利：" + percentStr + "%";
+					
+					text += "\r\n" + fibInfo.toString();
+					
+					sendEmail(subject, text, recEmail);
+					
 		 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX);
 		 		} else {
+		 			
+		 			subject = String.format("%s永续合约做多交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+					
+					text = StringUtil.formatLongMessage(pair, closePrice, PriceUtil.rectificationCutLossLongPrice(lowPrice), fibInfo.getFibValue(FibCode.FIB618), lastKlines.getDecimalNum());
+					
+					text += "，预计盈利：" + percentStr + "%";
+					
+					text += "\r\n" + fibInfo.toString();
+					
+					sendEmail(subject, text, recEmail);
+		 			
 		 			marketPlace(pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX);
 		 		}
 	 		}
