@@ -1086,16 +1086,29 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					text += pricePercentage + "%" + "\r\n" + fib.toString();
 					
-					String recEmail = userDetailsService.getEmaMonitorUserEmail();
+					//String recEmail = userDetailsService.getEmaMonitorUserEmail();
 					/*
 					if(info.verifyData(currentPrice, fib)) {
 						sendEmail(subject, text, recEmail);
 					}*/
 					
-					double percent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fib.getFibValue(FibCode.FIB618));
-					String percentStr = PriceUtil.formatDoubleDecimal(percent * 100, 2);
+					List<User> uList = userRepository.queryAllUserByEmaMonitor(1);
+					List<User> emailUserList = new ArrayList<User>();
 					
 					if(fib.getQuotationMode() == QuotationMode.SHORT && info.verifyData(currentPrice, fib)) {
+						
+						double percent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fib.getFibValue(FibCode.FIB618)) * 100;
+						String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+						
+						if(!CollectionUtils.isEmpty(uList)) {
+							for(User u : uList) {
+								if(percent >= u.getProfit()) {
+									emailUserList.add(u);
+								}
+							}
+						}
+						
+						String recEmail = userDetailsService.getSubscribeAiUserEmail(emailUserList);
 						
 						subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 						
@@ -1109,6 +1122,19 @@ public class KlinesServiceImpl implements KlinesService {
 						marketPlace(pair, PositionSide.LONG, 0, 0, 0, fib, AutoTradeType.PRICE_ACTION);
 						
 					} else if(fib.getQuotationMode() == QuotationMode.LONG && info.verifyData(currentPrice, fib)) {
+						
+						double percent = PriceUtil.getFallFluctuationPercentage(currentPrice, fib.getFibValue(FibCode.FIB618)) * 100;
+						String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+						
+						if(!CollectionUtils.isEmpty(uList)) {
+							for(User u : uList) {
+								if(percent >= u.getProfit()) {
+									emailUserList.add(u);
+								}
+							}
+						}
+						
+						String recEmail = userDetailsService.getSubscribeAiUserEmail(emailUserList);
 						
 						subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 						
