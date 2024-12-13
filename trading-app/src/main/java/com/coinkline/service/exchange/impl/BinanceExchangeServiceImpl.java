@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.coinkline.config.AppConfig;
+import com.coinkline.module.binance.ContractStatus;
+import com.coinkline.module.binance.ContractType;
 import com.coinkline.module.binance.SymbolExchangeInfo;
 import com.coinkline.service.exchange.BinanceExchangeService;
 import com.coinkline.service.user.UserService;
@@ -47,10 +49,17 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 				if(item instanceof JSONObject) {
 					JSONObject symbolJson = (JSONObject) item;
 					String contractType = symbolJson.getString("contractType");
-					String status = symbolJson.getString("status");
+					String statusStr = symbolJson.getString("status");
 					String symbol = symbolJson.getString("symbol");
+					long onboardDate = symbolJson.getLong("onboardDate");
 					JSONArray filters = symbolJson.getJSONArray("filters");
-					if("PERPETUAL".equals(contractType) && "TRADING".equals(status)) {
+					
+					
+					
+					ContractType type = ContractType.resolve(contractType);
+					ContractStatus status = ContractStatus.resolve(statusStr);
+					
+					if(type == ContractType.PERPETUAL && status == ContractStatus.TRADING) {
 						pairs.add(symbol);
 						SymbolExchangeInfo info = new SymbolExchangeInfo();
 						info.setSymbol(symbol);
@@ -75,7 +84,7 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 					}
 					
 					//待上市代币
-					if("PENDING_TRADING".equals(status)) {
+					if(status == ContractStatus.PENDING_TRADING) {
 						if(!StringUtil.contains(AppConfig.PENDING_TRADING_SET, symbol)) {
 							
 							AppConfig.PENDING_TRADING_SET.add(symbol);
@@ -83,7 +92,7 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 							String dateStr = DateFormatUtil.format(new Date());
 							String recEmail = userDetailsService.getAllUserEmail();
 							
-							String text = String.format("币安即将上市%s %s", symbol, dateStr);
+							String text = String.format("币安将于%s上市%s%s %s", DateFormatUtil.format(onboardDate), symbol, type.getMemo(), dateStr);
 							
 							emailWorkTaskPool.add(new SendMailTask(text, text, recEmail));
 						}
