@@ -1086,11 +1086,16 @@ public class KlinesServiceImpl implements KlinesService {
 						sendEmail(subject, text, recEmail);
 					}*/
 					
+					double percent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fib.getFibValue(FibCode.FIB618));
+					String percentStr = PriceUtil.formatDoubleDecimal(percent * 100, 2);
+					
 					if(fib.getQuotationMode() == QuotationMode.SHORT && info.verifyData(currentPrice, fib)) {
 						
-						subject = String.format("%s永续合约做多交易机会 %s", pair, dateStr);
+						subject = String.format("%s永续合约做多交易机会(PNL:%s) %s", pair, percentStr, dateStr);
 						
 						text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice(lowPrice), fib.getFibValue(FibCode.FIB618), lastKlines.getDecimalNum());
+						
+						text += "，预计盈利：" + percentStr + "%";
 						
 						sendEmail(subject, text, recEmail);
 						
@@ -1099,9 +1104,11 @@ public class KlinesServiceImpl implements KlinesService {
 						
 					} else if(fib.getQuotationMode() == QuotationMode.LONG && info.verifyData(currentPrice, fib)) {
 						
-						subject = String.format("%s永续合约做空交易机会 %s", pair, dateStr);
+						subject = String.format("%s永续合约做空交易机会(PNL:%s) %s", pair, percentStr, dateStr);
 						
 						text = StringUtil.formatShortMessage(pair, currentPrice, fib.getFibValue(FibCode.FIB618), PriceUtil.rectificationCutLossShortPrice(highPrice), lastKlines.getDecimalNum());
+
+						text += "，预计盈利：" + percentStr + "%";
 						
 						sendEmail(subject, text, recEmail);
 						
