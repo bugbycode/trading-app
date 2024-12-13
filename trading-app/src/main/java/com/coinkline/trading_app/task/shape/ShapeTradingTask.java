@@ -56,7 +56,7 @@ public class ShapeTradingTask {
 	 */
 	@Scheduled(cron = "45 4/5 * * * ?")
 	public void executeShapeTask() {
-		logger.info("ShapeTradingTask executeShapeTask start.");
+		logger.debug("ShapeTradingTask executeShapeTask start.");
 		Inerval inerval = Inerval.INERVAL_5M;
 		
 		List<EmailAuth> emailAuthList = emailRepository.query();
@@ -96,6 +96,6 @@ public class ShapeTradingTask {
 			}
 		}
 		
-		logger.info("ShapeTradingTask executeShapeTask end.");
+		logger.debug("ShapeTradingTask executeShapeTask end.");
 	}
 }

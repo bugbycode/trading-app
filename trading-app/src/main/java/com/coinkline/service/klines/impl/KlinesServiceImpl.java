@@ -376,14 +376,14 @@ public class KlinesServiceImpl implements KlinesService {
 						if(fibInfo != null) {
 							//盈利太少则不做交易
 							if((profitPercent * 100) < u.getProfit()) {
-								logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
 								continue;
 							}
 						}
 						
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
 						if(!CollectionUtils.isEmpty(orderList)) {
-							logger.info("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 							continue;
 						}
 						
@@ -401,41 +401,41 @@ public class KlinesServiceImpl implements KlinesService {
 						double order_value = ( Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) ) / leverage;
 						
 						if(order_value > u.getPositionValue()) {
-							logger.info("最少下单数量仓位价值超过" + u.getPositionValue() + "USDT");
+							logger.debug("最少下单数量仓位价值超过" + u.getPositionValue() + "USDT");
 							continue;
 						}
 						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 						if(Double.valueOf(availableBalanceStr) < (order_value * 2)) {
-							logger.info("用户" + u.getUsername() + "可下单金额小于" + (order_value * 2) + "USDT");
+							logger.debug("用户" + u.getUsername() + "可下单金额小于" + (order_value * 2) + "USDT");
 							continue;
 						}
 						
 						boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
-						logger.info("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
+						logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
 						if(!dualSidePosition) {
-							logger.info("开始修改持仓模式为双向持仓");
+							logger.debug("开始修改持仓模式为双向持仓");
 							Result result = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey, true);
 							if(result.getResult() == ResultCode.SUCCESS) {
-								logger.info("修改持仓模式成功");
+								logger.debug("修改持仓模式成功");
 							} else {
-								logger.info("修改持仓模式失败，失败原因：" + result.getMsg());
+								logger.debug("修改持仓模式失败，失败原因：" + result.getMsg());
 								sendEmail("修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
 							}
 						}
 						
 						MarginType marginType = MarginType.resolve(sc.getMarginType());
 						
-						logger.info(pair + "当前保证金模式：" + marginType);
+						logger.debug(pair + "当前保证金模式：" + marginType);
 						
 						if(marginType != MarginType.ISOLATED) {
-							logger.info("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
+							logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 							binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 						}
 						
-						logger.info(pair + "当前杠杆倍数：" + leverage + "倍");
+						logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
 						if(leverage != u.getLeverage()) {
-							logger.info("开始修改" + pair + "杠杆倍数");
+							logger.debug("开始修改" + pair + "杠杆倍数");
 							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, u.getLeverage());
 						}
 						
@@ -523,14 +523,14 @@ public class KlinesServiceImpl implements KlinesService {
 						if(fibInfo != null) {
 							//盈利太少则不做交易
 							if((profitPercent * 100) < u.getProfit()) {
-								logger.info(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
 								continue;
 							}
 						}
 
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
 						if(!CollectionUtils.isEmpty(orderList)) {
-							logger.info("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 							continue;
 						}
 
@@ -548,42 +548,42 @@ public class KlinesServiceImpl implements KlinesService {
 						double order_value = ( Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) ) / leverage;
 						
 						if(order_value > u.getPositionValue()) {
-							logger.info("最少下单数量仓位价值超过" + u.getPositionValue() + "USDT");
+							logger.debug("最少下单数量仓位价值超过" + u.getPositionValue() + "USDT");
 							continue;
 						}
 						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 						if(Double.valueOf(availableBalanceStr) < (order_value * 2)) {
-							logger.info("用户" + u.getUsername() + "可下单金额小于" + (order_value * 2) + "USDT");
+							logger.debug("用户" + u.getUsername() + "可下单金额小于" + (order_value * 2) + "USDT");
 							continue;
 						}
 						
 						boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
-						logger.info("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
+						logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
 						if(!dualSidePosition) {
-							logger.info("开始修改持仓模式为双向持仓");
+							logger.debug("开始修改持仓模式为双向持仓");
 							Result result = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey, true);
 							if(result.getResult() == ResultCode.SUCCESS) {
-								logger.info("修改持仓模式成功");
+								logger.debug("修改持仓模式成功");
 							} else {
-								logger.info("修改持仓模式失败，失败原因：" + result.getMsg());
+								logger.debug("修改持仓模式失败，失败原因：" + result.getMsg());
 								sendEmail("修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
 							}
 						}
 						
 						MarginType marginType = MarginType.resolve(sc.getMarginType());
 
-						logger.info(pair + "当前保证金模式：" + marginType);
+						logger.debug(pair + "当前保证金模式：" + marginType);
 						
 						if(marginType != MarginType.ISOLATED) {
-							logger.info("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
+							logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 							binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 						}
 						
-						logger.info(pair + "当前杠杆倍数：" + leverage + "倍");
+						logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
 						
 						if(leverage != u.getLeverage()) {
-							logger.info("开始修改" + pair + "杠杆倍数");
+							logger.debug("开始修改" + pair + "杠杆倍数");
 							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, u.getLeverage());
 						}
 						
@@ -1412,7 +1412,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		//logger.info(area);
+		logger.debug(area);
 		//最后一根k线
 		Klines lastDay = PriceUtil.getLastKlines(klinesList);
 		
@@ -1525,13 +1525,13 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					if(type == LongOrShortType.SHORT) {//做空
 						FibInfo fibInfo = new FibInfo(lowValue, highValue, klines.getDecimalNum(), FibLevel.LEVEL_1);
-						//logger.info(fibInfo);
+						logger.debug(fibInfo);
 						marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
 					}
 					
 					if(type == LongOrShortType.LONG) { // 做多
 						FibInfo fibInfo = new FibInfo(highValue, lowValue, klines.getDecimalNum(), FibLevel.LEVEL_1);
-						//logger.info(fibInfo);
+						logger.debug(fibInfo);
 						marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
 					}
 				}
@@ -1638,7 +1638,7 @@ public class KlinesServiceImpl implements KlinesService {
 					DateFormatUtil.format(time1 * 1000),
 					klines.getClosePrice(),
 					PriceUtil.formatDoubleDecimal(resultPrice,klines.getDecimalNum()));
-			logger.info(text);
+			logger.debug(text);
 			if(hitPrice(klines, resultPrice)) {
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
 				
@@ -1696,7 +1696,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			String upOrLowStr = "";
 			
-			//logger.info(String.format("价格1：%s，价格2：%s，时间：%s", line0Price,line1Price,DateFormatUtil.format(klines.getStartTime())));
+			logger.debug(String.format("价格1：%s，价格2：%s，时间：%s", line0Price,line1Price,DateFormatUtil.format(klines.getStartTime())));
 			
 			//第一条直线
 			if(hitPrice(klines, line0Price)) {
@@ -1791,7 +1791,7 @@ public class KlinesServiceImpl implements KlinesService {
 				parallelChannelOrTrianglePattern = "三角形";
 				//两条直线相交的时间
 				long intersectTime = util.getIntersectXValue();
-				logger.info(String.format("三角形AC和BD两条直线相交时间：%s", DateFormatUtil.format(intersectTime)));
+				logger.debug(String.format("三角形AC和BD两条直线相交时间：%s", DateFormatUtil.format(intersectTime)));
 				//正常绘图 相交时间应在ABCD四个点之后 否则不做分析
 				if(!(intersectTime > time0 && intersectTime > time1 && intersectTime > time2 && intersectTime > time3)) {
 					return;
@@ -1803,7 +1803,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 			} else {//平行
 				parallelChannelOrTrianglePattern = "平行通道";
-				logger.info("AC与BD两条直线平行，绘图分析为平行通道");
+				logger.debug("AC与BD两条直线平行，绘图分析为平行通道");
 			}
 			
 			//两条直线当前对应的价格
@@ -1812,7 +1812,7 @@ public class KlinesServiceImpl implements KlinesService {
 			//第二条直线 BD
 			double bdPrice = util.calculateLine2Yvalue(klines.getStartTime());
 			
-			logger.info(String.format("AC价格：%s，BD价格：%s，当前价格：%s", 
+			logger.debug(String.format("AC价格：%s，BD价格：%s，当前价格：%s", 
 					PriceUtil.formatDoubleDecimal(acPrice,klines.getDecimalNum()),
 					PriceUtil.formatDoubleDecimal(bdPrice,klines.getDecimalNum()),
 					klines.getClosePrice()));
@@ -1993,7 +1993,7 @@ public class KlinesServiceImpl implements KlinesService {
 		List<TradingOrder> orderList = orderRepository.findAll(klines.getPair(), 0, -1, 0);
 		if(!CollectionUtils.isEmpty(orderList)) {
 			for(TradingOrder o : orderList) {
-				//logger.info(o);
+				logger.debug(o);
 				double sl = o.getStopLoss();//止损
 				double tp = o.getTakeProfit();//止盈
 				LongOrShortType type = LongOrShortType.resolve(o.getLongOrShort());//持仓方向
@@ -2071,7 +2071,7 @@ public class KlinesServiceImpl implements KlinesService {
                 if(startTime < endTime && endTime - startTime > 60000) {
                 	result = false;
                 	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
-                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
+                	logger.debug(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
                 				+ "条数据，缺失时间段：" + DateFormatUtil.format(startTime) + " ~ " + DateFormatUtil.format(endTime));
                 	klinesRepository.insert(data);
                 }
@@ -2086,12 +2086,12 @@ public class KlinesServiceImpl implements KlinesService {
                 
                 //判断重复
                 if(current.getStartTime() == next.getStartTime()){
-                    logger.info("查询到重复K线信息：" + current);
+                    logger.debug("查询到重复K线信息：" + current);
                     result = false;
                     String _id = current.getId();
                     if(StringUtil.isNotEmpty(_id)){
                     	klinesRepository.remove(_id);
-                        logger.info("重复k线已从数据库中删除");
+                        logger.debug("重复k线已从数据库中删除");
                     }
                 }
             }

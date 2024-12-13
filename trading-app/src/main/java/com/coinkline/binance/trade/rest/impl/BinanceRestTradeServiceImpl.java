@@ -502,7 +502,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		BinanceOrderInfo order = new BinanceOrderInfo();
 		
 		if(status == HttpStatus.OK) {
-			logger.info(result.getBody());
+			logger.debug(result.getBody());
 			JSONObject o = new JSONObject(result.getBody());
 			if(o.has("avgPrice")) {
 				order.setAvgPrice(o.getString("avgPrice"));

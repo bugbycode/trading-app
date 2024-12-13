@@ -29,11 +29,11 @@ public class ShapeAnalysisTask implements Runnable{
 
 	@Override
 	public void run() {
-		logger.info("ShapeAnalysisTask run start.");
+		logger.debug("ShapeAnalysisTask run start.");
 		try {
 			//区分绘图类型
 			ShapeType type = info.getShapeType();
-			logger.info(klines.getPair() + " " + type.getMemo());
+			logger.debug(klines.getPair() + " " + type.getMemo());
 			//平行射线
 			if(type == ShapeType.LINE_TOOL_HORZ_RAY) {
 				klinesService.horizontalRay(klines, info);
@@ -55,7 +55,7 @@ public class ShapeAnalysisTask implements Runnable{
 		} catch (Exception e) {
 			logger.error("执行绘图分析任务时出现异常", e);
 		}
-		logger.info("ShapeAnalysisTask run end.");
+		logger.debug("ShapeAnalysisTask run end.");
 	}
 
 }

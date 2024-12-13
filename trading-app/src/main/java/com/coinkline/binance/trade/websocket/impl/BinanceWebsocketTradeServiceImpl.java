@@ -229,13 +229,13 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		
 		method.put("params", params);
 		
-		//logger.info(method);
+		logger.debug(method);
 		
 		websocketApi.sendMessage(method);
 		
 		JSONObject result = websocketApi.read(method.getString("id"));
 		if(result.getInt("status") == 200 && result.has("result")) {
-			//logger.info(result);
+			logger.debug(result);
 			JSONObject o = result.getJSONObject("result");
 			if(o.has("avgPrice")) {
 				order.setAvgPrice(o.getString("avgPrice"));

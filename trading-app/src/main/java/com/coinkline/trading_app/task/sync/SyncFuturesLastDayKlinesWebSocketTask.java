@@ -49,7 +49,7 @@ public class SyncFuturesLastDayKlinesWebSocketTask {
 	 */
 	@Scheduled(cron = "46 59 7 * * ?")
 	public void runWebsocketClient() {
-		logger.info("SyncFuturesLastDayKlinesWebSocketTask start.");
+		logger.debug("SyncFuturesLastDayKlinesWebSocketTask start.");
 		
 		Inerval inerval = Inerval.INERVAL_1D;
 		
@@ -73,6 +73,6 @@ public class SyncFuturesLastDayKlinesWebSocketTask {
 			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, analysisWorkTaskPool);
 		}
 		
-		logger.info("SyncFuturesLastDayKlinesWebSocketTask end.");
+		logger.debug("SyncFuturesLastDayKlinesWebSocketTask end.");
 	}
 }

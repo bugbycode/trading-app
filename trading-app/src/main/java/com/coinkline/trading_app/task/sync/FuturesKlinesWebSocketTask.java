@@ -50,7 +50,7 @@ public class FuturesKlinesWebSocketTask {
 	@Scheduled(cron = "47 14/15 * * * ?")
 	public void runWebsocketClient() {
 		
-		logger.info("FuturesKlinesWebSocketTask start.");
+		logger.debug("FuturesKlinesWebSocketTask start.");
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
@@ -74,6 +74,6 @@ public class FuturesKlinesWebSocketTask {
 			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, analysisWorkTaskPool);
 		}
 		
-		logger.info("FuturesKlinesWebSocketTask end.");
+		logger.debug("FuturesKlinesWebSocketTask end.");
 	}
 }

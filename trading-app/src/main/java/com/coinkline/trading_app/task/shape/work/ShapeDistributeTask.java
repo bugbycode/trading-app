@@ -37,7 +37,7 @@ public class ShapeDistributeTask implements Runnable {
 	
 	@Override
 	public void run() {
-		logger.info("ShapeDistributeTask run start.");
+		logger.debug("ShapeDistributeTask run start.");
 		try {
 			List<ShapeInfo> shapeList = shapeRepository.queryBySymbol(klines.getPair());
 			if(!CollectionUtils.isEmpty(shapeList)) {
@@ -48,7 +48,7 @@ public class ShapeDistributeTask implements Runnable {
 		} catch (Exception e) {
 			logger.error("执行分发绘图任务时出现异常", e);
 		}
-		logger.info("ShapeDistributeTask run end.");
+		logger.debug("ShapeDistributeTask run end.");
 	}
 
 }

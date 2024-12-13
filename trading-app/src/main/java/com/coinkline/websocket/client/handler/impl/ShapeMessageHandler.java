@@ -63,7 +63,7 @@ public class ShapeMessageHandler implements MessageHandler {
 		}
 		
 		if(client.coinCount() == 0) {
-			logger.info(client.getStreamName() + "订阅结束，关闭websocket连接");
+			logger.debug(client.getStreamName() + "订阅结束，关闭websocket连接");
 			client.close();
 		}
 	}
