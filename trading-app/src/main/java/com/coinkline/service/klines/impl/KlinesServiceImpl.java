@@ -1091,7 +1091,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					if(fib.getQuotationMode() == QuotationMode.SHORT && info.verifyData(currentPrice, fib)) {
 						
-						subject = String.format("%s永续合约做多交易机会(PNL:%s) %s", pair, percentStr, dateStr);
+						subject = String.format("%s永续合约做多交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
 						
 						text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice(lowPrice), fib.getFibValue(FibCode.FIB618), lastKlines.getDecimalNum());
 						
@@ -1104,7 +1104,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 					} else if(fib.getQuotationMode() == QuotationMode.LONG && info.verifyData(currentPrice, fib)) {
 						
-						subject = String.format("%s永续合约做空交易机会(PNL:%s) %s", pair, percentStr, dateStr);
+						subject = String.format("%s永续合约做空交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
 						
 						text = StringUtil.formatShortMessage(pair, currentPrice, fib.getFibValue(FibCode.FIB618), PriceUtil.rectificationCutLossShortPrice(highPrice), lastKlines.getDecimalNum());
 
