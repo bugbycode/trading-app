@@ -196,7 +196,7 @@ public class KlinesServiceImpl implements KlinesService {
 		List<Klines> klinesList_hitBack = new ArrayList<Klines>();
 		klinesList_hitBack.addAll(klinesList_hit);
 		
-		DeclineAndStrength<Boolean,QuotationMode> das = verifyDeclineAndStrength(klinesList_hitBack);
+		//DeclineAndStrength<Boolean,QuotationMode> das = verifyDeclineAndStrength(klinesList_hitBack);
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
@@ -220,19 +220,23 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];
 			
-			//FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
-			FibCode closePpositionCode = fibInfo.getTakeProfit(offset, codes);
+			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
+			//FibCode closePpositionCode = fibInfo.getTakeProfit(offset, codes);
 			
-			if(//PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
-					PriceUtil.checkFibHitPrice(klinesList_hit, fibInfo.getFibValue(code))
+			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
+					//PriceUtil.checkFibHitPrice(klinesList_hit, fibInfo.getFibValue(code))
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
 					&& !PriceUtil.isObsoleteLong(fibInfo,hitLowKlines,codes,offset)) {//FIB1~startFibCode做多
 
-				if(das.getVerify() && das.getLongOrShort() == QuotationMode.SHORT) {
-					
-					String subject = String.format("%s永续合约%s(%s)[%s]做多机会 %s", pair, code.getDescription(),
+				//if(das.getVerify() && das.getLongOrShort() == QuotationMode.SHORT) {
+				
+					//计算预计盈利百分比
+					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+				
+					String subject = String.format("%s永续合约%s(%s)[%s]做多机会(PNL:%s%%) %s", pair, code.getDescription(),
 							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 							fibInfo.getLevel().getLabel(),
+							PriceUtil.formatDoubleDecimal(profitPercent, 2),
 							DateFormatUtil.format(new Date()));
 					
 					String text = StringUtil.formatLongMessage(pair, currentPrice, fibInfo, lowPrice, closePpositionCode);
@@ -245,7 +249,7 @@ public class KlinesServiceImpl implements KlinesService {
 					//市价做多
 					marketPlace(pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET);
 					
-				}
+				//}
 				
 				break;
 			}
@@ -263,7 +267,7 @@ public class KlinesServiceImpl implements KlinesService {
 		List<Klines> klinesList_hitBack = new ArrayList<Klines>();
 		klinesList_hitBack.addAll(klinesList_hit);
 		
-		DeclineAndStrength<Boolean,QuotationMode> das = verifyDeclineAndStrength(klinesList_hitBack);
+		//DeclineAndStrength<Boolean,QuotationMode> das = verifyDeclineAndStrength(klinesList_hitBack);
 		
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
@@ -288,19 +292,22 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 
-			//FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
-			FibCode closePpositionCode = fibInfo.getTakeProfit(offset, codes);
+			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
+			//FibCode closePpositionCode = fibInfo.getTakeProfit(offset, codes);
 			
-			if(//PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit) 
-					PriceUtil.checkFibHitPrice(klinesList_hit, fibInfo.getFibValue(code))
+			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit) 
+					//PriceUtil.checkFibHitPrice(klinesList_hit, fibInfo.getFibValue(code))
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
 					&& !PriceUtil.isObsoleteShort(fibInfo,hitHighKlines,codes,offset)) {
 				
-				if(das.getVerify() && das.getLongOrShort() == QuotationMode.LONG) {
-
-					String subject = String.format("%s永续合约%s(%s)[%s]做空机会 %s", pair, code.getDescription(),
+				//if(das.getVerify() && das.getLongOrShort() == QuotationMode.LONG) {
+					//计算预计盈利百分比
+					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+					
+					String subject = String.format("%s永续合约%s(%s)[%s]做空机会(PNL:%s%%) %s", pair, code.getDescription(),
 							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 							fibInfo.getLevel().getLabel(),
+							PriceUtil.formatDoubleDecimal(profitPercent, 2),
 							DateFormatUtil.format(new Date()));
 					
 					String text = StringUtil.formatShortMessage(pair, currentPrice, fibInfo, hightPrice, closePpositionCode);
@@ -312,7 +319,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//市价做空
 					marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
-				}
+				//}
 				
 				break;
 			}
@@ -362,7 +369,8 @@ public class KlinesServiceImpl implements KlinesService {
 							FibCode takeProfitCode = FibCode.FIB618;
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
-								takeProfitCode = fibInfo.getTakeProfit(offset, codes);
+								//takeProfitCode = fibInfo.getTakeProfit(offset, codes);
+								takeProfitCode = fibInfo.getTakeProfit_v2(codes[offset]);
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
@@ -447,7 +455,8 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
 						
-						String subject_ = pair + "多头仓位已下单完成 " + dateStr;
+						String subject_ = pair + "多头仓位已下单完成(PNL:" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%) " + dateStr;
+						
 						String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
 								takeProfit.doubleValue(), decimalNum);
 						
@@ -508,7 +517,8 @@ public class KlinesServiceImpl implements KlinesService {
 							FibCode takeProfitCode = FibCode.FIB618;
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
-								takeProfitCode = fibInfo.getTakeProfit(offset, codes);
+								//takeProfitCode = fibInfo.getTakeProfit(offset, codes);
+								takeProfitCode = fibInfo.getTakeProfit_v2(codes[offset]);
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
@@ -596,7 +606,8 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 						
-						String subject_ = pair + "空头仓位已下单完成 " + dateStr;
+						String subject_ = pair + "空头仓位已下单完成(PNL:" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%) " + dateStr;
+						
 						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
 								stopLoss.doubleValue(), decimalNum);
 						
