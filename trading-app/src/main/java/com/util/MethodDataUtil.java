@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import com.coinkline.module.Method;
+import com.bugbycode.module.Method;
 
 public class MethodDataUtil {
 

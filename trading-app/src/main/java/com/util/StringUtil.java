@@ -3,9 +3,9 @@ package com.util;
 import java.util.Date;
 import java.util.Set;
 
-import com.coinkline.module.EmailInfo;
-import com.coinkline.module.FibCode;
-import com.coinkline.module.FibInfo;
+import com.bugbycode.module.EmailInfo;
+import com.bugbycode.module.FibCode;
+import com.bugbycode.module.FibInfo;
 
 public class StringUtil {
 	
