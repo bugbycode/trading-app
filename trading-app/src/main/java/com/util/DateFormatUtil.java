@@ -195,4 +195,15 @@ public class DateFormatUtil {
 			throw new RuntimeException(e.getLocalizedMessage());
 		}
 	}
+	
+	/**
+	 * 校验date是否为今日开盘时间
+	 * @param date
+	 * @return
+	 */
+	public static boolean verifyLastDayStartTime(Date date) {
+		Date now = new Date();
+		Date todayStartDate = getTodayStartTime(now);
+		return date.getTime() == todayStartDate.getTime();
+	}
 }

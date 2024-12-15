@@ -233,4 +233,11 @@ public interface KlinesService {
      * @return
      */
     public String getClosePrice(String pair,Inerval inerval);
+    
+    /**
+     * 校验日线级别k线并更新到最新
+     * @param list
+     * @return 有更新则返回true 否则返回false
+     */
+    public boolean verifyUpdateDayKlines(List<Klines> list);
 }

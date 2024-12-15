@@ -40,6 +40,12 @@ public class AnalysisKlinesTask implements Runnable{
                 return;
             }
             
+            //检查更新
+            if(klinesService.verifyUpdateDayKlines(klines_list_1d)) {
+            	logger.info(pair + "交易对日线级别K线信息已更新");
+            	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),5000);
+            }
+            
             if(!klinesService.checkData(klines_list_1d)) {
             	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),5000);
             }

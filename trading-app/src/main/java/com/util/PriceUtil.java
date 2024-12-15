@@ -1337,4 +1337,20 @@ public class PriceUtil {
 		}
 		return false;
 	}
+	
+	/**
+	 * 校验当前k线是否为最后一天k线
+	 * @param klines
+	 * @return
+	 */
+	public static boolean verifyLastDay(Klines klines) {
+		boolean flag = false;
+		Date now = new Date();
+		Date todayStart = DateFormatUtil.getTodayStartTime(now);
+		Date lastDayStart = DateFormatUtil.getStartTimeBySetDay(todayStart, -1);
+		if(klines.getStartTime() == lastDayStart.getTime()) {
+			flag = true;
+		}
+		return flag;
+	}
 }

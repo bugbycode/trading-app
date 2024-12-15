@@ -261,6 +261,15 @@ public class Klines {
     public double getBodyLowPriceDoubleValue() {
     	return Double.valueOf(getBodyLowPrice());
     }
+    
+    /**
+     * 校验时间级别
+     * @param inerval
+     * @return
+     */
+    public boolean verifyInterval(Inerval inerval) {
+    	return inerval.getDescption().equals(this.getInterval());
+    }
 	
 	@Override
 	public String toString() {

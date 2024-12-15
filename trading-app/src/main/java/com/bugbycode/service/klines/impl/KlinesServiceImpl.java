@@ -2176,7 +2176,7 @@ public class KlinesServiceImpl implements KlinesService {
                 if(startTime < endTime && endTime - startTime > 60000) {
                 	result = false;
                 	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
-                	logger.debug(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
+                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
                 				+ "条数据，缺失时间段：" + DateFormatUtil.format(startTime) + " ~ " + DateFormatUtil.format(endTime));
                 	klinesRepository.insert(data);
                 }
@@ -2191,12 +2191,12 @@ public class KlinesServiceImpl implements KlinesService {
                 
                 //判断重复
                 if(current.getStartTime() == next.getStartTime()){
-                    logger.debug("查询到重复K线信息：" + current);
+                    logger.info("查询到重复K线信息：" + current);
                     result = false;
                     String _id = current.getId();
                     if(StringUtil.isNotEmpty(_id)){
                     	klinesRepository.remove(_id);
-                        logger.debug("重复k线已从数据库中删除");
+                        logger.info("重复k线已从数据库中删除");
                     }
                 }
             }
@@ -2213,5 +2213,41 @@ public class KlinesServiceImpl implements KlinesService {
 			price = list.get(0).getClosePrice();
 		}
 		return price;
+	}
+
+	@Override
+	public boolean verifyUpdateDayKlines(List<Klines> list) {
+		Date now = new Date();
+		//开盘时间不校验更新
+		if(DateFormatUtil.verifyLastDayStartTime(now)) {
+			return false;
+		}
+		if(!CollectionUtils.isEmpty(list)) {
+			//最后一天k线
+			Klines last = PriceUtil.getLastKlines(list);
+			//校验是否为日线级别
+			if(!last.verifyInterval(Inerval.INERVAL_1D)) {
+				return false;
+			}
+			//如果最后一根k线为最后一天k线则不更新
+			if(PriceUtil.verifyLastDay(last)) {
+				return false;
+			}
+			//开始执行更新逻辑
+			//获取需要更新的时间段信息
+			long startTime = DateFormatUtil.parse(DateFormatUtil.format(last.getEndTime())).getTime() + 1000;
+			long endTime = DateFormatUtil.getEndTime(DateFormatUtil.getHours(now.getTime())).getTime();
+			List<Klines> list_day = this.continuousKlines(last.getPair(), startTime, endTime, Inerval.INERVAL_1D.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
+			if(CollectionUtils.isEmpty(list_day)) {
+				String message = "未同步到时间段" + DateFormatUtil.format(startTime) + "~" + DateFormatUtil.format(endTime) + last.getPair() + "交易对日线级别K线信息";
+				throw new RuntimeException(message);
+			}
+			
+			logger.info("已获取到时间段" + DateFormatUtil.format(startTime) + "~" + DateFormatUtil.format(endTime) + last.getPair() + "交易对日线级别" + list_day.size() + "条K线信息");
+			klinesRepository.insert(list_day);
+			
+			return true;
+		}
+		return false;
 	}
 }
