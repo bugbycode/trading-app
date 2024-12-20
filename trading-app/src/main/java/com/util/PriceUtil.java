@@ -657,7 +657,7 @@ public class PriceUtil {
 	 * @param cutLoss 止损百分比值
 	 * @return
 	 */
-	public static double rectificationCutLossLongPrice_v3(double price,int cutLoss) {
+	public static double rectificationCutLossLongPrice_v3(double price,double cutLoss) {
 		return price - (price * (cutLoss * 0.01));
 	}
 	
@@ -667,7 +667,7 @@ public class PriceUtil {
 	 * @param cutLoss 止损百分比值
 	 * @return
 	 */
-	public static double rectificationCutLossShortPrice_v3(double price,int cutLoss) {
+	public static double rectificationCutLossShortPrice_v3(double price,double cutLoss) {
 		return price + (price * (cutLoss * 0.01));
 	}
 	

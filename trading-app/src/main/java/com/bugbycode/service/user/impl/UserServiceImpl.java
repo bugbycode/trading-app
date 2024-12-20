@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -50,37 +51,37 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public String getFibMonitorUserEmail() {
-		List <User> userList = userRepository.queryAllUserByFibMonitor(1);
+		List <User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 		return getSubscribeAiUserEmail(userList);
 	}
 
 	@Override
 	public String getRiseAndFallMonitorUserEmail() {
-		List <User> userList = userRepository.queryAllUserByRiseAndFallMonitor(1);
+		List <User> userList = userRepository.queryAllUserByRiseAndFallMonitor(MonitorStatus.OPEN);
 		return getSubscribeAiUserEmail(userList);
 	}
 
 	@Override
 	public String getEmaMonitorUserEmail() {
-		List <User> userList = userRepository.queryAllUserByEmaMonitor(1);
+		List <User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 		return getSubscribeAiUserEmail(userList);
 	}
 
 	@Override
 	public String getEmaRiseAndFallUserEmail() {
-		List <User> userList = userRepository.queryAllUserByEmaRiseAndFall(1);
+		List <User> userList = userRepository.queryAllUserByEmaRiseAndFall(MonitorStatus.OPEN);
 		return getSubscribeAiUserEmail(userList);
 	}
 
 	@Override
 	public String getHighOrLowMonitorUserEmail() {
-		List <User> userList = userRepository.queryAllUserByHighOrLowMonitor(1);
+		List <User> userList = userRepository.queryAllUserByHighOrLowMonitor(MonitorStatus.OPEN);
 		return getSubscribeAiUserEmail(userList);
 	}
 
 	@Override
 	public String getAreaMonitorUserEmail() {
-		List <User> userList = userRepository.queryAllUserByAreaMonitor(1);
+		List <User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
 		return getSubscribeAiUserEmail(userList);
 	}
 	

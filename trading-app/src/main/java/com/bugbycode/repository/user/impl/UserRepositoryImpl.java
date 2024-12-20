@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -59,33 +60,33 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public List<User> queryAllUserByFibMonitor(int fibMonitor) {
-		return template.find(Query.query(Criteria.where("fibMonitor").is(fibMonitor)), User.class);
+	public List<User> queryAllUserByFibMonitor(MonitorStatus status) {
+		return template.find(Query.query(Criteria.where("fibMonitor").is(status.getValue())), User.class);
 	}
 
 	@Override
-	public List<User> queryAllUserByRiseAndFallMonitor(int riseAndFallMonitor) {
-		return template.find(Query.query(Criteria.where("riseAndFallMonitor").is(riseAndFallMonitor)), User.class);
+	public List<User> queryAllUserByRiseAndFallMonitor(MonitorStatus status) {
+		return template.find(Query.query(Criteria.where("riseAndFallMonitor").is(status.getValue())), User.class);
 	}
 
 	@Override
-	public List<User> queryAllUserByEmaMonitor(int emaMonitor) {
-		return template.find(Query.query(Criteria.where("emaMonitor").is(emaMonitor)), User.class);
+	public List<User> queryAllUserByEmaMonitor(MonitorStatus status) {
+		return template.find(Query.query(Criteria.where("emaMonitor").is(status.getValue())), User.class);
 	}
 
 	@Override
-	public List<User> queryAllUserByEmaRiseAndFall(int emaRiseAndFall) {
-		return template.find(Query.query(Criteria.where("emaRiseAndFall").is(emaRiseAndFall)), User.class);
+	public List<User> queryAllUserByEmaRiseAndFall(MonitorStatus status) {
+		return template.find(Query.query(Criteria.where("emaRiseAndFall").is(status.getValue())), User.class);
 	}
 
 	@Override
-	public List<User> queryAllUserByHighOrLowMonitor(int highOrLowMonitor) {
-		return template.find(Query.query(Criteria.where("highOrLowMonitor").is(highOrLowMonitor)), User.class);
+	public List<User> queryAllUserByHighOrLowMonitor(MonitorStatus status) {
+		return template.find(Query.query(Criteria.where("highOrLowMonitor").is(status.getValue())), User.class);
 	}
 	
 	@Override
-	public List<User> queryAllUserByAreaMonitor(int areaMonitor) {
-		return template.find(Query.query(Criteria.where("areaMonitor").is(areaMonitor)), User.class);
+	public List<User> queryAllUserByAreaMonitor(MonitorStatus status) {
+		return template.find(Query.query(Criteria.where("areaMonitor").is(status.getValue())), User.class);
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue, int cutLoss,double profit,int autoTradeType,int drawTrade) {
+			int baseStepSize,int leverage,int positionValue, double cutLoss,double profit,int autoTradeType,int drawTrade) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);

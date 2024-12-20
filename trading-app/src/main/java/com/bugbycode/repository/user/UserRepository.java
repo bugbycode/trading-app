@@ -2,6 +2,7 @@ package com.bugbycode.repository.user;
 
 import java.util.List;
 
+import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -45,45 +46,45 @@ public interface UserRepository {
 	
 	/**
 	 * 根据订阅价格回撤状态查询所有用户
-	 * @param fibMonitor
+	 * @param status
 	 * @return
 	 */
-	public List<User> queryAllUserByFibMonitor(int fibMonitor);
+	public List<User> queryAllUserByFibMonitor(MonitorStatus status);
 	
 	/**
 	 * 根据订阅行情波动状态查询所有用户
-	 * @param riseAndFallMonitor
+	 * @param status
 	 * @return
 	 */
-	public List<User> queryAllUserByRiseAndFallMonitor(int riseAndFallMonitor);
+	public List<User> queryAllUserByRiseAndFallMonitor(MonitorStatus status);
 	
 	/**
 	 * 根据订阅开仓机会状态查询所有用户
-	 * @param emaMonitor
+	 * @param status
 	 * @return
 	 */
-	public List<User> queryAllUserByEmaMonitor(int emaMonitor);
+	public List<User> queryAllUserByEmaMonitor(MonitorStatus status);
 	
 	/**
 	 * 根据订阅行情异动状态查询所有用户
-	 * @param emaRiseAndFall
+	 * @param status
 	 * @return
 	 */
-	public List<User> queryAllUserByEmaRiseAndFall(int emaRiseAndFall);
+	public List<User> queryAllUserByEmaRiseAndFall(MonitorStatus status);
 	
 	/**
 	 * 根据订阅高低点位状态查询所有用户
-	 * @param highOrLowMonitor
+	 * @param status
 	 * @return
 	 */
-	public List<User> queryAllUserByHighOrLowMonitor(int highOrLowMonitor);
+	public List<User> queryAllUserByHighOrLowMonitor(MonitorStatus status);
 	
 	/**
 	 * 根据订阅盘整区间状态查询所有用户
-	 * @param areaMonitor
+	 * @param status
 	 * @return
 	 */
-	public List<User> queryAllUserByAreaMonitor(int areaMonitor);
+	public List<User> queryAllUserByAreaMonitor(MonitorStatus status);
 	
 	/**
 	 * 查询所有用户信息
@@ -106,7 +107,7 @@ public interface UserRepository {
 	 * @param drawTrade 是否开启画线交易
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue,int cutLoss,double profit,int autoTradeType,int drawTrade);
+			int baseStepSize,int leverage,int positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

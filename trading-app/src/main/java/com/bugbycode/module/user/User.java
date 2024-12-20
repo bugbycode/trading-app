@@ -54,7 +54,7 @@ public class User implements UserDetails {
 	
 	private int positionValue = 50;//持仓价值
 	
-	private int cutLoss = 3;//止损比例
+	private double cutLoss = 3;//止损比例
 	
 	private double profit = 3;//收益筛选
 	
@@ -195,11 +195,11 @@ public class User implements UserDetails {
 		this.positionValue = positionValue;
 	}
 
-	public int getCutLoss() {
+	public double getCutLoss() {
 		return cutLoss;
 	}
 
-	public void setCutLoss(int cutLoss) {
+	public void setCutLoss(double cutLoss) {
 		this.cutLoss = cutLoss;
 	}
 

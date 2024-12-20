@@ -60,12 +60,12 @@ public class AnalysisKlinesTask implements Runnable{
             if(!klinesService.checkData(klines_list_15m)) {
             	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),5000);
             }
+
+            //斐波那契回撤分析
+            klinesService.futuresFibMonitor_v2(klines_list_15m, klines_list_15m);
             
             //盘整区间指标分析
             klinesService.futuresConsolidationAreaMonitor(klines_list_1d, klines_list_15m);
-            
-            //斐波那契回撤分析
-            klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
             
             //涨跌分析
             klinesService.futuresRiseAndFall(klines_list_15m);

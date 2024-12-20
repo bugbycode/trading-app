@@ -63,7 +63,7 @@ public class StringUtil {
 	 * @param currentPrice 开仓价格
 	 * @param fibInfo 斐波那契信息
 	 * @param maxPrice 空头止损价
-	 * @param fibCode 斐波那契点位
+	 * @param fibCode 斐波那契点位（止损参考价）
 	 * @return
 	 */
 	public static String formatShortMessage(String pair,double currentPrice,
@@ -79,7 +79,7 @@ public class StringUtil {
 	 * @param currentPrice 开仓价格
 	 * @param fibInfo 斐波那契信息
 	 * @param minPrice 多头止损价
-	 * @param fibCode 斐波那契点位
+	 * @param fibCode 斐波那契点位（止盈参考价）
 	 * @return
 	 */
 	public static String formatLongMessage(String pair,double currentPrice,

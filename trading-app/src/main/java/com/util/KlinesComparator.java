@@ -6,7 +6,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.SortType;
 
 /**
- * K线排序 开盘时间（升序）
+ * K线排序
  */
 public class KlinesComparator implements Comparator<Klines> {
 

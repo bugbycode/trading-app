@@ -12,7 +12,6 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.result.DeclineAndStrength;
 import com.bugbycode.module.trading.PositionSide;
-import com.bugbycode.module.user.User;
 
 public interface KlinesService {
 	
@@ -67,6 +66,13 @@ public interface KlinesService {
 	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
+	 * 合约做多
+	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param klinesList_hit  最近时间段内部分k线信息
+	 */
+	public void openLong_v2(FibInfo fibInfo,List<Klines> klinesList_hit);
+	
+	/**
 	 * 合约做空
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterHighKlines 回撤之后的最高日线
@@ -74,6 +80,12 @@ public interface KlinesService {
 	 */
 	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
+	/**
+	 * 合约做空
+	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param klinesList_hit  最近时间段内部分k线信息
+	 */
+	public void openShort_v2(FibInfo fibInfo,List<Klines> klinesList_hit);
 	
 	/**
 	 * 发送Fib0价格行为
@@ -97,6 +109,14 @@ public interface KlinesService {
 	 * @param klinesList_hit
 	 */
 	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
+	
+	/**
+	 * 斐波那契回撤点位监控 V2
+	 * 
+	 * @param klinesList 斐波那契回撤k线
+	 * @param klinesList_hit 开仓价格参考k线
+	 */
+	public void futuresFibMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
 	 * EMA点位监控
