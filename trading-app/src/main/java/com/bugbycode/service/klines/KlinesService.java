@@ -68,9 +68,10 @@ public interface KlinesService {
 	/**
 	 * 合约做多
 	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param afterLowKlines 回撤之后的最低K线
 	 * @param klinesList_hit  最近时间段内部分k线信息
 	 */
-	public void openLong_v2(FibInfo fibInfo,List<Klines> klinesList_hit);
+	public void openLong_v2(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
@@ -83,9 +84,10 @@ public interface KlinesService {
 	/**
 	 * 合约做空
 	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param afterHighKlines 回撤之后的最高K线
 	 * @param klinesList_hit  最近时间段内部分k线信息
 	 */
-	public void openShort_v2(FibInfo fibInfo,List<Klines> klinesList_hit);
+	public void openShort_v2(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 发送Fib0价格行为

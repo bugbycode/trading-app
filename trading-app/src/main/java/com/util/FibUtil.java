@@ -22,6 +22,8 @@ public class FibUtil {
 	private final Logger logger = LogManager.getLogger(FibUtil.class);
 	
 	private List<Klines> list;
+	
+	private Klines afterFlag;
 
 	public FibUtil(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
@@ -143,7 +145,22 @@ public class FibUtil {
 			}
 		}
 		
+		this.afterFlag = firstFlag;
+		
 		return fib;
+	}
+	
+	/**
+	 * 获取斐波那契回撤之后的所有k线信息
+	 * 
+	 * @return
+	 */
+	public List<Klines> getFibAfterKlines() {
+		List<Klines> afterList = new ArrayList<Klines>();
+		if(this.afterFlag != null) {
+			afterList = PriceUtil.subList(afterFlag, list);
+		}
+		return afterList;
 	}
 	
 	private PositionSide getPositionSide(Klines k) {

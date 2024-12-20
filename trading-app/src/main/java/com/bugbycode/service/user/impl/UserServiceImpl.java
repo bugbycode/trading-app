@@ -7,12 +7,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bugbycode.module.MonitorStatus;
+import com.bugbycode.module.Regex;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.user.UserService;
+import com.util.RegexUtil;
 import com.util.StringUtil;
 
 import jakarta.annotation.Resource;
@@ -28,9 +30,12 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public User loadUserByUsername(String username) throws UsernameNotFoundException {
+		if(!RegexUtil.test(username, Regex.EMAIL)) {
+			throw new UsernameNotFoundException("用户名密码错误");
+		}
 		User user = userRepository.queryByUsername(username);
 		if(user == null) {
-			throw new UsernameNotFoundException("用户不存在");
+			throw new UsernameNotFoundException("用户名密码错误");
 		}
 		if(StringUtil.isNotEmpty(user.getPassword())) {
 			user.setPassword(passwordEncoder.encode(user.getPassword()));

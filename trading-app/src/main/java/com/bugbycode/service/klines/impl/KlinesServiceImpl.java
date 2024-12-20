@@ -264,7 +264,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openLong_v2(FibInfo fibInfo,List<Klines> klinesList_hit) {
+	public void openLong_v2(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
 		
 		List<Klines> klinesList_hitBack = new ArrayList<Klines>();
 		
@@ -292,7 +292,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 			
-			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)) {
+			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
+					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
 				marketPlace(pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET);
@@ -392,7 +393,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openShort_v2(FibInfo fibInfo,List<Klines> klinesList_hit) {
+	public void openShort_v2(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		List<Klines> klinesList_hitBack = new ArrayList<Klines>();
 		klinesList_hitBack.addAll(klinesList_hit);
 		
@@ -418,7 +419,8 @@ public class KlinesServiceImpl implements KlinesService {
 
 			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 			
-			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)) {
+			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)
+					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				//市价做空
 				marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
 				
@@ -1082,12 +1084,16 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
+		
 		QuotationMode qm = fibInfo.getQuotationMode();
 		
 		if(qm == QuotationMode.LONG) {
-			openLong_v2(fibInfo,klinesList_hit);
+			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+			openLong_v2(fibInfo, afterLowKlines, klinesList_hit);
 		} else if(qm == QuotationMode.SHORT) {
-			openShort_v2(fibInfo, klinesList_hit);
+			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+			openShort_v2(fibInfo, afterHighKlines,klinesList_hit);
 		}
 	}
 	
