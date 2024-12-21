@@ -320,6 +320,10 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				
 			}
+			
+			if(code == fibInfo.getLevel().getStartFibCode()) {
+				break;
+			}
 		}
 	}
 	
@@ -444,6 +448,11 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					sendEmail(subject,text, u.getUsername());
 				}
+			}
+
+			
+			if(code == fibInfo.getLevel().getStartFibCode()) {
+				break;
 			}
 		}
 	}
