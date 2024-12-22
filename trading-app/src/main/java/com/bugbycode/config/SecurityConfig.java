@@ -47,7 +47,7 @@ public class SecurityConfig {
     	.formLogin((form) -> {
     		form.successHandler(new LoginSuccessHandler())
     		.failureHandler(new LoginFailHandler())
-    		.loginPage("/web")
+    		//.loginPage("/web")
     		.loginProcessingUrl("/login")
     		.permitAll();
     	}).logout(Customizer.withDefaults());
