@@ -66,8 +66,8 @@ public class FibUtil {
 			Klines k = this.list.get(index);
 			Klines k1 = this.list.get(index - 1);
 			Klines k2 = this.list.get(index - 2);
-			//Klines k3 = this.list.get(index - 3);
-			//Klines k4 = this.list.get(index - 4);
+			/*Klines k3 = this.list.get(index - 3);
+			Klines k4 = this.list.get(index - 4);*/
 			//做多情况
 			if(ps == PositionSide.LONG) {
 				//先寻找第一个标志性k线
@@ -166,24 +166,58 @@ public class FibUtil {
 	private PositionSide getPositionSide(Klines k) {
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		if(verifyHigh(k)) {
+		if(verifyShort(k)) {
 			ps = PositionSide.SHORT;
-		} else if(verifyLow(k)) {
+		} else if(verifyLong(k)) {
 			ps = PositionSide.LONG;
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyHigh(Klines k) {
+	/**
+	 * 判断做多
+	 * @param k
+	 * @return
+	 */
+	private boolean verifyLong(Klines k) {
+		double ema7 = k.getEma7();
+		double ema25 = k.getEma25();
+		return ema7 < ema25;
+	}
+	
+	/**
+	 * 判断做空
+	 * @param k
+	 * @return
+	 */
+	private boolean verifyShort(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
 		return ema7 > ema25;
 	}
 	
+	/**
+	 * 校验高点
+	 * @param k
+	 * @return
+	 */
+	private boolean verifyHigh(Klines k) {
+		double ema7 = k.getEma7();
+		double ema25 = k.getEma25();
+		double ema99 = k.getEma99();
+		return ema7 > ema25 && ema25 > ema99;
+	}
+	
+	/**
+	 * 校验低点
+	 * @param k
+	 * @return
+	 */
 	private boolean verifyLow(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		return ema7 < ema25;
+		double ema99 = k.getEma99();
+		return ema7 < ema25 && ema25 < ema99;
 	}
 }
