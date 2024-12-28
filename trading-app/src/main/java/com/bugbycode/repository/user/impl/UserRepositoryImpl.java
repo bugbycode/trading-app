@@ -2,10 +2,13 @@ package com.bugbycode.repository.user.impl;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import com.bugbycode.module.MonitorStatus;
@@ -21,12 +24,19 @@ import jakarta.annotation.Resource;
 @Repository("userRepository")
 public class UserRepositoryImpl implements UserRepository {
 
+	private final Logger logger = LogManager.getLogger(UserRepositoryImpl.class);
+	
 	@Resource
 	private MongoOperations template;
 	
 	@Override
 	public User queryByUsername(String username) {
-		return template.findOne(Query.query(Criteria.where("username").is(username)), User.class);
+		try {
+			return template.findOne(Query.query(Criteria.where("username").is(username)), User.class);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			throw new UsernameNotFoundException("用户名密码错误");
+		}
 	}
 
 	@Override
