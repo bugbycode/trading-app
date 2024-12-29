@@ -5,6 +5,9 @@ spring:
     mongodb:
       url: mongodb://trading:trading@localhost:27017
       database: trading
+google:
+  recaptcha:
+	secret: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	
 binance: 
   baseUrl: 
     websocket: wss://fstream.binance.com
