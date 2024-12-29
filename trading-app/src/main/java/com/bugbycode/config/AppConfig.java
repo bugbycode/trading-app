@@ -40,6 +40,8 @@ public class AppConfig {
 	//交易对交易规则
 	public static Map<String,SymbolExchangeInfo> SYMBOL_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, SymbolExchangeInfo>());
 	
+	public static String RECAPTCHA_SECRET;
+	
 	public static EmailAuth getEmailAuth() {
 		return EMAIL_AUTH.get(EMAIL_AUTH_USE_OFFSET);
 	}

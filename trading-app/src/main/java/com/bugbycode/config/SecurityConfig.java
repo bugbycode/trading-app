@@ -1,10 +1,10 @@
 package com.bugbycode.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.config.Customizer;
@@ -12,15 +12,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.handler.LoginFailHandler;
 import com.bugbycode.handler.LoginSuccessHandler;
+import com.bugbycode.webapp.filter.ReCaptchaFilter;
 import com.util.MD5Util;
 
-@Order(0)
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	@Autowired
+	private RestTemplate restTemplate;
 	
     @Bean
     @ConditionalOnMissingBean(AuthenticationEventPublisher.class)
@@ -50,7 +55,10 @@ public class SecurityConfig {
     		//.loginPage("/web")
     		.loginProcessingUrl("/login")
     		.permitAll();
-    	}).logout(Customizer.withDefaults());
+    	}).logout(Customizer.withDefaults())
+    	
+    	.addFilterBefore(new ReCaptchaFilter(restTemplate), UsernamePasswordAuthenticationFilter.class)
+    	;
     	
     	return http.build();
     }

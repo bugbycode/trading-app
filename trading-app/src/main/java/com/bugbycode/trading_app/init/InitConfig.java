@@ -32,11 +32,15 @@ public class InitConfig implements ApplicationRunner {
 	@Value("${binance.baseUrl.rest}")
 	private String restBaseUrl; 
 	
+	@Value("${google.recaptcha.secret}")
+	private String recapt_secret;
+	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		AppConfig.WEBSOCKET_API_URL = websocketApiBaseUrl;
 		AppConfig.WEBSOCKET_URL = websocketBaseUrl;
 		AppConfig.REST_BASE_URL = restBaseUrl;
+		AppConfig.RECAPTCHA_SECRET = recapt_secret;
 	}
 
 	@Bean("restTemplate")
