@@ -1,6 +1,7 @@
 package com.util;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +25,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.PriceFibInfo;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.binance.PriceInfo;
 
 public class PriceUtil {
 	
@@ -1353,4 +1355,39 @@ public class PriceUtil {
 		}
 		return flag;
 	}
+	
+	/**
+	 * 修正持仓数量
+	 * 
+	 * @param quantity 预计持仓数量 持仓数量 = 最小持仓数量 x 名义价值倍数
+	 * @param minQuantity 最小持仓数量
+	 * @param baseStepSize 名义价值倍数
+	 * @param positionValue 持仓成本限制
+	 * @param priceInfo 当前价格
+	 * @return
+	 */
+	public static BigDecimal rectificationQuantity(BigDecimal quantity,BigDecimal minQuantity,int baseStepSize, double positionValue,PriceInfo priceInfo) {
+		BigDecimal result = quantity;
+		//持仓成本限制
+		BigDecimal positionVal = new BigDecimal(positionValue);
+		//持仓价值
+		BigDecimal quantityValue = quantity.multiply(priceInfo.getPriceBigDecimalValue());
+		//预计持仓价值大于持仓成本限制
+		if(quantityValue.compareTo(positionVal) == 1) {
+			if(baseStepSize > 1) {
+				//重新计算名义价值倍数
+				//新名义价值倍数 = 持仓成本限制金额 / (最小持仓数量 x 当前价格) 
+				BigDecimal newBaseStepSizeVal = positionVal.divide(minQuantity.multiply(priceInfo.getPriceBigDecimalValue()), 10, RoundingMode.HALF_UP);
+				int newBaseStepSize = newBaseStepSizeVal.intValue();
+				//新计算倍数小于1时为1
+				if(newBaseStepSize < 1) {
+					newBaseStepSize = 1;
+				}
+				newBaseStepSizeVal = new BigDecimal(newBaseStepSize);
+				result = minQuantity.multiply(newBaseStepSizeVal);
+			}
+		}
+		return result;
+	}
+	
 }

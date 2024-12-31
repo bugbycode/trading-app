@@ -106,7 +106,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue, double cutLoss,double profit,int autoTradeType,int drawTrade) {
+			int baseStepSize,int leverage,double positionValue, double cutLoss,double profit,int autoTradeType,int drawTrade) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);

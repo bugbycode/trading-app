@@ -107,7 +107,7 @@ public interface UserRepository {
 	 * @param drawTrade 是否开启画线交易
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,int positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade);
+			int baseStepSize,int leverage,double positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

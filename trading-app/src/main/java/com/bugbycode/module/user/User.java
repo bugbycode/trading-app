@@ -52,7 +52,7 @@ public class User implements UserDetails {
 	
 	private int leverage = 10;//杠杆倍数
 	
-	private int positionValue = 50;//持仓价值
+	private double positionValue = 50;//持仓价值
 	
 	private double cutLoss = 3;//止损比例
 	
@@ -187,11 +187,11 @@ public class User implements UserDetails {
 		this.leverage = leverage;
 	}
 
-	public int getPositionValue() {
+	public double getPositionValue() {
 		return positionValue;
 	}
 
-	public void setPositionValue(int positionValue) {
+	public void setPositionValue(double positionValue) {
 		this.positionValue = positionValue;
 	}
 
