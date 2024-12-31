@@ -1,6 +1,5 @@
 package com.bugbycode.service.exchange.impl;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,11 +16,6 @@ import com.bugbycode.module.binance.ContractStatus;
 import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.service.exchange.BinanceExchangeService;
-import com.bugbycode.service.user.UserService;
-import com.bugbycode.trading_app.pool.WorkTaskPool;
-import com.bugbycode.trading_app.task.email.SendMailTask;
-import com.util.DateFormatUtil;
-import com.util.StringUtil;
 
 @Service("binanceExchangeService")
 public class BinanceExchangeServiceImpl implements BinanceExchangeService {
@@ -30,12 +24,6 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 	
 	@Autowired
 	private RestTemplate restTemplate;
-	
-	@Autowired
-	private UserService userDetailsService;
-	
-	@Autowired
-	private WorkTaskPool emailWorkTaskPool;
 	
 	@Override
 	public Set<String> exchangeInfo() {
@@ -51,10 +39,8 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 					String contractType = symbolJson.getString("contractType");
 					String statusStr = symbolJson.getString("status");
 					String symbol = symbolJson.getString("symbol");
-					long onboardDate = symbolJson.getLong("onboardDate");
+					//long onboardDate = symbolJson.getLong("onboardDate");
 					JSONArray filters = symbolJson.getJSONArray("filters");
-					
-					
 					
 					ContractType type = ContractType.resolve(contractType);
 					ContractStatus status = ContractStatus.resolve(statusStr);
@@ -81,21 +67,6 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 						});
 						
 						AppConfig.SYMBOL_EXCHANGE_INFO.put(symbol, info);
-					}
-					
-					//待上市代币
-					if(status == ContractStatus.PENDING_TRADING) {
-						if(!StringUtil.contains(AppConfig.PENDING_TRADING_SET, symbol)) {
-							
-							AppConfig.PENDING_TRADING_SET.add(symbol);
-							
-							String dateStr = DateFormatUtil.format(new Date());
-							String recEmail = userDetailsService.getAllUserEmail();
-							
-							String text = String.format("币安将于%s上市%s%s %s", DateFormatUtil.format(onboardDate), symbol, type.getMemo(), dateStr);
-							
-							emailWorkTaskPool.add(new SendMailTask(text, text, recEmail));
-						}
 					}
 				}
 			});
