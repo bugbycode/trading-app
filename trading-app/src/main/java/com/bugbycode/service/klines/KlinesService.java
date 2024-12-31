@@ -224,12 +224,6 @@ public interface KlinesService {
 	public DeclineAndStrength<Boolean,QuotationMode> verifyDeclineAndStrength(List<Klines> klinesList);
 	
 	/**
-	 * 平仓
-	 * @param klines 当前k线
-	 */
-	public void closeOrder(Klines klines);
-	
-	/**
      * 校验K线是否出现重复或缺失
      * @param list k线集合
      * @return true 表示没有重复或缺失 false 表示出现重复或缺失k线

@@ -46,12 +46,10 @@ import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.result.DeclineAndStrength;
 import com.bugbycode.module.trading.PositionSide;
-import com.bugbycode.module.trading.TradingOrder;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
-import com.bugbycode.repository.trading.OrderRepository;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
@@ -88,9 +86,6 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private WorkTaskPool emailWorkTaskPool;
-	
-	@Autowired
-	private OrderRepository orderRepository;
 	
 	@Autowired
 	private KlinesRepository klinesRepository;
@@ -530,25 +525,38 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						//最少下单数量
 						String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
+						BigDecimal minQuantity = new BigDecimal(quantityNum);
 						
-						BigDecimal quantity = new BigDecimal(quantityNum);
-						quantity = quantity.multiply(new BigDecimal(u.getBaseStepSize()));
+						//预期持仓数量
+						BigDecimal quantity = minQuantity.multiply(new BigDecimal(u.getBaseStepSize()));
 
+						logger.info("{}交易对多头预期持仓数量：{}", pair, quantity);
+						
+						//修正持仓数量
+						quantity = PriceUtil.rectificationQuantity(quantity, minQuantity, u.getBaseStepSize(), u.getPositionValue(), priceInfo);
+						
+						logger.info("{}交易对多头修正后持仓数量：{}", pair, quantity);
+						
+						if(quantity.doubleValue() == 0) {
+							return;
+						}
+						
+						//查询杠杆
 						SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
 
 						int leverage = sc.getLeverage();
 						
 						//持仓价值
-						double order_value = ( Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) ) / leverage;
+						double order_value = quantity.doubleValue() * Double.valueOf(priceInfo.getPrice());
 						
 						if(order_value > u.getPositionValue()) {
-							logger.debug("最少下单数量仓位价值超过" + u.getPositionValue() + "USDT");
+							logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + "USDT");
 							continue;
 						}
 						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
-						if(Double.valueOf(availableBalanceStr) < (order_value * 2)) {
-							logger.debug("用户" + u.getUsername() + "可下单金额小于" + (order_value * 2) + "USDT");
+						if(Double.valueOf(availableBalanceStr) < (order_value * 1.5)) {
+							logger.debug("用户" + u.getUsername() + "可下单金额小于" + (order_value * 1.5) + "USDT");
 							continue;
 						}
 						
@@ -594,13 +602,6 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						sendEmail(subject_, text_, tradeUserEmail);
-						
-						//仓位统计
-						TradingOrder to = new TradingOrder(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), stopLoss.doubleValue(), 
-								new Date().getTime(), LongOrShortType.LONG.getValue(), order_value, quantity.doubleValue());
-						orderRepository.insert(to);
-						
-						//Thread.sleep(500);
 						
 					} catch (Exception e) {
 						sendEmail("创建" + pair + "多头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
@@ -679,10 +680,23 @@ public class KlinesServiceImpl implements KlinesService {
 
 						//最少下单数量
 						String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
+						BigDecimal minQuantity = new BigDecimal(quantityNum);
 						
-						BigDecimal quantity = new BigDecimal(quantityNum);
-						quantity = quantity.multiply(new BigDecimal(u.getBaseStepSize()));
+						//预期持仓数量
+						BigDecimal quantity = minQuantity.multiply(new BigDecimal(u.getBaseStepSize()));
 
+						logger.info("{}交易对空头预期持仓数量：{}", pair, quantity);
+						
+						//修正持仓数量
+						quantity = PriceUtil.rectificationQuantity(quantity, minQuantity, u.getBaseStepSize(), u.getPositionValue(), priceInfo);
+						
+						logger.info("{}交易对空头修正后持仓数量：{}", pair, quantity);
+						
+						if(quantity.doubleValue() == 0) {
+							return;
+						}
+						
+						//查询杠杆
 						SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
 
 						int leverage = sc.getLeverage();
@@ -691,13 +705,13 @@ public class KlinesServiceImpl implements KlinesService {
 						double order_value = ( Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) ) / leverage;
 						
 						if(order_value > u.getPositionValue()) {
-							logger.debug("最少下单数量仓位价值超过" + u.getPositionValue() + "USDT");
+							logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + "USDT");
 							continue;
 						}
 						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
-						if(Double.valueOf(availableBalanceStr) < (order_value * 2)) {
-							logger.debug("用户" + u.getUsername() + "可下单金额小于" + (order_value * 2) + "USDT");
+						if(Double.valueOf(availableBalanceStr) < (order_value * 1.5)) {
+							logger.debug("用户" + u.getUsername() + "可下单金额小于" + (order_value * 1.5) + "USDT");
 							continue;
 						}
 						
@@ -745,11 +759,6 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						sendEmail(subject_, text_, tradeUserEmail);
-						
-						//仓位统计
-						TradingOrder to = new TradingOrder(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), stopLoss.doubleValue(), 
-								new Date().getTime(), LongOrShortType.SHORT.getValue(), order_value, quantity.doubleValue());
-						orderRepository.insert(to);
 						
 					} catch (Exception e) {
 						sendEmail("创建" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
@@ -2243,49 +2252,6 @@ public class KlinesServiceImpl implements KlinesService {
 							dateStr);
 					String text = fib.toString();
 					this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
-				}
-			}
-		}
-	}
-
-	@Override
-	public void closeOrder(Klines klines) {
-		List<TradingOrder> orderList = orderRepository.findAll(klines.getPair(), 0, -1, 0);
-		if(!CollectionUtils.isEmpty(orderList)) {
-			for(TradingOrder o : orderList) {
-				logger.debug(o);
-				double sl = o.getStopLoss();//止损
-				double tp = o.getTakeProfit();//止盈
-				LongOrShortType type = LongOrShortType.resolve(o.getLongOrShort());//持仓方向
-				//空头平仓
-				if(type == LongOrShortType.SHORT) {
-					double closePrice = 0;//平仓价
-					//止损 收盘价或最高价大于止损价
-					if(Double.valueOf(klines.getClosePrice()) >= sl || Double.valueOf(klines.getHighPrice()) >= sl) {
-						closePrice = Double.valueOf(klines.getClosePrice());
-					} else//止盈 收盘价或最低价小于止盈价
-					if(Double.valueOf(klines.getClosePrice()) <= tp || Double.valueOf(klines.getLowPrice()) <= tp){
-						closePrice = o.getTakeProfit();
-					}
-					if(closePrice > 0) {//平仓
-						//空头盈亏金额 = （开仓价 - 平仓价） * 持仓数量
-						double pnl = (o.getOpenPrice() - closePrice) * o.getCoinSize();
-						orderRepository.updateById(o.getId(), closePrice, new Date().getTime(), pnl);
-					}
-				} else if(type == LongOrShortType.LONG) {
-					double closePrice = 0;//平仓价
-					//止损 收盘价或最低价小于止损价
-					if(Double.valueOf(klines.getClosePrice()) <= sl || Double.valueOf(klines.getHighPrice()) <= sl) {
-						closePrice = Double.valueOf(klines.getClosePrice());
-					} else//止盈 收盘价或最高价大于止盈价
-					if(Double.valueOf(klines.getClosePrice()) >= tp || Double.valueOf(klines.getLowPrice()) >= tp){
-						closePrice = o.getTakeProfit();
-					}
-					if(closePrice > 0) {//平仓
-						//多头盈亏金额 = （平仓价 - 开仓价） * 持仓数量
-						double pnl = (o.getOpenPrice() - closePrice) * o.getCoinSize();
-						orderRepository.updateById(o.getId(), closePrice, new Date().getTime(), pnl);
-					}
 				}
 			}
 		}

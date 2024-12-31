@@ -13,7 +13,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
-import com.bugbycode.trading_app.task.close.CloseLongOrShortTask;
 import com.bugbycode.trading_app.task.sync.work.AnalysisKlinesTask;
 import com.bugbycode.trading_app.task.sync.work.SyncKlinesTask;
 import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoint;
@@ -51,7 +50,6 @@ public class MessageHandlerImpl implements MessageHandler{
 				klinesRepository.insert(kline);
 				if(kline.getInervalType() == Inerval.INERVAL_15M) {
 					analysisWorkTaskPool.add(new AnalysisKlinesTask(kline.getPair(), klinesService, klinesRepository));
-					analysisWorkTaskPool.add(new CloseLongOrShortTask(kline, klinesService));
 				}
 			}
 		};
