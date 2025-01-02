@@ -546,17 +546,19 @@ public class KlinesServiceImpl implements KlinesService {
 
 						int leverage = sc.getLeverage();
 						
-						//持仓价值
-						double order_value = quantity.doubleValue() * Double.valueOf(priceInfo.getPrice());
+						//持仓价值 = 持仓数量 * 价格
+						double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
 						
 						if(order_value > u.getPositionValue()) {
 							logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + "USDT");
 							continue;
 						}
 						
+						double minOrder_value = (order_value / leverage) * 1.5;
+						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
-						if(Double.valueOf(availableBalanceStr) < (order_value * 1.5)) {
-							logger.debug("用户" + u.getUsername() + "可下单金额小于" + (order_value * 1.5) + "USDT");
+						if(Double.valueOf(availableBalanceStr) < minOrder_value) {
+							logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + "USDT");
 							continue;
 						}
 						
@@ -701,17 +703,19 @@ public class KlinesServiceImpl implements KlinesService {
 
 						int leverage = sc.getLeverage();
 						
-						//持仓价值 = 持仓价值 / 扛杆
-						double order_value = ( Double.valueOf(quantityNum) * Double.valueOf(priceInfo.getPrice()) ) / leverage;
+						//持仓价值 = 持仓数量 * 价格
+						double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
 						
 						if(order_value > u.getPositionValue()) {
 							logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + "USDT");
 							continue;
 						}
 						
+						double minOrder_value = (order_value / leverage) * 1.5;
+						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
-						if(Double.valueOf(availableBalanceStr) < (order_value * 1.5)) {
-							logger.debug("用户" + u.getUsername() + "可下单金额小于" + (order_value * 1.5) + "USDT");
+						if(Double.valueOf(availableBalanceStr) < minOrder_value) {
+							logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + "USDT");
 							continue;
 						}
 						
