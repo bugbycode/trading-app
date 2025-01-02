@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.bugbycode.config.AppConfig;
+import com.util.RequestUtil;
 import com.util.StringUtil;
 
 import jakarta.servlet.FilterChain;
@@ -50,7 +51,8 @@ public class ReCaptchaFilter extends OncePerRequestFilter {
 		if("POST".equals(method) && url.endsWith("/login")) {
 
 	        String cha_response = request.getParameter("cha_response");
-			String clientIp = parseClientIp(request);
+	        
+			String clientIp = RequestUtil.parseClientIp(request);
 			
 			logger.info("method: {}, url: {}, clientIp: {}, cha_response: {}", method, url, clientIp, cha_response);
 			
@@ -91,19 +93,6 @@ public class ReCaptchaFilter extends OncePerRequestFilter {
 			}
 		}
 		filterChain.doFilter(request, response);
-	}
-
-	private String parseClientIp(HttpServletRequest request) {
-		// 尝试从 "X-Forwarded-For" 头中获取客户端真实 IP 地址
-        String clientIp = request.getHeader("X-Forwarded-For");
-        if (StringUtil.isEmpty(clientIp)) {
-            // 如果没有 "X-Forwarded-For" 头，直接获取请求的 remote address
-            clientIp = request.getRemoteAddr();
-        } else {
-            // 如果存在多个 IP，取第一个（客户端的 IP）
-            clientIp = clientIp.split(",")[0];
-        }
-        return clientIp;
 	}
 	
 	private void responseFaild(HttpServletResponse response) throws IOException {
