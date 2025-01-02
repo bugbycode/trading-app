@@ -530,12 +530,12 @@ public class KlinesServiceImpl implements KlinesService {
 						//预期持仓数量
 						BigDecimal quantity = minQuantity.multiply(new BigDecimal(u.getBaseStepSize()));
 
-						logger.info("{}交易对多头预期持仓数量：{}", pair, quantity);
+						logger.debug("{}交易对多头预期持仓数量：{}", pair, quantity);
 						
 						//修正持仓数量
 						quantity = PriceUtil.rectificationQuantity(quantity, minQuantity, u.getBaseStepSize(), u.getPositionValue(), priceInfo);
 						
-						logger.info("{}交易对多头修正后持仓数量：{}", pair, quantity);
+						logger.debug("{}交易对多头修正后持仓数量：{}", pair, quantity);
 						
 						if(quantity.doubleValue() == 0) {
 							return;
@@ -687,12 +687,12 @@ public class KlinesServiceImpl implements KlinesService {
 						//预期持仓数量
 						BigDecimal quantity = minQuantity.multiply(new BigDecimal(u.getBaseStepSize()));
 
-						logger.info("{}交易对空头预期持仓数量：{}", pair, quantity);
+						logger.debug("{}交易对空头预期持仓数量：{}", pair, quantity);
 						
 						//修正持仓数量
 						quantity = PriceUtil.rectificationQuantity(quantity, minQuantity, u.getBaseStepSize(), u.getPositionValue(), priceInfo);
 						
-						logger.info("{}交易对空头修正后持仓数量：{}", pair, quantity);
+						logger.debug("{}交易对空头修正后持仓数量：{}", pair, quantity);
 						
 						if(quantity.doubleValue() == 0) {
 							return;
