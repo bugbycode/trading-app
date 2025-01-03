@@ -51,4 +51,22 @@ public enum FibCode {
 	public String getDescription() {
 		return this.description;
 	}
+	
+	/**
+	 * 小于
+	 * @param code
+	 * @return
+	 */
+	public boolean lt(FibCode code) {
+		return this.getValue() < code.getValue();
+	}
+	
+	/**
+	 * 大于
+	 * @param code
+	 * @return
+	 */
+	public boolean gt(FibCode code) {
+		return this.getValue() > code.getValue();
+	}
 }

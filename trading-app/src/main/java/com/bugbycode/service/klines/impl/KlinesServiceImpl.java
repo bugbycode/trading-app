@@ -277,6 +277,9 @@ public class KlinesServiceImpl implements KlinesService {
 		//double hightPrice = hitKline.getHighPrice();
 		double currentPrice = closePrice;
 		
+		//波动幅度 618~382
+		double basePercent = PriceUtil.getRiseFluctuationPercentage(fibInfo.getFibValue(FibCode.FIB618), fibInfo.getFibValue(FibCode.FIB382)) * 100;
+		
 		//
 		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 		
@@ -284,6 +287,10 @@ public class KlinesServiceImpl implements KlinesService {
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];
+			
+			if(code.gt(FibCode.FIB1) && basePercent < 3) {
+				continue;
+			}
 			
 			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 			
@@ -406,6 +413,9 @@ public class KlinesServiceImpl implements KlinesService {
 		double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
+		//波动幅度 618~382
+		double basePercent = PriceUtil.getFallFluctuationPercentage(fibInfo.getFibValue(FibCode.FIB618), fibInfo.getFibValue(FibCode.FIB382)) * 100;
+		
 		//
 		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 		
@@ -416,6 +426,10 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 
+			if(code.gt(FibCode.FIB1) && basePercent < 3) {
+				continue;
+			}
+			
 			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 			
 			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)
@@ -424,7 +438,7 @@ public class KlinesServiceImpl implements KlinesService {
 				marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
 				
 				//计算预计盈利百分比
-				double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+				double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
 				for(User u : userList) {
 					if(profitPercent < u.getProfit()) {
 						continue;
