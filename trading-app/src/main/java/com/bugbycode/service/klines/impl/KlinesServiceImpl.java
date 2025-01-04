@@ -278,7 +278,7 @@ public class KlinesServiceImpl implements KlinesService {
 		double currentPrice = closePrice;
 		
 		//波动幅度 618~382
-		double basePercent = PriceUtil.getRiseFluctuationPercentage(fibInfo.getFibValue(FibCode.FIB618), fibInfo.getFibValue(FibCode.FIB382)) * 100;
+		double basePercent = PriceUtil.getRiseFluctuationPercentage(fibInfo.getFibValue(FibCode.FIB1), fibInfo.getFibValue(FibCode.FIB0)) * 100;
 		
 		//
 		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
@@ -414,7 +414,7 @@ public class KlinesServiceImpl implements KlinesService {
 		String pair = hitKline.getPair();
 		
 		//波动幅度 618~382
-		double basePercent = PriceUtil.getFallFluctuationPercentage(fibInfo.getFibValue(FibCode.FIB618), fibInfo.getFibValue(FibCode.FIB382)) * 100;
+		double basePercent = PriceUtil.getFallFluctuationPercentage(fibInfo.getFibValue(FibCode.FIB1), fibInfo.getFibValue(FibCode.FIB0)) * 100;
 		
 		//
 		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
