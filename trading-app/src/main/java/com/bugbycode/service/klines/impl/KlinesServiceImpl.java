@@ -61,6 +61,7 @@ import com.util.CommandUtil;
 import com.util.ConsolidationAreaUtil;
 import com.util.DateFormatUtil;
 import com.util.FibUtil;
+import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.KlinesUtil;
 import com.util.PriceUtil;
@@ -2335,11 +2336,20 @@ public class KlinesServiceImpl implements KlinesService {
                 }
                 
                 if(startTime < endTime && endTime - startTime > 60000) {
-                	result = false;
-                	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
-                	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
-                				+ "条数据，缺失时间段：" + DateFormatUtil.format(startTime) + " ~ " + DateFormatUtil.format(endTime));
-                	klinesRepository.insert(data);
+                	//用来标记原本缺陷的k线
+                	String fileName = current.getPair() + "_" + current.getInterval() + "_" + startTime + "_" + endTime + ".defect";
+                	if(!FileUtil.exists(fileName)) {
+                    	result = false;
+                    	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
+                    	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
+                    				+ "条数据，缺失时间段：" + DateFormatUtil.format(startTime) + " ~ " + DateFormatUtil.format(endTime));
+                    	klinesRepository.insert(data);
+                    	//创建同步标识
+                    	FileUtil.createFile(fileName);
+                	} else {
+                		logger.info("%s交易对%s级别%s~%s缺失部分已是最新数据", current.getPair(), current.getInterval(), 
+                				DateFormatUtil.format(startTime), DateFormatUtil.format(endTime));
+                	}
                 }
             }
             

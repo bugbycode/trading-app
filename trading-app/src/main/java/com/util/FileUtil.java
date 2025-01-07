@@ -148,4 +148,34 @@ public class FileUtil {
 		}
 		return result;
 	}
+	
+	public static void createFile(String parentPath,String fileName) {
+		String path = parentPath + File.separator + fileName;
+		try {
+			File f = new File(parentPath);
+			if(!f.isDirectory()) {
+				f.mkdirs();
+			}
+			File file = new File(path);
+			if(!file.exists()) {
+				file.createNewFile();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void createFile(String fileName) {
+		createFile(AppConfig.CACHE_PATH, fileName);
+	}
+	
+	public static boolean exists(String parentPath,String fileName) {
+		String path = parentPath + File.separator + fileName;
+		File file = new File(path);
+		return file.exists();
+	}
+	
+	public static boolean exists(String fileName) {
+		return exists(AppConfig.CACHE_PATH, fileName);
+	}
 }
