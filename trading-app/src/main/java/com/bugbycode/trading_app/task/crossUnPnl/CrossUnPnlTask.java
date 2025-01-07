@@ -22,8 +22,8 @@ import com.util.PriceUtil;
 /**
  * 未实现盈亏监控任务
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class CrossUnPnlTask {
 
 	private final Logger logger = LogManager.getLogger(CrossUnPnlTask.class);
@@ -40,7 +40,7 @@ public class CrossUnPnlTask {
 	/**
 	 * 3分30秒开始执行 每15分钟执行一次
 	 */
-	@Scheduled(cron = "30 3/5 * * * ?")
+	//@Scheduled(cron = "30 3/5 * * * ?")
 	public void monitor() {
 		logger.info("CrossUnPnlTask monitor() start.");
 		
