@@ -3,6 +3,7 @@ package com.bugbycode.repository.user;
 import java.util.List;
 
 import com.bugbycode.module.MonitorStatus;
+import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -105,9 +106,14 @@ public interface UserRepository {
 	 * @param profit 收益筛选
 	 * @param autoTradeType 自动交易参考指标 取值参考泛型 com.bugbycode.module.binance.AutoTradeType
 	 * @param drawTrade 是否开启画线交易
+	 * @param recvTrade 是否接收交易通知
+	 * @param recvCrossUnPnl 是否接收PNL通知
+	 * @param recvCrossUnPnlPercent 未实现盈亏阈值百分比 用于邮件通知条件
+	 * @param tradeStepBack 是否交易回踩单 0：否 1：是
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,double positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade);
+			int baseStepSize,int leverage,double positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade,
+			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息
@@ -123,4 +129,12 @@ public interface UserRepository {
 	 * @return
 	 */
 	public List<User> queryByDrawTrade(DrawTrade drawTrade);
+	
+	/**
+	 * 根据接收PNL通知开关状态查询所有关联用户信息
+	 * 
+	 * @param status PNL通知开关状
+	 * @return
+	 */
+	public List<User> queryByRecvCrossUnPnl(RecvCrossUnPnlStatus status);
 }

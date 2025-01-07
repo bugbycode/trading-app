@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import com.bugbycode.module.MonitorStatus;
+import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -106,7 +107,8 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade,
-			int baseStepSize,int leverage,double positionValue, double cutLoss,double profit,int autoTradeType,int drawTrade) {
+			int baseStepSize,int leverage,double positionValue, double cutLoss,double profit,int autoTradeType,int drawTrade,
+			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
@@ -118,6 +120,11 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("profit", profit);
 		update.set("autoTradeType", autoTradeType);
 		update.set("drawTrade", drawTrade);
+		update.set("recvTrade", recvTrade);
+		update.set("recvCrossUnPnl", recvCrossUnPnl);
+		update.set("recvCrossUnPnlPercent", recvCrossUnPnlPercent);
+		update.set("tradeStepBack", tradeStepBack);
+		
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
@@ -139,5 +146,13 @@ public class UserRepositoryImpl implements UserRepository {
 				User.class);
 	}
 
+	@Override
+	public List<User> queryByRecvCrossUnPnl(RecvCrossUnPnlStatus status) {
+		return template.find(
+				
+				Query.query(Criteria.where("recvCrossUnPnl").is(status.getValue())), 
+				
+				User.class);
+	}
 	
 }

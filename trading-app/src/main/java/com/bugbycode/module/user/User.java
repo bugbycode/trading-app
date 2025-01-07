@@ -58,6 +58,14 @@ public class User implements UserDetails {
 	
 	private double profit = 3;//收益筛选
 	
+	private int recvTrade = 1;//是否接收下单邮件 0：否 1：是
+	
+	private int recvCrossUnPnl = 1;//是否接收未实现盈亏邮件 0：否 1：是
+	
+	private double recvCrossUnPnlPercent = 0;//未实现盈亏阈值百分比 用于邮件通知条件
+	
+	private int tradeStepBack = 1;//是否交易回踩单 0：否 1：是
+	
 	public String getId() {
 		return id;
 	}
@@ -218,6 +226,38 @@ public class User implements UserDetails {
 	public void setAutoTradeType(int autoTradeType) {
 		this.autoTradeType = autoTradeType;
 	}
+	
+	public int getRecvTrade() {
+		return recvTrade;
+	}
+
+	public void setRecvTrade(int recvTrade) {
+		this.recvTrade = recvTrade;
+	}
+
+	public int getRecvCrossUnPnl() {
+		return recvCrossUnPnl;
+	}
+
+	public void setRecvCrossUnPnl(int recvCrossUnPnl) {
+		this.recvCrossUnPnl = recvCrossUnPnl;
+	}
+
+	public double getRecvCrossUnPnlPercent() {
+		return recvCrossUnPnlPercent;
+	}
+
+	public void setRecvCrossUnPnlPercent(double recvCrossUnPnlPercent) {
+		this.recvCrossUnPnlPercent = recvCrossUnPnlPercent;
+	}
+
+	public int getTradeStepBack() {
+		return tradeStepBack;
+	}
+
+	public void setTradeStepBack(int tradeStepBack) {
+		this.tradeStepBack = tradeStepBack;
+	}
 
 	public void copy(User user) {
 		this.setId(user.getId());
@@ -231,6 +271,10 @@ public class User implements UserDetails {
 		this.setAreaMonitor(user.getAreaMonitor());
 		this.setBinanceApiKey(user.getBinanceApiKey());
 		this.setBinanceSecretKey(user.getBinanceSecretKey());
+		this.setRecvTrade(user.getRecvTrade());
+		this.setRecvCrossUnPnl(user.getRecvCrossUnPnl());
+		this.setRecvCrossUnPnlPercent(user.getRecvCrossUnPnlPercent());
+		this.setTradeStepBack(user.getTradeStepBack());
 	}
 	
 	public void copyAIInfo(User user) {
@@ -240,5 +284,9 @@ public class User implements UserDetails {
 		this.setEmaRiseAndFall(user.getEmaRiseAndFall());
 		this.setEmaMonitor(user.getEmaMonitor());
 		this.setAreaMonitor(user.getAreaMonitor());
+		this.setRecvTrade(user.getRecvTrade());
+		this.setRecvCrossUnPnl(user.getRecvCrossUnPnl());
+		this.setRecvCrossUnPnlPercent(user.getRecvCrossUnPnlPercent());
+		this.setTradeStepBack(user.getTradeStepBack());
 	}
 }

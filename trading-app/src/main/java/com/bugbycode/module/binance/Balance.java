@@ -1,5 +1,7 @@
 package com.bugbycode.module.binance;
 
+import java.math.BigDecimal;
+
 public class Balance {
 	
 	private String accountAlias;// 账户唯一识别码
@@ -67,5 +69,23 @@ public class Balance {
 		this.updateTime = updateTime;
 	}
 	
+	public BigDecimal getBalanceBigDecimalValue() {
+		return new BigDecimal(balance);
+	}
 	
+	public BigDecimal getCrossWalletBalanceBigDecimalValue() {
+		return new BigDecimal(crossWalletBalance);
+	}
+	
+	public BigDecimal getCrossUnPnlBigDecimalValue() {
+		return new BigDecimal(crossUnPnl);
+	}
+	
+	public BigDecimal getAvailableBalanceBigDecimalValue() {
+		return new BigDecimal(availableBalance);
+	}
+	
+	public BigDecimal getMaxWithdrawAmountBigDecimalValue() {
+		return new BigDecimal(maxWithdrawAmount);
+	}
 }

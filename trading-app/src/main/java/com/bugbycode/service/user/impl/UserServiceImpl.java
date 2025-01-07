@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bugbycode.module.MonitorStatus;
+import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.Regex;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -104,5 +105,10 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public List<User> queryByDrawTrade(DrawTrade drawTrade) {
 		return userRepository.queryByDrawTrade(drawTrade);
+	}
+
+	@Override
+	public List<User> queryByRecvCrossUnPnl(RecvCrossUnPnlStatus status) {
+		return userRepository.queryByRecvCrossUnPnl(status);
 	}
 }

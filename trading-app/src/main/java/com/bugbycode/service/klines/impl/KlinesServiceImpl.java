@@ -32,9 +32,11 @@ import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.PriceFibInfo;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.area.ConsolidationArea;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -483,6 +485,7 @@ public class KlinesServiceImpl implements KlinesService {
 					String binanceSecretKey = u.getBinanceSecretKey();
 					String tradeUserEmail = u.getUsername();
 					String dateStr = DateFormatUtil.format(new Date());
+					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					try {
 						
 						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -505,8 +508,15 @@ public class KlinesServiceImpl implements KlinesService {
 							FibCode takeProfitCode = FibCode.FIB618;
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
+								FibCode code = codes[offset];
 								//takeProfitCode = fibInfo.getTakeProfit(offset, codes);
-								takeProfitCode = fibInfo.getTakeProfit_v2(codes[offset]);
+								takeProfitCode = fibInfo.getTakeProfit_v2(code);
+								
+								//回踩单判断
+								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+									return;
+								}
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
@@ -617,7 +627,9 @@ public class KlinesServiceImpl implements KlinesService {
 							text_ += "\r\n" + fibInfo.toString();
 						}
 						
-						sendEmail(subject_, text_, tradeUserEmail);
+						if(recvTradeStatus == RecvTradeStatus.OPEN) {
+							sendEmail(subject_, text_, tradeUserEmail);
+						}
 						
 					} catch (Exception e) {
 						sendEmail("创建" + pair + "多头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
@@ -640,6 +652,7 @@ public class KlinesServiceImpl implements KlinesService {
 					String binanceSecretKey = u.getBinanceSecretKey();
 					String tradeUserEmail = u.getUsername();
 					String dateStr = DateFormatUtil.format(new Date());
+					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					try {
 
 						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -661,8 +674,15 @@ public class KlinesServiceImpl implements KlinesService {
 							FibCode takeProfitCode = FibCode.FIB618;
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
+								FibCode code = codes[offset];
 								//takeProfitCode = fibInfo.getTakeProfit(offset, codes);
-								takeProfitCode = fibInfo.getTakeProfit_v2(codes[offset]);
+								takeProfitCode = fibInfo.getTakeProfit_v2(code);
+								
+								//回踩单判断
+								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+									return;
+								}
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
@@ -776,7 +796,9 @@ public class KlinesServiceImpl implements KlinesService {
 							text_ += "\r\n" + fibInfo.toString();
 						}
 						
-						sendEmail(subject_, text_, tradeUserEmail);
+						if(recvTradeStatus == RecvTradeStatus.OPEN) {
+							sendEmail(subject_, text_, tradeUserEmail);
+						}
 						
 					} catch (Exception e) {
 						sendEmail("创建" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);

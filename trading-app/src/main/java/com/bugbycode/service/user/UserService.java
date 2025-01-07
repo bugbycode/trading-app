@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -73,4 +74,12 @@ public interface UserService extends UserDetailsService{
 	public List<User> queryByDrawTrade(DrawTrade drawTrade);
 	
 	public String getSubscribeAiUserEmail(List <User> userList);
+	
+	/**
+	 * 根据接收PNL通知开关状态查询所有关联用户信息
+	 * 
+	 * @param status PNL通知开关状
+	 * @return
+	 */
+	public List<User> queryByRecvCrossUnPnl(RecvCrossUnPnlStatus status);
 }

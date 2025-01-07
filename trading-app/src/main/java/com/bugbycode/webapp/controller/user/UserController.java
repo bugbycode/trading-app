@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
+import com.bugbycode.module.RecvCrossUnPnlStatus;
+import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
+import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.Balance;
@@ -105,7 +108,10 @@ public class UserController extends BaseController{
 		AutoTrade autoTrade = AutoTrade.valueOf(data.getAutoTrade());
 		AutoTradeType autoTradeType = AutoTradeType.valueOf(data.getAutoTradeType());
 		DrawTrade drawTrade = DrawTrade.valueOf(data.getDrawTrade());
-				
+		RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(data.getRecvTrade());
+		RecvCrossUnPnlStatus recvCrossUnPnlStatus = RecvCrossUnPnlStatus.valueOf(data.getRecvCrossUnPnl());
+		TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(data.getTradeStepBack());
+		
 		if(data.getCutLoss() == 0) {
 			data.setCutLoss(3);
 		}
@@ -128,11 +134,12 @@ public class UserController extends BaseController{
 		if(StringUtil.isEmpty(data.getPassword()) || !dbUser.getPassword().equals(MD5Util.md5(data.getPassword()))) {
 			json.put("message", "密码不正确");
 			code = ResultCode.ERROR;
-		} else if((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && autoTrade == AutoTrade.CLOSE) {
+		} else if(((StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey())) && autoTrade == AutoTrade.CLOSE) 
+				|| !CollectionUtils.isEmpty(balanceList)) {
 			
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
 					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
-					drawTrade.getValue());
+					drawTrade.getValue(), recvTradeStatus.getValue(), recvCrossUnPnlStatus.getValue(), data.getRecvCrossUnPnlPercent(), tradeStepBackStatus.getValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -144,23 +151,10 @@ public class UserController extends BaseController{
 			user.setProfit(data.getProfit());
 			user.setAutoTradeType(autoTradeType.value());
 			user.setDrawTrade(drawTrade.getValue());
-			
-			json.put("message", "修改成功");
-		} else if(!CollectionUtils.isEmpty(balanceList)) {
-			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
-					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
-					drawTrade.getValue());
-			
-			user.setBinanceApiKey(data.getBinanceApiKey());
-			user.setBinanceSecretKey(data.getBinanceSecretKey());
-			user.setAutoTrade(autoTrade.value());
-			user.setBaseStepSize(data.getBaseStepSize());
-			user.setLeverage(data.getLeverage());
-			user.setPositionValue(data.getPositionValue());
-			user.setCutLoss(data.getCutLoss());
-			user.setProfit(data.getProfit());
-			user.setAutoTradeType(autoTradeType.value());
-			user.setDrawTrade(drawTrade.getValue());
+			user.setRecvTrade(recvTradeStatus.getValue());
+			user.setRecvCrossUnPnl(recvCrossUnPnlStatus.getValue());
+			user.setRecvCrossUnPnlPercent(data.getRecvCrossUnPnlPercent());
+			user.setTradeStepBack(tradeStepBackStatus.getValue());
 			
 			json.put("message", "修改成功");
 		} else {
