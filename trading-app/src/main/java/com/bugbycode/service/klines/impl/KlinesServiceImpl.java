@@ -280,9 +280,6 @@ public class KlinesServiceImpl implements KlinesService {
 		//double hightPrice = hitKline.getHighPrice();
 		double currentPrice = closePrice;
 		
-		//波动幅度 618~382
-		//double basePercent = PriceUtil.getRiseFluctuationPercentage(fibInfo.getFibValue(FibCode.FIB1), fibInfo.getFibValue(FibCode.FIB0)) * 100;
-		
 		//
 		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 		
@@ -290,11 +287,6 @@ public class KlinesServiceImpl implements KlinesService {
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];
-			
-			//回撤点大于1且非开仓点位则不做交易
-			if(code.gt(FibCode.FIB1) && !fibInfo.verifyStepBack(code)) {
-				continue;
-			}
 			
 			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 			
@@ -417,9 +409,6 @@ public class KlinesServiceImpl implements KlinesService {
 		double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
-		//波动幅度 618~382
-		//double basePercent = PriceUtil.getFallFluctuationPercentage(fibInfo.getFibValue(FibCode.FIB1), fibInfo.getFibValue(FibCode.FIB0)) * 100;
-		
 		//
 		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 		
@@ -430,11 +419,6 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 
-			//回撤点大于1且非开仓点位则不做交易
-			if(code.gt(FibCode.FIB1) && !fibInfo.verifyStepBack(code)) {
-				continue;
-			}
-			
 			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 			
 			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)
