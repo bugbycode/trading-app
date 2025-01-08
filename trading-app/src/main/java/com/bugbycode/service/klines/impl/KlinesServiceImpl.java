@@ -290,10 +290,11 @@ public class KlinesServiceImpl implements KlinesService {
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];
-			/*
-			if(code.gt(FibCode.FIB1) && basePercent < 3) {
+			
+			//回撤点大于1且非开仓点位则不做交易
+			if(code.gt(FibCode.FIB1) && !fibInfo.verifyStepBack(code)) {
 				continue;
-			}*/
+			}
 			
 			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 			
@@ -428,10 +429,11 @@ public class KlinesServiceImpl implements KlinesService {
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
-			/*
-			if(code.gt(FibCode.FIB1) && basePercent < 3) {
+
+			//回撤点大于1且非开仓点位则不做交易
+			if(code.gt(FibCode.FIB1) && !fibInfo.verifyStepBack(code)) {
 				continue;
-			}*/
+			}
 			
 			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 			
