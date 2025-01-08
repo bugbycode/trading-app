@@ -220,8 +220,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];
 			
-			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
-			//FibCode closePpositionCode = fibInfo.getTakeProfit(offset, codes);
+			FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
 			
 			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
 					//PriceUtil.checkFibHitPrice(klinesList_hit, fibInfo.getFibValue(code))
@@ -288,7 +287,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];
 			
-			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
+			FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
 			
 			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
@@ -356,8 +355,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 
-			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
-			//FibCode closePpositionCode = fibInfo.getTakeProfit(offset, codes);
+			FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
 			
 			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit) 
 					//PriceUtil.checkFibHitPrice(klinesList_hit, fibInfo.getFibValue(code))
@@ -419,7 +417,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 
-			FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
+			FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
 			
 			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
@@ -496,8 +494,7 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
-								//takeProfitCode = fibInfo.getTakeProfit(offset, codes);
-								takeProfitCode = fibInfo.getTakeProfit_v2(code);
+								takeProfitCode = fibInfo.getTakeProfit_v3(code);
 								
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
@@ -662,8 +659,7 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
-								//takeProfitCode = fibInfo.getTakeProfit(offset, codes);
-								takeProfitCode = fibInfo.getTakeProfit_v2(code);
+								takeProfitCode = fibInfo.getTakeProfit_v3(code);
 								
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
