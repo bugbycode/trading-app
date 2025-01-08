@@ -128,6 +128,17 @@ public class FibInfo {
 	}
 	
 	/**
+	 * 校验是否为回踩单开仓点位
+	 * @param code
+	 * @return
+	 */
+	public boolean verifyStepBack(FibCode code) {
+		//一级0位置分别对应回撤0.382 0.5 0.618 0.786
+		return code == FibCode.FIB1_618 || code == FibCode.FIB2 || code == FibCode.FIB2_618
+				 || code == FibCode.FIB4_618;
+	}
+	
+	/**
 	 * 
 	 * @param fib1 斐波那契回撤起始价
 	 * @param fib0 斐波那契回撤结束价
