@@ -49,6 +49,7 @@ import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.result.DeclineAndStrength;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
+import com.bugbycode.repository.email.EmailRepository;
 import com.bugbycode.repository.high_low_hitprice.HighOrLowHitPriceRepository;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
@@ -101,6 +102,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private ShapeRepository shapeRepository;
+	
+	@Autowired
+	private EmailRepository emailRepository;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -796,7 +800,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void sendEmail(String subject,String text,String recEmail) {
 		
 	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
-			emailWorkTaskPool.add(new SendMailTask(subject, text, recEmail));
+			emailWorkTaskPool.add(new SendMailTask(subject, text, recEmail, emailRepository));
 	 	}
 		
 	}
@@ -1802,7 +1806,7 @@ public class KlinesServiceImpl implements KlinesService {
 					DateFormatUtil.format(time * 1000),klines.getClosePrice());
 			
 			if(hitPrice(klines, price)) {
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				//所有k线信息
 				List<Klines> list = klinesRepository.findByPairAndGtStartTime(info.getSymbol(), time * 1000, Inerval.INERVAL_15M.getDescption());
@@ -1871,7 +1875,7 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
 						klines.getClosePrice());
 				
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 
 				FibInfo fibInfo = new FibInfo(price1, price0, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				if(upOrLowStr.equals("上")) {//做空
@@ -1891,7 +1895,7 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
 						klines.getClosePrice());
 				
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				FibInfo fibInfo = new FibInfo(price0, price1, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				if(upOrLowStr.equals("上")) {//做空
@@ -1932,7 +1936,7 @@ public class KlinesServiceImpl implements KlinesService {
 					PriceUtil.formatDoubleDecimal(resultPrice,klines.getDecimalNum()));
 			logger.debug(text);
 			if(hitPrice(klines, resultPrice)) {
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				long startTime = time0 < time1 ? (time0 * 1000) : (time1 * 1000);
 				long endTime = time0 < time1 ? (time1 * 1000) : (time0 * 1000);
@@ -2005,7 +2009,7 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format(time2 * 1000),
 						klines.getClosePrice());
 				
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				FibInfo fibInfo = new FibInfo(line1Price, line0Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
@@ -2031,7 +2035,7 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format(time2 * 1000),
 						klines.getClosePrice());
 				
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				FibInfo fibInfo = new FibInfo(line0Price, line1Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
@@ -2155,7 +2159,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(StringUtil.isNotEmpty(subject)) {
 				
-				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				if(upOrLowStr.equals("上")) {//做空
 					marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
@@ -2196,7 +2200,7 @@ public class KlinesServiceImpl implements KlinesService {
 				double takeProfitDoubleValue = price + profitLevel;
 				
 				String text = StringUtil.formatLongMessage(klines.getPair(), price, stopLossDoubleValue, takeProfitDoubleValue, klines.getDecimalNum());
-				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				marketPlace(pair, PositionSide.LONG, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT);
 				
@@ -2236,7 +2240,7 @@ public class KlinesServiceImpl implements KlinesService {
 				double takeProfitDoubleValue = price - profitLevel;
 				
 				String text = StringUtil.formatLongMessage(klines.getPair(), price, stopLossDoubleValue, takeProfitDoubleValue, klines.getDecimalNum());
-				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				marketPlace(pair, PositionSide.SHORT, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT);
 				
@@ -2274,7 +2278,7 @@ public class KlinesServiceImpl implements KlinesService {
 							PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
 							dateStr);
 					String text = fib.toString();
-					this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner()));
+					this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				}
 			}
 		}

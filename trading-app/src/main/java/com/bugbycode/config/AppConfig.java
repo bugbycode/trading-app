@@ -35,16 +35,19 @@ public class AppConfig {
 	public static String RECAPTCHA_SECRET;
 	
 	public static EmailAuth getEmailAuth() {
-		return EMAIL_AUTH.get(EMAIL_AUTH_USE_OFFSET);
+		return EMAIL_AUTH == null ? null : EMAIL_AUTH.get(EMAIL_AUTH_USE_OFFSET);
 	}
 	
 	//获取下一项认证信息
 	public static void nexEmailAuth() {
-		
-		EMAIL_AUTH_USE_OFFSET++;
-		
-		if(EMAIL_AUTH_USE_OFFSET >= EMAIL_AUTH.size()) {
-			EMAIL_AUTH_USE_OFFSET = 0;
+		if(EMAIL_AUTH != null) {
+			
+			EMAIL_AUTH_USE_OFFSET++;
+			
+			if(EMAIL_AUTH_USE_OFFSET >= EMAIL_AUTH.size()) {
+				EMAIL_AUTH_USE_OFFSET = 0;
+			}
+			
 		}
 		
 	}

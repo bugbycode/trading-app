@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
+import com.bugbycode.repository.email.EmailRepository;
 import com.util.EmailUtil;
 import com.util.StringUtil;
 
@@ -21,10 +22,13 @@ public class SendMailTask implements Runnable {
 	
 	private String recvEmail;
 	
-	public SendMailTask(String subject, String text, String recvEmail) {
+	private EmailRepository emailRepository;
+	
+	public SendMailTask(String subject, String text, String recvEmail,EmailRepository emailRepository) {
 		this.subject = subject;
 		this.text = text;
 		this.recvEmail = recvEmail;
+		this.emailRepository = emailRepository;
 	}
 
 	@Override
@@ -35,7 +39,7 @@ public class SendMailTask implements Runnable {
 			logger.info("邮件主题：" + subject);
 			logger.info("邮件内容：" + text);
 			
-			Result<ResultCode, Exception> result = EmailUtil.send(subject, text, recvEmail);
+			Result<ResultCode, Exception> result = EmailUtil.send(subject, text, recvEmail,emailRepository);
 			
 			switch (result.getResult()) {
 			case ERROR:
