@@ -13,11 +13,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.CollectionUtils;
 
-import com.bugbycode.config.AppConfig;
-import com.bugbycode.module.EmailAuth;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.ShapeInfo;
-import com.bugbycode.repository.email.EmailRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
@@ -33,9 +30,6 @@ import com.util.CoinPairSet;
 public class ShapeTradingTask {
 	
 	private final Logger logger = LogManager.getLogger(ShapeTradingTask.class);
-	
-	@Autowired
-	private EmailRepository emailRepository;
 	
 	@Autowired
 	private ShapeRepository shapeRepository;
@@ -58,14 +52,6 @@ public class ShapeTradingTask {
 	public void executeShapeTask() {
 		logger.debug("ShapeTradingTask executeShapeTask start.");
 		Inerval inerval = Inerval.INERVAL_5M;
-		
-		List<EmailAuth> emailAuthList = emailRepository.query();
-		if(CollectionUtils.isEmpty(emailAuthList)) {
-			logger.info("邮箱认证未配置");
-			return;
-		}
-		
-		AppConfig.setEmailAuth(emailAuthList);
 		
 		List<ShapeInfo> shapeList = shapeRepository.query();
 		//所有交易对

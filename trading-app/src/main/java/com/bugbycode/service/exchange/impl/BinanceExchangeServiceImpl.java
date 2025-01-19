@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.ContractStatus;
 import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.service.exchange.BinanceExchangeService;
+import com.util.ProcessUtil;
 
 @Service("binanceExchangeService")
 public class BinanceExchangeServiceImpl implements BinanceExchangeService {
@@ -27,6 +29,12 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 	
 	@Override
 	public Set<String> exchangeInfo() {
+		
+		ResultCode code = ProcessUtil.startupMongod();
+		if(code == ResultCode.ERROR) {
+			logger.info("Start mongodb error.");
+		}
+		
 		Set<String> pairs = new HashSet<String>();
 		//
 		String resultStr = restTemplate.getForObject(AppConfig.REST_BASE_URL + "/fapi/v1/exchangeInfo", String.class);

@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.bugbycode.config.AppConfig;
+import com.util.ProcessUtil;
 import com.util.RequestUtil;
 import com.util.StringUtil;
 
@@ -91,6 +92,8 @@ public class ReCaptchaFilter extends OncePerRequestFilter {
 					return;
 				}
 			}
+			
+			ProcessUtil.startupMongod();
 		}
 		filterChain.doFilter(request, response);
 	}
