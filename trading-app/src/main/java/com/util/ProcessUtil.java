@@ -17,13 +17,13 @@ public class ProcessUtil {
 		
 		try {
 			
-			logger.info("run \"{}\"", cmd);
+			logger.debug("run \"{}\"", cmd);
 			
 			String pidStr = CommandUtil.run(cmd);
 			
 			pidStr = pidStr.trim();
 			
-			//logger.info(pidStr);
+			logger.debug(pidStr);
 			
 			if(StringUtil.isNotEmpty(pidStr)) {
 				pId = Long.valueOf(pidStr);
@@ -46,14 +46,14 @@ public class ProcessUtil {
 			long pId = getMongoDbPid();
 			
 			if(pId == -1) {
-				logger.info("run \"{}\"", cmd);
+				logger.debug("run \"{}\"", cmd);
 				String result = CommandUtil.run(cmd);
-				logger.info(result);
+				logger.debug(result);
 				
 				pId = getMongoDbPid();
 			}
 			
-			logger.info("Mongodb pid as {}", pId);
+			logger.debug("Mongodb pid as {}", pId);
 			
 			if(pId > 0) {
 				code = ResultCode.SUCCESS;
