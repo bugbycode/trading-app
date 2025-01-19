@@ -54,11 +54,6 @@ public class ShapeTradingTask {
 	public void executeShapeTask() {
 		logger.debug("ShapeTradingTask executeShapeTask start.");
 		Inerval inerval = Inerval.INERVAL_5M;
-
-		ResultCode code = ProcessUtil.startupMongod();
-		if(code == ResultCode.ERROR) {
-			logger.info("Start mongodb error.");
-		}
 		
 		List<ShapeInfo> shapeList = shapeRepository.query();
 		//所有交易对
