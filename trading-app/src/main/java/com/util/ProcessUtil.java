@@ -23,7 +23,7 @@ public class ProcessUtil {
 			
 			pidStr = pidStr.trim();
 			
-			logger.info(pidStr);
+			//logger.info(pidStr);
 			
 			if(StringUtil.isNotEmpty(pidStr)) {
 				pId = Long.valueOf(pidStr);
@@ -49,9 +49,9 @@ public class ProcessUtil {
 				logger.info("run \"{}\"", cmd);
 				String result = CommandUtil.run(cmd);
 				logger.info(result);
+				
+				pId = getMongoDbPid();
 			}
-			
-			pId = getMongoDbPid();
 			
 			logger.info("Mongodb pid as {}", pId);
 			
