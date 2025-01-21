@@ -521,7 +521,7 @@ public class KlinesServiceImpl implements KlinesService {
 									takeProfitCode = fibInfo.getTakeProfit_v4(code);
 								}
 								
-								logger.info("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
+								logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
 								
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
@@ -694,7 +694,7 @@ public class KlinesServiceImpl implements KlinesService {
 									takeProfitCode = fibInfo.getTakeProfit_v4(code);
 								}
 								
-								logger.info("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
+								logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
 								
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
