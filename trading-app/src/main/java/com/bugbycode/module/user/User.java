@@ -66,6 +66,8 @@ public class User implements UserDetails {
 	
 	private int tradeStepBack = 1;//是否交易回踩单 0：否 1：是
 	
+	private int tradeStyle = 0; // 交易风格 0：保守 1：激进
+	
 	public String getId() {
 		return id;
 	}
@@ -259,6 +261,14 @@ public class User implements UserDetails {
 		this.tradeStepBack = tradeStepBack;
 	}
 
+	public int getTradeStyle() {
+		return tradeStyle;
+	}
+
+	public void setTradeStyle(int tradeStyle) {
+		this.tradeStyle = tradeStyle;
+	}
+
 	public void copy(User user) {
 		this.setId(user.getId());
 		this.setUsername(user.getUsername());
@@ -275,6 +285,7 @@ public class User implements UserDetails {
 		this.setRecvCrossUnPnl(user.getRecvCrossUnPnl());
 		this.setRecvCrossUnPnlPercent(user.getRecvCrossUnPnlPercent());
 		this.setTradeStepBack(user.getTradeStepBack());
+		this.setTradeStyle(user.getTradeStyle());
 	}
 	
 	public void copyAIInfo(User user) {
@@ -288,5 +299,6 @@ public class User implements UserDetails {
 		this.setRecvCrossUnPnl(user.getRecvCrossUnPnl());
 		this.setRecvCrossUnPnlPercent(user.getRecvCrossUnPnlPercent());
 		this.setTradeStepBack(user.getTradeStepBack());
+		this.setTradeStyle(user.getTradeStyle());
 	}
 }

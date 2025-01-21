@@ -18,6 +18,7 @@ import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.TradeStepBackStatus;
+import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.Balance;
@@ -111,6 +112,7 @@ public class UserController extends BaseController{
 		RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(data.getRecvTrade());
 		RecvCrossUnPnlStatus recvCrossUnPnlStatus = RecvCrossUnPnlStatus.valueOf(data.getRecvCrossUnPnl());
 		TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(data.getTradeStepBack());
+		TradeStyle tradeStyle = TradeStyle.valueOf(data.getTradeStyle());
 		
 		if(data.getCutLoss() == 0) {
 			data.setCutLoss(3);
@@ -139,7 +141,8 @@ public class UserController extends BaseController{
 			
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
 					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
-					drawTrade.getValue(), recvTradeStatus.getValue(), recvCrossUnPnlStatus.getValue(), data.getRecvCrossUnPnlPercent(), tradeStepBackStatus.getValue());
+					drawTrade.getValue(), recvTradeStatus.getValue(), recvCrossUnPnlStatus.getValue(), data.getRecvCrossUnPnlPercent(), 
+					tradeStepBackStatus.getValue(), tradeStyle.getValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -155,6 +158,7 @@ public class UserController extends BaseController{
 			user.setRecvCrossUnPnl(recvCrossUnPnlStatus.getValue());
 			user.setRecvCrossUnPnlPercent(data.getRecvCrossUnPnlPercent());
 			user.setTradeStepBack(tradeStepBackStatus.getValue());
+			user.setTradeStyle(tradeStyle.getValue());
 			
 			json.put("message", "修改成功");
 		} else {

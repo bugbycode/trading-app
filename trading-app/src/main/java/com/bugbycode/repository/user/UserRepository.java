@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
+import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -110,10 +111,11 @@ public interface UserRepository {
 	 * @param recvCrossUnPnl 是否接收PNL通知
 	 * @param recvCrossUnPnlPercent 未实现盈亏阈值百分比 用于邮件通知条件
 	 * @param tradeStepBack 是否交易回踩单 0：否 1：是
+	 * @param tradeStyle 交易风格 0：保守 1：激进
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
 			int baseStepSize,int leverage,double positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade,
-			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack);
+			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

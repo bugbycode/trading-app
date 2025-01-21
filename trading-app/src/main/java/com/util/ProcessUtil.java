@@ -13,7 +13,7 @@ public class ProcessUtil {
 		
 		long pId = -1;
 		
-		String cmd = "ps -ef | grep mongod | grep -v grep | awk '{print $2}'";
+		String cmd = "ps -ef | grep mongod | grep -v grep | grep -v mongosh | awk '{print $2}'";
 		
 		try {
 			

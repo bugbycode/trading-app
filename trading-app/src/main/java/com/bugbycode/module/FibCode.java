@@ -62,11 +62,38 @@ public enum FibCode {
 	}
 	
 	/**
+	 * 小于等于
+	 * @param code
+	 * @return
+	 */
+	public boolean lte(FibCode code) {
+		return this.getValue() <= code.getValue();
+	}
+	
+	/**
 	 * 大于
 	 * @param code
 	 * @return
 	 */
 	public boolean gt(FibCode code) {
 		return this.getValue() > code.getValue();
+	}
+	
+	/**
+	 * 大于等于
+	 * @param code
+	 * @return
+	 */
+	public boolean gte(FibCode code) {
+		return this.getValue() >= code.getValue();
+	}
+	
+	/**
+	 * 比较是否相等
+	 * @param code
+	 * @return
+	 */
+	public boolean equalsValue(FibCode code) {
+		return this.getValue() == code.getValue();
 	}
 }

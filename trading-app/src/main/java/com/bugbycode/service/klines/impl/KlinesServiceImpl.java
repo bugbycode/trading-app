@@ -37,6 +37,7 @@ import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.TradeStepBackStatus;
+import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.area.ConsolidationArea;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -291,17 +292,24 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];
 			
-			FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
-			
 			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
 				marketPlace(pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET);
 				
-				//计算预计盈利百分比
-				double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
 				for(User u : userList) {
+
+					FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
+					
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					if(tradeStyle == TradeStyle.CONSERVATIVE) {
+						closePpositionCode = fibInfo.getTakeProfit_v4(code);
+					}
+					
+					//计算预计盈利百分比
+					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+					
 					if(profitPercent < u.getProfit()) {
 						continue;
 					}
@@ -420,17 +428,24 @@ public class KlinesServiceImpl implements KlinesService {
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
-
-			FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
 			
 			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				//市价做空
 				marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
 				
-				//计算预计盈利百分比
-				double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
 				for(User u : userList) {
+
+					FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
+					
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					if(tradeStyle == TradeStyle.CONSERVATIVE) {
+						closePpositionCode = fibInfo.getTakeProfit_v4(code);
+					}
+					
+					//计算预计盈利百分比
+					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+					
 					if(profitPercent < u.getProfit()) {
 						continue;
 					}
@@ -475,6 +490,7 @@ public class KlinesServiceImpl implements KlinesService {
 					String tradeUserEmail = u.getUsername();
 					String dateStr = DateFormatUtil.format(new Date());
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					try {
 						
 						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -498,7 +514,12 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
-								takeProfitCode = fibInfo.getTakeProfit_v3(code);
+								
+								if(tradeStyle == TradeStyle.RADICAL) {
+									takeProfitCode = fibInfo.getTakeProfit_v3(code);
+								} else {
+									takeProfitCode = fibInfo.getTakeProfit_v4(code);
+								}
 								
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
@@ -641,6 +662,7 @@ public class KlinesServiceImpl implements KlinesService {
 					String tradeUserEmail = u.getUsername();
 					String dateStr = DateFormatUtil.format(new Date());
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					try {
 
 						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -663,7 +685,12 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
-								takeProfitCode = fibInfo.getTakeProfit_v3(code);
+								
+								if(tradeStyle == TradeStyle.RADICAL) {
+									takeProfitCode = fibInfo.getTakeProfit_v3(code);
+								} else {
+									takeProfitCode = fibInfo.getTakeProfit_v4(code);
+								}
 								
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
