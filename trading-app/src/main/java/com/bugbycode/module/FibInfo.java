@@ -23,7 +23,7 @@ public class FibInfo {
 			takeProfit = FibCode.FIB1_618;
 		} else if(code.gt(FibCode.FIB1)) {
 			takeProfit = FibCode.FIB1;
-		} else if(code.equalsValue(FibCode.FIB786) && code.equalsValue(FibCode.FIB1)) {
+		} else if(code.equalsValue(FibCode.FIB786) || code.equalsValue(FibCode.FIB1)) {
 			takeProfit = FibCode.FIB5;
 		}
 		return takeProfit;
