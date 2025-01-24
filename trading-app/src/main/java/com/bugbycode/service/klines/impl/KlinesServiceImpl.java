@@ -589,10 +589,12 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 							
 							if(takeProfitCode == FibCode.FIB1) {
-								profitPercent = u.getProfit();
+								profitPercent = u.getProfit() / 100;
 								takeProfit = new BigDecimal(
 										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
 												);
+								logger.info("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
+										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
 							}
 						}
 						
@@ -777,10 +779,12 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 							
 							if(takeProfitCode == FibCode.FIB1) {
-								profitPercent = u.getProfit();
+								profitPercent = u.getProfit() / 100;
 								takeProfit = new BigDecimal(
 										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
 												);
+								logger.info("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
+										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
 							}
 						}
 
