@@ -8,7 +8,6 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
-import com.util.PriceUtil;
 
 import java.util.List;
 
@@ -62,10 +61,10 @@ public class AnalysisKlinesTask implements Runnable{
             	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),5000);
             }
             
-            List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(klines_list_15m);
+            //List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(klines_list_15m);
             
             //斐波那契回撤分析
-            klinesService.futuresFibMonitor_v2(klines_list_1h, klines_list_15m);
+            klinesService.futuresFibMonitor_v2(klines_list_15m, klines_list_15m);
             
             //盘整区间指标分析
             klinesService.futuresConsolidationAreaMonitor(klines_list_1d, klines_list_15m);

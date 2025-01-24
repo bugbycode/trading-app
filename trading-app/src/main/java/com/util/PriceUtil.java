@@ -1228,6 +1228,26 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 根据波动幅度获取上涨之后价格
+	 * @param price 参考价格
+	 * @param percent 波动幅度
+	 * @return
+	 */
+	public static double getLongTakeProfitForPercent(double price,double percent) {
+		return price + (price * percent);
+	}
+	
+	/**
+	 * 根据波动幅度获取下跌之后价格
+	 * @param price 参考价格
+	 * @param percent 波动幅度
+	 * @return
+	 */
+	public static double getShortTakeProfitForPercent(double price,double percent) {
+		return price - (price * percent);
+	}
+	
+	/**
 	 * 根据EMA指标分析计算斐波那契回撤信息
 	 * @param list
 	 * @return
