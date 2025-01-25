@@ -321,12 +321,12 @@ public class KlinesServiceImpl implements KlinesService {
 					double profitPrice = fibInfo.getFibValue(closePpositionCode);
 					
 					//回踩单
-					if(closePpositionCode == FibCode.FIB1) {
+					/*if(closePpositionCode == FibCode.FIB1) {
 						
 						profitPercent = u.getProfit();
 						
 						profitPrice = PriceUtil.getLongTakeProfitForPercent(currentPrice, profitPercent / 100);
-					}
+					}*/
 					
 					//开仓订阅提醒
 					String subject = String.format("%s永续合约%s(%s)[%s]做多机会(PNL:%s%%) %s", pair, code.getDescription(),
@@ -471,12 +471,12 @@ public class KlinesServiceImpl implements KlinesService {
 					double profitPrice = fibInfo.getFibValue(closePpositionCode);
 					
 					//回踩单
-					if(closePpositionCode == FibCode.FIB1) {
+					/*if(closePpositionCode == FibCode.FIB1) {
 						
 						profitPercent = u.getProfit();
 						
 						profitPrice = PriceUtil.getShortTakeProfitForPercent(currentPrice, profitPercent / 100);
-					}
+					}*/
 					
 					String subject = String.format("%s永续合约%s(%s)[%s]做空机会(PNL:%s%%) %s", pair, code.getDescription(),
 							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -522,7 +522,7 @@ public class KlinesServiceImpl implements KlinesService {
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					
 					//计算预计盈利百分比
-					double profitPercent = u.getProfit();
+					double profitPercent = 0;
 					
 					try {
 						
@@ -588,14 +588,14 @@ public class KlinesServiceImpl implements KlinesService {
 								continue;
 							}
 							
-							if(takeProfitCode == FibCode.FIB1) {
+							/*if(takeProfitCode == FibCode.FIB1) {
 								profitPercent = u.getProfit() / 100;
 								takeProfit = new BigDecimal(
 										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
 												);
 								logger.info("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
 										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
-							}
+							}*/
 						}
 						
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
@@ -778,14 +778,14 @@ public class KlinesServiceImpl implements KlinesService {
 								continue;
 							}
 							
-							if(takeProfitCode == FibCode.FIB1) {
+							/*if(takeProfitCode == FibCode.FIB1) {
 								profitPercent = u.getProfit() / 100;
 								takeProfit = new BigDecimal(
 										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
 												);
 								logger.info("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
 										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
-							}
+							}*/
 						}
 
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
