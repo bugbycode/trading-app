@@ -300,7 +300,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					FibCode closePpositionCode = fibInfo.getTakeProfit_v5(code);//止盈点位
+					FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 					
 					//计算预计盈利百分比
 					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
@@ -445,7 +445,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					FibCode closePpositionCode = fibInfo.getTakeProfit_v5(code);//止盈点位
+					FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
 					
 					//计算预计盈利百分比
 					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
@@ -547,7 +547,7 @@ public class KlinesServiceImpl implements KlinesService {
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
 								
-								takeProfitCode = fibInfo.getTakeProfit_v5(code);
+								takeProfitCode = fibInfo.getTakeProfit_v2(code);
 								
 								logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
 								
@@ -741,7 +741,7 @@ public class KlinesServiceImpl implements KlinesService {
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
 								
-								takeProfitCode = fibInfo.getTakeProfit_v5(code);
+								takeProfitCode = fibInfo.getTakeProfit_v2(code);
 								
 								logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
 								
