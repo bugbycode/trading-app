@@ -63,7 +63,7 @@ public class AnalysisKlinesTask implements Runnable{
             }
             
             List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(klines_list_15m);
-            
+            logger.info(klines_list_1h);
             //斐波那契回撤分析
             klinesService.futuresFibMonitor_v2(klines_list_1h, klines_list_15m);
             
@@ -74,7 +74,7 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.futuresRiseAndFall(klines_list_15m);
 
             //价格行为分析
-            klinesService.declineAndStrengthCheck(klines_list_15m);
+            klinesService.declineAndStrengthCheck(klines_list_1h);
             
             //EMA指标涨跌判断
             klinesService.futuresEmaRiseAndFall(klines_list_15m);
