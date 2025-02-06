@@ -299,14 +299,6 @@ public class KlinesServiceImpl implements KlinesService {
 				marketPlace(pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET);
 				
 				for(User u : userList) {
-					/*
-					FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
-					
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						closePpositionCode = fibInfo.getTakeProfit_v4(code);
-					}
-					*/
 					
 					FibCode closePpositionCode = fibInfo.getTakeProfit_v5(code);//止盈点位
 					
@@ -319,14 +311,16 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//止盈价
 					double profitPrice = fibInfo.getFibValue(closePpositionCode);
+
+					//根据交易风格设置盈利限制
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					
-					//回踩单
-					/*if(closePpositionCode == FibCode.FIB1) {
-						
-						profitPercent = u.getProfit();
-						
+					if(tradeStyle == TradeStyle.CONSERVATIVE) {
+						if(profitPercent > u.getProfitLimit()) {
+							profitPercent = u.getProfitLimit();
+						}
 						profitPrice = PriceUtil.getLongTakeProfitForPercent(currentPrice, profitPercent / 100);
-					}*/
+					}
 					
 					//开仓订阅提醒
 					String subject = String.format("%s永续合约%s(%s)[%s]做多机会(PNL:%s%%) %s", pair, code.getDescription(),
@@ -450,13 +444,6 @@ public class KlinesServiceImpl implements KlinesService {
 				marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
 				
 				for(User u : userList) {
-					/*
-					FibCode closePpositionCode = fibInfo.getTakeProfit_v3(code);//止盈点位
-					
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						closePpositionCode = fibInfo.getTakeProfit_v4(code);
-					}*/
 					
 					FibCode closePpositionCode = fibInfo.getTakeProfit_v5(code);//止盈点位
 					
@@ -470,13 +457,15 @@ public class KlinesServiceImpl implements KlinesService {
 					//止盈价
 					double profitPrice = fibInfo.getFibValue(closePpositionCode);
 					
-					//回踩单
-					/*if(closePpositionCode == FibCode.FIB1) {
-						
-						profitPercent = u.getProfit();
-						
+					//根据交易风格设置盈利限制
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					
+					if(tradeStyle == TradeStyle.CONSERVATIVE) {
+						if(profitPercent > u.getProfitLimit()) {
+							profitPercent = u.getProfitLimit();
+						}
 						profitPrice = PriceUtil.getShortTakeProfitForPercent(currentPrice, profitPercent / 100);
-					}*/
+					}
 					
 					String subject = String.format("%s永续合约%s(%s)[%s]做空机会(PNL:%s%%) %s", pair, code.getDescription(),
 							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -588,14 +577,19 @@ public class KlinesServiceImpl implements KlinesService {
 								continue;
 							}
 							
-							/*if(takeProfitCode == FibCode.FIB1) {
-								profitPercent = u.getProfit() / 100;
+							//根据交易风格设置盈利限制
+							if(tradeStyle == TradeStyle.CONSERVATIVE) {
+								double dbProfitLimit = u.getProfitLimit() / 100;
+								if(profitPercent > dbProfitLimit) {
+									profitPercent = dbProfitLimit;
+								}
 								takeProfit = new BigDecimal(
 										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
 												);
 								logger.info("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
 										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
-							}*/
+							}
+							
 						}
 						
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
@@ -778,14 +772,19 @@ public class KlinesServiceImpl implements KlinesService {
 								continue;
 							}
 							
-							/*if(takeProfitCode == FibCode.FIB1) {
-								profitPercent = u.getProfit() / 100;
+							//根据交易风格设置盈利限制
+							if(tradeStyle == TradeStyle.CONSERVATIVE) {
+								double dbProfitLimit = u.getProfitLimit() / 100;
+								if(profitPercent > dbProfitLimit) {
+									profitPercent = dbProfitLimit;
+								}
+								
 								takeProfit = new BigDecimal(
 										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
 												);
 								logger.info("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
 										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
-							}*/
+							}
 						}
 
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
