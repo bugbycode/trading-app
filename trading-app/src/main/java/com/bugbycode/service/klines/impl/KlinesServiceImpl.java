@@ -1268,8 +1268,10 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void declineAndStrengthCheck(List<Klines> klinesListData) {
 		
-		List<Klines> klinesList = new ArrayList<Klines>();
-		klinesList.addAll(klinesListData);
+		List<Klines> tmp_klinesList = new ArrayList<Klines>();
+		tmp_klinesList.addAll(klinesListData);
+		
+		List<Klines> klinesList = PriceUtil.to1HFor15MKlines(tmp_klinesList);
 		
 		if(!CollectionUtils.isEmpty(klinesList)){
 			
