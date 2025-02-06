@@ -68,6 +68,8 @@ public class User implements UserDetails {
 	
 	private int tradeStyle = 0; // 交易风格 0：保守 1：激进
 	
+	private double profitLimit = 4;//止盈百分比限制 交易风格为保守时使用
+	
 	public String getId() {
 		return id;
 	}
@@ -269,6 +271,14 @@ public class User implements UserDetails {
 		this.tradeStyle = tradeStyle;
 	}
 
+	public double getProfitLimit() {
+		return profitLimit;
+	}
+
+	public void setProfitLimit(double profitLimit) {
+		this.profitLimit = profitLimit;
+	}
+
 	public void copy(User user) {
 		this.setId(user.getId());
 		this.setUsername(user.getUsername());
@@ -286,6 +296,7 @@ public class User implements UserDetails {
 		this.setRecvCrossUnPnlPercent(user.getRecvCrossUnPnlPercent());
 		this.setTradeStepBack(user.getTradeStepBack());
 		this.setTradeStyle(user.getTradeStyle());
+		this.setProfitLimit(user.getProfitLimit());
 	}
 	
 	public void copyAIInfo(User user) {
@@ -300,5 +311,6 @@ public class User implements UserDetails {
 		this.setRecvCrossUnPnlPercent(user.getRecvCrossUnPnlPercent());
 		this.setTradeStepBack(user.getTradeStepBack());
 		this.setTradeStyle(user.getTradeStyle());
+		this.setProfitLimit(user.getProfitLimit());
 	}
 }
