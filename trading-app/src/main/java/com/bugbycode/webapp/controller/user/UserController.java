@@ -142,7 +142,7 @@ public class UserController extends BaseController{
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
 					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
 					drawTrade.getValue(), recvTradeStatus.getValue(), recvCrossUnPnlStatus.getValue(), data.getRecvCrossUnPnlPercent(), 
-					tradeStepBackStatus.getValue(), tradeStyle.getValue(), user.getProfitLimit());
+					tradeStepBackStatus.getValue(), tradeStyle.getValue(), data.getProfitLimit());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -159,7 +159,7 @@ public class UserController extends BaseController{
 			user.setRecvCrossUnPnlPercent(data.getRecvCrossUnPnlPercent());
 			user.setTradeStepBack(tradeStepBackStatus.getValue());
 			user.setTradeStyle(tradeStyle.getValue());
-			user.setProfitLimit(user.getProfitLimit());
+			user.setProfitLimit(data.getProfitLimit());
 			
 			json.put("message", "修改成功");
 		} else {
