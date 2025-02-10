@@ -1475,7 +1475,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
 		double sec_fib5Price = secondFibInfo.getFibValue(FibCode.FIB5);
 		
-		logger.info("{}交易对二级斐波那契回撤信息：{}", pair, secondFibInfo);
+		//logger.info("{}交易对二级斐波那契回撤信息：{}", pair, secondFibInfo);
 		
 		double closePrice = lastKlines.getClosePriceDoubleValue();
 		double percent = 0;
@@ -1502,6 +1502,10 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					text = StringUtil.formatLongMessage(pair, closePrice, secondFibInfo, stopLoss.doubleValue(), FibCode.FIB5);
 					
+					text += "，预计盈利：" + percentStr + "%";
+					
+					text += "\r\n" + secondFibInfo.toString();
+					
 					sendEmail(subject, text, u.getUsername());
 				}
 				
@@ -1525,6 +1529,10 @@ public class KlinesServiceImpl implements KlinesService {
 							);
 					
 					text = StringUtil.formatShortMessage(pair, closePrice, secondFibInfo, stopLoss.doubleValue(), FibCode.FIB5);
+					
+					text += "，预计盈利：" + percentStr + "%";
+					
+					text += "\r\n" + secondFibInfo.toString();
 					
 					sendEmail(subject, text, u.getUsername());
 				}
