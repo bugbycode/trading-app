@@ -1497,7 +1497,7 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					BigDecimal stopLoss = new BigDecimal(
-							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(closePrice), cutLoss),secondFibInfo.getDecimalPoint())
+							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss),secondFibInfo.getDecimalPoint())
 							);
 					
 					text = StringUtil.formatLongMessage(pair, closePrice, secondFibInfo, stopLoss.doubleValue(), FibCode.FIB5);
@@ -1525,7 +1525,7 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					BigDecimal stopLoss = new BigDecimal(
-							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(closePrice), cutLoss),secondFibInfo.getDecimalPoint())
+							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss),secondFibInfo.getDecimalPoint())
 							);
 					
 					text = StringUtil.formatShortMessage(pair, closePrice, secondFibInfo, stopLoss.doubleValue(), FibCode.FIB5);
