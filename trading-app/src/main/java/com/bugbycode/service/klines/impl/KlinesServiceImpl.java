@@ -1507,11 +1507,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					BigDecimal stopLoss = new BigDecimal(
-							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss),secondFibInfo.getDecimalPoint())
-							);
-					
-					text = StringUtil.formatLongMessage(pair, closePrice, secondFibInfo, stopLoss.doubleValue(), FibCode.FIB5);
+					text = StringUtil.formatLongMessage(pair, closePrice, secondFibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), FibCode.FIB5);
 					
 					text += "，预计盈利：" + percentStr + "%";
 					
@@ -1535,11 +1531,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					BigDecimal stopLoss = new BigDecimal(
-							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss),secondFibInfo.getDecimalPoint())
-							);
-					
-					text = StringUtil.formatShortMessage(pair, closePrice, secondFibInfo, stopLoss.doubleValue(), FibCode.FIB5);
+					text = StringUtil.formatShortMessage(pair, closePrice, secondFibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), FibCode.FIB5);
 					
 					text += "，预计盈利：" + percentStr + "%";
 					
