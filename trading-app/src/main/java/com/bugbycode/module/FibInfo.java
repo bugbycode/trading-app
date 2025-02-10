@@ -72,7 +72,9 @@ public class FibInfo {
 	 */
 	public FibCode getTakeProfit_v2(FibCode code) {
 		FibCode takeProfit = FibCode.FIB382;
-		if(code.getValue() > FibCode.FIB1.getValue()) {
+		if(code == FibCode.FIB4_618) {
+			takeProfit = FibCode.FIB2_618;
+		} else if(code.getValue() > FibCode.FIB1.getValue()) {
 			takeProfit = FibCode.FIB1;
 		}
 		return takeProfit;
