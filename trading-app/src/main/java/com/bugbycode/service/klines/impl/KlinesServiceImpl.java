@@ -1456,11 +1456,22 @@ public class KlinesServiceImpl implements KlinesService {
 		String subject = "";//邮件主题
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		List<Klines> klinesList = new ArrayList<Klines>();
-		klinesList.addAll(klinesListData);
+		List<Klines> klinesList_tmp = new ArrayList<Klines>();
+		klinesList_tmp.addAll(klinesListData);
 		
-		Klines lastKlines = PriceUtil.getLastKlines(klinesListData);
+		List<Klines> klinesList = PriceUtil.to1HFor15MKlines(klinesList_tmp);
+		
+		Klines lastKlines = PriceUtil.getLastKlines(klinesList);
+		
 		String pair = lastKlines.getPair();
+		
+		int minute = DateFormatUtil.getMinute(lastKlines.getEndTime());
+		if(minute != 0) {
+			logger.info("{}1小时级别最后一根k线时间为：{}，不是整点时间已将其移除", pair, DateFormatUtil.format(lastKlines.getEndTime()));
+			klinesList.remove(klinesList.size() - 1);
+			lastKlines = PriceUtil.getLastKlines(klinesList);
+			logger.info(lastKlines);
+		}
 		
 		FibUtil_v2 fu = new FibUtil_v2(klinesList);
 		
