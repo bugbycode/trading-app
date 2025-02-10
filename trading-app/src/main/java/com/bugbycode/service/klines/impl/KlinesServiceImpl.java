@@ -561,6 +561,8 @@ public class KlinesServiceImpl implements KlinesService {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
+							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
+								takeProfitCode = FibCode.FIB5;
 							}
 							
 							stopLoss = new BigDecimal(
@@ -755,6 +757,8 @@ public class KlinesServiceImpl implements KlinesService {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
+							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
+								takeProfitCode = FibCode.FIB5;
 							}
 							
 							stopLoss = new BigDecimal(
@@ -1496,6 +1500,9 @@ public class KlinesServiceImpl implements KlinesService {
 				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
 				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
+				//市价做多
+				marketPlace(pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
+				
 				for(User u : uList) {
 					double profit = u.getProfit();
 					double cutLoss = u.getCutLoss();
@@ -1510,8 +1517,6 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					text += "\r\n" + secondFibInfo.toString();
 					
-					logger.info("开仓价：{}，止损比例：{}，止损价：{}" ,closePrice, cutLoss ,PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss));
-					
 					sendEmail(subject, text, u.getUsername());
 				}
 				
@@ -1520,6 +1525,9 @@ public class KlinesServiceImpl implements KlinesService {
 				percent = PriceUtil.getFallFluctuationPercentage(closePrice, sec_fib5Price) * 100;
 				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
 				subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+				
+				//市价做空
+				marketPlace(pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
 				
 				for(User u : uList) {
 					
@@ -1535,7 +1543,7 @@ public class KlinesServiceImpl implements KlinesService {
 					text += "，预计盈利：" + percentStr + "%";
 					
 					text += "\r\n" + secondFibInfo.toString();
-					logger.info("开仓价：{}，止损比例：{}，止损价：{}" ,closePrice, cutLoss ,PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss));
+					
 					sendEmail(subject, text, u.getUsername());
 				}
 			}

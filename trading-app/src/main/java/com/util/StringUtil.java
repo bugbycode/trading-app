@@ -70,7 +70,7 @@ public class StringUtil {
 			FibInfo fibInfo,double maxPrice,FibCode fibCode) {
 		
 		return StringUtil.formatShortMessage(pair, currentPrice, fibInfo.getFibValue(fibCode), 
-				PriceUtil.rectificationCutLossShortPrice(maxPrice),fibInfo.getDecimalPoint());
+				maxPrice,fibInfo.getDecimalPoint());
 	}
 	
 	/**
@@ -85,7 +85,7 @@ public class StringUtil {
 	public static String formatLongMessage(String pair,double currentPrice,
 			FibInfo fibInfo,double minPrice,FibCode fibCode) {
 		
-		return StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice(minPrice), 
+		return StringUtil.formatLongMessage(pair, currentPrice, minPrice, 
 				fibInfo.getFibValue(fibCode), fibInfo.getDecimalPoint());
 	}
 	

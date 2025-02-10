@@ -255,13 +255,13 @@ public class FibUtil_v2 {
 	public boolean verifyFirstFibOpen(FibInfo firstFibInfo,double currentPrice) {
 		boolean flag = false;
 		if(firstFibInfo != null) {
-			double first_fib5Price = firstFibInfo.getFibValue(FibCode.FIB5);
+			double first_fibPrice = firstFibInfo.getFibValue(FibCode.FIB618);
 			//double first_fib1Price = firstFibInfo.getFibValue(FibCode.FIB1);
 			QuotationMode qm = firstFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				flag = currentPrice < first_fib5Price;
+				flag = currentPrice < first_fibPrice;
 			} else {
-				flag = currentPrice > first_fib5Price;
+				flag = currentPrice > first_fibPrice;
 			}
 		}
 		return flag;
