@@ -1489,8 +1489,13 @@ public class KlinesServiceImpl implements KlinesService {
 				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
 				for(User u : uList) {
-					
+					double profit = u.getProfit();
 					double cutLoss = u.getCutLoss();
+					
+					if(percent < profit) {
+						continue;
+					}
+					
 					BigDecimal stopLoss = new BigDecimal(
 							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(closePrice), cutLoss),secondFibInfo.getDecimalPoint())
 							);
@@ -1508,7 +1513,13 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : uList) {
 					
+					double profit = u.getProfit();
 					double cutLoss = u.getCutLoss();
+					
+					if(percent < profit) {
+						continue;
+					}
+					
 					BigDecimal stopLoss = new BigDecimal(
 							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(closePrice), cutLoss),secondFibInfo.getDecimalPoint())
 							);

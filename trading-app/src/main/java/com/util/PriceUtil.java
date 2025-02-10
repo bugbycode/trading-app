@@ -23,7 +23,6 @@ import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.PriceFibInfo;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.PriceInfo;
 
@@ -1497,6 +1496,9 @@ public class PriceUtil {
 		} else if(parent.isRise() && current.isFall() 
 				&& current.getBodyLowPriceDoubleValue() <= parent.getBodyLowPriceDoubleValue()) {//看跌吞没
 			flag = true;
+		} else if(parent.isFall() && current.isRise() 
+				&& current.getBodyHighPriceDoubleValue() < parent.getHighPriceDoubleValue()) {
+			flag = true;
 		}
 		return flag;
 	}
@@ -1513,6 +1515,9 @@ public class PriceUtil {
 			flag = true;
 		} else if(parent.isFall() && current.isRise() 
 				&& current.getBodyLowPriceDoubleValue() >= parent.getBodyLowPriceDoubleValue()) {//看涨吞没
+			flag = true;
+		} else if(parent.isRise() && current.isFall() 
+				&& current.getBodyLowPriceDoubleValue() > parent.getLowPriceDoubleValue()) {
 			flag = true;
 		}
 		return flag;
