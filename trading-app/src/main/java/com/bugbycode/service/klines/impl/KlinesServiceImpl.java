@@ -1467,10 +1467,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		int minute = DateFormatUtil.getMinute(lastKlines.getEndTime());
 		if(minute != 59) {
-			logger.info("{}1小时级别最后一根k线时间为：{}，不是完整的k线已将其移除", pair, DateFormatUtil.format(lastKlines.getEndTime()));
-			klinesList.remove(klinesList.size() - 1);
-			lastKlines = PriceUtil.getLastKlines(klinesList);
-			logger.info(lastKlines);
+			return;
 		}
 		
 		FibUtil_v2 fu = new FibUtil_v2(klinesList);
@@ -1513,6 +1510,8 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					text += "\r\n" + secondFibInfo.toString();
 					
+					logger.info("开仓价：{}，止损比例：{}，止损价：{}" ,closePrice, cutLoss ,PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss));
+					
 					sendEmail(subject, text, u.getUsername());
 				}
 				
@@ -1536,7 +1535,7 @@ public class KlinesServiceImpl implements KlinesService {
 					text += "，预计盈利：" + percentStr + "%";
 					
 					text += "\r\n" + secondFibInfo.toString();
-					
+					logger.info("开仓价：{}，止损比例：{}，止损价：{}" ,closePrice, cutLoss ,PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss));
 					sendEmail(subject, text, u.getUsername());
 				}
 			}
