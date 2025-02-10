@@ -1410,4 +1410,111 @@ public class PriceUtil {
 		return result;
 	}
 	
+	/**
+	 * 校验价格是否出现颓势
+	 * @param list
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice(List<Klines> list) {
+		boolean flag = false;
+		int lastIndex = list.size() - 1;
+		Klines k0 = list.get(lastIndex);
+		Klines k1 = list.get(lastIndex - 1);
+		Klines k2 = list.get(lastIndex - 2);
+		if(isRise_V2(k1, k2) && verifyDecliningPrice(k0, k1)) {
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * 校验价格是否出现强势
+	 * @param list
+	 * @return
+	 */
+	public static boolean verifyPowerful(List<Klines> list) {
+		boolean flag = false;
+		int lastIndex = list.size() - 1;
+		Klines k0 = list.get(lastIndex);
+		Klines k1 = list.get(lastIndex - 1);
+		Klines k2 = list.get(lastIndex - 2);
+		if(isFall_V2(k1, k2) && verifyPowerful(k0, k1)) {
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * 判断是否上涨
+	 * @param current 当前k线
+	 * @param parrent 前一根k线
+	 * @return
+	 */
+	public static boolean isRise_V2(Klines current,Klines parrent) {
+		boolean flag = false;
+		if(current.isRise() && parrent.isRise()) {//都为阳线则上涨
+			flag = true;
+		} else if(parrent.isRise() && current.isFall() && 
+				current.getBodyLowPriceDoubleValue() > parrent.getBodyLowPriceDoubleValue()) {//前一根为阳线 当前为阴线且收盘价大于前一根开盘价
+			flag = true;
+		} else if(parrent.isFall() && current.isRise() && 
+				current.getBodyHighPriceDoubleValue() >= parrent.getHighPriceDoubleValue()) { //前一根k线为阴线 当前为阳线且收盘价大于等于前一根k线最高价
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * 判断是否下跌
+	 * @param current 当前k线
+	 * @param parrent 前一根k线
+	 * @return
+	 */
+	public static boolean isFall_V2(Klines current,Klines parrent) {
+		boolean flag = false;
+		if(current.isFall() && current.isFall()) { //皆为阴线则为下跌
+			flag = true;
+		} else if(parrent.isFall() && current.isRise() 
+				&& current.getBodyHighPriceDoubleValue() < parrent.getBodyHighPriceDoubleValue()) { //前一根k为阴线 当前为阳线且收盘价小于前一根开盘价
+			flag = true;
+		} else if(parrent.isRise() && current.isFall() 
+				&& current.getBodyLowPriceDoubleValue() <= parrent.getLowPriceDoubleValue()) { //前一根k线为阳线 当前k线为阴线且收盘价小于等于前一根k线最低价
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * 判断是否出现颓势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice(Klines current,Klines parent) {
+		boolean flag = false;
+		if(isFall_V2(current,parent)) {// 下跌
+			flag = true;
+		} else if(parent.isRise() && current.isFall() 
+				&& current.getBodyLowPriceDoubleValue() <= parent.getBodyLowPriceDoubleValue()) {//看跌吞没
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * 判断是否出现强势
+	 * @param current
+	 * @param parent
+	 * @return
+	 */
+	public static boolean verifyPowerful(Klines current,Klines parent) {
+		boolean flag = false;
+		if(isRise_V2(current,parent)) {// 上涨
+			flag = true;
+		} else if(parent.isFall() && current.isRise() 
+				&& current.getBodyLowPriceDoubleValue() >= parent.getBodyLowPriceDoubleValue()) {//看涨吞没
+			flag = true;
+		}
+		return flag;
+	}
 }

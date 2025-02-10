@@ -63,6 +63,7 @@ import com.util.CommandUtil;
 import com.util.ConsolidationAreaUtil;
 import com.util.DateFormatUtil;
 import com.util.FibUtil;
+import com.util.FibUtil_v2;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.KlinesUtil;
@@ -1446,6 +1447,79 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void declineAndStrengthCheck_v2(List<Klines> klinesListData) {
+		
+		String text = "";//邮件内容
+		String subject = "";//邮件主题
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		List<Klines> klinesList = new ArrayList<Klines>();
+		klinesList.addAll(klinesListData);
+		
+		Klines lastKlines = PriceUtil.getLastKlines(klinesListData);
+		String pair = lastKlines.getPair();
+		
+		FibUtil_v2 fu = new FibUtil_v2(klinesList);
+		
+		FibInfo firstFibInfo = fu.getFibInfo();
+		if(firstFibInfo == null) {
+			logger.info("无法计算出{}交易对一级斐波那契回撤信息", pair);
+			return;
+		}
+		
+		QuotationMode qm = firstFibInfo.getQuotationMode();
+		
+		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
+		double sec_fib5Price = secondFibInfo.getFibValue(FibCode.FIB5);
+		
+		logger.info("{}交易对二级斐波那契回撤信息：{}", pair, secondFibInfo);
+		
+		double closePrice = lastKlines.getClosePriceDoubleValue();
+		double percent = 0;
+		List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+		
+		if(fu.verifyFirstFibOpen(firstFibInfo, closePrice) && fu.verifySecondFibOpen(secondFibInfo, closePrice)) {
+			if(qm == QuotationMode.LONG && PriceUtil.verifyPowerful(klinesList)) {//做多情况
+				
+				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, sec_fib5Price) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+				
+				for(User u : uList) {
+					
+					double cutLoss = u.getCutLoss();
+					BigDecimal stopLoss = new BigDecimal(
+							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(closePrice), cutLoss),secondFibInfo.getDecimalPoint())
+							);
+					
+					text = StringUtil.formatLongMessage(pair, closePrice, secondFibInfo, stopLoss.doubleValue(), FibCode.FIB5);
+					
+					sendEmail(subject, text, u.getUsername());
+				}
+				
+			} else if(qm == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice(klinesList)) { //做空情况
+				
+				percent = PriceUtil.getFallFluctuationPercentage(closePrice, sec_fib5Price) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+				
+				for(User u : uList) {
+					
+					double cutLoss = u.getCutLoss();
+					BigDecimal stopLoss = new BigDecimal(
+							PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(closePrice), cutLoss),secondFibInfo.getDecimalPoint())
+							);
+					
+					text = StringUtil.formatShortMessage(pair, closePrice, secondFibInfo, stopLoss.doubleValue(), FibCode.FIB5);
+					
+					sendEmail(subject, text, u.getUsername());
+				}
+			}
+		}
+		
 	}
 	
 	@Override
