@@ -1522,4 +1522,82 @@ public class PriceUtil {
 		}
 		return flag;
 	}
+	
+	/**
+	 * 判断是否出现颓势 V3
+	 * @param list
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v3(List<Klines> list) {
+		
+		int lastIndex = list.size() - 1;
+		Klines k0 = list.get(lastIndex);
+		Klines k1 = list.get(lastIndex - 1);
+		Klines k2 = list.get(lastIndex - 2);
+		
+		return isRise_v3(k1, k2) && isFall_v3(k0, k1);
+	}
+	
+	/**
+	 * 判断是否出现强势 V3
+	 * @param list
+	 * @return
+	 */
+	public static boolean verifyPowerful_v3(List<Klines> list) {
+		
+		int lastIndex = list.size() - 1;
+		Klines k0 = list.get(lastIndex);
+		Klines k1 = list.get(lastIndex - 1);
+		Klines k2 = list.get(lastIndex - 2);
+		
+		return isFall_v3(k1, k2) && isRise_v3(k0, k1);
+	}
+	
+	/**
+	 * 判断连根k线是否为上涨 V3 
+	 * </br>
+	 * 
+	 * 如果两根k线是上涨 那么则应满足 实体部分最低价在不断抬高
+	 * 
+	 * @param current 当前k线
+	 * @param parrent 前一根k线
+	 * @return
+	 */
+	public static boolean isRise_v3(Klines current, Klines parrent) {
+		boolean flag = false;
+		if(current.isRise() && parrent.isRise()) { //两根k线均为阳线则为上涨
+			flag = true;
+		} else if(parrent.isRise() && current.isFall() 
+				&& current.getClosePriceDoubleValue() > parrent.getOpenPriceDoubleValue()) { //前一根k线为阳线 当前k线为阴线 且当前k线收盘价大于前一根k线开盘价 则为上涨
+			flag = true;
+		} else if(parrent.isFall() && current.isRise() 
+				&& current.getClosePriceDoubleValue() >= parrent.getOpenPriceDoubleValue()) { //前一根k线为阴线 当前为阳线 且当前k线收盘价大于等于前一根k线开盘价（看涨吞没）
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * 判断连根k线是否为下跌 V3 
+	 * </br>
+	 * 
+	 * 如果两根k线是下跌 那么则应满足 实体部分最高价在不断降低
+	 * 
+	 * @param current 当前k线
+	 * @param parrent 前一根k线
+	 * @return
+	 */
+	public static boolean isFall_v3(Klines current, Klines parrent) {
+		boolean flag = false;
+		if(current.isFall() && parrent.isFall()) { //两根k线均为阴线则为下跌
+			flag = true;
+		} else if(parrent.isFall() && current.isRise() 
+				&& current.getClosePriceDoubleValue() < parrent.getOpenPriceDoubleValue()) { //一阴一阳 当前k线收盘价小于前一根k线开盘价
+			flag = true;
+		} else if(parrent.isRise() && current.isFall()
+				&& current.getClosePriceDoubleValue() <= parrent.getOpenPriceDoubleValue()) { //一阳一阴 当前k线收盘价小于等于前一根k线开盘价
+			flag = true;
+		}
+		return flag;
+	}
 }

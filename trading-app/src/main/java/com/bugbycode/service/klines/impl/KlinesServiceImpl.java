@@ -1494,7 +1494,7 @@ public class KlinesServiceImpl implements KlinesService {
 		List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 		
 		if(fu.verifyFirstFibOpen(firstFibInfo, closePrice) && fu.verifySecondFibOpen(secondFibInfo, closePrice)) {
-			if(qm == QuotationMode.LONG && PriceUtil.verifyPowerful(klinesList)) {//做多情况
+			if(qm == QuotationMode.LONG && PriceUtil.verifyPowerful_v3(klinesList)) {//做多情况
 				
 				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, sec_fib5Price) * 100;
 				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -1520,7 +1520,7 @@ public class KlinesServiceImpl implements KlinesService {
 					sendEmail(subject, text, u.getUsername());
 				}
 				
-			} else if(qm == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice(klinesList)) { //做空情况
+			} else if(qm == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v3(klinesList)) { //做空情况
 				
 				percent = PriceUtil.getFallFluctuationPercentage(closePrice, sec_fib5Price) * 100;
 				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
