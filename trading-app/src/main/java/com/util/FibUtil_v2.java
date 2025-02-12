@@ -276,13 +276,13 @@ public class FibUtil_v2 {
 	public boolean verifySecondFibOpen(FibInfo secondFibInfo,double currentPrice) {
 		boolean flag = false;
 		if(secondFibInfo != null) {
-			//0.382回撤价格
-			double sec_fib382Price = secondFibInfo.getFibValue(FibCode.FIB382);
+			//0.236回撤价格
+			double sec_fib236Price = secondFibInfo.getFibValue(FibCode.FIB236);
 			QuotationMode qm = secondFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				flag = currentPrice >= sec_fib382Price;
+				flag = currentPrice >= sec_fib236Price;
 			} else {
-				flag = currentPrice <= sec_fib382Price;
+				flag = currentPrice <= sec_fib236Price;
 			}
 		}
 		return flag;
