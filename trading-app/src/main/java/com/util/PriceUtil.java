@@ -1554,7 +1554,7 @@ public class PriceUtil {
 	}
 	
 	/**
-	 * 判断连根k线是否为上涨 V3 
+	 * 判断两根k线是否为上涨 V3 
 	 * </br>
 	 * 
 	 * 如果两根k线是上涨 那么则应满足 实体部分最低价在不断抬高
@@ -1578,7 +1578,7 @@ public class PriceUtil {
 	}
 	
 	/**
-	 * 判断连根k线是否为下跌 V3 
+	 * 判断两根k线是否为下跌 V3 
 	 * </br>
 	 * 
 	 * 如果两根k线是下跌 那么则应满足 实体部分最高价在不断降低
@@ -1695,5 +1695,39 @@ public class PriceUtil {
 			flag = true;
 		}
 		return flag;
+	}
+	
+	/**
+	 * 判断是否可做多
+	 * @param price 价格
+	 * @param list k线
+	 * @return
+	 */
+	public static boolean isLong_v2(double price, List<Klines> list) {
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		Klines k2 = list.get(index -2);
+		
+		double closePrice = k0.getClosePriceDoubleValue();
+		
+		return closePrice >= price && (isHitPrice(k0, price) || isHitPrice(k1, price) || isHitPrice(k2, price)) && isRise_v3(k0, k1);
+	}
+	
+	/**
+	 * 判断是否可做空
+	 * @param price 价格
+	 * @param list k线
+	 * @return
+	 */
+	public static boolean isShort_v2(double price, List<Klines> list) {
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		Klines k2 = list.get(index -2);
+		
+		double closePrice = k0.getClosePriceDoubleValue();
+		
+		return closePrice <= price && (isHitPrice(k0, price) || isHitPrice(k1, price) || isHitPrice(k2, price)) && isFall_v3(k0, k1);
 	}
 }
