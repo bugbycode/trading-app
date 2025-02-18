@@ -1600,4 +1600,100 @@ public class PriceUtil {
 		}
 		return flag;
 	}
+	
+	/**
+	 * 判断EMA指标是否可做多
+	 * @param list
+	 * @return
+	 */
+	public static boolean isLongForEma(List<Klines> list) {
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		return isOpenForEma(list) && isRise_v3(k0, k1);
+	}
+	
+	/**
+	 * 判断EMA指标是否可做空
+	 * @param list
+	 * @return
+	 */
+	public static boolean isShortForEma(List<Klines> list) {
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		return isOpenForEma(list) && isFall_v3(k0, k1);
+	}
+	
+	/**
+	 * 判断EMA指标是否可开仓
+	 * @param list k线信息
+	 * @return
+	 */
+	public static boolean isOpenForEma(List<Klines> list) {
+		
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		Klines k2 = list.get(index -1);
+		//判断回踩ema99 情况
+	 	
+		return isHitEma99(k0) || isHitEma99(k1) || isHitEma99(k2);
+	}
+	
+	/**
+	 * 判断k线是否回踩ema99均线
+	 * @param current
+	 * @return
+	 */
+	public static boolean isHitEma99(Klines current) {
+		double ema99 = current.getEma99();
+		return isHitPrice(current, ema99);
+	}
+	
+	/**
+	 * 判断是否到达某个价格
+	 * @param current 当前k线
+	 * @param price 价格
+	 * @return
+	 */
+	public static boolean isHitPrice(Klines current,double price) {
+		
+		double lowPrice = current.getLowPriceDoubleValue();
+	 	double highPrice = current.getHighPriceDoubleValue();
+	 	
+	 	return lowPrice <= price && highPrice >= price;
+	}
+	
+	/**
+	 * 判断是否处于上涨状态
+	 * @param list
+	 * @return
+	 */
+	public static boolean isRise_v3(List<Klines> list) {
+		boolean flag = false;
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		if(isRise_v3(k0, k1)) {
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * 判断是否处于下跌状态
+	 * @param list
+	 * @return
+	 */
+	public static boolean isFall_v3(List<Klines> list) {
+		boolean flag = false;
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		if(isFall_v3(k0, k1)) {
+			flag = true;
+		}
+		return flag;
+	}
 }

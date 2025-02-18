@@ -140,6 +140,12 @@ public interface KlinesService {
 	public void futuresEmaRiseAndFall(List<Klines> klinesList);
 	
 	/**
+	 * EMA指标判断涨跌 V2
+	 * @param klinesList
+	 */
+	public void futuresEmaRiseAndFall_V2(List<Klines> klinesList);
+	
+	/**
 	 * 盘整区点位监控
 	 * @param klinesList 盘整区k线信息（日线级别）
 	 * @param hitKlinesList 参考价格k线信息（15分钟）

@@ -1896,6 +1896,99 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
+	public void futuresEmaRiseAndFall_V2(List<Klines> list) {
+		
+		String subject = "";
+		String text = "";
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		List<Klines> klinesList = new ArrayList<Klines>();
+		klinesList.addAll(list);
+		
+		KlinesComparator kc_asc = new KlinesComparator(SortType.ASC);
+		klinesList.sort(kc_asc);
+		
+		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA7);
+		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA25);
+		PriceUtil.calculateEMAArray(klinesList, EMAType.EMA99);
+	 	
+		int index = klinesList.size() - 1;
+		
+		Klines lastKlines = klinesList.get(index);
+		String pair = lastKlines.getPair();
+	 	double lowPrice = Double.valueOf(lastKlines.getLowPrice());
+	 	double highPrice = Double.valueOf(lastKlines.getHighPrice());
+		double closePrice = Double.valueOf(lastKlines.getClosePrice());
+	 	
+		if(PriceUtil.isOpenForEma(klinesList)) {
+			
+			FibInfo fibInfo = PriceUtil.getFibInfoForEma(klinesList);
+			if(fibInfo != null) {
+				QuotationMode mode = fibInfo.getQuotationMode();
+				if(mode == QuotationMode.LONG && PriceUtil.isFall_v3(klinesList)) {//做空
+		 			
+					double percent = PriceUtil.getFallFluctuationPercentage(closePrice, fibInfo.getFibValue(FibCode.FIB618)) * 100;
+					String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+					
+		 			List<User> uList = userRepository.queryAllUserByEmaRiseAndFall(MonitorStatus.OPEN);
+				 	List<User> emailUserList = new ArrayList<User>();
+				 	if(!CollectionUtils.isEmpty(uList)) {
+						for(User u : uList) {
+							if(percent >= u.getProfit()) {
+								emailUserList.add(u);
+							}
+						}
+					}
+		 			
+				 	String recEmail = userDetailsService.getSubscribeAiUserEmail(emailUserList);
+		 			
+		 			subject = String.format("%s永续合约做空交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+					
+					text = StringUtil.formatShortMessage(pair, closePrice, fibInfo.getFibValue(FibCode.FIB618), PriceUtil.rectificationCutLossShortPrice(highPrice), lastKlines.getDecimalNum());
+
+					text += "，预计盈利：" + percentStr + "%";
+					
+					text += "\r\n" + fibInfo.toString();
+					
+					sendEmail(subject, text, recEmail);
+					
+		 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX);
+				 	
+		 		} else if(mode == QuotationMode.SHORT && PriceUtil.isRise_v3(klinesList)) {//做多
+		 			
+		 			double percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(FibCode.FIB618)) * 100;
+					String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+					
+					List<User> uList = userRepository.queryAllUserByEmaRiseAndFall(MonitorStatus.OPEN);
+				 	List<User> emailUserList = new ArrayList<User>();
+					if(!CollectionUtils.isEmpty(uList)) {
+						for(User u : uList) {
+							if(percent >= u.getProfit()) {
+								emailUserList.add(u);
+							}
+						}
+					}
+					
+					String recEmail = userDetailsService.getSubscribeAiUserEmail(emailUserList);
+		 			
+		 			subject = String.format("%s永续合约做多交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+					
+					text = StringUtil.formatLongMessage(pair, closePrice, PriceUtil.rectificationCutLossLongPrice(lowPrice), fibInfo.getFibValue(FibCode.FIB618), lastKlines.getDecimalNum());
+					
+					text += "，预计盈利：" + percentStr + "%";
+					
+					text += "\r\n" + fibInfo.toString();
+					
+					sendEmail(subject, text, recEmail);
+		 			
+		 			marketPlace(pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX);
+		 		}
+			}
+	 		
+		}
+	}
+	
+	@Override
 	public void futuresConsolidationAreaMonitor(List<Klines> klinesList, List<Klines> hitKlinesList) {
 		String dateStr = DateFormatUtil.format(new Date());
 		ConsolidationAreaUtil cau = new ConsolidationAreaUtil(klinesList);
