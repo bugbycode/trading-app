@@ -1925,7 +1925,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibInfo fibInfo = PriceUtil.getFibInfoForEma(klinesList);
 			if(fibInfo != null) {
 				QuotationMode mode = fibInfo.getQuotationMode();
-				if(mode == QuotationMode.LONG && PriceUtil.isFall_v3(klinesList)) {//做空
+				if(mode == QuotationMode.LONG && PriceUtil.isFall_v3(klinesList) && fibInfo.getFibValue(FibCode.FIB382) <= closePrice) {//做空
 		 			
 					double percent = PriceUtil.getFallFluctuationPercentage(closePrice, fibInfo.getFibValue(FibCode.FIB618)) * 100;
 					String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -1954,7 +1954,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 		 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX);
 				 	
-		 		} else if(mode == QuotationMode.SHORT && PriceUtil.isRise_v3(klinesList)) {//做多
+		 		} else if(mode == QuotationMode.SHORT && PriceUtil.isRise_v3(klinesList) && fibInfo.getFibValue(FibCode.FIB382) >= closePrice) {//做多
 		 			
 		 			double percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(FibCode.FIB618)) * 100;
 					String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
