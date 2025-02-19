@@ -562,7 +562,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfitCode = FibCode.FIB618;
+								takeProfitCode = FibCode.FIB382;
 							}
 							
 							stopLoss = new BigDecimal(
@@ -758,7 +758,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfitCode = FibCode.FIB618;
+								takeProfitCode = FibCode.FIB382;
 							}
 							
 							stopLoss = new BigDecimal(
@@ -1485,7 +1485,7 @@ public class KlinesServiceImpl implements KlinesService {
 		QuotationMode qm = firstFibInfo.getQuotationMode();
 		
 		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
-		double sec_fibPrice = secondFibInfo.getFibValue(FibCode.FIB618);
+		double sec_fibPrice = secondFibInfo.getFibValue(FibCode.FIB382);
 		
 		//logger.info("{}交易对二级斐波那契回撤信息：{}", pair, secondFibInfo);
 		

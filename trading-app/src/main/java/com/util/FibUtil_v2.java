@@ -277,7 +277,7 @@ public class FibUtil_v2 {
 		boolean flag = false;
 		if(secondFibInfo != null) {
 			//回撤价格
-			double sec_fibPrice = secondFibInfo.getFibValue(FibCode.FIB382);
+			double sec_fibPrice = secondFibInfo.getFibValue(FibCode.FIB236);
 			QuotationMode qm = secondFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
 				flag = currentPrice >= sec_fibPrice;
