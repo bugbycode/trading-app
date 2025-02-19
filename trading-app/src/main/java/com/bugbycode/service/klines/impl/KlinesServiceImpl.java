@@ -562,7 +562,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfitCode = FibCode.FIB382;
+								takeProfitCode = FibCode.FIB618;
 							}
 							
 							stopLoss = new BigDecimal(
@@ -758,7 +758,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfitCode = FibCode.FIB382;
+								takeProfitCode = FibCode.FIB618;
 							}
 							
 							stopLoss = new BigDecimal(
@@ -1485,7 +1485,7 @@ public class KlinesServiceImpl implements KlinesService {
 		QuotationMode qm = firstFibInfo.getQuotationMode();
 		
 		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
-		double sec_fib382Price = secondFibInfo.getFibValue(FibCode.FIB382);
+		double sec_fibPrice = secondFibInfo.getFibValue(FibCode.FIB618);
 		
 		//logger.info("{}交易对二级斐波那契回撤信息：{}", pair, secondFibInfo);
 		
@@ -1496,7 +1496,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fu.verifyFirstFibOpen(firstFibInfo, closePrice) && fu.verifySecondFibOpen(secondFibInfo, closePrice)) {
 			if(qm == QuotationMode.LONG && PriceUtil.verifyPowerful_v3(klinesList)) {//做多情况
 				
-				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, sec_fib382Price) * 100;
+				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, sec_fibPrice) * 100;
 				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
 				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
@@ -1522,7 +1522,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 			} else if(qm == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v3(klinesList)) { //做空情况
 				
-				percent = PriceUtil.getFallFluctuationPercentage(closePrice, sec_fib382Price) * 100;
+				percent = PriceUtil.getFallFluctuationPercentage(closePrice, sec_fibPrice) * 100;
 				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
 				subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
