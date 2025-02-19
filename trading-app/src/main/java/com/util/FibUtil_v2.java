@@ -65,28 +65,28 @@ public class FibUtil_v2 {
 				break;
 			}
 			Klines k = this.list.get(index);
-			//Klines k1 = this.list.get(index - 1);
-			//Klines k2 = this.list.get(index - 2);
+			Klines k1 = this.list.get(index - 1);
+			Klines k2 = this.list.get(index - 2);
 			/*Klines k3 = this.list.get(index - 3);
 			Klines k4 = this.list.get(index - 4);*/
 			//做多情况
 			if(ps == PositionSide.LONG) {
 				//先寻找第一个标志性k线
 				if(firstFlag == null) {
-					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
-							&& verifyHigh(k3) && verifyHigh(k4)*/) {
+					if(verifyHigh(k) && verifyHigh(k1) && verifyHigh(k2)
+							/*&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						firstFlag = k;
 						logger.debug(firstFlag);
 					}
 				} else if(secondFlag == null) {//寻找第二个标志性k线
-					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
-							&& verifyLow(k3) && verifyLow(k4)*/) {
+					if(verifyLow(k) && verifyLow(k1) && verifyLow(k2)
+							/*&& verifyLow(k3) && verifyLow(k4)*/) {
 						secondFlag = k;
 						logger.debug(secondFlag);
 					}
 				} else if(thirdFlag == null) {//寻找第三个标志性k线
-					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
-							&& verifyHigh(k3) && verifyHigh(k4)*/) {
+					if(verifyHigh(k) && verifyHigh(k1) && verifyHigh(k2)
+							/*&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						thirdFlag = k;
 						logger.debug(thirdFlag);
 					}
@@ -101,20 +101,20 @@ public class FibUtil_v2 {
 			if(ps == PositionSide.SHORT) {
 				//先寻找第一个标志性k线
 				if(firstFlag == null) {
-					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
-							&& verifyLow(k3) && verifyLow(k4)*/) {
+					if(verifyLow(k) && verifyLow(k1) && verifyLow(k2)
+							/*&& verifyLow(k3) && verifyLow(k4)*/) {
 						firstFlag = k;
 						logger.debug(firstFlag);
 					}
 				} else if(secondFlag == null) {//寻找第二个标志性k线
-					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
-							&& verifyHigh(k3) && verifyHigh(k4)*/) {
+					if(verifyHigh(k) && verifyHigh(k1) && verifyHigh(k2)
+							/*&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						secondFlag = k;
 						logger.debug(secondFlag);
 					}
 				} else if(thirdFlag == null) {//寻找第三个标志性k线
-					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
-							&& verifyLow(k3) && verifyLow(k4)*/) {
+					if(verifyLow(k) && verifyLow(k1) && verifyLow(k2)
+							/*&& verifyLow(k3) && verifyLow(k4)*/) {
 						thirdFlag = k;
 						logger.debug(thirdFlag);
 					}
@@ -232,7 +232,8 @@ public class FibUtil_v2 {
 	private boolean verifyHigh(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		return ema7 > ema25;
+		double ema99 = k.getEma99();
+		return ema7 > ema25 && ema25 > ema99;
 	}
 	
 	/**
@@ -243,7 +244,8 @@ public class FibUtil_v2 {
 	private boolean verifyLow(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		return ema7 < ema25;
+		double ema99 = k.getEma99();
+		return ema7 < ema25 && ema25 < ema99;
 	}
 	
 	/**
@@ -259,9 +261,9 @@ public class FibUtil_v2 {
 			//double first_fib1Price = firstFibInfo.getFibValue(FibCode.FIB1);
 			QuotationMode qm = firstFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				flag = currentPrice < first_fibPrice;
+				flag = currentPrice <= first_fibPrice;
 			} else {
-				flag = currentPrice > first_fibPrice;
+				flag = currentPrice >= first_fibPrice;
 			}
 		}
 		return flag;
