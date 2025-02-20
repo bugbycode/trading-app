@@ -1084,8 +1084,10 @@ public class KlinesServiceImpl implements KlinesService {
 			
 		}
 		
-		String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-	 	sendEmail(subject, text, recEmail);
+		if(StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
+			String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+		 	sendEmail(subject, text, recEmail);
+		}
 	}
 
 	@Override
@@ -1568,7 +1570,6 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		double closePrice = lastKlines.getClosePriceDoubleValue();
 		double percent = 0;
-		List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 		
 		if(fu.verifyFirstFibOpen(firstFibInfo, closePrice) && fu.verifySecondFibOpen(secondFibInfo, closePrice)) {
 			if(qm == QuotationMode.LONG && PriceUtil.verifyPowerful_v3(klinesList)) {//做多情况
@@ -1579,6 +1580,8 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				//市价做多
 				marketPlace(pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
+
+				List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : uList) {
 					double profit = u.getProfit();
@@ -1605,6 +1608,8 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				//市价做空
 				marketPlace(pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
+
+				List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : uList) {
 					
@@ -2097,10 +2102,11 @@ public class KlinesServiceImpl implements KlinesService {
 		String subject = "";
 		String text = "";
 		
-		String recEmail = userDetailsService.getAreaMonitorUserEmail();
-		
 		//订阅信息
 		if(hitPrice(current, areaLowPrice)) {
+			
+			String recEmail = userDetailsService.getAreaMonitorUserEmail();
+			
 			subject = String.format("%s永续合约价格已到达盘整区下边缘%s %s", pair, areaLowPrice, dateStr);
 			text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
 					pair,
@@ -2111,6 +2117,9 @@ public class KlinesServiceImpl implements KlinesService {
 		} 
 		
 		if(hitPrice(current, areaHighPrice)) {
+			
+			String recEmail = userDetailsService.getAreaMonitorUserEmail();
+			
 			subject = String.format("%s永续合约价格已到达盘整区上边缘%s %s", pair, areaHighPrice, dateStr);
 			text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
 					pair,
