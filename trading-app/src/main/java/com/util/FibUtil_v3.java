@@ -178,7 +178,7 @@ public class FibUtil_v3 {
 				secondFibAfterFlag = highKlines;
 			}
 			
-			fibInfo = new FibInfo(startPrice, endPrice, firstFibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
+			fibInfo = new FibInfo(startPrice, endPrice, firstFibInfo.getDecimalPoint(), FibLevel.LEVEL_2);
 		}
 		return fibInfo;
 	}
@@ -206,7 +206,7 @@ public class FibUtil_v3 {
 				thirdFibAfterFlag = highKlines;
 			}
 			
-			fibInfo = new FibInfo(startPrice, endPrice, secondFibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
+			fibInfo = new FibInfo(startPrice, endPrice, secondFibInfo.getDecimalPoint(), FibLevel.LEVEL_3);
 		}
 		return fibInfo;
 	}

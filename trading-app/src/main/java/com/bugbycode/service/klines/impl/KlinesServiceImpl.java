@@ -282,19 +282,23 @@ public class KlinesServiceImpl implements KlinesService {
 		//double hightPrice = hitKline.getHighPrice();
 		double currentPrice = closePrice;
 		
-		//
-		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
-		
 		//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
 		for(int offset = 0;offset < codes.length;offset++) {
 			
-			FibCode code = codes[offset];
+			FibCode code = codes[offset];//当前斐波那契点位
+			
+			if(code.gt(FibCode.FIB1)) {
+				continue;
+			}
 			
 			if(PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
 				marketPlace(pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET);
+				
+				//
+				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
 					
@@ -424,9 +428,6 @@ public class KlinesServiceImpl implements KlinesService {
 		double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
-		//
-		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
-		
 		FibCode[] codes = FibCode.values();
 		
 		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
@@ -434,10 +435,18 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
+			if(code.gt(FibCode.FIB1)) {
+				continue;
+			}
+			
 			if(PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
+				
 				//市价做空
 				marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
+
+				//
+				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
 					
@@ -665,7 +674,12 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
 						
-						String subject_ = pair + "多头仓位已下单完成(PNL:" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%) " + dateStr;
+						String fibLevelStr = "";
+						if(fibInfo != null) {
+							fibLevelStr += "[" + fibInfo.getLevel().getLabel() + "]";
+						}
+						
+						String subject_ = pair + "多头仓位已买入" + fibLevelStr + "(PNL:" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%) " + dateStr;
 						
 						String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
 								takeProfit.doubleValue(), decimalNum);
@@ -864,7 +878,12 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 						
-						String subject_ = pair + "空头仓位已下单完成(PNL:" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%) " + dateStr;
+						String fibLevelStr = "";
+						if(fibInfo != null) {
+							fibLevelStr += "[" + fibInfo.getLevel().getLabel() + "]";
+						}
+						
+						String subject_ = pair + "空头仓位已卖出" + fibLevelStr + "(PNL:" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%) " + dateStr;
 						
 						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
 								stopLoss.doubleValue(), decimalNum);
@@ -1252,7 +1271,17 @@ public class KlinesServiceImpl implements KlinesService {
 		} else {
 			logger.debug("{}一级斐波那契回撤：{}", pair, firstFibInfo.toString());
 			qm = firstFibInfo.getQuotationMode();
-			// 
+			//
+			if(thirdFibInfo == null) {
+				List<Klines> fibAfterKlines = fu.getFibAfterKlines();
+				if(qm == QuotationMode.LONG) {
+					Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+					openLong_v2(firstFibInfo, afterLowKlines, klinesList_hit);
+				} else if(qm == QuotationMode.SHORT) {
+					Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+					openShort_v2(firstFibInfo, afterHighKlines,klinesList_hit);
+				}
+			}
 		}
 		
 		if(secondFibInfo == null) {
