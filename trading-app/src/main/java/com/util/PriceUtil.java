@@ -1766,4 +1766,32 @@ public class PriceUtil {
 		}
 		return result;
 	}
+	
+	/**
+	 * 获取最低价K线
+	 * @param k0
+	 * @param k1
+	 * @return
+	 */
+	public static Klines getMinPriceKlines(Klines k0, Klines k1) {
+		if(k0.getLowPriceDoubleValue() < k1.getLowPriceDoubleValue()) {
+			return k0;
+		} else {
+			return k1;
+		}
+	}
+	
+	/**
+	 * 获取最高价k线
+	 * @param k0
+	 * @param k1
+	 * @return
+	 */
+	public static Klines getMaxPriceKlines(Klines k0, Klines k1) {
+		if(k0.getHighPriceDoubleValue() > k1.getHighPriceDoubleValue()) {
+			return k0;
+		} else {
+			return k1;
+		}
+	}
 }

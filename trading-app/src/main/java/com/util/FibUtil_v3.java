@@ -28,6 +28,8 @@ public class FibUtil_v3 {
 	private Klines afterFlag;
 	
 	private Klines secondFibAfterFlag;
+	
+	private Klines thirdFibAfterFlag;
 
 	public FibUtil_v3(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
@@ -197,9 +199,11 @@ public class FibUtil_v3 {
 			if(qm == QuotationMode.LONG) {//多头 找低点
 				Klines lowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 				endPrice = lowKlines.getLowPriceDoubleValue();
+				thirdFibAfterFlag = lowKlines;
 			} else {//空头 找高点
 				Klines highKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 				endPrice = highKlines.getHighPriceDoubleValue();
+				thirdFibAfterFlag = highKlines;
 			}
 			
 			fibInfo = new FibInfo(startPrice, endPrice, secondFibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
@@ -232,6 +236,22 @@ public class FibUtil_v3 {
 		List<Klines> afterList = new ArrayList<Klines>();
 		if(this.secondFibAfterFlag != null) {
 			Klines last = PriceUtil.getAfterKlines(secondFibAfterFlag, list);
+			if(last != null) {
+				afterList = PriceUtil.subList(last, list);
+			}
+		}
+		return afterList;
+	}
+	
+	/**
+	 * 获取第三级斐波那契回撤之后的所有k线信息
+	 * 
+	 * @return
+	 */
+	public List<Klines> getThirdFibAfterKlines() {
+		List<Klines> afterList = new ArrayList<Klines>();
+		if(this.thirdFibAfterFlag != null) {
+			Klines last = PriceUtil.getAfterKlines(thirdFibAfterFlag, list);
 			if(last != null) {
 				afterList = PriceUtil.subList(last, list);
 			}
@@ -337,5 +357,17 @@ public class FibUtil_v3 {
 			}
 		}
 		return flag;
+	}
+
+	public Klines getAfterFlag() {
+		return afterFlag;
+	}
+
+	public Klines getSecondFibAfterFlag() {
+		return secondFibAfterFlag;
+	}
+
+	public Klines getThirdFibAfterFlag() {
+		return thirdFibAfterFlag;
 	}
 }
