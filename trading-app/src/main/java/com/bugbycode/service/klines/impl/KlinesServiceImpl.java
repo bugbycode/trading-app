@@ -64,6 +64,7 @@ import com.util.ConsolidationAreaUtil;
 import com.util.DateFormatUtil;
 import com.util.FibUtil;
 import com.util.FibUtil_v2;
+import com.util.FibUtil_v3;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.KlinesUtil;
@@ -1236,6 +1237,36 @@ public class KlinesServiceImpl implements KlinesService {
 		} else if(qm == QuotationMode.SHORT) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			openShort_v2(fibInfo, afterHighKlines,klinesList_hit);
+		}
+	}
+	
+	@Override
+	public void futuresFibMonitor_v3(List<Klines> klinesList,List<Klines> klinesList_hit) {
+
+		Klines last = PriceUtil.getLastKlines(klinesList);
+		String pair = last.getPair();
+		
+		FibUtil_v3 fu = new FibUtil_v3(klinesList);
+		FibInfo firstFibInfo = fu.getFibInfo();
+		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
+		FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
+		
+		if(firstFibInfo == null) {
+			logger.info("无法计算出{}一级斐波那契回撤信息", pair);
+		} else {
+			logger.info("{}一级斐波那契回撤：{}", pair, firstFibInfo.toString());
+		}
+		
+		if(secondFibInfo == null) {
+			logger.info("无法计算出{}二级斐波那契回撤信息", pair);
+		} else {
+			logger.info("{}二级斐波那契回撤：{}", pair, secondFibInfo.toString());
+		}
+		
+		if(thirdFibInfo == null) {
+			logger.info("无法计算出{}三级斐波那契回撤信息", pair);
+		} else {
+			logger.info("{}三级斐波那契回撤：{}", pair, thirdFibInfo.toString());
 		}
 	}
 	

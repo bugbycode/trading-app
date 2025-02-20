@@ -105,7 +105,7 @@ public interface KlinesService {
 	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
-	 * 日线级别斐波那契回撤点位监控
+	 * 斐波那契回撤点位监控
 	 * 
 	 * @param klinesList
 	 * @param klinesList_hit
@@ -119,6 +119,16 @@ public interface KlinesService {
 	 * @param klinesList_hit 开仓价格参考k线
 	 */
 	public void futuresFibMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit);
+	
+	
+	/**
+	 * 斐波那契回撤点位监控
+	 * 
+	 * @param klinesList
+	 * @param klinesList_hit
+	 */
+	public void futuresFibMonitor_v3(List<Klines> klinesList,List<Klines> klinesList_hit);
+	
 	
 	/**
 	 * EMA点位监控
