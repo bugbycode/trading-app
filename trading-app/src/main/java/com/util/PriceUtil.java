@@ -1794,4 +1794,28 @@ public class PriceUtil {
 			return k1;
 		}
 	}
+	
+	/**
+	 * 验证多头盈利百分比
+	 * @param currentPrice 当前价格
+	 * @param takeProfit 止盈价
+	 * @param profit 预期获利百分比
+	 * @return
+	 */
+	public static boolean checkLongProfit(double currentPrice,BigDecimal takeProfit,double profit) {
+		double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice,takeProfit.doubleValue());
+		return (profitPercent * 100) >= profit;
+	}
+	
+	/**
+	 * 验证空头盈利百分比
+	 * @param currentPrice 当前价格
+	 * @param takeProfit 止盈价
+	 * @param profit 预期获利百分比
+	 * @return
+	 */
+	public static boolean checkShortProfit(double currentPrice,BigDecimal takeProfit,double profit) {
+		double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice,takeProfit.doubleValue());
+		return (profitPercent * 100) >= profit;
+	}
 }
