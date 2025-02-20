@@ -270,10 +270,6 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void openLong_v2(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
 		
-		List<Klines> klinesList_hitBack = new ArrayList<Klines>();
-		
-		klinesList_hitBack.addAll(klinesList_hit);
-		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
 		
@@ -294,7 +290,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];
 			
-			if(PriceUtil.isLong(fibInfo.getFibValue(code), klinesList_hit)
+			if(PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
@@ -417,8 +413,6 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void openShort_v2(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
-		List<Klines> klinesList_hitBack = new ArrayList<Klines>();
-		klinesList_hitBack.addAll(klinesList_hit);
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
@@ -440,7 +434,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(PriceUtil.isShort(fibInfo.getFibValue(code), klinesList_hit)
+			if(PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				//市价做空
 				marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
