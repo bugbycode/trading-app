@@ -46,7 +46,7 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 					ContractType type = ContractType.resolve(contractType);
 					ContractStatus status = ContractStatus.resolve(statusStr);
 					
-					if(type == ContractType.PERPETUAL && status == ContractStatus.TRADING) {
+					if(type == ContractType.PERPETUAL && status == ContractStatus.TRADING && !symbol.endsWith("USDC")) {
 						pairs.add(symbol);
 						SymbolExchangeInfo info = new SymbolExchangeInfo();
 						info.setSymbol(symbol);
