@@ -1254,7 +1254,7 @@ public class KlinesServiceImpl implements KlinesService {
 		QuotationMode qm = null;
 		
 		if(firstFibInfo == null) {
-			logger.info("无法计算出{}一级斐波那契回撤信息", pair);
+			logger.debug("无法计算出{}一级斐波那契回撤信息", pair);
 		} else {
 			logger.debug("{}一级斐波那契回撤：{}", pair, firstFibInfo.toString());
 			qm = firstFibInfo.getQuotationMode();
@@ -1262,7 +1262,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		if(secondFibInfo == null) {
-			logger.info("无法计算出{}二级斐波那契回撤信息", pair);
+			logger.debug("无法计算出{}二级斐波那契回撤信息", pair);
 		} else {
 			logger.debug("{}二级斐波那契回撤：{}", pair, secondFibInfo.toString());
 			qm = secondFibInfo.getQuotationMode();
@@ -1278,7 +1278,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		if(thirdFibInfo == null) {
-			logger.info("无法计算出{}三级斐波那契回撤信息", pair);
+			logger.debug("无法计算出{}三级斐波那契回撤信息", pair);
 		} else {
 			logger.debug("{}三级斐波那契回撤：{}", pair, thirdFibInfo.toString());
 			qm = thirdFibInfo.getQuotationMode();
