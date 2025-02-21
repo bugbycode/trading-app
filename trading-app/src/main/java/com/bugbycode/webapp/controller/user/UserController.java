@@ -98,7 +98,7 @@ public class UserController extends BaseController{
 	@GetMapping("/getBalance")
 	public List<Balance> getBalance(){
 		User user = getUserInfo();
-		return binanceWebsocketTradeService.balance(user.getBinanceApiKey(), user.getBinanceSecretKey());
+		return binanceWebsocketTradeService.balance_v2(user.getBinanceApiKey(), user.getBinanceSecretKey());
 	}
 	
 	@PostMapping("/changeHmac")
@@ -130,7 +130,7 @@ public class UserController extends BaseController{
 		}
 		List<Balance> balanceList = new ArrayList<Balance>();
 		if(!(StringUtil.isEmpty(data.getBinanceApiKey()) || StringUtil.isEmpty(data.getBinanceSecretKey()))){
-			balanceList = binanceWebsocketTradeService.balance(data.getBinanceApiKey(), data.getBinanceSecretKey());
+			balanceList = binanceWebsocketTradeService.balance_v2(data.getBinanceApiKey(), data.getBinanceSecretKey());
 		}
 		
 		if(StringUtil.isEmpty(data.getPassword()) || !dbUser.getPassword().equals(MD5Util.md5(data.getPassword()))) {

@@ -17,13 +17,6 @@ import com.bugbycode.module.trading.Type;
 public interface BinanceWebsocketTradeService {
 
 	/**
-	 * 账户余额 (USER_DATA)
-	 * @param apiKey
-	 * @param secretKey
-	 */
-	public List<Balance> balance(String apiKey,String secretKey);
-	
-	/**
 	 * 账户余额V2 (USER_DATA)
 	 * @param apiKey
 	 * @param secretKey

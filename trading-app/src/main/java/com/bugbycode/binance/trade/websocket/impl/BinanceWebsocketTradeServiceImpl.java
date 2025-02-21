@@ -36,50 +36,6 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	private TradingWebSocketClientEndpoint websocketApi;
 
 	@Override
-	public List<Balance> balance(String apiKey, String secretKey) {
-		
-		List<Balance> blanceList = new ArrayList<Balance>();
-		
-		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.BALANCE);
-		JSONObject params = new JSONObject();
-		params.put("apiKey", apiKey);
-		params.put("timestamp", new Date().getTime());
-		
-		MethodDataUtil.generateSignature(params, secretKey);
-		
-		method.put("params", params);
-		
-		websocketApi.sendMessage(method);
-		
-		JSONObject result = websocketApi.read(method.getString("id"));
-		
-		if(result.getInt("status") == 200 && result.has("result")) {
-			JSONArray data = result.getJSONArray("result");
-			for(int index = 0;index < data.length();index++) {
-				JSONObject item = data.getJSONObject(index);
-				Balance balance = new Balance();
-				balance.setAccountAlias(item.getString("accountAlias"));
-				balance.setAsset(item.getString("asset"));
-				balance.setBalance(item.getString("balance"));
-				balance.setCrossWalletBalance(item.getString("crossWalletBalance"));
-				balance.setCrossUnPnl(item.getString("crossUnPnl"));
-				balance.setAvailableBalance(item.getString("availableBalance"));
-				balance.setMaxWithdrawAmount(item.getString("maxWithdrawAmount"));
-				balance.setMarginAvailable(item.getBoolean("marginAvailable"));
-				balance.setUpdateTime(item.getLong("updateTime"));
-				blanceList.add(balance);
-			}
-		} else if(result.has("error")){
-			JSONObject errorJson = result.getJSONObject("error");
-			String message = errorJson.getInt("code") + ":" + errorJson.getString("msg");
-			logger.error(message);
-			//throw new RuntimeException(errorJson.getInt("code") + ":" + errorJson.getString("msg"));
-		}
-		
-		return blanceList;
-	}
-
-	@Override
 	public List<Balance> balance_v2(String apiKey, String secretKey) {
 		List<Balance> blanceList = new ArrayList<Balance>();
 		
@@ -293,7 +249,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 
 	@Override
 	public String availableBalance(String apiKey, String secretKey, String asset) {
-		List<Balance> list = balance(apiKey, secretKey);
+		List<Balance> list = balance_v2(apiKey, secretKey);
 		Balance balance = null;
 		for(Balance bl : list) {
 			if(bl.getAsset().equals(asset)) {
