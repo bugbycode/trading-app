@@ -592,7 +592,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						//多头的止盈价格必须大于当前价格
-						if(priceInfo.getPriceDoubleValue() >= takeProfit.doubleValue()) {
+						if(!(priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
 							return;
 						}
 						
@@ -806,7 +806,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						//空头止盈价格必须小于当前价格
-						if(priceInfo.getPriceDoubleValue() <= takeProfit.doubleValue()) {
+						if(!(priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
 							return;
 						}
 
