@@ -665,18 +665,25 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
+
+						//开仓邮件通知
+						String subject_ = "";
+						String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
 						
-						String fibLevelStr = "";
-						if(fibInfo != null) {
-							fibLevelStr += "[" + fibInfo.getLevel().getLabel() + "]";
+						if(autoTradeType == AutoTradeType.FIB_RET && fibInfo != null) {
+							subject_ = String.format("%s多头仓位已买入[%s][%s(%s)][PNL:%s%%] %s", 
+									pair, 
+									fibInfo.getLevel().getLabel(),
+									codes[offset].getDescription(), 
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(codes[offset]),fibInfo.getDecimalPoint()),
+									pnlStr, 
+									dateStr);
+						} else {
+							subject_ = String.format("%s多头仓位已买入[PNL:%s%%] %s", pair, pnlStr, dateStr);
 						}
 						
-						String subject_ = pair + "多头仓位已买入" + fibLevelStr + "(PNL:" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%) " + dateStr;
-						
-						String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
-								takeProfit.doubleValue(), decimalNum);
-						
-						text_ += "，PNL：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
+						String text_ = StringUtil.formatLongMessage_v2(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
+								takeProfit.doubleValue(), decimalNum, pnlStr);
 						
 						if(fibInfo != null) {
 							text_ += "\n\n" + fibInfo.toString();
@@ -870,17 +877,24 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
 						
-						String fibLevelStr = "";
-						if(fibInfo != null) {
-							fibLevelStr += "[" + fibInfo.getLevel().getLabel() + "]";
+						//开仓邮件通知
+						String subject_ = "";
+						String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
+						
+						if(autoTradeType == AutoTradeType.FIB_RET && fibInfo != null) {
+							subject_ = String.format("%s空头仓位已卖出[%s][%s(%s)][PNL:%s%%] %s", 
+									pair, 
+									fibInfo.getLevel().getLabel(),
+									codes[offset].getDescription(), 
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(codes[offset]),fibInfo.getDecimalPoint()),
+									pnlStr, 
+									dateStr);
+						} else {
+							subject_ = String.format("%s空头仓位已卖出[PNL:%s%%] %s", pair, pnlStr, dateStr);
 						}
 						
-						String subject_ = pair + "空头仓位已卖出" + fibLevelStr + "(PNL:" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%) " + dateStr;
-						
-						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
-								stopLoss.doubleValue(), decimalNum);
-						
-						text_ += "，PNL：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
+						String text_ = StringUtil.formatShortMessage_v2(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
+								stopLoss.doubleValue(), decimalNum, pnlStr);
 						
 						if(fibInfo != null) {
 							text_ += "\n\n" + fibInfo.toString();

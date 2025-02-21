@@ -24,7 +24,6 @@ public class StringUtil {
 	 * @param minPrice 空头止盈价
 	 * @param maxPrice 空头止损价
 	 * @param decimalPoint 保留小数点数量
-	 * 
 	 * @return
 	 */
 	public static String formatShortMessage(String pair,double currentPrice,
@@ -34,7 +33,28 @@ public class StringUtil {
 				PriceUtil.formatDoubleDecimal(currentPrice,decimalPoint),
 				PriceUtil.formatDoubleDecimal(minPrice,decimalPoint),
 				PriceUtil.formatDoubleDecimal(maxPrice,decimalPoint),
-						PriceUtil.formatDoubleDecimal((currentPrice - minPrice) / (maxPrice - currentPrice),2));
+				PriceUtil.formatDoubleDecimal((currentPrice - minPrice) / (maxPrice - currentPrice),2));
+	}
+	
+	/**
+	 * 空头格式化消息
+	 * @param pair 交易对
+	 * @param currentPrice 开仓价格
+	 * @param minPrice 空头止盈价
+	 * @param maxPrice 空头止损价
+	 * @param decimalPoint 保留小数点数量
+	 * @param pnl 盈利百分比
+	 * @return
+	 */
+	public static String formatShortMessage_v2(String pair,double currentPrice,
+			double minPrice,double maxPrice,int decimalPoint, String pnl) {
+		//空头回报率 (开仓价 - 止盈价) / (止损价 - 开仓价) || 多头回报率 (止盈价 - 开仓价) / (开仓价 - 止损价)
+		return String.format("%s卖出价：%s，止盈价：%s，止损价：%s，盈亏比：%s，PNL：%s%%", pair,
+				PriceUtil.formatDoubleDecimal(currentPrice,decimalPoint),
+				PriceUtil.formatDoubleDecimal(minPrice,decimalPoint),
+				PriceUtil.formatDoubleDecimal(maxPrice,decimalPoint),
+				PriceUtil.formatDoubleDecimal((currentPrice - minPrice) / (maxPrice - currentPrice),2),
+				pnl);
 	}
 	
 	/**
@@ -55,6 +75,27 @@ public class StringUtil {
 				PriceUtil.formatDoubleDecimal(maxPrice,decimalPoint),
 				PriceUtil.formatDoubleDecimal(minPrice,decimalPoint), 
 				PriceUtil.formatDoubleDecimal((maxPrice - currentPrice) / (currentPrice - minPrice),2));
+	}
+	
+	/**
+	 * 多头格式化消息
+	 * @param pair 交易对
+	 * @param currentPrice 开仓价格
+	 * @param minPrice 止损价
+	 * @param maxPrice 止盈价
+	 * @param decimalPoint 保留小数点数量
+	 * @param pnl 盈利百分比
+	 * @return
+	 */
+	public static String formatLongMessage_v2(String pair,double currentPrice,
+			double minPrice,double maxPrice,int decimalPoint, String pnl) {
+		//空头回报率 (开仓价 - 止盈价) / (止损价 - 开仓价) || 多头回报率 (止盈价 - 开仓价) / (开仓价 - 止损价)
+		return String.format("%s买入价：%s，止盈价：%s，止损价：%s，盈亏比：%s，PNL：%s%%", pair,
+				PriceUtil.formatDoubleDecimal(currentPrice,decimalPoint),
+				PriceUtil.formatDoubleDecimal(maxPrice,decimalPoint),
+				PriceUtil.formatDoubleDecimal(minPrice,decimalPoint), 
+				PriceUtil.formatDoubleDecimal((maxPrice - currentPrice) / (currentPrice - minPrice),2),
+				pnl);
 	}
 	
 	/**
