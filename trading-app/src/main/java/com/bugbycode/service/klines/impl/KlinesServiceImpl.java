@@ -551,7 +551,7 @@ public class KlinesServiceImpl implements KlinesService {
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-									return;
+									continue;
 								}
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
@@ -593,7 +593,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						//多头的止盈价格必须大于当前价格
 						if(!(priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
-							return;
+							continue;
 						}
 						
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
@@ -617,7 +617,7 @@ public class KlinesServiceImpl implements KlinesService {
 						logger.debug("{}交易对多头修正后持仓数量：{}", pair, quantity);
 						
 						if(quantity.doubleValue() == 0) {
-							return;
+							continue;
 						}
 						
 						//查询杠杆
@@ -764,7 +764,7 @@ public class KlinesServiceImpl implements KlinesService {
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-									return;
+									continue;
 								}
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
@@ -807,7 +807,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						//空头止盈价格必须小于当前价格
 						if(!(priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
-							return;
+							continue;
 						}
 
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
@@ -831,7 +831,7 @@ public class KlinesServiceImpl implements KlinesService {
 						logger.debug("{}交易对空头修正后持仓数量：{}", pair, quantity);
 						
 						if(quantity.doubleValue() == 0) {
-							return;
+							continue;
 						}
 						
 						//查询杠杆
