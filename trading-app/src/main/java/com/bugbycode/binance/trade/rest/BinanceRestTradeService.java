@@ -158,13 +158,6 @@ public interface BinanceRestTradeService {
 	public List<Balance> balance_v3(String binanceApiKey,String binanceSecretKey);
 	
 	/**
-	 * 账户余额V2 (USER_DATA)
-	 * @param binanceApiKey
-	 * @param binanceSecretKey
-	 */
-	public List<Balance> balance_v2(String binanceApiKey,String binanceSecretKey);
-	
-	/**
 	 * 交易对配置 (USER_DATA) 查询交易对上的基础配置
 	 * @param binanceApiKey
 	 * @param binanceSecretKey

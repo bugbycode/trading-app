@@ -678,47 +678,6 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	}
 
 	@Override
-	public List<Balance> balance_v2(String binanceApiKey,String binanceSecretKey) {
-		
-		List<Balance> blanceList = new ArrayList<Balance>();
-		
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("timestamp", new Date().getTime());
-		
-		String queryString = UrlQueryStringUtil.parse(params);
-		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
-		
-		queryString += "&signature=" + signature;
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-MBX-APIKEY", binanceApiKey);
-		HttpEntity<String> entity = new HttpEntity<>(headers);
-		
-		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v2/balance?" + queryString, HttpMethod.GET, entity, String.class);
-		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
-
-		if(status == HttpStatus.OK) {
-			JSONArray data = new JSONArray(result.getBody());
-			for(int index = 0;index < data.length();index++) {
-				JSONObject item = data.getJSONObject(index);
-				Balance balance = new Balance();
-				balance.setAccountAlias(item.getString("accountAlias"));
-				balance.setAsset(item.getString("asset"));
-				balance.setBalance(item.getString("balance"));
-				balance.setCrossWalletBalance(item.getString("crossWalletBalance"));
-				balance.setCrossUnPnl(item.getString("crossUnPnl"));
-				balance.setAvailableBalance(item.getString("availableBalance"));
-				balance.setMaxWithdrawAmount(item.getString("maxWithdrawAmount"));
-				balance.setMarginAvailable(item.getBoolean("marginAvailable"));
-				balance.setUpdateTime(item.getLong("updateTime"));
-				blanceList.add(balance);
-			}
-		}
-		
-		return blanceList;
-	}
-
-	@Override
 	public List<SymbolConfig> getSymbolConfig(String binanceApiKey, String binanceSecretKey, String symbol) {
 		
 		List<SymbolConfig> scList = new ArrayList<SymbolConfig>();
