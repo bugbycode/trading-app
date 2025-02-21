@@ -676,10 +676,10 @@ public class KlinesServiceImpl implements KlinesService {
 						String text_ = StringUtil.formatLongMessage(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
 								takeProfit.doubleValue(), decimalNum);
 						
-						text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
+						text_ += "，PNL：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 						
 						if(fibInfo != null) {
-							text_ += "\r\n" + fibInfo.toString();
+							text_ += "\n\n" + fibInfo.toString();
 						}
 						
 						if(recvTradeStatus == RecvTradeStatus.OPEN) {
@@ -880,10 +880,10 @@ public class KlinesServiceImpl implements KlinesService {
 						String text_ = StringUtil.formatShortMessage(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
 								stopLoss.doubleValue(), decimalNum);
 						
-						text_ += "，预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
+						text_ += "，PNL：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%";
 						
 						if(fibInfo != null) {
-							text_ += "\r\n" + fibInfo.toString();
+							text_ += "\n\n" + fibInfo.toString();
 						}
 						
 						if(recvTradeStatus == RecvTradeStatus.OPEN) {
