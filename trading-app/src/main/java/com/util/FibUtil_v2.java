@@ -162,17 +162,19 @@ public class FibUtil_v2 {
 			double startPrice = firstFibInfo.getFibValue(FibCode.FIB0);
 			double endPrice = 0;
 			List<Klines> fibAfterKlines = getFibAfterKlines();
-			//一级斐波那契回撤行情模式 LONG/SHORT
-			QuotationMode qm = firstFibInfo.getQuotationMode();
-			if(qm == QuotationMode.LONG) {//多头 找低点
-				Klines lowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-				endPrice = lowKlines.getLowPriceDoubleValue();
-			} else {//空头 找高点
-				Klines highKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-				endPrice = highKlines.getHighPriceDoubleValue();
+			if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+				//一级斐波那契回撤行情模式 LONG/SHORT
+				QuotationMode qm = firstFibInfo.getQuotationMode();
+				if(qm == QuotationMode.LONG) {//多头 找低点
+					Klines lowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+					endPrice = lowKlines.getLowPriceDoubleValue();
+				} else {//空头 找高点
+					Klines highKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+					endPrice = highKlines.getHighPriceDoubleValue();
+				}
+				
+				fibInfo = new FibInfo(startPrice, endPrice, firstFibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 			}
-			
-			fibInfo = new FibInfo(startPrice, endPrice, firstFibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 		}
 		return fibInfo;
 	}
