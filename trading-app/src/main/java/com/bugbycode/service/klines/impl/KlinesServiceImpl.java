@@ -591,6 +591,11 @@ public class KlinesServiceImpl implements KlinesService {
 							
 						}
 						
+						//多头的止盈价格必须大于当前价格
+						if(priceInfo.getPriceDoubleValue() >= takeProfit.doubleValue()) {
+							return;
+						}
+						
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
 						if(!CollectionUtils.isEmpty(orderList)) {
 							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
@@ -798,6 +803,11 @@ public class KlinesServiceImpl implements KlinesService {
 								logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
 										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
 							}
+						}
+						
+						//空头止盈价格必须小于当前价格
+						if(priceInfo.getPriceDoubleValue() <= takeProfit.doubleValue()) {
+							return;
 						}
 
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
