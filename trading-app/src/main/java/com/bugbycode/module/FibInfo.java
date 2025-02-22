@@ -19,7 +19,7 @@ public class FibInfo {
 	 */
 	public FibCode getTakeProfit_v7(FibCode code) {
 		FibCode takeProfit = FibCode.FIB382;
-		
+		/*
 		if(level == FibLevel.LEVEL_3) {
 			if(code == FibCode.FIB4_618) {//4.618 -> 2.618
 				takeProfit = FibCode.FIB2_618;
@@ -40,7 +40,7 @@ public class FibInfo {
 			} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
 				takeProfit = FibCode.FIB236;
 			}
-		} else {
+		} else {*/
 			if(code == FibCode.FIB4_618) {//4.618 -> 2.618
 				takeProfit = FibCode.FIB2_618;
 			} else if(code == FibCode.FIB2_618) { // 2.618 -> 2
@@ -60,7 +60,7 @@ public class FibInfo {
 			} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
 				takeProfit = FibCode.FIB236;
 			}
-		}
+		//}
 		
 		return takeProfit;
 	}
