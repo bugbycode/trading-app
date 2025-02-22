@@ -1745,11 +1745,13 @@ public class PriceUtil {
 	 */
 	public static Klines getAfterKlines(Klines current,List<Klines> list) {
 		Klines result = null;
-		for(int index = 0; index < list.size(); index++) {
-			Klines tmp = list.get(index);
-			if(tmp.getStartTime() == current.getStartTime() && index != list.size() - 1) {
-				result = list.get(index + 1);
-				break;
+		if(!(current == null || CollectionUtils.isEmpty(list))) {
+			for(int index = 0; index < list.size(); index++) {
+				Klines tmp = list.get(index);
+				if(tmp.getStartTime() == current.getStartTime() && index != list.size() - 1) {
+					result = list.get(index + 1);
+					break;
+				}
 			}
 		}
 		return result;
@@ -1763,11 +1765,13 @@ public class PriceUtil {
 	 */
 	public static Klines getBeforeKlines(Klines current,List<Klines> list) {
 		Klines result = null;
-		for(int index = 0; index < list.size(); index++) {
-			Klines tmp = list.get(index);
-			if(tmp.getStartTime() == current.getStartTime() && index != 0) {
-				result = list.get(index - 1);
-				break;
+		if(!(current == null || CollectionUtils.isEmpty(list))) {
+			for(int index = 0; index < list.size(); index++) {
+				Klines tmp = list.get(index);
+				if(tmp.getStartTime() == current.getStartTime() && index != 0) {
+					result = list.get(index - 1);
+					break;
+				}
 			}
 		}
 		return result;
