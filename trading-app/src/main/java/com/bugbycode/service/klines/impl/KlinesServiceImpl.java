@@ -1282,6 +1282,13 @@ public class KlinesServiceImpl implements KlinesService {
 		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
 		FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
 		
+		//获取最后一天之后的所有参考价格k线信息
+		List<Klines> today_hit = PriceUtil.getLastDayAfterKline(last, klinesList_hit);
+		//当日最高价k线
+		Klines today_high_klines = PriceUtil.getMaxPriceKLine(today_hit);
+		//当日最低价k线
+		Klines today_low_klines = PriceUtil.getMinPriceKLine(today_hit);
+		
 		QuotationMode qm = null;
 		
 		if(firstFibInfo == null) {
@@ -1294,9 +1301,15 @@ public class KlinesServiceImpl implements KlinesService {
 				List<Klines> fibAfterKlines = fu.getFibAfterKlines();
 				if(qm == QuotationMode.LONG) {
 					Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+					
+					afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+					
 					openLong_v2(firstFibInfo, afterLowKlines, klinesList_hit);
 				} else if(qm == QuotationMode.SHORT) {
 					Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+					
+					afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+					
 					openShort_v2(firstFibInfo, afterHighKlines,klinesList_hit);
 				}
 			}
@@ -1311,9 +1324,15 @@ public class KlinesServiceImpl implements KlinesService {
 			List<Klines> fibAfterKlines = fu.getSecondFibAfterKlines();
 			if(qm == QuotationMode.LONG) {
 				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
 				openLong_v2(secondFibInfo, afterLowKlines, klinesList_hit);
 			} else if(qm == QuotationMode.SHORT) {
 				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
 				openShort_v2(secondFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
@@ -1326,9 +1345,15 @@ public class KlinesServiceImpl implements KlinesService {
 			List<Klines> fibAfterKlines = fu.getThirdFibAfterKlines();
 			if(qm == QuotationMode.LONG) {
 				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
 				openLong_v2(thirdFibInfo, afterLowKlines, klinesList_hit);
 			} else if(qm == QuotationMode.SHORT) {
 				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
 				openShort_v2(thirdFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}

@@ -1784,10 +1784,18 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static Klines getMinPriceKlines(Klines k0, Klines k1) {
-		if(k0.getLowPriceDoubleValue() < k1.getLowPriceDoubleValue()) {
+		if(!(k0 == null || k1 == null)) {
+			if(k0.getLowPriceDoubleValue() < k1.getLowPriceDoubleValue()) {
+				return k0;
+			} else {
+				return k1;
+			}
+		} else if(k0 != null && k1 == null) {
 			return k0;
-		} else {
+		} else if(k0 == null && k1 != null) {
 			return k1;
+		} else {
+			return null;
 		}
 	}
 	
@@ -1798,10 +1806,18 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static Klines getMaxPriceKlines(Klines k0, Klines k1) {
-		if(k0.getHighPriceDoubleValue() > k1.getHighPriceDoubleValue()) {
+		if(!(k0 == null || k1 == null)) {
+			if(k0.getHighPriceDoubleValue() > k1.getHighPriceDoubleValue()) {
+				return k0;
+			} else {
+				return k1;
+			}
+		} else if(k0 != null && k1 == null) {
 			return k0;
-		} else {
+		} else if(k0 == null && k1 != null) {
 			return k1;
+		} else {
+			return null;
 		}
 	}
 	
@@ -1827,5 +1843,29 @@ public class PriceUtil {
 	public static boolean checkShortProfit(double currentPrice,BigDecimal takeProfit,double profit) {
 		double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice,takeProfit.doubleValue());
 		return (profitPercent * 100) >= profit;
+	}
+	
+	/**
+	 * 获取时间在某一天结束之后的所有k线信息
+	 * @param last 某一天k线信息
+	 * @param list k线信息
+	 * @return
+	 */
+	public static List<Klines> getLastDayAfterKline(Klines last,List<Klines> list) {
+		if(!(last == null || CollectionUtils.isEmpty(list))) {
+			int startIndex = -1;
+			for(int index = 0;index < list.size();index++) {
+				Klines tmp = list.get(index);
+				if(tmp.getStartTime() > last.getEndTime()) {
+					startIndex = index;
+					break;
+				}
+			}
+			if(startIndex != -1) {
+				Klines startKlines = list.get(startIndex);
+				return subList(startKlines, list);
+			}
+		}
+		return new ArrayList<Klines>();
 	}
 }
