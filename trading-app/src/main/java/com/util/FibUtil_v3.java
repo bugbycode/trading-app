@@ -139,6 +139,8 @@ public class FibUtil_v3 {
 				//终端（高点）
 				Klines fibEndKlines = PriceUtil.getMaxPriceKLine(PriceUtil.subList(fibStartKlines, last, list));
 				fib = new FibInfo(fibStartKlines.getLowPriceDoubleValue(), fibEndKlines.getHighPriceDoubleValue(), last.getDecimalNum(), FibLevel.LEVEL_1);
+				
+				this.afterFlag = fibEndKlines;
 			} else 
 			//做空情况
 			if(ps == PositionSide.SHORT) {
@@ -147,10 +149,10 @@ public class FibUtil_v3 {
 				//终端（低点）
 				Klines fibEndKlines = PriceUtil.getMinPriceKLine(PriceUtil.subList(fibStartKlines, last, list));
 				fib = new FibInfo(fibStartKlines.getHighPriceDoubleValue(), fibEndKlines.getLowPriceDoubleValue(), last.getDecimalNum(), FibLevel.LEVEL_1);
+				
+				this.afterFlag = fibEndKlines;
 			}
 		}
-		
-		this.afterFlag = firstFlag;
 		
 		return fib;
 	}
