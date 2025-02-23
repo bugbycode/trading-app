@@ -1281,6 +1281,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibInfo firstFibInfo = fu.getFibInfo();
 		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
 		FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
+		FibInfo fourthFibInfo = fu.getFourthFibInfo(thirdFibInfo);
 		
 		//获取最后一天之后的所有参考价格k线信息
 		List<Klines> today_hit = PriceUtil.getLastDayAfterKline(last, klinesList_hit);
@@ -1321,19 +1322,21 @@ public class KlinesServiceImpl implements KlinesService {
 			logger.debug("{}二级斐波那契回撤：{}", pair, secondFibInfo.toString());
 			qm = secondFibInfo.getQuotationMode();
 			//
-			List<Klines> fibAfterKlines = fu.getSecondFibAfterKlines();
-			if(qm == QuotationMode.LONG) {
-				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+			if(fourthFibInfo == null) {
+				List<Klines> fibAfterKlines = fu.getSecondFibAfterKlines();
+				if(qm == QuotationMode.LONG) {
+					Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 
-				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
-				
-				openLong_v2(secondFibInfo, afterLowKlines, klinesList_hit);
-			} else if(qm == QuotationMode.SHORT) {
-				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+					afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+					
+					openLong_v2(secondFibInfo, afterLowKlines, klinesList_hit);
+				} else if(qm == QuotationMode.SHORT) {
+					Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 
-				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
-				
-				openShort_v2(secondFibInfo, afterHighKlines,klinesList_hit);
+					afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+					
+					openShort_v2(secondFibInfo, afterHighKlines,klinesList_hit);
+				}
 			}
 		}
 		
@@ -1355,6 +1358,27 @@ public class KlinesServiceImpl implements KlinesService {
 				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
 				
 				openShort_v2(thirdFibInfo, afterHighKlines,klinesList_hit);
+			}
+		}
+		
+		if(fourthFibInfo == null) {
+			logger.debug("无法计算出{}四级斐波那契回撤信息", pair);
+		} else {
+			logger.debug("{}四级斐波那契回撤：{}", pair, fourthFibInfo.toString());
+			qm = fourthFibInfo.getQuotationMode();
+			List<Klines> fibAfterKlines = fu.getFourthFibAfterKlines();
+			if(qm == QuotationMode.LONG) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
+				openLong_v2(fourthFibInfo, afterLowKlines, klinesList_hit);
+			} else if(qm == QuotationMode.SHORT) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
+				openShort_v2(fourthFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 	}

@@ -30,6 +30,8 @@ public class FibUtil_v3 {
 	private Klines secondFibAfterFlag;
 	
 	private Klines thirdFibAfterFlag;
+	
+	private Klines fourthFibAfterFlag;
 
 	public FibUtil_v3(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
@@ -218,6 +220,36 @@ public class FibUtil_v3 {
 	}
 	
 	/**
+	 * 获取第四级斐波那契回撤信息
+	 * @param thirdFibInfo
+	 * @return
+	 */
+	public FibInfo getFourthFibInfo(FibInfo thirdFibInfo) {
+		FibInfo fibInfo = null;
+		if(thirdFibInfo != null) {
+			double startPrice = thirdFibInfo.getFibValue(FibCode.FIB0);
+			double endPrice = 0;
+			List<Klines> fibAfterKlines = getThirdFibAfterKlines();
+			if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+				//三级斐波那契回撤行情模式 LONG/SHORT
+				QuotationMode qm = thirdFibInfo.getQuotationMode();
+				if(qm == QuotationMode.LONG) {//多头 找低点
+					Klines lowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+					endPrice = lowKlines.getLowPriceDoubleValue();
+					fourthFibAfterFlag = lowKlines;
+				} else {//空头 找高点
+					Klines highKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+					endPrice = highKlines.getHighPriceDoubleValue();
+					fourthFibAfterFlag = highKlines;
+				}
+				
+				fibInfo = new FibInfo(startPrice, endPrice, thirdFibInfo.getDecimalPoint(), FibLevel.LEVEL_4);
+			}
+		}
+		return fibInfo;
+	}
+	
+	/**
 	 * 获取斐波那契回撤之后的所有k线信息
 	 * 
 	 * @return
@@ -258,6 +290,22 @@ public class FibUtil_v3 {
 		List<Klines> afterList = new ArrayList<Klines>();
 		if(this.thirdFibAfterFlag != null) {
 			Klines last = PriceUtil.getAfterKlines(thirdFibAfterFlag, list);
+			if(last != null) {
+				afterList = PriceUtil.subList(last, list);
+			}
+		}
+		return afterList;
+	}
+	
+	/**
+	 * 获取第四级斐波那契回撤之后的所有k线信息
+	 * 
+	 * @return
+	 */
+	public List<Klines> getFourthFibAfterKlines() {
+		List<Klines> afterList = new ArrayList<Klines>();
+		if(this.fourthFibAfterFlag != null) {
+			Klines last = PriceUtil.getAfterKlines(fourthFibAfterFlag, list);
 			if(last != null) {
 				afterList = PriceUtil.subList(last, list);
 			}
@@ -375,5 +423,9 @@ public class FibUtil_v3 {
 
 	public Klines getThirdFibAfterFlag() {
 		return thirdFibAfterFlag;
+	}
+
+	public Klines getFourthFibAfterFlag() {
+		return fourthFibAfterFlag;
 	}
 }
