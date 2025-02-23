@@ -507,6 +507,23 @@ public class PriceUtil {
 				|| (Double.valueOf(current.getOpenPrice()) <= hitPrice && Double.valueOf(current.getClosePrice()) >= hitPrice);
 	}
 	
+
+	/**
+	 * 是否出现跌破条件价的价格行为</br></br>
+	 * 1、开盘价收盘价小于等于条件价且最高价大于等于条件价</br>
+	 * 2、开盘价大于等于条件价、收盘价小于等于条件价</br>
+	 * 
+	 * @param current 当前k线
+	 * @param hitPrice 条件价
+	 * @return
+	 */
+	public static boolean isBreachShort(Klines current,double hitPrice) {
+				//开盘价收盘价小于等于条件价且最高价大于等于条件价
+		return (Double.valueOf(current.getOpenPrice()) <= hitPrice && Double.valueOf(current.getClosePrice()) <= hitPrice && Double.valueOf(current.getHighPrice()) >= hitPrice) ||
+			   //开盘价大于等于条件价、收盘价小于等于条件价
+				(Double.valueOf(current.getOpenPrice()) >= hitPrice && Double.valueOf(current.getClosePrice()) <= hitPrice);
+	}
+	
 	/**
 	 * 判断是否为首次突破
 	 * @param list
@@ -574,22 +591,6 @@ public class PriceUtil {
 		}
 		
 		return isShort;
-	}
-	
-	/**
-	 * 是否出现跌破条件价的价格行为</br></br>
-	 * 1、开盘价收盘价小于等于条件价且最高价大于等于条件价</br>
-	 * 2、开盘价大于等于条件价、收盘价小于等于条件价</br>
-	 * 
-	 * @param current 当前k线
-	 * @param hitPrice 条件价
-	 * @return
-	 */
-	public static boolean isBreachShort(Klines current,double hitPrice) {
-				//开盘价收盘价小于等于条件价且最高价大于等于条件价
-		return (Double.valueOf(current.getOpenPrice()) <= hitPrice && Double.valueOf(current.getClosePrice()) <= hitPrice && Double.valueOf(current.getHighPrice()) >= hitPrice) ||
-			   //开盘价大于等于条件价、收盘价小于等于条件价
-				(Double.valueOf(current.getOpenPrice()) >= hitPrice && Double.valueOf(current.getClosePrice()) <= hitPrice);
 	}
 	
 	public static FibKlinesData<List<Klines>,List<Klines>> getFibKlinesData(List<Klines> list){
@@ -1701,6 +1702,40 @@ public class PriceUtil {
 			flag = true;
 		}
 		return flag;
+	}
+	
+	/**
+	 * 判断是否可做多
+	 * @param price 价格
+	 * @param list k线
+	 * @return
+	 */
+	public static boolean isLong_v3(double price, List<Klines> list) {
+		
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		
+		double c_0 = k0.getClosePriceDoubleValue();
+		
+		return (isBreachLong(k0, price) && k0.isRise()) || (isBreachLong(k1, price) && k1.isFall() && c_0 >= price);
+	}
+	
+	/**
+	 * 判断是否可做空
+	 * @param price 价格
+	 * @param list k线
+	 * @return
+	 */
+	public static boolean isShort_v3(double price, List<Klines> list) {
+		
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+
+		double c_0 = k0.getClosePriceDoubleValue();
+		
+		return (isBreachShort(k0, price) && k0.isFall()) || (isBreachShort(k1, price) && k1.isRise() && c_0 <= price);
 	}
 	
 	/**
