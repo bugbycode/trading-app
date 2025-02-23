@@ -412,6 +412,37 @@ public class FibUtil_v3 {
 		}
 		return flag;
 	}
+	
+	/**
+	 * 校验上级回撤点是否可开仓
+	 * 
+	 * @param parentFibInfo 上级斐波那契回撤信息
+	 * @param parentHitCode 上级开仓的回撤点
+	 * @param childFibInfo 次级斐波那契回撤信息
+	 * @return
+	 */
+	public boolean verifyParentOpen(FibInfo parentFibInfo, FibCode parentHitCode,FibInfo childFibInfo) {
+		boolean result = false;
+		if(parentHitCode == null || childFibInfo == null || parentFibInfo == null) {
+			result = true;
+		} else {
+			//行情模式
+			QuotationMode qm = parentFibInfo.getQuotationMode();
+			double codePrice = parentFibInfo.getFibValue(parentHitCode);
+			//次级斐波那契回撤结束点价格
+			double childFibEndPrice = childFibInfo.getFibValue(FibCode.FIB0);
+			if(qm == QuotationMode.LONG) {
+				if(childFibEndPrice > codePrice) {
+					result = true;
+				}
+			} else if(qm == QuotationMode.SHORT) {
+				if(childFibEndPrice < codePrice) {
+					result = true;
+				}
+			}
+		}
+		return result;
+	}
 
 	public Klines getAfterFlag() {
 		return afterFlag;

@@ -62,7 +62,6 @@ import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.util.CommandUtil;
 import com.util.ConsolidationAreaUtil;
 import com.util.DateFormatUtil;
-import com.util.FibUtil;
 import com.util.FibUtil_v2;
 import com.util.FibUtil_v3;
 import com.util.FileUtil;
@@ -268,7 +267,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openLong_v2(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
+	public void openLong_v2(FibUtil_v3 fu,FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
@@ -282,12 +281,24 @@ public class KlinesServiceImpl implements KlinesService {
 		//double hightPrice = hitKline.getHighPrice();
 		double currentPrice = closePrice;
 		
+		//次级回撤信息
+		FibLevel level = fibInfo.getLevel();
+		FibInfo childFibInfo = null;
+		if(level == FibLevel.LEVEL_1) {
+			childFibInfo = fu.getSecondFibInfo(fibInfo);
+		} else if(level == FibLevel.LEVEL_2) {
+			childFibInfo = fu.getThirdFibInfo(fibInfo);
+		} else if(level == FibLevel.LEVEL_3) {
+			childFibInfo = fu.getFourthFibInfo(fibInfo);
+		}
+		
 		//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
 			if(PriceUtil.isLong_v3(fibInfo.getFibValue(code), klinesList_hit)
+					&& fu.verifyParentOpen(fibInfo, code, childFibInfo)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
@@ -412,7 +423,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openShort_v2(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
+	public void openShort_v2(FibUtil_v3 fu,FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
@@ -426,12 +437,24 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibCode[] codes = FibCode.values();
 		
+		//次级回撤信息
+		FibLevel level = fibInfo.getLevel();
+		FibInfo childFibInfo = null;
+		if(level == FibLevel.LEVEL_1) {
+			childFibInfo = fu.getSecondFibInfo(fibInfo);
+		} else if(level == FibLevel.LEVEL_2) {
+			childFibInfo = fu.getThirdFibInfo(fibInfo);
+		} else if(level == FibLevel.LEVEL_3) {
+			childFibInfo = fu.getFourthFibInfo(fibInfo);
+		}
+		
 		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
 			if(PriceUtil.isShort_v3(fibInfo.getFibValue(code), klinesList_hit)
+					&& fu.verifyParentOpen(fibInfo, code, childFibInfo)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				
 				//市价做空
@@ -1246,7 +1269,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit) {
 		
-		FibUtil fu = new FibUtil(klinesList);
+		FibUtil_v3 fu = new FibUtil_v3(klinesList);
 		
 		FibInfo fibInfo = fu.getFibInfo();
 		
@@ -1264,10 +1287,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(qm == QuotationMode.LONG) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong_v2(fibInfo, afterLowKlines, klinesList_hit);
+			openLong_v2(fu,fibInfo, afterLowKlines, klinesList_hit);
 		} else if(qm == QuotationMode.SHORT) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort_v2(fibInfo, afterHighKlines,klinesList_hit);
+			openShort_v2(fu,fibInfo, afterHighKlines,klinesList_hit);
 		}
 	}
 	
@@ -1298,21 +1321,19 @@ public class KlinesServiceImpl implements KlinesService {
 			logger.debug("{}一级斐波那契回撤：{}", pair, firstFibInfo.toString());
 			qm = firstFibInfo.getQuotationMode();
 			//
-			if(thirdFibInfo == null) {
-				List<Klines> fibAfterKlines = fu.getFibAfterKlines();
-				if(qm == QuotationMode.LONG) {
-					Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-					
-					afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
-					
-					openLong_v2(firstFibInfo, afterLowKlines, klinesList_hit);
-				} else if(qm == QuotationMode.SHORT) {
-					Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-					
-					afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
-					
-					openShort_v2(firstFibInfo, afterHighKlines,klinesList_hit);
-				}
+			List<Klines> fibAfterKlines = fu.getFibAfterKlines();
+			if(qm == QuotationMode.LONG) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+				
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
+				openLong_v2(fu, firstFibInfo, afterLowKlines, klinesList_hit);
+			} else if(qm == QuotationMode.SHORT) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+				
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
+				openShort_v2(fu, firstFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 		
@@ -1322,21 +1343,19 @@ public class KlinesServiceImpl implements KlinesService {
 			logger.debug("{}二级斐波那契回撤：{}", pair, secondFibInfo.toString());
 			qm = secondFibInfo.getQuotationMode();
 			//
-			if(fourthFibInfo == null) {
-				List<Klines> fibAfterKlines = fu.getSecondFibAfterKlines();
-				if(qm == QuotationMode.LONG) {
-					Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+			List<Klines> fibAfterKlines = fu.getSecondFibAfterKlines();
+			if(qm == QuotationMode.LONG) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 
-					afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
-					
-					openLong_v2(secondFibInfo, afterLowKlines, klinesList_hit);
-				} else if(qm == QuotationMode.SHORT) {
-					Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
+				openLong_v2(fu, secondFibInfo, afterLowKlines, klinesList_hit);
+			} else if(qm == QuotationMode.SHORT) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 
-					afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
-					
-					openShort_v2(secondFibInfo, afterHighKlines,klinesList_hit);
-				}
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
+				openShort_v2(fu, secondFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 		
@@ -1351,13 +1370,13 @@ public class KlinesServiceImpl implements KlinesService {
 
 				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
 				
-				openLong_v2(thirdFibInfo, afterLowKlines, klinesList_hit);
+				openLong_v2(fu, thirdFibInfo, afterLowKlines, klinesList_hit);
 			} else if(qm == QuotationMode.SHORT) {
 				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 
 				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
 				
-				openShort_v2(thirdFibInfo, afterHighKlines,klinesList_hit);
+				openShort_v2(fu, thirdFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 		
@@ -1372,13 +1391,13 @@ public class KlinesServiceImpl implements KlinesService {
 
 				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
 				
-				openLong_v2(fourthFibInfo, afterLowKlines, klinesList_hit);
+				openLong_v2(fu, fourthFibInfo, afterLowKlines, klinesList_hit);
 			} else if(qm == QuotationMode.SHORT) {
 				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 
 				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
 				
-				openShort_v2(fourthFibInfo, afterHighKlines,klinesList_hit);
+				openShort_v2(fu, fourthFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 	}
