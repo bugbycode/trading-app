@@ -1816,7 +1816,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		//一级回撤
-		if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
+		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
 			
 			percent = PriceUtil.getFallFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
