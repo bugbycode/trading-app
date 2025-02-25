@@ -23,6 +23,7 @@ import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.PriceFibInfo;
+import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.PriceInfo;
 
@@ -1558,6 +1559,45 @@ public class PriceUtil {
 		Klines k2 = list.get(lastIndex - 2);
 		
 		return isFall_v3(k1, k2) && isRise_v3(k0, k1);
+	}
+	
+	/**
+	 * 判断是否出现强势 V4
+	 * @param fibInfo 回撤信息
+	 * @param list 价格参考的k线信息
+	 * @return
+	 */
+	public static boolean verifyPowerful_v4(FibInfo fibInfo, List<Klines> list) {
+		boolean result = false;
+		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
+			Klines current = getLastKlines(list);
+			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
+			QuotationMode qm = fibInfo.getQuotationMode();
+			if(qm == QuotationMode.SHORT) {
+				result = isBreachLong(current, fib236Price);
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 判断是否出现颓势 V4
+	 * @param fibInfo 回撤信息
+	 * @param list 价格参考的k线信息
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v4(FibInfo fibInfo, List<Klines> list) {
+		boolean result = false;
+		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
+			Klines current = getLastKlines(list);
+			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
+			QuotationMode qm = fibInfo.getQuotationMode();
+			if(qm == QuotationMode.LONG) {
+				result = isBreachShort(current, fib236Price);
+			}
+		}
+		return result;
 	}
 	
 	/**

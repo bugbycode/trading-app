@@ -581,7 +581,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfitCode = FibCode.FIB5;
+								takeProfitCode = FibCode.FIB618;
 							}
 							
 							stopLoss = new BigDecimal(
@@ -794,7 +794,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfitCode = FibCode.FIB5;
+								takeProfitCode = FibCode.FIB618;
 							}
 							
 							stopLoss = new BigDecimal(
@@ -1713,6 +1713,170 @@ public class KlinesServiceImpl implements KlinesService {
 					sendEmail(subject, text, u.getUsername());
 				}
 			}
+		}
+		
+	}
+	
+	@Override
+	public void declineAndStrengthCheck_v3(List<Klines> klinesListData) {
+		
+		if(CollectionUtils.isEmpty(klinesListData)) {
+			return;
+		}
+		
+		String text = "";//邮件内容
+		String subject = "";//邮件主题
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		List<Klines> klinesList_tmp = new ArrayList<Klines>();
+		klinesList_tmp.addAll(klinesListData);
+		
+		List<Klines> klinesList = PriceUtil.to1HFor15MKlines(klinesList_tmp);
+		
+		Klines lastKlines = PriceUtil.getLastKlines(klinesList);
+		
+		String pair = lastKlines.getPair();
+		double closePrice = lastKlines.getClosePriceDoubleValue();
+		
+		int minute = DateFormatUtil.getMinute(lastKlines.getEndTime());
+		if(minute != 59) {
+			return;
+		}
+		
+		FibUtil_v2 fu = new FibUtil_v2(klinesList);
+		
+		FibInfo firstFibInfo = fu.getFibInfo();
+		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
+		
+		double percent = 0;
+		FibCode takeProfitCode = FibCode.FIB618;
+		
+		//二级回撤
+		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList)) {
+			
+			percent = PriceUtil.getFallFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
+			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+			subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+			
+			//市价做空
+			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
+			
+			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+			
+			for(User u : uList) {
+				
+				double profit = u.getProfit();
+				double cutLoss = u.getCutLoss();
+				
+				if(percent < profit) {
+					continue;
+				}
+				
+				text = StringUtil.formatShortMessage(pair, closePrice, secondFibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), takeProfitCode);
+				
+				text += "，预计盈利：" + percentStr + "%";
+				
+				if(secondFibInfo != null) {
+					text += "\n\n" + secondFibInfo.toString();
+				}
+				
+				sendEmail(subject, text, u.getUsername());
+			}
+			
+		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList)) {
+			
+			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
+			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+			subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+			
+			//市价做多
+			marketPlace(pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
+			
+			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+			
+			for(User u : uList) {
+				double profit = u.getProfit();
+				double cutLoss = u.getCutLoss();
+				
+				if(percent < profit) {
+					continue;
+				}
+				
+				text = StringUtil.formatLongMessage(pair, closePrice, secondFibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
+				
+				text += "，预计盈利：" + percentStr + "%";
+				
+				if(secondFibInfo != null) {
+					text += "\n\n" + secondFibInfo.toString();
+				}
+				
+				sendEmail(subject, text, u.getUsername());
+			}
+			
+		}
+		
+		//一级回撤
+		if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
+			
+			percent = PriceUtil.getFallFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
+			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+			subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+
+			//市价做空
+			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION);
+			
+			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+			
+			for(User u : uList) {
+				
+				double profit = u.getProfit();
+				double cutLoss = u.getCutLoss();
+				
+				if(percent < profit) {
+					continue;
+				}
+				
+				text = StringUtil.formatShortMessage(pair, closePrice, firstFibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), takeProfitCode);
+				
+				text += "，预计盈利：" + percentStr + "%";
+				
+				if(firstFibInfo != null) {
+					text += "\n\n" + firstFibInfo.toString();
+				}
+				
+				sendEmail(subject, text, u.getUsername());
+			}
+			
+		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesList)) {
+			
+			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
+			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+			subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+			
+			//市价做多
+			marketPlace(pair, PositionSide.LONG, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION);
+			
+			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+			
+			for(User u : uList) {
+				double profit = u.getProfit();
+				double cutLoss = u.getCutLoss();
+				
+				if(percent < profit) {
+					continue;
+				}
+				
+				text = StringUtil.formatLongMessage(pair, closePrice, firstFibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
+				
+				text += "，预计盈利：" + percentStr + "%";
+				
+				if(firstFibInfo != null) {
+					text += "\n\n" + firstFibInfo.toString();
+				}
+				
+				sendEmail(subject, text, u.getUsername());
+			}
+			
 		}
 		
 	}

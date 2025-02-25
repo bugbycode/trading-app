@@ -242,6 +242,12 @@ public interface KlinesService {
 	public void declineAndStrengthCheck_v2(List<Klines> klinesList);
 	
 	/**
+	 * 检查是否出现颓势或强势价格行为 v3
+	 * @param klinesList
+	 */
+	public void declineAndStrengthCheck_v3(List<Klines> klinesList);
+	
+	/**
 	 * 验证是否出现颓势或强势价格行为
 	 * @param klinesList
 	 * @return
