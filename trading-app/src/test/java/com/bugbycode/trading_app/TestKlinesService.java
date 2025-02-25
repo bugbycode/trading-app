@@ -22,6 +22,7 @@ import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.util.DateFormatUtil;
 import com.util.FibUtil;
+import com.util.FibUtil_v2;
 import com.util.FibUtil_v3;
 import com.util.PriceUtil;
 
@@ -142,5 +143,21 @@ public class TestKlinesService {
         logger.info(secondFibInfo);
         logger.info(thirdFibInfo); 
         logger.info(fourthFibInfo);
+    }
+
+    @Test
+    public void testDeclineAndStrengthCheck_v3() {
+        String pair = "AIXBTUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(), 5000);
+
+        List<Klines> klinesList = PriceUtil.to1HFor15MKlines(list);
+
+        FibUtil_v2 fu = new FibUtil_v2(klinesList);
+        FibInfo fibInfo = fu.getFibInfo();
+        FibInfo secondFibInfo = fu.getSecondFibInfo(fibInfo);
+
+        logger.info(fibInfo);
+
+        logger.info(secondFibInfo);
     }
 }
