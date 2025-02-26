@@ -1752,7 +1752,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibCode takeProfitCode = FibCode.FIB618;
 		
 		//二级回撤
-		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList)) {
+		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			percent = PriceUtil.getFallFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -1783,7 +1783,7 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 			
-		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList)) {
+		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
