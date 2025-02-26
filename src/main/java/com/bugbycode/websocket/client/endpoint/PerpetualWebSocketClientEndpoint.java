@@ -52,7 +52,7 @@ public class PerpetualWebSocketClientEndpoint {
     			throw new RuntimeException("MessageHandler is null.");
     		}
 			this.container.connectToServer(this, new URI(AppConfig.WEBSOCKET_URL + "/ws/" + coinPairSet.getStreamName()));
-			logger.debug("开始连接websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName());
+			logger.info("开始连接websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -61,12 +61,12 @@ public class PerpetualWebSocketClientEndpoint {
     @OnOpen
     public void onOpen(Session session) {
         this.session = session;
-        logger.debug("连接websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName() + "成功。");
+        logger.info("连接websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName() + "成功。");
     }
 
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        logger.debug("websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName() + "，已断开连接。");
+        logger.info("websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName() + "，已断开连接。");
     }
 
     @OnMessage
