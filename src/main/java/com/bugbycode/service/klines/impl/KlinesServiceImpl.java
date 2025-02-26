@@ -579,7 +579,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-								takeProfitCode = FibCode.FIB618;
+								takeProfitCode = FibCode.FIB5;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								takeProfitCode = FibCode.FIB618;
 							}
@@ -792,7 +792,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-								takeProfitCode = FibCode.FIB618;
+								takeProfitCode = FibCode.FIB5;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								takeProfitCode = FibCode.FIB618;
 							}
@@ -2410,6 +2410,62 @@ public class KlinesServiceImpl implements KlinesService {
 		if(closePrice <= areaHighPrice && hightPrice >= areaHighPrice) {
 			FibInfo fibInfo = new FibInfo(areaLowPrice, areaHighPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
+		}
+	}
+	
+	@Override
+	public void futuresConsolidationAreaMonitor_v2(List<Klines> klinesList,List<Klines> hitKlinesList) {
+		Klines last = PriceUtil.getLastKlines(klinesList);
+		String pair = last.getPair();
+		
+		Klines current = PriceUtil.getLastKlines(hitKlinesList);
+		double closePrice = current.getClosePriceDoubleValue();
+		
+		FibUtil_v3 fu = new FibUtil_v3(klinesList);
+		FibInfo firstFibInfo = fu.getFibInfo();
+		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
+		FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
+		FibInfo fourthFibInfo = fu.getFourthFibInfo(thirdFibInfo);
+		
+		String subject = "";
+		String text = "";
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		if(fourthFibInfo != null) {
+			double t_price = thirdFibInfo.getFibValue(FibCode.FIB1);
+			double f_price = fourthFibInfo.getFibValue(FibCode.FIB1);
+			double areaHighPrice = PriceUtil.getMaxPrice(t_price, f_price);
+			double areaLowPrice = PriceUtil.getMinPrice(t_price, f_price);
+			
+			if(PriceUtil.isBreachShort(current, areaHighPrice)) { //高点做空
+				String recEmail = userDetailsService.getAreaMonitorUserEmail();
+				
+				subject = String.format("%s永续合约盘整区高点(%s)做空交易机会 %s", pair, areaHighPrice, dateStr);
+				text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+						pair,
+						PriceUtil.formatDoubleDecimal(areaLowPrice,current.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(areaHighPrice,current.getDecimalNum()),
+						closePrice);
+				sendEmail(subject, text, recEmail);
+				
+				FibInfo fibInfo = new FibInfo(areaLowPrice, areaHighPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
+				marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
+			}
+			
+			if(PriceUtil.isBreachLong(current, areaLowPrice)) {
+				String recEmail = userDetailsService.getAreaMonitorUserEmail();
+				
+				subject = String.format("%s永续合约盘整区低点(%s)做多交易机会 %s", pair, areaLowPrice, dateStr);
+				text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+						pair,
+						PriceUtil.formatDoubleDecimal(areaLowPrice,current.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(areaHighPrice,current.getDecimalNum()),
+						closePrice);
+				sendEmail(subject, text, recEmail);
+				
+				FibInfo fibInfo = new FibInfo(areaHighPrice, areaLowPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
+				marketPlace(pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
+			}
 		}
 	}
 	

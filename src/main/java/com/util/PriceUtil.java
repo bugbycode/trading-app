@@ -49,6 +49,22 @@ public class PriceUtil {
 		return result;
 	}
 	
+	public static double getMaxPrice(double price0,double price1) {
+		if(price0 > price1) {
+			return price0;
+		} else {
+			return price1;
+		}
+	}
+	
+	public static double getMinPrice(double price0,double price1) {
+		if(price0 < price1) {
+			return price0;
+		} else {
+			return price1;
+		}
+	}
+	
 	public static Klines getLastKlines(List<Klines> klinesList) {
 		Klines result = null;
 		
