@@ -28,10 +28,16 @@ public class FibInfo {
 				takeProfit = FibCode.FIB1_618;
 			} else if(code == FibCode.FIB1_618) { // 1.618 -> 1
 				takeProfit = FibCode.FIB1;
-			} else if(code == FibCode.FIB1) { // 1 -> 0.5
+			} else if(code == FibCode.FIB1) { // 1 -> 0.618
+				takeProfit = FibCode.FIB618;
+			} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
 				takeProfit = FibCode.FIB5;
-			} else { // -> 0.382
+			} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
 				takeProfit = FibCode.FIB382;
+			} else if(code == FibCode.FIB5) { // 0.5 -> 0.382
+				takeProfit = FibCode.FIB382;
+			} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
+				takeProfit = FibCode.FIB236;
 			}
 		} else if(level == FibLevel.LEVEL_3) {
 			if(code == FibCode.FIB4_618) {//4.618 -> 2.618
