@@ -4,9 +4,9 @@ import com.util.PriceUtil;
 
 public class FibInfo {
 
-	private double low;
+	private double startPrice;
 	
-	private double high;
+	private double endPrice;
 	
 	private int decimalPoint;
 	
@@ -290,8 +290,8 @@ public class FibInfo {
 	 * @param level 斐波那契回撤级别 lv1 lv2 lv3 ……
 	 */
 	public FibInfo(double fib1,double fib0,int decimalPoint,FibLevel level) {
-		this.high = fib1;
-		this.low = fib0;
+		this.startPrice = fib1;
+		this.endPrice = fib0;
 		this.decimalPoint = decimalPoint;
 		this.level = level;
 	}
@@ -305,30 +305,30 @@ public class FibInfo {
 	 */
 	public FibInfo(Klines kline1, Klines kline2,int decimalPoint,FibLevel level) {
 		if(kline1.getStartTime() < kline2.getStartTime()) {
-			this.high = Double.valueOf(kline1.getLowPrice());
-			this.low = Double.valueOf(kline2.getHighPrice());
+			this.startPrice = Double.valueOf(kline1.getLowPrice());
+			this.endPrice = Double.valueOf(kline2.getHighPrice());
 		} else {
-			this.high = Double.valueOf(kline2.getHighPrice());
-			this.low = Double.valueOf(kline1.getLowPrice());
+			this.startPrice = Double.valueOf(kline2.getHighPrice());
+			this.endPrice = Double.valueOf(kline1.getLowPrice());
 		}
 		this.decimalPoint = decimalPoint;
 		this.level = level;
 	}
 
 	public double getEndPrice() {
-		return low;
+		return endPrice;
 	}
 
 	public double getStartPrice() {
-		return high;
+		return startPrice;
 	}
 	
 	public double getFibValue(FibCode code) {
-		return calculateFibonacciRetracement(low,high,code.getValue());
+		return calculateFibonacciRetracement(endPrice,startPrice,code.getValue());
 	}
 	
 	public double getFibValue(double fibValue) {
-		return calculateFibonacciRetracement(low,high,fibValue);
+		return calculateFibonacciRetracement(endPrice,startPrice,fibValue);
 	}
 	
 	public int getDecimalPoint() {
@@ -337,29 +337,29 @@ public class FibInfo {
 
 	/**
 	 * 计算斐波那契回撤 第一个参数小于第二个参数时表示从高到低计算，反之从低到高
-	 * @param low 起始价
-	 * @param high 最终价
+	 * @param endPrice 起始价
+	 * @param startPrice 最终价
 	 * @param fibonacciLevel
 	 * @return
 	 */
-    public double calculateFibonacciRetracement(double low, double high, double fibonacciLevel) {
+    public double calculateFibonacciRetracement(double endPrice, double startPrice, double fibonacciLevel) {
         /*
     	if (fibonacciLevel < FibCode.FIB0.getValue() || fibonacciLevel > FibCode.FIB4_764.getValue()) {
             throw new IllegalArgumentException("参数不合法。");
         }*/
 
         // 计算斐波那契水平（从高到低）
-        //return low + fibonacciLevel * range;
+        //return endPrice + fibonacciLevel * range;
         // 计算斐波那契水平（从低到高）
-        //return high - fibonacciLevel * range;
-        if(low > high) {
+        //return startPrice - fibonacciLevel * range;
+        if(endPrice > startPrice) {
         	// 计算价格范围
-            double range = low - high;
-        	return low - fibonacciLevel * range;
+            double range = endPrice - startPrice;
+        	return endPrice - fibonacciLevel * range;
         } else {
         	// 计算价格范围
-            double range = high - low;
-        	return low + fibonacciLevel * range;
+            double range = startPrice - endPrice;
+        	return endPrice + fibonacciLevel * range;
         }
     }
     
