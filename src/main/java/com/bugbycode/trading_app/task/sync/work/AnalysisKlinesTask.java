@@ -77,10 +77,10 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.declineAndStrengthCheck_v3(klines_list_15m);
             
             //EMA指标涨跌判断
-            klinesService.futuresEmaRiseAndFall_V2(klines_list_15m);
+            //klinesService.futuresEmaRiseAndFall_V2(klines_list_15m);
 
             //标志性高低点分析
-            klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
+            klinesService.futuresHighOrLowMonitor_v2(klines_list_1d, klines_list_15m);
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);

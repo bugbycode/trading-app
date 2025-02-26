@@ -1128,6 +1128,170 @@ public class KlinesServiceImpl implements KlinesService {
 		 	sendEmail(subject, text, recEmail);
 		}
 	}
+	
+	@Override
+	public void futuresHighOrLowMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit) {
+		
+		Date now = new Date();
+		String dateStr = DateFormatUtil.format(now);
+		
+		Klines current = PriceUtil.getLastKlines(klinesList_hit);
+		Klines last = PriceUtil.getLastKlines(klinesList);
+		String pair = last.getPair();
+		
+		FibUtil_v3 fu = new FibUtil_v3(klinesList);
+		FibInfo firstFibInfo = fu.getFibInfo();
+		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
+		FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
+		FibInfo fourthFibInfo = fu.getFourthFibInfo(thirdFibInfo);
+		
+		QuotationMode qm = null;
+		double highPrice = 0;
+		double lowPrice = 0;
+		
+		Klines low = null;
+		Klines high = null;
+		
+		if(firstFibInfo != null) {
+			qm = firstFibInfo.getQuotationMode();
+			if(qm == QuotationMode.LONG) {
+				low = fu.getFirstStart();
+				high = fu.getFirstEnd();
+			} else {
+				high = fu.getFirstStart();
+				low = fu.getFirstEnd();
+			}
+			highPrice = high.getHighPriceDoubleValue();
+			lowPrice = low.getLowPriceDoubleValue();
+			//高点做空
+			if(PriceUtil.isBreachShort(current, highPrice)) {
+				String subject = String.format("%s永续合约突破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()),dateStr);
+				
+				String text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair, 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(high.getStartTime())), 
+						PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()));
+				
+				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+			 	sendEmail(subject, text, recEmail);
+			}
+			//低点做多
+			if(PriceUtil.isBreachLong(current, lowPrice)) {
+				String subject = String.format("%s永续合约跌破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()),dateStr);
+				
+				String text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(low.getStartTime())), 
+						PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()));
+				
+				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+			 	sendEmail(subject, text, recEmail);
+			}
+		}
+		
+		if(secondFibInfo != null) {
+			qm = secondFibInfo.getQuotationMode();
+			if(qm == QuotationMode.LONG) {
+				low = fu.getSecondStart();
+				high = fu.getSecondEnd();
+			} else {
+				high = fu.getSecondStart();
+				low = fu.getSecondEnd();
+			}
+			highPrice = high.getHighPriceDoubleValue();
+			lowPrice = low.getLowPriceDoubleValue();
+			//高点做空
+			if(PriceUtil.isBreachShort(current, highPrice)) {
+				String subject = String.format("%s永续合约突破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()),dateStr);
+				
+				String text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair, 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(high.getStartTime())), 
+						PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()));
+				
+				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+			 	sendEmail(subject, text, recEmail);
+			}
+			//低点做多
+			if(PriceUtil.isBreachLong(current, lowPrice)) {
+				String subject = String.format("%s永续合约跌破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()),dateStr);
+				
+				String text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(low.getStartTime())), 
+						PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()));
+				
+				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+			 	sendEmail(subject, text, recEmail);
+			}
+		}
+		
+		if(thirdFibInfo != null) {
+			qm = thirdFibInfo.getQuotationMode();
+			if(qm == QuotationMode.LONG) {
+				low = fu.getThirdStart();
+				high = fu.getThirdEnd();
+			} else {
+				high = fu.getThirdStart();
+				low = fu.getThirdEnd();
+			}
+			highPrice = high.getHighPriceDoubleValue();
+			lowPrice = low.getLowPriceDoubleValue();
+			//高点做空
+			if(PriceUtil.isBreachShort(current, highPrice)) {
+				String subject = String.format("%s永续合约突破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()),dateStr);
+				
+				String text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair, 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(high.getStartTime())), 
+						PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()));
+				
+				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+			 	sendEmail(subject, text, recEmail);
+			}
+			//低点做多
+			if(PriceUtil.isBreachLong(current, lowPrice)) {
+				String subject = String.format("%s永续合约跌破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()),dateStr);
+				
+				String text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(low.getStartTime())), 
+						PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()));
+				
+				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+			 	sendEmail(subject, text, recEmail);
+			}
+		}
+		
+		if(fourthFibInfo != null) {
+			qm = fourthFibInfo.getQuotationMode();
+			if(qm == QuotationMode.LONG) {
+				low = fu.getFourthStart();
+				high = fu.getFourthEnd();
+			} else {
+				high = fu.getFourthStart();
+				low = fu.getFourthEnd();
+			}
+			highPrice = high.getHighPriceDoubleValue();
+			lowPrice = low.getLowPriceDoubleValue();
+			//高点做空
+			if(PriceUtil.isBreachShort(current, highPrice)) {
+				String subject = String.format("%s永续合约突破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()),dateStr);
+				
+				String text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair, 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(high.getStartTime())), 
+						PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()));
+				
+				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+			 	sendEmail(subject, text, recEmail);
+			}
+			//低点做多
+			if(PriceUtil.isBreachLong(current, lowPrice)) {
+				String subject = String.format("%s永续合约跌破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()),dateStr);
+				
+				String text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
+						DateFormatUtil.format_yyyy_mm_dd(new Date(low.getStartTime())), 
+						PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()));
+				
+				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
+			 	sendEmail(subject, text, recEmail);
+			}
+		}
+	}
 
 	@Override
 	public void futuresFibMonitor(List<Klines> klinesList, List<Klines> klinesList_hit) {

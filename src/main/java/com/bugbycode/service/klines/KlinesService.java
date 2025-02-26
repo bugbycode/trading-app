@@ -108,6 +108,14 @@ public interface KlinesService {
 	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
+	 * 标志性高低点价格监控 v2
+	 * 
+	 * @param klinesList
+	 * @param klinesList_hit
+	 */
+	public void futuresHighOrLowMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit);
+	
+	/**
 	 * 斐波那契回撤点位监控
 	 * 
 	 * @param klinesList

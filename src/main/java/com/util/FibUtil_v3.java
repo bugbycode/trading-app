@@ -33,6 +33,22 @@ public class FibUtil_v3 {
 	
 	private Klines fourthFibAfterFlag;
 
+	private Klines firstStart;
+	
+	private Klines firstEnd;
+	
+	private Klines secondStart;
+	
+	private Klines secondEnd;
+	
+	private Klines thirdStart;
+	
+	private Klines thirdEnd;
+	
+	private Klines fourthStart;
+	
+	private Klines fourthEnd;
+	
 	public FibUtil_v3(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
 		this.list.addAll(list);
@@ -143,6 +159,8 @@ public class FibUtil_v3 {
 				fib = new FibInfo(fibStartKlines.getLowPriceDoubleValue(), fibEndKlines.getHighPriceDoubleValue(), last.getDecimalNum(), FibLevel.LEVEL_1);
 				
 				this.afterFlag = fibEndKlines;
+				this.firstStart = fibStartKlines;
+				this.firstEnd = fibEndKlines;
 			} else 
 			//做空情况
 			if(ps == PositionSide.SHORT) {
@@ -153,6 +171,8 @@ public class FibUtil_v3 {
 				fib = new FibInfo(fibStartKlines.getHighPriceDoubleValue(), fibEndKlines.getLowPriceDoubleValue(), last.getDecimalNum(), FibLevel.LEVEL_1);
 				
 				this.afterFlag = fibEndKlines;
+				this.firstStart = fibStartKlines;
+				this.firstEnd = fibEndKlines;
 			}
 		}
 		
@@ -171,16 +191,19 @@ public class FibUtil_v3 {
 			double endPrice = 0;
 			List<Klines> fibAfterKlines = getFibAfterKlines();
 			if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+				this.secondStart = this.firstEnd;
 				//一级斐波那契回撤行情模式 LONG/SHORT
 				QuotationMode qm = firstFibInfo.getQuotationMode();
 				if(qm == QuotationMode.LONG) {//多头 找低点
 					Klines lowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 					endPrice = lowKlines.getLowPriceDoubleValue();
-					secondFibAfterFlag = lowKlines;
+					this.secondFibAfterFlag = lowKlines;
+					this.secondEnd = lowKlines;
 				} else {//空头 找高点
 					Klines highKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 					endPrice = highKlines.getHighPriceDoubleValue();
-					secondFibAfterFlag = highKlines;
+					this.secondFibAfterFlag = highKlines;
+					this.secondEnd = highKlines;
 				}
 				
 				fibInfo = new FibInfo(startPrice, endPrice, firstFibInfo.getDecimalPoint(), FibLevel.LEVEL_2);
@@ -201,16 +224,19 @@ public class FibUtil_v3 {
 			double endPrice = 0;
 			List<Klines> fibAfterKlines = getSecondFibAfterKlines();
 			if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+				this.thirdStart = this.secondEnd;
 				//二级斐波那契回撤行情模式 LONG/SHORT
 				QuotationMode qm = secondFibInfo.getQuotationMode();
 				if(qm == QuotationMode.LONG) {//多头 找低点
 					Klines lowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 					endPrice = lowKlines.getLowPriceDoubleValue();
-					thirdFibAfterFlag = lowKlines;
+					this.thirdFibAfterFlag = lowKlines;
+					this.thirdEnd = lowKlines;
 				} else {//空头 找高点
 					Klines highKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 					endPrice = highKlines.getHighPriceDoubleValue();
-					thirdFibAfterFlag = highKlines;
+					this.thirdFibAfterFlag = highKlines;
+					this.thirdEnd = highKlines;
 				}
 				
 				fibInfo = new FibInfo(startPrice, endPrice, secondFibInfo.getDecimalPoint(), FibLevel.LEVEL_3);
@@ -231,16 +257,19 @@ public class FibUtil_v3 {
 			double endPrice = 0;
 			List<Klines> fibAfterKlines = getThirdFibAfterKlines();
 			if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+				this.fourthStart = this.thirdEnd;
 				//三级斐波那契回撤行情模式 LONG/SHORT
 				QuotationMode qm = thirdFibInfo.getQuotationMode();
 				if(qm == QuotationMode.LONG) {//多头 找低点
 					Klines lowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 					endPrice = lowKlines.getLowPriceDoubleValue();
-					fourthFibAfterFlag = lowKlines;
+					this.fourthFibAfterFlag = lowKlines;
+					this.fourthEnd = lowKlines;
 				} else {//空头 找高点
 					Klines highKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 					endPrice = highKlines.getHighPriceDoubleValue();
-					fourthFibAfterFlag = highKlines;
+					this.fourthFibAfterFlag = highKlines;
+					this.fourthEnd = highKlines;
 				}
 				
 				fibInfo = new FibInfo(startPrice, endPrice, thirdFibInfo.getDecimalPoint(), FibLevel.LEVEL_4);
@@ -463,5 +492,37 @@ public class FibUtil_v3 {
 
 	public Klines getFourthFibAfterFlag() {
 		return fourthFibAfterFlag;
+	}
+
+	public Klines getFirstStart() {
+		return firstStart;
+	}
+
+	public Klines getFirstEnd() {
+		return firstEnd;
+	}
+
+	public Klines getSecondStart() {
+		return secondStart;
+	}
+
+	public Klines getSecondEnd() {
+		return secondEnd;
+	}
+
+	public Klines getThirdStart() {
+		return thirdStart;
+	}
+
+	public Klines getThirdEnd() {
+		return thirdEnd;
+	}
+
+	public Klines getFourthStart() {
+		return fourthStart;
+	}
+
+	public Klines getFourthEnd() {
+		return fourthEnd;
 	}
 }
