@@ -306,11 +306,5 @@ public class User implements UserDetails {
 		this.setEmaRiseAndFall(user.getEmaRiseAndFall());
 		this.setEmaMonitor(user.getEmaMonitor());
 		this.setAreaMonitor(user.getAreaMonitor());
-		this.setRecvTrade(user.getRecvTrade());
-		this.setRecvCrossUnPnl(user.getRecvCrossUnPnl());
-		this.setRecvCrossUnPnlPercent(user.getRecvCrossUnPnlPercent());
-		this.setTradeStepBack(user.getTradeStepBack());
-		this.setTradeStyle(user.getTradeStyle());
-		this.setProfitLimit(user.getProfitLimit());
 	}
 }
