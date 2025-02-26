@@ -112,7 +112,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
 			String interval,QUERY_SPLIT split) {
 		
-				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
+				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
 				.queryParam("pair", pair)
 				.queryParam("contractType", "PERPETUAL")
 				.queryParam("startTime", startTime)
