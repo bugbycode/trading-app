@@ -37,9 +37,9 @@ public class MessageHandlerImpl implements MessageHandler{
 		
 		boolean finish = klinesJson.getBoolean("x");
 		
-		if(finish) {
+		if(finish && client.putFinishPair(kline.getPair())) {
+			
 			logger.debug(message);
-			client.subCount();
 			
 			//15分钟k线分析
 			long count = klinesRepository.count(kline.getPair(), Inerval.INERVAL_1D.getDescption());
@@ -54,7 +54,7 @@ public class MessageHandlerImpl implements MessageHandler{
 			}
 		};
 		
-		if(client.coinCount() == 0) {
+		if(client.isFinish()) {
 			client.close();
 		}
 	}

@@ -54,15 +54,14 @@ public class ShapeMessageHandler implements MessageHandler {
 		
 		boolean finish = klinesJson.getBoolean("x");
 		
-		if(finish) {
-			client.subCount();
+		if(finish && client.putFinishPair(kline.getPair())) {
 			
 			logger.debug(kline);
 			
 			this.workTaskPool.add(new ShapeDistributeTask(kline, klinesService, shapeRepository,analysisWorkTaskPool));
 		}
 		
-		if(client.coinCount() == 0) {
+		if(client.isFinish()) {
 			logger.debug(client.getStreamName() + "订阅结束，关闭websocket连接");
 			client.close();
 		}

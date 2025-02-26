@@ -40,8 +40,6 @@ public class PerpetualWebSocketClientEndpoint {
     
     private CoinPairSet coinPairSet;
     
-    private ThreadLocal<Integer> coinCount;
-    
     private WorkTaskPool analysisWorkTaskPool;
     
     private KlinesService klinesService;
@@ -51,7 +49,6 @@ public class PerpetualWebSocketClientEndpoint {
     public PerpetualWebSocketClientEndpoint(CoinPairSet coinPairSet,MessageHandler messageHandler, 
     		KlinesService klinesService, KlinesRepository klinesRepository, WorkTaskPool analysisWorkTaskPool) {
     	this.coinPairSet = coinPairSet;
-    	this.coinCount = ThreadLocal.withInitial(() -> this.coinPairSet.size()); 
     	this.messageHandler = messageHandler;
         this.container = ContainerProvider.getWebSocketContainer();
         this.analysisWorkTaskPool = analysisWorkTaskPool;
@@ -115,15 +112,15 @@ public class PerpetualWebSocketClientEndpoint {
 		return coinPairSet;
 	}
 	
-	public int coinCount() {
-		return this.coinCount.get();
-	}
-	
-	public void subCount() {
-		this.coinCount.set(this.coinCount() - 1);
-	}
-	
 	public String getStreamName() {
 		return this.coinPairSet.getStreamName();
+	}
+	
+	public boolean putFinishPair(String pair) {
+		return this.coinPairSet.addFinishPair(pair);
+	}
+	
+	public boolean isFinish() {
+		return this.coinPairSet.isFinish();
 	}
 }

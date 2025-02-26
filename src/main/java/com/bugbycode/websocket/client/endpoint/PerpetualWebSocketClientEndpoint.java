@@ -37,11 +37,8 @@ public class PerpetualWebSocketClientEndpoint {
     
     private CoinPairSet coinPairSet;
     
-    private ThreadLocal<Integer> coinCount;
-    
     public PerpetualWebSocketClientEndpoint(CoinPairSet coinPairSet) {
     	this.coinPairSet = coinPairSet;
-    	this.coinCount = ThreadLocal.withInitial(() -> this.coinPairSet.size());
         this.container = ContainerProvider.getWebSocketContainer();
     }
     
@@ -102,13 +99,13 @@ public class PerpetualWebSocketClientEndpoint {
 	public CoinPairSet getCoinPairSet() {
 		return coinPairSet;
 	}
-	
-	public int coinCount() {
-		return this.coinCount.get();
+
+	public boolean putFinishPair(String pair) {
+		return this.coinPairSet.addFinishPair(pair);
 	}
 	
-	public void subCount() {
-		this.coinCount.set(this.coinCount() - 1);
+	public boolean isFinish() {
+		return this.coinPairSet.isFinish();
 	}
 	
 	public String getStreamName() {
