@@ -1975,7 +1975,7 @@ public class PriceUtil {
 		double v_0 = k0.getVDoubleValue();
 		double v_1 = k1.getVDoubleValue();
 		
-		if(!(v_0 == 0 || v_1 == 0)) {
+		if(v_0 == 0 || v_1 == 0) {
 			return false;
 		}
 		
