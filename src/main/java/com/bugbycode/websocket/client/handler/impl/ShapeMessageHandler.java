@@ -50,7 +50,7 @@ public class ShapeMessageHandler implements MessageHandler {
 		
 		Klines kline = new Klines(result.getString("ps"), klinesJson.getLong("t"), klinesJson.getString("o"), 
 				klinesJson.getString("h"), klinesJson.getString("l"), klinesJson.getString("c"), klinesJson.getLong("T"),
-				client.getCoinPairSet().getInerval().getDescption(), decimalNum, klinesJson.getString("v"), klinesJson.getString("n"),
+				client.getCoinPairSet().getInerval().getDescption(), decimalNum, klinesJson.getString("v"), klinesJson.getLong("n"),
 				klinesJson.getString("q"), klinesJson.getString("V"), klinesJson.getString("Q"));
 		
 		boolean finish = klinesJson.getBoolean("x");

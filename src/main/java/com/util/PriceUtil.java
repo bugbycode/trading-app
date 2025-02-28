@@ -1196,7 +1196,7 @@ public class PriceUtil {
 		String pair = firstKlines.getPair();
 		int decimalNum = firstKlines.getDecimalNum();
 		String inerval = Inerval.INERVAL_1H.getDescption();
-		return new Klines(pair, startTime, openPrice, highPrice, lowPrice, closePrice, endTime, inerval, decimalNum, null, null, null, null, null);
+		return new Klines(pair, startTime, openPrice, highPrice, lowPrice, closePrice, endTime, inerval, decimalNum, null, 0, null, null, null);
 	}
 	
 	/**
