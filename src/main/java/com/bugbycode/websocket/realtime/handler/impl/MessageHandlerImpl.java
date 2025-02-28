@@ -40,7 +40,7 @@ public class MessageHandlerImpl implements MessageHandler{
 		
 		if(finish && client.putFinishPair(kline.getPair())) {
 			
-			logger.debug(message);
+			logger.info(kline);
 			
 			//15分钟k线分析
 			long count = klinesRepository.count(kline.getPair(), Inerval.INERVAL_1D.getDescption());
