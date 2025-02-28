@@ -302,4 +302,10 @@ public interface KlinesService {
      * @return 有更新则返回true 否则返回false
      */
     public boolean verifyUpdateDayKlines(List<Klines> list);
+    
+    /**
+     * 量价分析
+     * @param list
+     */
+    public void volumeMonitor(List<Klines> list);
 }

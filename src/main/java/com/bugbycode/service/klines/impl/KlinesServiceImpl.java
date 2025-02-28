@@ -3251,4 +3251,45 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		return false;
 	}
+
+	@Override
+	public void volumeMonitor(List<Klines> list) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 3) {
+			return;
+		}
+		
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		String pair = k0.getPair();
+		
+		String subject = "";
+		String text = k0.toString();
+		
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		if(PriceUtil.isFall_v3(list) && PriceUtil.isRelease(list)) {//下跌
+			
+			if(k0.isDownlead() && !k0.isUplead()) {
+				subject = String.format("%永续合约出现买盘 %s", pair, dateStr);
+			} else {
+				subject = String.format("%永续合约放量下跌 %s", pair, dateStr);
+			}
+			
+		} else if(PriceUtil.isRise_v3(list) && PriceUtil.isRelease(list)) { //上涨
+			
+			if(k0.isUplead() && !k0.isDownlead()) {
+				subject = String.format("%永续合约出现抛压 %s", pair, dateStr);
+			} else {
+				subject = String.format("%永续合约放量上涨 %s", pair, dateStr);
+			}
+			
+		}
+		
+		if(StringUtil.isNotEmpty(subject)) {
+			String recEmail = userDetailsService.getVolumeMonitorUserEmail();
+			sendEmail(subject, text, recEmail);
+		}
+	}
 }

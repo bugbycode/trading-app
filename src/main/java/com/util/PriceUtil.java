@@ -1959,4 +1959,26 @@ public class PriceUtil {
 		}
 		return new ArrayList<Klines>();
 	}
+	
+	/**
+	 * 是否出现放量
+	 * @param list
+	 * @return
+	 */
+	public static boolean isRelease(List<Klines> list) {
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		
+		double v_0 = k0.getVDoubleValue();
+		double v_1 = k1.getVDoubleValue();
+		
+		if(!(v_0 == 0 || v_1 == 0)) {
+			return false;
+		}
+		
+		return v_0 > (v_1 * 3);
+	}
 }

@@ -8,7 +8,6 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
-import com.util.PriceUtil;
 
 import java.util.List;
 
@@ -79,6 +78,9 @@ public class AnalysisKlinesTask implements Runnable{
             //EMA指标涨跌判断
             //klinesService.futuresEmaRiseAndFall_V2(klines_list_15m);
 
+            //量价分析
+            klinesService.volumeMonitor(klines_list_15m);
+            
             //标志性高低点分析
             klinesService.futuresHighOrLowMonitor_v2(klines_list_1d, klines_list_15m);
 

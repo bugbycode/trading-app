@@ -3,6 +3,7 @@ package com.bugbycode.module;
 import org.springframework.data.annotation.Id;
 
 import com.util.DateFormatUtil;
+import com.util.StringUtil;
 
 public class Klines {
 	
@@ -162,6 +163,10 @@ public class Klines {
 	
 	public Inerval getInervalType() {
 		return Inerval.resolve(this.interval);
+	}
+	
+	public double getVDoubleValue() {
+		return StringUtil.isEmpty(v) ? 0 : Double.valueOf(v);
 	}
 
 	public String getV() {
