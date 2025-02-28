@@ -70,6 +70,8 @@ public class User implements UserDetails {
 	
 	private double profitLimit = 4;//止盈百分比限制 交易风格为保守时使用
 	
+	private int volumeMonitor = 0; //是否启用量价分析 0：否 1：是
+	
 	public String getId() {
 		return id;
 	}
@@ -279,24 +281,12 @@ public class User implements UserDetails {
 		this.profitLimit = profitLimit;
 	}
 
-	public void copy(User user) {
-		this.setId(user.getId());
-		this.setUsername(user.getUsername());
-		this.setPassword(user.getPassword());
-		this.setRiseAndFallMonitor(user.getRiseAndFallMonitor());
-		this.setHighOrLowMonitor(user.getHighOrLowMonitor());
-		this.setFibMonitor(user.getFibMonitor());
-		this.setEmaRiseAndFall(user.getEmaRiseAndFall());
-		this.setEmaMonitor(user.getEmaMonitor());
-		this.setAreaMonitor(user.getAreaMonitor());
-		this.setBinanceApiKey(user.getBinanceApiKey());
-		this.setBinanceSecretKey(user.getBinanceSecretKey());
-		this.setRecvTrade(user.getRecvTrade());
-		this.setRecvCrossUnPnl(user.getRecvCrossUnPnl());
-		this.setRecvCrossUnPnlPercent(user.getRecvCrossUnPnlPercent());
-		this.setTradeStepBack(user.getTradeStepBack());
-		this.setTradeStyle(user.getTradeStyle());
-		this.setProfitLimit(user.getProfitLimit());
+	public int getVolumeMonitor() {
+		return volumeMonitor;
+	}
+
+	public void setVolumeMonitor(int volumeMonitor) {
+		this.volumeMonitor = volumeMonitor;
 	}
 	
 	public void copyAIInfo(User user) {
@@ -306,5 +296,6 @@ public class User implements UserDetails {
 		this.setEmaRiseAndFall(user.getEmaRiseAndFall());
 		this.setEmaMonitor(user.getEmaMonitor());
 		this.setAreaMonitor(user.getAreaMonitor());
+		this.setVolumeMonitor(user.getVolumeMonitor());
 	}
 }

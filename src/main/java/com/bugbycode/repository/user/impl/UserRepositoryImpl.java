@@ -67,6 +67,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("highOrLowMonitor", user.getHighOrLowMonitor());
 		update.set("riseAndFallMonitor", user.getRiseAndFallMonitor());
 		update.set("areaMonitor", user.getAreaMonitor());
+		update.set("volumeMonitor", user.getVolumeMonitor());
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 

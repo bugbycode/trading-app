@@ -83,9 +83,9 @@ public class UserController extends BaseController{
 			throw new AccessDeniedException("无权访问");
 		}
 		
-		user.copyAIInfo(data);
-		
 		userRepository.updateUserSubscribeInfo(user.getUsername(), data);
+		
+		user.copyAIInfo(data);
 		
 		JSONObject json = new JSONObject();
 		
