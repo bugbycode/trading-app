@@ -35,7 +35,7 @@ public class Klines {
 	
 	private String v;//成交量
 	
-	private long n;//成交笔数
+	private Long n;//成交笔数
 	
 	private String q;//成交额
 	
@@ -44,7 +44,7 @@ public class Klines {
 	private String iq;//主动买入的成交额
 
 	public Klines(String pair,long startTime, String openPrice, String highPrice, String lowPrice, 
-			String closePrice, long endTime,String interval,int decimalNum, String v, long n, String q,
+			String closePrice, long endTime,String interval,int decimalNum, String v, Long n, String q,
 			String iv, String iq) {
 		this.pair = pair;
 		this.startTime = startTime;
@@ -172,11 +172,11 @@ public class Klines {
 		this.v = v;
 	}
 
-	public long getN() {
+	public Long getN() {
 		return n;
 	}
 
-	public void setN(long n) {
+	public void setN(Long n) {
 		this.n = n;
 	}
 
