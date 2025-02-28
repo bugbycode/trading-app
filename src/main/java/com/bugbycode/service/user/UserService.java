@@ -52,6 +52,12 @@ public interface UserService extends UserDetailsService{
 	public String getAreaMonitorUserEmail();
 	
 	/**
+	 * 查询所有开启量价监控的邮箱账号信息
+	 * @return
+	 */
+	public String getVolumeMonitorUserEmail();
+	
+	/**
 	 * 获取所有用户邮箱信息 结果使用逗号分隔
 	 * @return
 	 */

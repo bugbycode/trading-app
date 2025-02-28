@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
+import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -139,4 +140,11 @@ public interface UserRepository {
 	 * @return
 	 */
 	public List<User> queryByRecvCrossUnPnl(RecvCrossUnPnlStatus status);
+	
+	/**
+	 * 根据量价监控状态查询所有关联用户信息
+	 * @param status 是否开启量价监控
+	 * @return
+	 */
+	public List<User> queryByVolumeMonitorStatus(VolumeMonitorStatus status);
 }

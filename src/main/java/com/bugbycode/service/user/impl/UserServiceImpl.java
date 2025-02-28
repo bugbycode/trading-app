@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.Regex;
+import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -88,6 +89,12 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public String getAreaMonitorUserEmail() {
 		List <User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
+		return getSubscribeAiUserEmail(userList);
+	}
+	
+	@Override
+	public String getVolumeMonitorUserEmail() {
+		List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
 		return getSubscribeAiUserEmail(userList);
 	}
 	

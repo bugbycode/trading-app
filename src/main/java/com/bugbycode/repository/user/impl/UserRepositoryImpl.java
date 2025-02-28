@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
+import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.DrawTrade;
@@ -154,6 +155,15 @@ public class UserRepositoryImpl implements UserRepository {
 		return template.find(
 				
 				Query.query(Criteria.where("recvCrossUnPnl").is(status.getValue())), 
+				
+				User.class);
+	}
+
+	@Override
+	public List<User> queryByVolumeMonitorStatus(VolumeMonitorStatus status) {
+		return template.find(
+				
+				Query.query(Criteria.where("volumeMonitor").is(status.getValue())), 
 				
 				User.class);
 	}
