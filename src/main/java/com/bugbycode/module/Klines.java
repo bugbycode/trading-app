@@ -32,9 +32,20 @@ public class Klines {
 	private long endTime;
 	
 	private int decimalNum = 2;
+	
+	private String v;//成交量
+	
+	private String n;//成交笔数
+	
+	private String q;//成交额
+	
+	private String iv;//主动买入的成交量
+	
+	private String iq;//主动买入的成交额
 
 	public Klines(String pair,long startTime, String openPrice, String highPrice, String lowPrice, 
-			String closePrice, long endTime,String interval,int decimalNum) {
+			String closePrice, long endTime,String interval,int decimalNum, String v, String n, String q,
+			String iv, String iq) {
 		this.pair = pair;
 		this.startTime = startTime;
 		this.openPrice = openPrice;
@@ -44,6 +55,11 @@ public class Klines {
 		this.endTime = endTime;
 		this.decimalNum = decimalNum;
 		this.interval = interval;
+		this.v = v;
+		this.n = n;
+		this.q = q;
+		this.iv = iv;
+		this.iq = iq;
 	}
 	
 	public String getId(){
@@ -146,6 +162,46 @@ public class Klines {
 	
 	public Inerval getInervalType() {
 		return Inerval.resolve(this.interval);
+	}
+
+	public String getV() {
+		return v;
+	}
+
+	public void setV(String v) {
+		this.v = v;
+	}
+
+	public String getN() {
+		return n;
+	}
+
+	public void setN(String n) {
+		this.n = n;
+	}
+
+	public String getQ() {
+		return q;
+	}
+
+	public void setQ(String q) {
+		this.q = q;
+	}
+
+	public String getIv() {
+		return iv;
+	}
+
+	public void setIv(String iv) {
+		this.iv = iv;
+	}
+
+	public String getIq() {
+		return iq;
+	}
+
+	public void setIq(String iq) {
+		this.iq = iq;
 	}
 
 	/**
@@ -273,8 +329,8 @@ public class Klines {
 	
 	@Override
 	public String toString() {
-		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s，时间级别：%s", 
+		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s，时间级别：%s，成交量：%s，成交额：%s，成交笔数：%s，主动买入成交量：%s，主动买入成交额：%s", 
 				pair,DateFormatUtil.format(startTime),getOpenPrice(),getHighPrice()
-				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime),this.interval);
+				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime),this.interval, this.v, this.q, this.n, this.iv, this.iq);
 	}
 }

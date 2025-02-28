@@ -79,7 +79,10 @@ public class CommandUtil {
 					Klines kl = new Klines(pair,klJson.getLong(0),
 							klJson.getString(1),klJson.getString(2),
 							klJson.getString(3),klJson.getString(4),
-							klJson.getLong(6),interval,decimalNum);
+							klJson.getLong(6),interval,decimalNum,
+							klJson.getString(5),klJson.getString(8),
+							klJson.getString(7), klJson.getString(9), 
+							klJson.getString(10));
 					klinesList.add(kl);
 				};
 				
