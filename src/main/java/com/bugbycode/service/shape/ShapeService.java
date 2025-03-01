@@ -1,7 +1,6 @@
 package com.bugbycode.service.shape;
 
 import com.bugbycode.module.ShapeInfo;
-import com.util.page.Page;
 import com.util.page.SearchResult;
 
 public interface ShapeService {

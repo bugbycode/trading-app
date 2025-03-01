@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.Inerval;
-import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -22,7 +21,6 @@ import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.websocket.client.endpoint.PerpetualWebSocketClientEndpoint;
 import com.bugbycode.websocket.client.handler.impl.ShapeMessageHandler;
 import com.util.CoinPairSet;
-import com.util.ProcessUtil;
 
 /**
  * 绘图交易计划任务

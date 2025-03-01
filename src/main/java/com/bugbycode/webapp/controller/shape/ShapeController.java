@@ -3,8 +3,6 @@ package com.bugbycode.webapp.controller.shape;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.security.access.AccessDeniedException;
@@ -32,8 +30,6 @@ import jakarta.annotation.Resource;
 @RestController
 @RequestMapping("/shape")
 public class ShapeController extends BaseController{
-
-	private final Logger logger = LogManager.getLogger(ShapeController.class);
 	
 	@Resource
 	private ShapeRepository shapeRepository;
