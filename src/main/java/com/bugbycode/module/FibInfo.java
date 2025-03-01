@@ -32,7 +32,7 @@ public class FibInfo {
 				takeProfit = FibCode.FIB618;
 			} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
 				takeProfit = FibCode.FIB5;
-			} else if(code == FibCode.FIB618) { // 0.618 -> 0.382
+			} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
 				takeProfit = FibCode.FIB382;
 			} else if(code == FibCode.FIB5) { // 0.5 -> 0.382
 				takeProfit = FibCode.FIB382;
@@ -52,7 +52,7 @@ public class FibInfo {
 				takeProfit = FibCode.FIB786;
 			} else if(code == FibCode.FIB786) { // 0.786 -> 0.618
 				takeProfit = FibCode.FIB618;
-			} else if(code == FibCode.FIB618) { // 0.618 -> 0.5
+			} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.5
 				takeProfit = FibCode.FIB5;
 			} else if(code == FibCode.FIB5) { // 0.5 -> 0.382
 				takeProfit = FibCode.FIB382;
@@ -176,6 +176,9 @@ public class FibInfo {
 			case FIB786:
 				takeProfit = FibCode.FIB618;
 				break;
+			case FIB66:
+				takeProfit = FibCode.FIB5;
+				break;
 			case FIB618:
 				takeProfit = FibCode.FIB5;
 				break;
@@ -201,6 +204,9 @@ public class FibInfo {
 				break;
 			case FIB786:
 				takeProfit = FibCode.FIB618;
+				break;
+			case FIB66:
+				takeProfit = FibCode.FIB5;
 				break;
 			case FIB618:
 				takeProfit = FibCode.FIB5;
@@ -233,13 +239,13 @@ public class FibInfo {
 		int index = offset;
 		FibCode current = codes[index];
 		if(this.level == FibLevel.LEVEL_1) {//1级回撤
-			if(current == FibCode.FIB786) {
+			if(current == FibCode.FIB66 || current == FibCode.FIB786) {
 				index += 2;
 			} else {
 				index++;
 			}
 		} else { // 2级 或 3级回撤
-			if(current == FibCode.FIB786) {
+			if(current == FibCode.FIB66 || current == FibCode.FIB786) {
 				index += 3;
 			} else if(current == FibCode.FIB5) {//0.5 ~ 0.382
 				index++;
