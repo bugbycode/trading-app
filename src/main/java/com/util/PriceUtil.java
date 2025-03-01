@@ -481,8 +481,15 @@ public class PriceUtil {
 		boolean result = false;
 
 		if(!ObjectUtils.isEmpty(afterLowKlines)) {
-			if(codeOffset > 0 && Double.valueOf(afterLowKlines.getLowPrice()) <= Double.valueOf(fibInfo.getFibValue(codes[codeOffset - 1]))) {
-				result = true;
+			if(codeOffset > 0) {
+				FibCode current = codes[codeOffset];
+				FibCode next = codes[codeOffset - 1];
+				if(current == FibCode.FIB618) {
+					next = FibCode.FIB786;
+				}
+				if(afterLowKlines.getLowPriceDoubleValue() <= fibInfo.getFibValue(next)) {
+					result = true;
+				}
 			}
 		}
 		
@@ -501,8 +508,15 @@ public class PriceUtil {
 		boolean result = false;
 
 		if(!ObjectUtils.isEmpty(afterHighKlines)) {
-			if(codeOffset > 0 && Double.valueOf(afterHighKlines.getHighPrice()) >= fibInfo.getFibValue(codes[codeOffset - 1])) {
-				result = true;
+			if(codeOffset > 0) {
+				FibCode current = codes[codeOffset];
+				FibCode next = codes[codeOffset - 1];
+				if(current == FibCode.FIB618) {
+					next = FibCode.FIB786;
+				}
+				if(afterHighKlines.getHighPriceDoubleValue() >= fibInfo.getFibValue(next)) {
+					result = true;
+				}
 			}
 		}
 		
