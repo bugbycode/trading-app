@@ -54,7 +54,7 @@ public class ReCaptchaFilter extends OncePerRequestFilter {
 	        
 			String clientIp = RequestUtil.parseClientIp(request);
 			
-			logger.info("method: {}, url: {}, clientIp: {}, cha_response: {}", method, url, clientIp, cha_response);
+			logger.info("Login IP address: {}", clientIp);
 			
 			if(StringUtil.isEmpty(cha_response)) {
 				responseFaild(response);
