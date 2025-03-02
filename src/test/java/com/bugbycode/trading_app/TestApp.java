@@ -1,6 +1,8 @@
 package com.bugbycode.trading_app;
 
 import java.text.ParseException;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
@@ -9,7 +11,12 @@ import com.util.PriceUtil;
 public class TestApp {
 
 	public static void main(String[] args) throws ParseException {
-		System.out.println(String.format("多头仓位已买入[PNL：%s%%]", "30"));
+		Set<String> set = new HashSet<String>();
+		set.add("BTCUSDT");
+		set.add("DOGEUSDT");
+		
+		System.out.println(set.contains(new String("BTCUSDT")));
+		System.out.println(set.contains(new String("LTCUSDT")));
 	}
 
 }

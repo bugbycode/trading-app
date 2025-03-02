@@ -54,39 +54,15 @@ public class TestKlinesService {
     @Test
     public void testQuery() {
         Date now = new Date();
-        String pair = "BTCUSDT";
-        List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),3);
+        String pair = "PIPPINUSDT";
+        List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),10);
         
-        klines_list_1d.remove(klines_list_1d.size() - 1);
-        klines_list_1d.remove(klines_list_1d.size() - 1);
+        klines_list_15m.remove(PriceUtil.getLastKlines(klines_list_15m)) ;
 
-        logger.info(klines_list_1d);
-
-        if(!CollectionUtils.isEmpty(klines_list_1d)) {
-            Klines last = PriceUtil.getLastKlines(klines_list_1d);
-            //logger.info(last.verifyInterval(Inerval.INERVAL_15M));
-            if(PriceUtil.verifyLastDay(last)){
-               return; 
-            }
-
-            //获取需要更新的时间段信息
-			long startTime = DateFormatUtil.parse(DateFormatUtil.format(last.getEndTime())).getTime() + 1000;
-            long endTime = DateFormatUtil.getEndTime(DateFormatUtil.getHours(now.getTime())).getTime();
-            logger.info(new Date(startTime));
-            logger.info(new Date(endTime));
-            List<Klines> list_day = klinesService.continuousKlines(last.getPair(), startTime, endTime, Inerval.INERVAL_1D.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
-            logger.info(list_day);
+        for(Klines k : klines_list_15m) {
+            logger.info(k);
         }
-        //Date start = DateFormatUtil.getTodayStartTime(now);
-        //start = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(start));
-        /*start = DateFormatUtil.parse(DateFormatUtil.format(start.getTime() + 150000));
-        logger.info(DateFormatUtil.format(start));
-        start = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_mm_00(start));
-        */
-        /*logger.info(DateFormatUtil.format(start));
-        logger.info(DateFormatUtil.verifyLastDayStartTime(start));
-
-        logger.info(DateFormatUtil.getEndTime(DateFormatUtil.getHours(now.getTime())));*/
+        klinesService.volumeMonitor(klines_list_15m);
     }
 
     @Test
@@ -159,5 +135,37 @@ public class TestKlinesService {
         logger.info(fibInfo);
 
         logger.info(secondFibInfo);
+    }
+
+    @Test
+    public void testSyncKlines() {
+        String pair = "BTCUSDT";
+        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 10, QUERY_SPLIT.NOT_ENDTIME);
+        logger.info(list);
+    }
+
+    @Test
+    public void test15mTo1h(){
+        String pair = "BTCUSDT";
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),500);
+        List<Klines> list_1h = PriceUtil.to1HFor15MKlines(list);
+        //logger.info(list_1h);
+        Klines lastKlines = PriceUtil.getLastKlines(list_1h);
+        int minute = DateFormatUtil.getMinute(lastKlines.getEndTime());
+		if(minute != 59) {
+			list_1h.remove(lastKlines);
+		}
+        for(Klines k : list_1h) {
+            logger.info(k);
+        }
+    }
+
+    @Test
+    public void testFibInfo(){
+        String pair = "BNXUSDT";
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),1500);
+        FibUtil fu = new FibUtil(list);
+        FibInfo fibInfo = fu.getFibInfo();
+        logger.info(fibInfo);
     }
 }
