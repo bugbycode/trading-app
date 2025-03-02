@@ -13,6 +13,23 @@ public class FibInfo {
 	private FibLevel level;
 	
 	/**
+	 * 止盈点位 V8
+	 * @param code 开仓时所处的斐波那契回撤点位
+	 * @return 止盈的斐波那契回撤点位
+	 */
+	public FibCode getTakeProfit_v8(FibCode code) {
+		FibCode takeProfit = FibCode.FIB382;
+		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+			takeProfit = FibCode.FIB2_618;
+		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
+			takeProfit = FibCode.FIB1_618;
+		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
+			takeProfit = FibCode.FIB1;
+		}
+		return takeProfit;
+	}
+	
+	/**
 	 * 止盈点位 V7
 	 * @param code 开仓时所处的斐波那契回撤点位
 	 * @return 止盈的斐波那契回撤点位
