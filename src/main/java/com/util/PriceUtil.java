@@ -1210,7 +1210,54 @@ public class PriceUtil {
 		String pair = firstKlines.getPair();
 		int decimalNum = firstKlines.getDecimalNum();
 		String inerval = Inerval.INERVAL_1H.getDescption();
-		return new Klines(pair, startTime, openPrice, highPrice, lowPrice, closePrice, endTime, inerval, decimalNum, null, 0l, null, null, null);
+		
+		String v = String.valueOf(sum_volume(list_15m));
+		String iv = String.valueOf(sum_i_volume(list_15m));
+		long n = sum_n(list_15m);
+		String q = String.valueOf(sum_q(list_15m));
+		String iq = String.valueOf(sum_iq(list_15m));
+		
+		return new Klines(pair, startTime, openPrice, highPrice, lowPrice, closePrice, endTime, inerval, decimalNum, v, n, q, iv, iq);
+	}
+	
+	public static double sum_volume(List<Klines> list) {
+		double v = 0;
+		for(Klines k : list) {
+			v += k.getVDoubleValue();
+		}
+		return v;
+	}
+	
+	public static double sum_i_volume(List<Klines> list) {
+		double iv = 0;
+		for(Klines k : list) {
+			iv += k.getIvDoubleValue();
+		}
+		return iv;
+	}
+	
+	public static long sum_n(List<Klines> list) {
+		long n = 0;
+		for(Klines k : list) {
+			n += k.getN();
+		}
+		return n;
+	}
+	
+	public static double sum_q(List<Klines> list) {
+		double q = 0;
+		for(Klines k : list) {
+			q += k.getQDoubleValue();
+		}
+		return q;
+	}
+	
+	public static double sum_iq(List<Klines> list) {
+		double iq = 0;
+		for(Klines k : list) {
+			iq += k.getIqDoubleValue();
+		}
+		return iq;
 	}
 	
 	/**

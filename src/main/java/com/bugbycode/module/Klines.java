@@ -178,11 +178,15 @@ public class Klines {
 	}
 
 	public Long getN() {
-		return n;
+		return n == null ? 0 : n;
 	}
 
 	public void setN(Long n) {
 		this.n = n;
+	}
+	
+	public double getQDoubleValue() {
+		return StringUtil.isEmpty(q) ? 0 : Double.valueOf(q);
 	}
 
 	public String getQ() {
@@ -193,12 +197,20 @@ public class Klines {
 		this.q = q;
 	}
 
+	public double getIvDoubleValue() {
+		return StringUtil.isEmpty(iv) ? 0 : Double.valueOf(iv);
+	}
+	
 	public String getIv() {
 		return iv;
 	}
 
 	public void setIv(String iv) {
 		this.iv = iv;
+	}
+	
+	public double getIqDoubleValue() {
+		return StringUtil.isEmpty(iq) ? 0 : Double.valueOf(iq);
 	}
 
 	public String getIq() {

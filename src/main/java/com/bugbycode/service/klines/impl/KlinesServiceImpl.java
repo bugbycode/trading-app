@@ -1882,30 +1882,30 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void declineAndStrengthCheck_v3(List<Klines> klinesList) {
+	public void declineAndStrengthCheck_v3(List<Klines> klinesListData) {
 		
-		if(CollectionUtils.isEmpty(klinesList)) {
+		if(CollectionUtils.isEmpty(klinesListData)) {
 			return;
 		}
 		
 		String text = "";//邮件内容
 		String subject = "";//邮件主题
 		String dateStr = DateFormatUtil.format(new Date());
-		/*
+		
 		List<Klines> klinesList_tmp = new ArrayList<Klines>();
 		klinesList_tmp.addAll(klinesListData);
 		
-		List<Klines> klinesList = PriceUtil.to1HFor15MKlines(klinesList_tmp);*/
+		List<Klines> klinesList = PriceUtil.to1HFor15MKlines(klinesList_tmp);
 		
-		Klines lastKlines = PriceUtil.getLastKlines(klinesList);
+		Klines lastKlines = PriceUtil.getLastKlines(klinesListData);
 		
 		String pair = lastKlines.getPair();
 		double closePrice = lastKlines.getClosePriceDoubleValue();
-		/*
+		
 		int minute = DateFormatUtil.getMinute(lastKlines.getEndTime());
 		if(minute != 59) {
-			return;
-		}*/
+			klinesList.remove(lastKlines);
+		}
 		
 		FibUtil_v2 fu = new FibUtil_v2(klinesList);
 		
@@ -1916,7 +1916,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibCode takeProfitCode = FibCode.FIB618;
 		
 		//二级回撤
-		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
+		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesListData) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			percent = PriceUtil.getFallFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -1947,7 +1947,7 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 			
-		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
+		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesListData) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -1980,7 +1980,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		//一级回撤
-		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
+		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesListData)) {
 			
 			percent = PriceUtil.getFallFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -2011,7 +2011,7 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 			
-		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesList)) {
+		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesListData)) {
 			
 			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
