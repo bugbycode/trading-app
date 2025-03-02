@@ -19,7 +19,7 @@ public class FibInfo {
 	 */
 	public FibCode getTakeProfit_v7(FibCode code) {
 		FibCode takeProfit = FibCode.FIB382;
-		if(level == FibLevel.LEVEL_4) {
+		if(level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) {
 			if(code == FibCode.FIB4_618) {//4.618 -> 2.618
 				takeProfit = FibCode.FIB2_618;
 			} else if(code == FibCode.FIB2_618) { // 2.618 -> 2
