@@ -579,7 +579,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-								takeProfitCode = FibCode.FIB5;
+								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								takeProfitCode = FibCode.FIB618;
 							}
@@ -792,7 +792,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-								takeProfitCode = FibCode.FIB5;
+								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								takeProfitCode = FibCode.FIB618;
 							}
