@@ -17,12 +17,9 @@ import com.bugbycode.module.EMAType;
 import com.bugbycode.module.EmaTrade;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
-import com.bugbycode.module.FibKlinesData;
 import com.bugbycode.module.FibLevel;
-import com.bugbycode.module.HighOrLowHitPrice;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.PriceFibInfo;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.PriceInfo;
@@ -193,60 +190,6 @@ public class PriceUtil {
 		BigDecimal bigDecimal = new BigDecimal(decimalFormat.format(number));
 		
 		return bigDecimal.toPlainString();
-	}
-	
-	/**
-	 * 获取价格回撤信息
-	 * @param klinesList
-	 * @return
-	 */
-	public static PriceFibInfo getPriceFibInfo(List<Klines> klinesList) {
-		
-		int index = klinesList.size() - 1;
-		int offset = index - 1;
-		
-		Klines kl = klinesList.get(index);
-		
-		boolean isFall = isFall(klinesList);
-		double lowPrice = Double.valueOf(kl.getLowPrice());
-		double hightPrice = Double.valueOf(kl.getHighPrice());
-
-		PriceFibInfo info = new PriceFibInfo();
-		info.setLowKlinesTime(kl.getStartTime());
-		info.setHighKlinesTime(kl.getStartTime());
-		info.setInerval(kl.getInterval());
-		
-		while(offset >= 1) {
-			Klines current = klinesList.get(offset--);
-			Klines parent = klinesList.get(offset);
-			if(isFall) {
-				if(isRise(current, parent)) {
-					if(hightPrice < Double.valueOf(current.getHighPrice())) {
-						hightPrice = Double.valueOf(current.getHighPrice());
-						info.setHighKlinesTime(current.getStartTime());
-					}
-					break;
-				}
-			} else {
-				if(isFall(current, parent)) {
-					if(lowPrice > Double.valueOf(current.getLowPrice())) {
-						lowPrice = Double.valueOf(current.getLowPrice());
-						info.setLowKlinesTime(current.getStartTime());
-					}
-					break;
-				}
-			}
-			if(lowPrice > Double.valueOf(current.getLowPrice())) {
-				lowPrice = Double.valueOf(current.getLowPrice());
-				info.setLowKlinesTime(current.getStartTime());
-			}
-			if(hightPrice < Double.valueOf(current.getHighPrice())) {
-				hightPrice = Double.valueOf(current.getHighPrice());
-				info.setHighKlinesTime(current.getStartTime());
-			}
-		}
-		
-		return info;
 	}
 	
 	/**
@@ -622,36 +565,6 @@ public class PriceUtil {
 		}
 		
 		return isShort;
-	}
-	
-	public static FibKlinesData<List<Klines>,List<Klines>> getFibKlinesData(List<Klines> list){
-		int klinesSize = list.size();
-		
-		//标志性高点K线信息
-		List<Klines> lconicHighPriceList = new ArrayList<Klines>();
-		//标志性低点K线信息
-		List<Klines> lconicLowPriceList = new ArrayList<Klines>();
-		//获取标志性高低点K线信息
-		int index = klinesSize - 2;
-		while(index >= 1) {
-			Klines klines = list.get(index);
-			Klines klines_parent = list.get(index - 1);
-			Klines klines_after = list.get(index + 1);
-			//判断是否为标志性高点
-			if(Double.valueOf(klines.getHighPrice()) >= Double.valueOf(klines_parent.getHighPrice()) 
-					&& Double.valueOf(klines.getHighPrice()) >= Double.valueOf(klines_after.getHighPrice())){
-				lconicHighPriceList.add(klines);
-			}
-			
-			//判断是否为标志性低点
-			if(Double.valueOf(klines.getLowPrice()) <= Double.valueOf(klines_parent.getLowPrice()) 
-					&& Double.valueOf(klines.getLowPrice()) <= Double.valueOf(klines_after.getLowPrice())){
-				lconicLowPriceList.add(klines);
-			}
-			index--;
-		}
-		
-		return new FibKlinesData<List<Klines>,List<Klines>>(lconicLowPriceList,lconicHighPriceList);
 	}
 	
 	/**
@@ -1064,30 +977,6 @@ public class PriceUtil {
     				&& !checkLowerKlines(k, subList(k, list))) {
     			result = k;
     			break;
-    		}
-    	}
-    	return result;
-    }
-    
-    public static HighOrLowHitPrice getMax(List<HighOrLowHitPrice> list) {
-    	HighOrLowHitPrice result = null;
-    	if(!CollectionUtils.isEmpty(list)) {
-    		for(HighOrLowHitPrice price : list) {
-    			if(result == null || result.getPrice() < price.getPrice()) {
-    				result = price;
-    			}
-    		}
-    	}
-    	return result;
-    }
-    
-    public static HighOrLowHitPrice getMin(List<HighOrLowHitPrice> list) {
-    	HighOrLowHitPrice result = null;
-    	if(!CollectionUtils.isEmpty(list)) {
-    		for(HighOrLowHitPrice price : list) {
-    			if(result == null || result.getPrice() > price.getPrice()) {
-    				result = price;
-    			}
     		}
     	}
     	return result;

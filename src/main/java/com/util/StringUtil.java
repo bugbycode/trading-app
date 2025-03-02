@@ -1,9 +1,7 @@
 package com.util;
 
-import java.util.Date;
 import java.util.Set;
 
-import com.bugbycode.module.EmailInfo;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 
@@ -128,32 +126,6 @@ public class StringUtil {
 		
 		return StringUtil.formatLongMessage(pair, currentPrice, minPrice, 
 				fibInfo.getFibValue(fibCode), fibInfo.getDecimalPoint());
-	}
-	
-	/**
-	 * 合约购买提醒格式化消息
-	 * @param pair 交易对
-	 * @param buyPrice 购买价
-	 * @param referencePrice 参考价
-	 * @return
-	 */
-	public static EmailInfo formatBuyFuturesMessage(String pair,double buyPrice,double referencePrice) {
-		String text = String.format("%s交易对跌破%s并收回，当前价格：%s", pair,referencePrice,buyPrice);
-		String subject = pair + "永续合约交易对买入时机 " + DateFormatUtil.format(new Date());
-		return new EmailInfo(subject,text);
-	}
-	
-	/**
-	 * 合约卖出提醒格式化消息
-	 * @param pair 交易对
-	 * @param buyPrice 卖出价
-	 * @param referencePrice 参考价
-	 * @return
-	 */
-	public static EmailInfo formatSellFuturesMessage(String pair,double sellPrice,double referencePrice) {
-		String text = String.format("%s交易对突破%s并收回，当前价格：%s", pair,referencePrice,sellPrice);
-		String subject = pair + "永续合约交易对卖出时机 " + DateFormatUtil.format(new Date());
-		return new EmailInfo(subject,text);
 	}
 	
 	public static String concat(double[] arr) {

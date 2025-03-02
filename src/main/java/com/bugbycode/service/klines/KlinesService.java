@@ -7,10 +7,8 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
-import com.bugbycode.module.result.DeclineAndStrength;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.FibUtil_v3;
 
@@ -60,14 +58,6 @@ public interface KlinesService {
 	
 	/**
 	 * 合约做多
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param afterLowKlines 回撤之后的最低日线
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
-	
-	/**
-	 * 合约做多
 	 * @param fu
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterLowKlines 回撤之后的最低K线
@@ -82,14 +72,6 @@ public interface KlinesService {
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
 	public void openLong_v3(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
-	
-	/**
-	 * 合约做空
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param afterHighKlines 回撤之后的最高日线
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
@@ -109,21 +91,6 @@ public interface KlinesService {
 	public void openShort_v3(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
-	 * 发送Fib0价格行为
-	 * @param fibInfo 斐波那契回撤信息
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void sendFib0Email(FibInfo fibInfo,List<Klines> klinesList_hit);
-	
-	/**
-	 * 标志性高低点价格监控
-	 * 
-	 * @param klinesList
-	 * @param klinesList_hit
-	 */
-	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
-	
-	/**
 	 * 标志性高低点价格监控 v2
 	 * 
 	 * @param klinesList
@@ -132,24 +99,7 @@ public interface KlinesService {
 	public void futuresHighOrLowMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
-	 * 斐波那契回撤点位监控
-	 * 
-	 * @param klinesList
-	 * @param klinesList_hit
-	 */
-	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
-	
-	/**
-	 * 斐波那契回撤点位监控 V2
-	 * 
-	 * @param klinesList 斐波那契回撤k线
-	 * @param klinesList_hit 开仓价格参考k线
-	 */
-	public void futuresFibMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit);
-	
-	
-	/**
-	 * 斐波那契回撤点位监控
+	 * 斐波那契回撤点位监控 V3 （日线级别回撤指标）
 	 * 
 	 * @param klinesList
 	 * @param klinesList_hit
@@ -157,45 +107,18 @@ public interface KlinesService {
 	public void futuresFibMonitor_v3(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
-	 * 斐波那契回撤点位监控
+	 * 斐波那契回撤点位监控 V4 （15分钟级别回撤指标）
 	 * 
 	 * @param klinesList
 	 * @param klinesList_hit
 	 */
 	public void futuresFibMonitor_v4(List<Klines> klinesList,List<Klines> klinesList_hit);
-	
-	
-	/**
-	 * EMA点位监控
-	 * @param klinesList
-	 */
-	@Deprecated
-	public void futuresEMAMonitor(List<Klines> klinesList);
 
 	/**
 	 * 监控k线涨跌
 	 * @param klinesList
 	 */
 	public void futuresRiseAndFall(List<Klines> klinesList);
-
-	/**
-	 * EMA指标判断涨跌
-	 * @param klinesList
-	 */
-	public void futuresEmaRiseAndFall(List<Klines> klinesList);
-	
-	/**
-	 * EMA指标判断涨跌 V2
-	 * @param klinesList
-	 */
-	public void futuresEmaRiseAndFall_V2(List<Klines> klinesList);
-	
-	/**
-	 * 盘整区点位监控
-	 * @param klinesList 盘整区k线信息（日线级别）
-	 * @param hitKlinesList 参考价格k线信息（15分钟）
-	 */
-	public void futuresConsolidationAreaMonitor(List<Klines> klinesList,List<Klines> hitKlinesList);
 	
 	/**
 	 * 盘整区点位监控
@@ -269,29 +192,10 @@ public interface KlinesService {
 	public void fibRetracement(Klines klines,ShapeInfo info);
 	
 	/**
-	 * 检查是否出现颓势或强势价格行为
-	 * @param klinesList
-	 */
-	public void declineAndStrengthCheck(List<Klines> klinesList);
-	
-	/**
-	 * 检查是否出现颓势或强势价格行为 v2
-	 * @param klinesList
-	 */
-	public void declineAndStrengthCheck_v2(List<Klines> klinesList);
-	
-	/**
 	 * 检查是否出现颓势或强势价格行为 v3
 	 * @param klinesList
 	 */
 	public void declineAndStrengthCheck_v3(List<Klines> klinesList);
-	
-	/**
-	 * 验证是否出现颓势或强势价格行为
-	 * @param klinesList
-	 * @return
-	 */
-	public DeclineAndStrength<Boolean,QuotationMode> verifyDeclineAndStrength(List<Klines> klinesList);
 	
 	/**
      * 校验K线是否出现重复或缺失
