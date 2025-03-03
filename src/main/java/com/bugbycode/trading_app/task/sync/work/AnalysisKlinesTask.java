@@ -62,22 +62,22 @@ public class AnalysisKlinesTask implements Runnable{
             }
             
             //斐波那契回撤分析
-            klinesService.futuresFibMonitor_v3(klines_list_1d, klines_list_15m);
+            klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
             
             //盘整区间指标分析
-            klinesService.futuresConsolidationAreaMonitor_v2(klines_list_1d, klines_list_15m);
+            klinesService.futuresConsolidationAreaMonitor(klines_list_1d, klines_list_15m);
             
             //涨跌分析
             klinesService.futuresRiseAndFall(klines_list_15m);
 
             //价格行为分析
-            klinesService.declineAndStrengthCheck_v3(klines_list_15m);
+            klinesService.declineAndStrengthCheck(klines_list_15m);
             
             //量价分析
             klinesService.volumeMonitor(klines_list_15m);
             
             //标志性高低点分析
-            klinesService.futuresHighOrLowMonitor_v2(klines_list_1d, klines_list_15m);
+            klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);

@@ -185,7 +185,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openLong_v2(FibUtil_v3 fu,FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
+	public void openLong(FibUtil_v3 fu,FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
@@ -273,7 +273,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openLong_v3(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
+	public void openLong_v2(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
 		
@@ -345,7 +345,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openShort_v2(FibUtil_v3 fu,FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
+	public void openShort(FibUtil_v3 fu,FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
@@ -433,7 +433,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openShort_v3(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
+	public void openShort_v2(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
@@ -959,7 +959,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void futuresHighOrLowMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit) {
+	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit) {
 		
 		Date now = new Date();
 		String dateStr = DateFormatUtil.format(now);
@@ -1123,7 +1123,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresFibMonitor_v3(List<Klines> klinesList,List<Klines> klinesList_hit) {
+	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit) {
 
 		Klines last = PriceUtil.getLastKlines(klinesList);
 		String pair = last.getPair();
@@ -1155,13 +1155,13 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
 				
-				openLong_v2(fu, firstFibInfo, afterLowKlines, klinesList_hit);
+				openLong(fu, firstFibInfo, afterLowKlines, klinesList_hit);
 			} else if(qm == QuotationMode.SHORT) {
 				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 				
 				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
 				
-				openShort_v2(fu, firstFibInfo, afterHighKlines,klinesList_hit);
+				openShort(fu, firstFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 		
@@ -1177,13 +1177,13 @@ public class KlinesServiceImpl implements KlinesService {
 
 				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
 				
-				openLong_v2(fu, secondFibInfo, afterLowKlines, klinesList_hit);
+				openLong(fu, secondFibInfo, afterLowKlines, klinesList_hit);
 			} else if(qm == QuotationMode.SHORT) {
 				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 
 				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
 				
-				openShort_v2(fu, secondFibInfo, afterHighKlines,klinesList_hit);
+				openShort(fu, secondFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 		
@@ -1198,13 +1198,13 @@ public class KlinesServiceImpl implements KlinesService {
 
 				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
 				
-				openLong_v2(fu, thirdFibInfo, afterLowKlines, klinesList_hit);
+				openLong(fu, thirdFibInfo, afterLowKlines, klinesList_hit);
 			} else if(qm == QuotationMode.SHORT) {
 				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 
 				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
 				
-				openShort_v2(fu, thirdFibInfo, afterHighKlines,klinesList_hit);
+				openShort(fu, thirdFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 		
@@ -1219,19 +1219,19 @@ public class KlinesServiceImpl implements KlinesService {
 
 				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
 				
-				openLong_v2(fu, fourthFibInfo, afterLowKlines, klinesList_hit);
+				openLong(fu, fourthFibInfo, afterLowKlines, klinesList_hit);
 			} else if(qm == QuotationMode.SHORT) {
 				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 
 				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
 				
-				openShort_v2(fu, fourthFibInfo, afterHighKlines,klinesList_hit);
+				openShort(fu, fourthFibInfo, afterHighKlines,klinesList_hit);
 			}
 		}
 	}
 	
 	@Override
-	public void futuresFibMonitor_v4(List<Klines> klinesList,List<Klines> klinesList_hit) {
+	public void futuresFibMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit) {
 		
 		FibUtil fu = new FibUtil(klinesList);
 		
@@ -1251,15 +1251,15 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(qm == QuotationMode.LONG) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong_v3(fibInfo, afterLowKlines, klinesList_hit);
+			openLong_v2(fibInfo, afterLowKlines, klinesList_hit);
 		} else if(qm == QuotationMode.SHORT) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort_v3(fibInfo, afterHighKlines, klinesList_hit);
+			openShort_v2(fibInfo, afterHighKlines, klinesList_hit);
 		}
 	}
 	
 	@Override
-	public void declineAndStrengthCheck_v3(List<Klines> klinesListData) {
+	public void declineAndStrengthCheck(List<Klines> klinesListData) {
 		
 		if(CollectionUtils.isEmpty(klinesListData)) {
 			return;
@@ -1493,7 +1493,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresConsolidationAreaMonitor_v2(List<Klines> klinesList,List<Klines> hitKlinesList) {
+	public void futuresConsolidationAreaMonitor(List<Klines> klinesList,List<Klines> hitKlinesList) {
 		Klines last = PriceUtil.getLastKlines(klinesList);
 		String pair = last.getPair();
 		

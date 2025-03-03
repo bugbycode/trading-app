@@ -63,7 +63,7 @@ public interface KlinesService {
 	 * @param afterLowKlines 回撤之后的最低K线
 	 * @param klinesList_hit  最近时间段内部分k线信息
 	 */
-	public void openLong_v2(FibUtil_v3 fu,FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	public void openLong(FibUtil_v3 fu,FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做多
@@ -71,7 +71,7 @@ public interface KlinesService {
 	 * @param afterLowKlines 回撤之后的最低日线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openLong_v3(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	public void openLong_v2(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
@@ -80,7 +80,7 @@ public interface KlinesService {
 	 * @param afterHighKlines 回撤之后的最高K线
 	 * @param klinesList_hit  最近时间段内部分k线信息
 	 */
-	public void openShort_v2(FibUtil_v3 fu,FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public void openShort(FibUtil_v3 fu,FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
@@ -88,31 +88,31 @@ public interface KlinesService {
 	 * @param afterHighKlines 回撤之后的最高日线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openShort_v3(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public void openShort_v2(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
-	 * 标志性高低点价格监控 v2
+	 * 标志性高低点价格监控
 	 * 
 	 * @param klinesList
 	 * @param klinesList_hit
 	 */
-	public void futuresHighOrLowMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit);
+	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
-	 * 斐波那契回撤点位监控 V3 （日线级别回撤指标）
+	 * 斐波那契回撤点位监控 （日线级别回撤指标）
 	 * 
 	 * @param klinesList
 	 * @param klinesList_hit
 	 */
-	public void futuresFibMonitor_v3(List<Klines> klinesList,List<Klines> klinesList_hit);
+	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
-	 * 斐波那契回撤点位监控 V4 （15分钟级别回撤指标）【测试中】
+	 * 斐波那契回撤点位监控 V2 （15分钟级别回撤指标）【测试中】
 	 * 
 	 * @param klinesList
 	 * @param klinesList_hit
 	 */
-	public void futuresFibMonitor_v4(List<Klines> klinesList,List<Klines> klinesList_hit);
+	public void futuresFibMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit);
 
 	/**
 	 * 监控k线涨跌
@@ -125,7 +125,7 @@ public interface KlinesService {
 	 * @param klinesList 盘整区k线信息（日线级别）
 	 * @param hitKlinesList 参考价格k线信息（15分钟）
 	 */
-	public void futuresConsolidationAreaMonitor_v2(List<Klines> klinesList,List<Klines> hitKlinesList);
+	public void futuresConsolidationAreaMonitor(List<Klines> klinesList,List<Klines> hitKlinesList);
 	
 	/**
 	 * 发送邮件
@@ -192,10 +192,10 @@ public interface KlinesService {
 	public void fibRetracement(Klines klines,ShapeInfo info);
 	
 	/**
-	 * 检查是否出现颓势或强势价格行为 v3
+	 * 检查是否出现颓势或强势价格行为
 	 * @param klinesList
 	 */
-	public void declineAndStrengthCheck_v3(List<Klines> klinesList);
+	public void declineAndStrengthCheck(List<Klines> klinesList);
 	
 	/**
      * 校验K线是否出现重复或缺失
