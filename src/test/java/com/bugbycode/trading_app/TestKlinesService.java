@@ -55,7 +55,7 @@ public class TestKlinesService {
     public void testQuery() {
         Date now = new Date();
         String pair = "PIPPINUSDT";
-        List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),10);
+        List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,10);
         
         klines_list_15m.remove(PriceUtil.getLastKlines(klines_list_15m)) ;
 
@@ -76,9 +76,9 @@ public class TestKlinesService {
             logger.info("已删除：" + k);
         }*/
         
-        List<Klines> list_day = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(), 1500);
+        List<Klines> list_day = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
         if(klinesService.verifyUpdateDayKlines(list_day)){
-            list_day = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(), 1500);
+            list_day = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
             klinesService.checkData(list_day);
         } 
     }
@@ -86,7 +86,7 @@ public class TestKlinesService {
     @Test
     public void testFibUtil() {
         String pair = "AVAUSDT";
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(), 3000);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 3000);
         FibUtil fu = new FibUtil(list);
         logger.info(fu.getFibInfo());
     }
@@ -94,8 +94,8 @@ public class TestKlinesService {
     @Test
     public void testDeclineAndStrengthCheck() {
     	String pair = "BTCUSDT";
-    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(), 5000);
-        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(), 5000);
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
 
         Klines last = PriceUtil.getLastKlines(list);
 
@@ -124,7 +124,7 @@ public class TestKlinesService {
     @Test
     public void testDeclineAndStrengthCheck_v3() {
         String pair = "AIXBTUSDT";
-    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(), 5000);
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
 
         List<Klines> klinesList = PriceUtil.to1HFor15MKlines(list);
 
@@ -147,7 +147,7 @@ public class TestKlinesService {
     @Test
     public void test15mTo1h(){
         String pair = "BTCUSDT";
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         List<Klines> list_1h = PriceUtil.to1HFor15MKlines(list);
         //logger.info(list_1h);
         Klines lastKlines = PriceUtil.getLastKlines(list_1h);
@@ -163,7 +163,7 @@ public class TestKlinesService {
     @Test
     public void testFibInfo(){
         String pair = "BNXUSDT";
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
         FibUtil fu = new FibUtil(list);
         FibInfo fibInfo = fu.getFibInfo();
         logger.info(fibInfo);

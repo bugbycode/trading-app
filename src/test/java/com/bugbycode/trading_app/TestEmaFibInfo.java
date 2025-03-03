@@ -45,7 +45,7 @@ public class TestEmaFibInfo {
     @Test
     public void testEmaFibInfo(){
         String pair = "IOTXUSDT";
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(), 1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
 
         FibInfo fibInfo = PriceUtil.getFibInfoForEma(list);
 

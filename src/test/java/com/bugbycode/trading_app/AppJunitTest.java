@@ -41,13 +41,13 @@ public class AppJunitTest {
 
 	@Test
 	public void testMongo(){
-		List<Klines> list = klinesRepository.findByPair("BTCUSDT", Inerval.INERVAL_1D.getDescption());
+		List<Klines> list = klinesRepository.findByPair("BTCUSDT", Inerval.INERVAL_1D);
 		logger.info(list);
 	}
 	
 	@Test
 	public void query15MKlines(){
-		List<Klines> list = klinesRepository.findByPair("ETCUSDT", Inerval.INERVAL_15M.getDescption());
+		List<Klines> list = klinesRepository.findByPair("ETCUSDT", Inerval.INERVAL_15M);
 		PriceUtil.calculateEMAArray(list, EMAType.EMA7);
 		PriceUtil.calculateEMAArray(list, EMAType.EMA25);
 		PriceUtil.calculateEMAArray(list, EMAType.EMA99);
