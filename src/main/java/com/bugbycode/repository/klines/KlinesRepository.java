@@ -26,7 +26,7 @@ public interface KlinesRepository {
      * @param interval 时间级别
      * @return
      */
-    public List<Klines> findByPair(String pair,String interval);
+    public List<Klines> findByPair(String pair,Inerval interval);
 
     /**
      * 根据开盘时间和交易对查询1条k线信息
@@ -35,7 +35,7 @@ public interface KlinesRepository {
      * @param interval 时间级别
      * @return
      */
-    public Klines findOneByStartTime(long startTime,String pair,String interval);
+    public Klines findOneByStartTime(long startTime,String pair,Inerval interval);
 
     /**
      * 删除一条k线信息
@@ -43,7 +43,7 @@ public interface KlinesRepository {
      * @param pair 交易对
      * @param interval 时间级别
      */
-    public void remove(long startTime,String pair,String interval);
+    public void remove(long startTime,String pair,Inerval interval);
 
     /**
      * 根据交易对和起始时间查询开盘时间大于等于起始时间的所有k线信息
@@ -52,7 +52,7 @@ public interface KlinesRepository {
      * @param interval 时间级别
      * @return
      */
-    public List<Klines> findByPairAndGtStartTime(String pair,long startTime,String interval);
+    public List<Klines> findByPairAndGtStartTime(String pair,long startTime,Inerval interval);
 
     /**
      * 根据ID删除一条k线信息
@@ -75,7 +75,7 @@ public interface KlinesRepository {
 	 * @param limit 查询条数
      * @return
      */
-    public List<Klines> findByPair(String pair,String interval,long skip,int limit);
+    public List<Klines> findByPair(String pair,Inerval interval,long skip,int limit);
     
     /**
      * 统计总条数
@@ -83,7 +83,7 @@ public interface KlinesRepository {
      * @param interval 时间级别
      * @return
      */
-    public long count(String pair,String interval);
+    public long count(String pair,Inerval interval);
     
     /**
      * 查询最新的一部分k线信息
@@ -92,7 +92,7 @@ public interface KlinesRepository {
      * @param limit 查询条数
      * @return
      */
-    public List<Klines> findLastKlinesByPair(String pair,String interval,int limit);
+    public List<Klines> findLastKlinesByPair(String pair,Inerval interval,int limit);
     
     /**
      * 根据时间段查询k线信息(根据开盘时间匹配)

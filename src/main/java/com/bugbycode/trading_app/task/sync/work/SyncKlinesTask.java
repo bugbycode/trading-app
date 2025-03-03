@@ -50,7 +50,7 @@ public class SyncKlinesTask implements Runnable{
 
             //日线级别
             //数据库中存储的k线信息
-            List<Klines> klines_list_db = klinesRepository.findByPair(pair, Inerval.INERVAL_1D.getDescption());
+            List<Klines> klines_list_db = klinesRepository.findByPair(pair, Inerval.INERVAL_1D);
             
             klinesService.checkData(klines_list_db);
 
@@ -65,7 +65,7 @@ public class SyncKlinesTask implements Runnable{
                 long startTime = lastDayKlines == null ? firstDayStartTime.getTime() : lastDayKlines.getEndTime() + 1;
                 
                 List<Klines> klines_list = klinesService.continuousKlines(pair, startTime, lastDayEndTimeDate.getTime(), 
-                                            Inerval.INERVAL_1D.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
+                                            Inerval.INERVAL_1D, QUERY_SPLIT.NOT_ENDTIME);
                 
                 if(!CollectionUtils.isEmpty(klines_list)){
                     
@@ -77,7 +77,7 @@ public class SyncKlinesTask implements Runnable{
 
             //=======================================================================================================
             //十五分钟级别
-            List<Klines> klines_list_15m_db = klinesRepository.findByPair(pair, Inerval.INERVAL_15M.getDescption());
+            List<Klines> klines_list_15m_db = klinesRepository.findByPair(pair, Inerval.INERVAL_15M);
 
             klinesService.checkData(klines_list_15m_db);
 
@@ -100,7 +100,7 @@ public class SyncKlinesTask implements Runnable{
 
             //同步15分钟级别k线信息
             List<Klines> klines_list_15m = klinesService.continuousKlines(pair, startTime, endTime_15m.getTime(), 
-                        Inerval.INERVAL_15M.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
+                        Inerval.INERVAL_15M, QUERY_SPLIT.NOT_ENDTIME);
             if(!CollectionUtils.isEmpty(klines_list_15m)){
                 
                 logger.info("已获取到" + klines_list_15m.size() + "条" + pair + "交易对十五分钟级别k线信息");

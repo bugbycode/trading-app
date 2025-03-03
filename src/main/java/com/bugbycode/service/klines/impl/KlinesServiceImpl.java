@@ -98,13 +98,13 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
-			String interval,QUERY_SPLIT split) {
+			Inerval interval,QUERY_SPLIT split) {
 		
 				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
 				.queryParam("pair", pair)
 				.queryParam("contractType", "PERPETUAL")
 				.queryParam("startTime", startTime)
-				.queryParam("interval", interval)
+				.queryParam("interval", interval.getDescption())
 				.queryParam("limit", 1500);
 		
 		switch (split) {
@@ -130,7 +130,7 @@ public class KlinesServiceImpl implements KlinesService {
 			logger.error(e.getMessage(), e);
 		}
 		
-		return CommandUtil.format(pair, result, interval);
+		return CommandUtil.format(pair, result, interval.getDescption());
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class KlinesServiceImpl implements KlinesService {
 		Date firstDayStartTime = DateFormatUtil.getStartTimeBySetDay(lastDayStartTimeDate, -limit);//多少天以前起始时间
 		
 		return continuousKlines(pair, firstDayStartTime.getTime(), 
-				lastDayEndTimeDate.getTime() + 999, Inerval.INERVAL_1D.getDescption(),split);
+				lastDayEndTimeDate.getTime() + 999, Inerval.INERVAL_1D,split);
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class KlinesServiceImpl implements KlinesService {
 			endTime_5m = DateFormatUtil.getStartTimeBySetMillisecond(endTime_5m, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime_5m.getTime(),
-					endTime_5m.getTime(), Inerval.INERVAL_5M.getDescption(),split);
+					endTime_5m.getTime(), Inerval.INERVAL_5M,split);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -175,7 +175,7 @@ public class KlinesServiceImpl implements KlinesService {
 			endTime = DateFormatUtil.getStartTimeBySetMillisecond(endTime, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime.getTime(),
-					endTime.getTime(), Inerval.INERVAL_15M.getDescption(),split);
+					endTime.getTime(), Inerval.INERVAL_15M,split);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1568,7 +1568,7 @@ public class KlinesServiceImpl implements KlinesService {
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				//所有k线信息
-				List<Klines> list = klinesRepository.findByPairAndGtStartTime(info.getSymbol(), time * 1000, Inerval.INERVAL_15M.getDescption());
+				List<Klines> list = klinesRepository.findByPairAndGtStartTime(info.getSymbol(), time * 1000, Inerval.INERVAL_15M);
 				if(!CollectionUtils.isEmpty(list)) {
 					Klines high = PriceUtil.getMaxPriceKLine(list);
 					Klines low = PriceUtil.getMinPriceKLine(list);
@@ -1700,7 +1700,7 @@ public class KlinesServiceImpl implements KlinesService {
 				long startTime = time0 < time1 ? (time0 * 1000) : (time1 * 1000);
 				long endTime = time0 < time1 ? (time1 * 1000) : (time0 * 1000);
 				
-				List<Klines> list = klinesRepository.findByPairAndGtStartTime(info.getSymbol(), endTime, Inerval.INERVAL_15M.getDescption());
+				List<Klines> list = klinesRepository.findByPairAndGtStartTime(info.getSymbol(), endTime, Inerval.INERVAL_15M);
 				List<Klines> list_draw = klinesRepository.findByTimeLimit(info.getSymbol(), Inerval.INERVAL_15M, startTime, endTime);
 				
 				Klines high_draw =  PriceUtil.getMaxPriceKLine(list_draw);
@@ -2085,7 +2085,7 @@ public class KlinesServiceImpl implements KlinesService {
                 	String fileName = current.getPair() + "_" + current.getInterval() + "_" + startTime + "_" + endTime + ".defect";
                 	if(!FileUtil.exists(fileName)) {
                     	result = false;
-                    	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInterval(), QUERY_SPLIT.NOT_ENDTIME);
+                    	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInervalType(), QUERY_SPLIT.NOT_ENDTIME);
                     	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
                     				+ "条数据，缺失时间段：" + DateFormatUtil.format(startTime) + " ~ " + DateFormatUtil.format(endTime));
                     	klinesRepository.insert(data);
@@ -2124,7 +2124,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public String getClosePrice(String pair, Inerval inerval) {
 		String price = "0";
-		List<Klines> list = klinesRepository.findLastKlinesByPair(pair, inerval.getDescption(), 1);
+		List<Klines> list = klinesRepository.findLastKlinesByPair(pair, inerval, 1);
 		if(!CollectionUtils.isEmpty(list)) {
 			price = list.get(0).getClosePrice();
 		}
@@ -2153,7 +2153,7 @@ public class KlinesServiceImpl implements KlinesService {
 			//获取需要更新的时间段信息
 			long startTime = DateFormatUtil.parse(DateFormatUtil.format(last.getEndTime())).getTime() + 1000;
 			long endTime = DateFormatUtil.getEndTime(DateFormatUtil.getHours(now.getTime())).getTime();
-			List<Klines> list_day = this.continuousKlines(last.getPair(), startTime, endTime, Inerval.INERVAL_1D.getDescption(), QUERY_SPLIT.NOT_ENDTIME);
+			List<Klines> list_day = this.continuousKlines(last.getPair(), startTime, endTime, Inerval.INERVAL_1D, QUERY_SPLIT.NOT_ENDTIME);
 			if(CollectionUtils.isEmpty(list_day)) {
 				String message = "未同步到时间段" + DateFormatUtil.format(startTime) + "~" + DateFormatUtil.format(endTime) + last.getPair() + "交易对日线级别K线信息";
 				throw new RuntimeException(message);

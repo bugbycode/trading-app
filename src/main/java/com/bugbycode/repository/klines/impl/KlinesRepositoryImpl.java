@@ -24,34 +24,34 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 
     @Override
     public void insert(Klines klines) {
-        Klines tmp = findOneByStartTime(klines.getStartTime(),klines.getPair(),klines.getInterval());
+        Klines tmp = findOneByStartTime(klines.getStartTime(),klines.getPair(),klines.getInervalType());
         if(tmp == null) {
             template.insert(klines);
         }
     }
 
     @Override
-    public List<Klines> findByPair(String pair, String interval) {
-        return template.find(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval))
+    public List<Klines> findByPair(String pair, Inerval interval) {
+        return template.find(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval.getDescption()))
             .with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
     }
 
     @Override
-    public Klines findOneByStartTime(long startTime,String pair, String interval) {
+    public Klines findOneByStartTime(long startTime,String pair, Inerval interval) {
         return template.findOne(Query.query(Criteria.where("pair").is(pair)
-        .and("startTime").is(startTime).and("interval").is(interval)), Klines.class);
+        .and("startTime").is(startTime).and("interval").is(interval.getDescption())), Klines.class);
     }
 
     @Override
-    public void remove(long startTime,String pair, String interval) {
+    public void remove(long startTime,String pair, Inerval interval) {
         template.remove(Query.query(Criteria.where("pair").is(pair).and("startTime").is(startTime)
-        .and("interval").is(interval)), Klines.class);
+        .and("interval").is(interval.getDescption())), Klines.class);
     }
 
     @Override
-    public List<Klines> findByPairAndGtStartTime(String pair, long startTime, String interval) {
+    public List<Klines> findByPairAndGtStartTime(String pair, long startTime, Inerval interval) {
         return template.find(Query.query(Criteria.where("pair").is(pair).and("startTime").gte(startTime)
-            .and("interval").is(interval))
+            .and("interval").is(interval.getDescption()))
             .with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
     }
 
@@ -76,18 +76,18 @@ public class KlinesRepositoryImpl implements KlinesRepository{
     }
 
 	@Override
-	public List<Klines> findByPair(String pair, String interval, long skip, int limit) {
-		return template.find(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval))
+	public List<Klines> findByPair(String pair, Inerval interval, long skip, int limit) {
+		return template.find(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval.getDescption()))
 	            .with(Sort.by(Sort.Direction.ASC,"startTime")).skip(skip).limit(limit), Klines.class);
 	}
 
 	@Override
-	public long count(String pair, String interval) {
-		return template.count(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval)).with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
+	public long count(String pair, Inerval interval) {
+		return template.count(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval.getDescption())).with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
 	}
 
 	@Override
-	public List<Klines> findLastKlinesByPair(String pair, String interval, int limit) {
+	public List<Klines> findLastKlinesByPair(String pair, Inerval interval, int limit) {
 		long count = count(pair, interval);
 		if(count > 0) {
 			return findByPair(pair, interval, count - limit, limit);

@@ -23,7 +23,7 @@ public interface KlinesService {
 	 * @param split 用来判断是否读取所有K线 ALL 所有 NOT_ENDTIME 没有返回最后一根K线
 	 * @return
 	 */
-	public List<Klines> continuousKlines(String pair,long startTime,long endTime,String interval,QUERY_SPLIT split);
+	public List<Klines> continuousKlines(String pair,long startTime,long endTime,Inerval interval,QUERY_SPLIT split);
 	
 
 	/**

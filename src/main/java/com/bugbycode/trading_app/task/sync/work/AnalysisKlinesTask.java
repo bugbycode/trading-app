@@ -34,7 +34,7 @@ public class AnalysisKlinesTask implements Runnable{
     public void run() {
         try {
             //查询日线级别K线信息
-            List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),5000);
+            List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
             if(CollectionUtils.isEmpty(klines_list_1d)){
                 logger.info("无法获取" + pair + "交易对日线级别K线信息");
                 return;
@@ -43,22 +43,22 @@ public class AnalysisKlinesTask implements Runnable{
             //检查更新
             if(klinesService.verifyUpdateDayKlines(klines_list_1d)) {
             	logger.info(pair + "交易对日线级别K线信息已更新");
-            	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),5000);
+            	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
             }
             
             if(!klinesService.checkData(klines_list_1d)) {
-            	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D.getDescption(),5000);
+            	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
             }
             
             //查询15分钟级别k线信息
-            List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),5000);
+            List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
             if(CollectionUtils.isEmpty(klines_list_15m)){
                 logger.info("无法获取" + pair + "交易对15分钟级别K线信息");
                 return;
             }
             
             if(!klinesService.checkData(klines_list_15m)) {
-            	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M.getDescption(),5000);
+            	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
             }
             
             //斐波那契回撤分析
