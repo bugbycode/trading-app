@@ -107,12 +107,11 @@ public interface KlinesService {
 	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
-	 * 斐波那契回撤点位监控 V2 （15分钟级别回撤指标）【测试中】
+	 * 斐波那契回撤点位监控 V2 【测试中】
 	 * 
 	 * @param klinesList
-	 * @param klinesList_hit
 	 */
-	public void futuresFibMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit);
+	public void futuresFibMonitor_v2(List<Klines> klinesList);
 
 	/**
 	 * 监控k线涨跌

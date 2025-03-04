@@ -25,6 +25,14 @@ public class FibInfo {
 			takeProfit = FibCode.FIB1_618;
 		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
 			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1) { // 1 -> 0.618
+			takeProfit = FibCode.FIB618;
+		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
+			takeProfit = FibCode.FIB5;
+		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
+			takeProfit = FibCode.FIB382;
+		} else if(code == FibCode.FIB5) { // 0.5 -> 0.382
+			takeProfit = FibCode.FIB382;
 		}
 		return takeProfit;
 	}

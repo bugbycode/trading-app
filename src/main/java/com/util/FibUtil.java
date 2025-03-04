@@ -64,28 +64,28 @@ public class FibUtil {
 				break;
 			}
 			Klines k = this.list.get(index);
-			Klines k1 = this.list.get(index - 1);
+			/*Klines k1 = this.list.get(index - 1);
 			Klines k2 = this.list.get(index - 2);
-			/*Klines k3 = this.list.get(index - 3);
+			Klines k3 = this.list.get(index - 3);
 			Klines k4 = this.list.get(index - 4);*/
 			//做多情况
 			if(ps == PositionSide.LONG) {
 				//先寻找第一个标志性k线
 				if(firstFlag == null) {
-					if(verifyHigh(k) && verifyHigh(k1) && verifyHigh(k2)
-							/*&& verifyHigh(k3) && verifyHigh(k4)*/) {
+					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
+							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						firstFlag = k;
 						logger.debug(firstFlag);
 					}
 				} else if(secondFlag == null) {//寻找第二个标志性k线
-					if(verifyLow(k) && verifyLow(k1) && verifyLow(k2)
-							/*&& verifyLow(k3) && verifyLow(k4)*/) {
+					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
+							&& verifyLow(k3) && verifyLow(k4)*/) {
 						secondFlag = k;
 						logger.debug(secondFlag);
 					}
 				} else if(thirdFlag == null) {//寻找第三个标志性k线
-					if(verifyHigh(k) && verifyHigh(k1) && verifyHigh(k2)
-							/*&& verifyHigh(k3) && verifyHigh(k4)*/) {
+					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
+							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						thirdFlag = k;
 						logger.debug(thirdFlag);
 					}
@@ -100,20 +100,20 @@ public class FibUtil {
 			if(ps == PositionSide.SHORT) {
 				//先寻找第一个标志性k线
 				if(firstFlag == null) {
-					if(verifyLow(k) && verifyLow(k1) && verifyLow(k2)
-							/*&& verifyLow(k3) && verifyLow(k4)*/) {
+					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
+							&& verifyLow(k3) && verifyLow(k4)*/) {
 						firstFlag = k;
 						logger.debug(firstFlag);
 					}
 				} else if(secondFlag == null) {//寻找第二个标志性k线
-					if(verifyHigh(k) && verifyHigh(k1) && verifyHigh(k2)
-							/*&& verifyHigh(k3) && verifyHigh(k4)*/) {
+					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
+							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						secondFlag = k;
 						logger.debug(secondFlag);
 					}
 				} else if(thirdFlag == null) {//寻找第三个标志性k线
-					if(verifyLow(k) && verifyLow(k1) && verifyLow(k2)
-							/*&& verifyLow(k3) && verifyLow(k4)*/) {
+					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
+							&& verifyLow(k3) && verifyLow(k4)*/) {
 						thirdFlag = k;
 						logger.debug(thirdFlag);
 					}

@@ -1231,14 +1231,25 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresFibMonitor_v2(List<Klines> klinesList,List<Klines> klinesList_hit) {
+	public void futuresFibMonitor_v2(List<Klines> klinesList) {
 		
-		FibUtil fu = new FibUtil(klinesList);
+		if(CollectionUtils.isEmpty(klinesList)) {
+			return;
+		}
+		
+		List<Klines> list_1h = PriceUtil.to1HFor15MKlines(klinesList);
+
+		Klines last = PriceUtil.getLastKlines(list_1h);
+		String pair = last.getPair();
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			list_1h.remove(last);
+		}
+		
+		FibUtil fu = new FibUtil(list_1h);
 		
 		FibInfo fibInfo = fu.getFibInfo();
-		
-		Klines last = PriceUtil.getLastKlines(klinesList);
-		String pair = last.getPair();
 		
 		if(fibInfo == null) {
 			logger.info("无法计算出" + pair + "斐波那契回撤信息");
@@ -1251,10 +1262,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(qm == QuotationMode.LONG) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong_v2(fibInfo, afterLowKlines, klinesList_hit);
+			openLong_v2(fibInfo, afterLowKlines, klinesList);
 		} else if(qm == QuotationMode.SHORT) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort_v2(fibInfo, afterHighKlines, klinesList_hit);
+			openShort_v2(fibInfo, afterHighKlines, klinesList);
 		}
 	}
 	
