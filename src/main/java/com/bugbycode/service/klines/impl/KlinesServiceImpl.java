@@ -1450,14 +1450,14 @@ public class KlinesServiceImpl implements KlinesService {
 			String text = "";//邮件内容
 			String subject = "";//邮件主题
 			String dateStr = DateFormatUtil.format(new Date());
-			if(PriceUtil.isFall(klinesList)) {//下跌
+			if(PriceUtil.isFall_v3(klinesList)) {//下跌
 				
 				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
-					if(pricePercentage >= 5) {
+					if(pricePercentage >= 10) {
 						subject = pair + "永续合约价格大暴跌";
-					} else if(pricePercentage >= 3) {
+					} else if(pricePercentage >= 5) {
 						subject = pair + "永续合约价格暴跌";
-					}else if(pricePercentage >= 1.5) {
+					}else if(pricePercentage >= 3) {
 						subject = pair + "永续合约价格大跌";
 					}
 				} else {
@@ -1470,13 +1470,13 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 				}
 				
-			} else if(PriceUtil.isRise(klinesList)) {
+			} else if(PriceUtil.isRise_v3(klinesList)) {
 				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
-					if(pricePercentage >= 5) {
+					if(pricePercentage >= 10) {
 						subject = pair + "永续合约价格大暴涨";
-					} else if(pricePercentage >= 3) {
+					} else if(pricePercentage >= 5) {
 						subject = pair + "永续合约价格暴涨";
-					}else if(pricePercentage >= 1.5) {
+					}else if(pricePercentage >= 3) {
 						subject = pair + "永续合约价格大涨";
 					}
 				} else {

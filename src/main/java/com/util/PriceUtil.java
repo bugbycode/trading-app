@@ -212,14 +212,14 @@ public class PriceUtil {
 			Klines current = klinesList.get(offset--);
 			Klines parent = klinesList.get(offset);
 			if(isFall) {
-				if(isRise(current, parent)) {
+				if(isRise_v3(current, parent)) {
 					if(hightPrice < Double.valueOf(current.getHighPrice())) {
 						hightPrice = Double.valueOf(current.getHighPrice());
 					}
 					break;
 				}
 			} else {
-				if(isFall(current, parent)) {
+				if(isFall_v3(current, parent)) {
 					if(lowPrice > Double.valueOf(current.getLowPrice())) {
 						lowPrice = Double.valueOf(current.getLowPrice());
 					}
