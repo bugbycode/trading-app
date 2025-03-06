@@ -2195,21 +2195,29 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		if(PriceUtil.isFall_v3(list) && PriceUtil.isRelease(list)) {//下跌
+		if(PriceUtil.isBuying(list)) {
 			
-			if(k0.isDownlead() && !k0.isUplead()) {
-				subject = String.format("%s永续合约出现买盘 %s", pair, dateStr);
-			} else {
-				subject = String.format("%s永续合约放量下跌 %s", pair, dateStr);
-			}
+			subject = String.format("%s永续合约出现买盘 %s", pair, dateStr);
+		
+		} else if(PriceUtil.isBuyingExhaustion(list)) {
+			
+			subject = String.format("%s永续合约买盘衰竭 %s", pair, dateStr);
+			
+		} else if(PriceUtil.isSelling(list)) {
+			
+			subject = String.format("%s永续合约出现卖盘 %s", pair, dateStr);
+			
+		} else if(PriceUtil.isSellingExhaustion(list)) {
+			
+			subject = String.format("%s永续合约卖盘衰竭 %s", pair, dateStr);
+			
+		} else if(PriceUtil.isFall_v3(list) && PriceUtil.isRelease(list)) {//下跌
+			
+			subject = String.format("%s永续合约放量下跌 %s", pair, dateStr);
 			
 		} else if(PriceUtil.isRise_v3(list) && PriceUtil.isRelease(list)) { //上涨
 			
-			if(k0.isUplead() && !k0.isDownlead()) {
-				subject = String.format("%s永续合约出现抛压 %s", pair, dateStr);
-			} else {
-				subject = String.format("%s永续合约放量上涨 %s", pair, dateStr);
-			}
+			subject = String.format("%s永续合约放量上涨 %s", pair, dateStr);
 			
 		}
 		

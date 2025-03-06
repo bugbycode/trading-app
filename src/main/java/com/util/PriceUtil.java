@@ -1929,6 +1929,132 @@ public class PriceUtil {
 			return false;
 		}
 		
-		return v_0 > (v_1 * 3);
+		return v_0 > (v_1 * 4);
+	}
+	
+	/**
+	 * 是否出现增量
+	 * @param k0
+	 * @param k1
+	 * @param k2
+	 * @return
+	 */
+	public static boolean isIncrement(Klines k0, Klines k1, Klines k2) {
+		double v_0 = k0.getVDoubleValue();
+		double v_1 = k1.getVDoubleValue();
+		double v_2 = k2.getVDoubleValue();
+		return v_0 >= v_1 && v_1 >= v_2;
+	}
+	
+	/**
+	 * 是否出现增量
+	 * @param list
+	 * @return
+	 */
+	public static boolean isIncrement(List<Klines> list) {
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		Klines k2 = list.get(index - 2);
+		
+		return isIncrement(k0, k1, k2);
+	}
+	
+	/**
+	 * 是否出现缩量
+	 * @param k0
+	 * @param k1
+	 * @param k2
+	 * @return
+	 */
+	public static boolean isReduced(Klines k0, Klines k1, Klines k2) {
+		double v_0 = k0.getVDoubleValue();
+		double v_1 = k1.getVDoubleValue();
+		double v_2 = k2.getVDoubleValue();
+		return v_0 <= v_1 && v_1 <= v_2;
+	}
+	
+	/**
+	 * 是否出现缩量
+	 * @param list
+	 * @return
+	 */
+	public static boolean isReduced(List<Klines> list) {
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		Klines k2 = list.get(index - 2);
+		
+		return isReduced(k0, k1, k2);
+	}
+	
+	/**
+	 * 是否出现买盘衰竭 缩量上涨且最后一根k线出现上引线
+	 * @param list
+	 * @return
+	 */
+	public static boolean isBuyingExhaustion(List<Klines> list) {
+		
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		Klines k2 = list.get(index - 2);
+		
+		return (isRise_v3(k0, k1) && isRise_v3(k1, k2)) && isReduced(list) && k0.isUplead();
+	}
+	
+	/**
+	 * 是否出现买盘 量增价跌且最后一根k线出现下引线
+	 * @param list
+	 * @return
+	 */
+	public static boolean isBuying(List<Klines> list) {
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		Klines k2 = list.get(index - 2);
+		
+		return (isFall_v3(k0, k1) && isFall_v3(k1, k2)) && isIncrement(list) && k0.isDownlead();
+	}
+	
+	/**
+	 * 是否出现卖盘衰竭 缩量下跌且最后一根k线出现下引线
+	 * @param list
+	 */
+	public static boolean isSellingExhaustion(List<Klines> list) {
+		
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		Klines k2 = list.get(index - 2);
+		
+		return (isFall_v3(k0, k1) && isFall_v3(k1, k2)) && isReduced(list) && k0.isDownlead();
+	}
+	
+	/**
+	 * 是否出现卖盘 量增价涨且最后一根k线出现上引线
+	 * @param list
+	 * @return
+	 */
+	public static boolean isSelling(List<Klines> list) {
+		
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		Klines k2 = list.get(index - 2);
+		
+		return (isRise_v3(k0, k1) && isRise_v3(k1, k2)) && isIncrement(list) && k0.isUplead();
 	}
 }
