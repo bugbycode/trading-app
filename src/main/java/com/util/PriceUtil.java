@@ -2005,7 +2005,7 @@ public class PriceUtil {
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
 		Klines k2 = list.get(index - 2);
-		Klines k3 = list.get(index - 2);
+		Klines k3 = list.get(index - 3);
 		
 		return (isRise_v3(k1, k2) && isRise_v3(k2, k3)) && isIncrement(k1, k2, k3) && k0.getVDoubleValue() < k1.getVDoubleValue();
 	}
@@ -2022,7 +2022,7 @@ public class PriceUtil {
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
 		Klines k2 = list.get(index - 2);
-		Klines k3 = list.get(index - 2);
+		Klines k3 = list.get(index - 3);
 		
 		return (isFall_v3(k1, k2) && isFall_v3(k2, k3)) && isReduced(k1, k2, k3) && k0.getVDoubleValue() > k1.getVDoubleValue();
 	}
@@ -2039,7 +2039,7 @@ public class PriceUtil {
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
 		Klines k2 = list.get(index - 2);
-		Klines k3 = list.get(index - 2);
+		Klines k3 = list.get(index - 3);
 		
 		return (isFall_v3(k1, k2) && isFall_v3(k2, k3)) && isIncrement(k1, k2, k3) && k0.getVDoubleValue() < k1.getVDoubleValue();
 	}
@@ -2057,7 +2057,7 @@ public class PriceUtil {
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
 		Klines k2 = list.get(index - 2);
-		Klines k3 = list.get(index - 2);
+		Klines k3 = list.get(index - 3);
 		
 		return (isRise_v3(k1, k2) && isRise_v3(k2, k3)) && isReduced(k1, k2, k3) && k0.getVDoubleValue() > k1.getVDoubleValue();
 	}
