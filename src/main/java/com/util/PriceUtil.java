@@ -1929,7 +1929,7 @@ public class PriceUtil {
 			return false;
 		}
 		
-		return v_0 > (v_1 * 4);
+		return v_0 > (v_1 * 5);
 	}
 	
 	/**
@@ -2060,6 +2060,16 @@ public class PriceUtil {
 		Klines k3 = list.get(index - 3);
 		
 		return (isRise_v3(k1, k2) && isRise_v3(k2, k3)) && isReduced(k1, k2, k3) && k0.getVDoubleValue() > k1.getVDoubleValue();
+	}
+	
+	/**
+	 * 计算EMA信息
+	 * @param list
+	 */
+	public static void calculateEMA_7_25_99(List<Klines> list) {
+		calculateEMAArray(list, EMAType.EMA7);
+		calculateEMAArray(list, EMAType.EMA25);
+		calculateEMAArray(list, EMAType.EMA99);
 	}
 	
 	/**
