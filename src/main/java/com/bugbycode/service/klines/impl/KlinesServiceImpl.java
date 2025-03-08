@@ -1908,25 +1908,26 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		double ema7 = k0.getEma7();
 		double ema25 = k0.getEma25();
+		double ema99 = k0.getEma99();
 		
 		String subject = "";
 		String text = k0.toString();
 		
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		if(PriceUtil.isBuying(list) && ema7 < ema25) {
+		if(PriceUtil.isBuying(list) && ema7 < ema25 && ema7 < ema99) {
 			
 			subject = String.format("%s永续合约出现买盘 %s", pair, dateStr);
 		
-		} else if(PriceUtil.isBuyingExhaustion(list) && ema7 > ema25) {
+		} else if(PriceUtil.isBuyingExhaustion(list) && ema7 > ema25 && ema7 > ema99) {
 			
 			subject = String.format("%s永续合约买盘衰竭 %s", pair, dateStr);
 			
-		} else if(PriceUtil.isSelling(list) && ema7 > ema25) {
+		} else if(PriceUtil.isSelling(list) && ema7 > ema25 && ema7 > ema99) {
 			
 			subject = String.format("%s永续合约出现卖盘 %s", pair, dateStr);
 			
-		} else if(PriceUtil.isSellingExhaustion(list) && ema7 < ema25) {
+		} else if(PriceUtil.isSellingExhaustion(list) && ema7 < ema25 && ema7 < ema99) {
 			
 			subject = String.format("%s永续合约卖盘衰竭 %s", pair, dateStr);
 			

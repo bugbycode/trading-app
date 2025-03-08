@@ -1929,7 +1929,7 @@ public class PriceUtil {
 			return false;
 		}
 		
-		return v_0 > (v_1 * 5);
+		return v_0 > (v_1 * 5) && k0.getPriceFluctuationPercentage() > 3;
 	}
 	
 	/**
