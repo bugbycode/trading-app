@@ -13,6 +13,33 @@ public class FibInfo {
 	private FibLevel level;
 	
 	/**
+	 * 止盈点位 V9 (保守的交易风格) </br>
+	 * 
+	 * 1、当【盈利百分比】大于【用户止盈百分比限制】则止盈点位为下一个回撤点位 </br>
+	 * 2、当下一个回撤点位止盈时【盈利百分比】小于【用户盈利预期】时则止盈点位保持不变 </br>
+	 * 
+	 * @param code 开仓时所处的斐波那契回撤点位
+	 * @param price 当前价格
+	 * @param profit 用户盈利预期
+	 * @param profitLimit 用户止盈百分比限制
+	 * @return 止盈的斐波那契回撤点位
+	 */
+	public FibCode getTakeProfit_v9(FibCode code, double price, double profit, double profitLimit) {
+		
+		FibCode takeProfit = getTakeProfit_v8(code);
+		FibCode next = getNextFibCode(code);
+		
+		double pricePercent = PriceUtil.getPercent(price, takeProfit, this); //价格波动幅度
+		double nextPricePercent = PriceUtil.getPercent(price, next, this);;//下一个点位价格波动幅度
+		
+		if(pricePercent > profitLimit && nextPricePercent >= profit) {
+			takeProfit = next;
+		}
+		
+		return takeProfit;
+	}
+	
+	/**
 	 * 止盈点位 V8
 	 * @param code 开仓时所处的斐波那契回撤点位
 	 * @return 止盈的斐波那契回撤点位
@@ -380,6 +407,28 @@ public class FibInfo {
 
 	public FibLevel getLevel() {
 		return level;
+	}
+	
+	/**
+	 * 获取下一个点位 点位顺序为： 1 -> 0.786 -> 0.618 -> 0.5 -> 0.382 -> 0.236 -> 0
+	 * @param current 当前点位
+	 * @return
+	 */
+	public FibCode getNextFibCode(FibCode current) {
+		FibCode result = FibCode.FIB0;
+		FibCode codes[] = FibCode.values();
+		for(int index = 0; index < codes.length; index++) {
+			FibCode code = codes[index];
+			if(code == current && code != FibCode.FIB0) {
+				if(code == FibCode.FIB786 || code == FibCode.FIB66) {
+					result = codes[index + 2];
+				} else {
+					result = codes[index + 1];
+				}
+				break;
+			}
+		}
+		return result;
 	}
 
 	@Override

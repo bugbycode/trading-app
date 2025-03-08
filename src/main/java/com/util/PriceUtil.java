@@ -2057,4 +2057,21 @@ public class PriceUtil {
 		
 		return (isRise_v3(k0, k1) && isRise_v3(k1, k2)) && isIncrement(list) && k0.isUplead();
 	}
+	
+	/**
+	 * 计算涨跌幅度
+	 * @param price 当前价格
+	 * @param code 止盈点位
+	 * @param fibInfo 回撤信息
+	 * @return
+	 */
+	public static double getPercent(double price,FibCode code, FibInfo fibInfo) {
+		double pricePercent = 0;
+		if(fibInfo.getQuotationMode() == QuotationMode.LONG) {
+			pricePercent = PriceUtil.getRiseFluctuationPercentage(price, fibInfo.getFibValue(code)) * 100;
+		} else {
+			pricePercent = PriceUtil.getFallFluctuationPercentage(price, fibInfo.getFibValue(code)) * 100;
+		}
+		return pricePercent;
+	}
 }

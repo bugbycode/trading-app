@@ -62,7 +62,7 @@ public class AnalysisKlinesTask implements Runnable{
             }
             
             //斐波那契回撤分析
-            klinesService.futuresFibMonitor_v2(klines_list_15m);
+            klinesService.futuresFibMonitor(klines_list_15m);
             
             //盘整区间指标分析
             klinesService.futuresConsolidationAreaMonitor(klines_list_1d, klines_list_15m);

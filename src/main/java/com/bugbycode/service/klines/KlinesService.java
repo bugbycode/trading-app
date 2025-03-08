@@ -10,7 +10,6 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.trading.PositionSide;
-import com.util.FibUtil_v3;
 
 public interface KlinesService {
 	
@@ -58,29 +57,11 @@ public interface KlinesService {
 	
 	/**
 	 * 合约做多
-	 * @param fu
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param afterLowKlines 回撤之后的最低K线
-	 * @param klinesList_hit  最近时间段内部分k线信息
-	 */
-	public void openLong(FibUtil_v3 fu,FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
-	
-	/**
-	 * 合约做多
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterLowKlines 回撤之后的最低日线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openLong_v2(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
-	
-	/**
-	 * 合约做空
-	 * @param fu
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param afterHighKlines 回撤之后的最高K线
-	 * @param klinesList_hit  最近时间段内部分k线信息
-	 */
-	public void openShort(FibUtil_v3 fu,FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
@@ -88,7 +69,7 @@ public interface KlinesService {
 	 * @param afterHighKlines 回撤之后的最高日线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openShort_v2(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 标志性高低点价格监控
@@ -99,19 +80,11 @@ public interface KlinesService {
 	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
-	 * 斐波那契回撤点位监控 （日线级别回撤指标）
-	 * 
-	 * @param klinesList
-	 * @param klinesList_hit
-	 */
-	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
-	
-	/**
-	 * 斐波那契回撤点位监控 V2 【测试中】
+	 * 斐波那契回撤点位监控
 	 * 
 	 * @param klinesList
 	 */
-	public void futuresFibMonitor_v2(List<Klines> klinesList);
+	public void futuresFibMonitor(List<Klines> klinesList);
 
 	/**
 	 * 监控k线涨跌
