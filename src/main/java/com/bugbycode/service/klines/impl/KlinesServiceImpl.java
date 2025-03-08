@@ -999,14 +999,14 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		List<Klines> klinesList = PriceUtil.to1HFor15MKlines(klinesList_tmp);
 		
-		Klines lastKlines = PriceUtil.getLastKlines(klinesListData);
+		Klines lastKlines = PriceUtil.getLastKlines(klinesList);
 		
 		String pair = lastKlines.getPair();
 		double closePrice = lastKlines.getClosePriceDoubleValue();
 		
 		int minute = DateFormatUtil.getMinute(lastKlines.getEndTime());
 		if(minute != 59) {
-			klinesList.remove(lastKlines);
+			return;
 		}
 		
 		FibUtil_v2 fu = new FibUtil_v2(klinesList);
@@ -1018,7 +1018,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibCode takeProfitCode = FibCode.FIB618;
 		
 		//二级回撤
-		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesListData) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
+		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			percent = PriceUtil.getFallFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -1049,7 +1049,7 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 			
-		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesListData) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
+		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -1082,7 +1082,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		//一级回撤
-		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesListData)) {
+		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
 			
 			percent = PriceUtil.getFallFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
@@ -1113,7 +1113,7 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 			
-		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesListData)) {
+		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesList)) {
 			
 			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
 			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
