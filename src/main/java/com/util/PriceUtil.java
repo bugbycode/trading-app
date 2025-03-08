@@ -1993,7 +1993,7 @@ public class PriceUtil {
 	}
 	
 	/**
-	 * 是否出现买盘衰竭 缩量上涨且最后一根k线出现上引线
+	 * 是否出现买盘衰竭 量增价涨且最后一根k线成交量比前一根k线成交量小
 	 * @param list
 	 * @return
 	 */
@@ -2005,12 +2005,13 @@ public class PriceUtil {
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
 		Klines k2 = list.get(index - 2);
+		Klines k3 = list.get(index - 2);
 		
-		return (isRise_v3(k0, k1) && isRise_v3(k1, k2)) && isReduced(list) && k0.isUplead();
+		return (isRise_v3(k1, k2) && isRise_v3(k2, k3)) && isIncrement(k1, k2, k3) && k0.getVDoubleValue() < k1.getVDoubleValue();
 	}
 	
 	/**
-	 * 是否出现买盘 量增价跌且最后一根k线出现下引线
+	 * 是否出现买盘 缩量下跌且最后一根k线成交量比前一根k线成交量大
 	 * @param list
 	 * @return
 	 */
@@ -2021,12 +2022,13 @@ public class PriceUtil {
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
 		Klines k2 = list.get(index - 2);
+		Klines k3 = list.get(index - 2);
 		
-		return (isFall_v3(k0, k1) && isFall_v3(k1, k2)) && isIncrement(list) && k0.isDownlead();
+		return (isFall_v3(k1, k2) && isFall_v3(k2, k3)) && isReduced(k1, k2, k3) && k0.getVDoubleValue() > k1.getVDoubleValue();
 	}
 	
 	/**
-	 * 是否出现卖盘衰竭 缩量下跌且最后一根k线出现下引线
+	 * 是否出现卖盘衰竭 量增价跌且最后一根k线成交量比前一根k线成交量小
 	 * @param list
 	 */
 	public static boolean isSellingExhaustion(List<Klines> list) {
@@ -2037,12 +2039,13 @@ public class PriceUtil {
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
 		Klines k2 = list.get(index - 2);
+		Klines k3 = list.get(index - 2);
 		
-		return (isFall_v3(k0, k1) && isFall_v3(k1, k2)) && isReduced(list) && k0.isDownlead();
+		return (isFall_v3(k1, k2) && isFall_v3(k2, k3)) && isIncrement(k1, k2, k3) && k0.getVDoubleValue() < k1.getVDoubleValue();
 	}
 	
 	/**
-	 * 是否出现卖盘 量增价涨且最后一根k线出现上引线
+	 * 是否出现卖盘 缩量上涨且最后一根k线成交量比前一根k线成交量大
 	 * @param list
 	 * @return
 	 */
@@ -2054,8 +2057,9 @@ public class PriceUtil {
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
 		Klines k2 = list.get(index - 2);
+		Klines k3 = list.get(index - 2);
 		
-		return (isRise_v3(k0, k1) && isRise_v3(k1, k2)) && isIncrement(list) && k0.isUplead();
+		return (isRise_v3(k1, k2) && isRise_v3(k2, k3)) && isReduced(k1, k2, k3) && k0.getVDoubleValue() > k1.getVDoubleValue();
 	}
 	
 	/**
