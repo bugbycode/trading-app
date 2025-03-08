@@ -2080,11 +2080,29 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static double getPercent(double price,FibCode code, FibInfo fibInfo) {
-		double pricePercent = 0;
+		/*double pricePercent = 0;
 		if(fibInfo.getQuotationMode() == QuotationMode.LONG) {
 			pricePercent = PriceUtil.getRiseFluctuationPercentage(price, fibInfo.getFibValue(code)) * 100;
 		} else {
 			pricePercent = PriceUtil.getFallFluctuationPercentage(price, fibInfo.getFibValue(code)) * 100;
+		}
+		return pricePercent;*/
+		return getPercent(price, fibInfo.getFibValue(code), fibInfo.getQuotationMode());
+	}
+	
+	/**
+	 * 计算涨跌幅度
+	 * @param price 当前价格
+	 * @param takeProfitPrice 止盈价
+	 * @param qm LONG/SHORT LONG：上涨 SHORT：下跌
+	 * @return
+	 */
+	public static double getPercent(double price, double takeProfitPrice, QuotationMode qm) {
+		double pricePercent = 0;
+		if(qm == QuotationMode.LONG) {
+			pricePercent = PriceUtil.getRiseFluctuationPercentage(price, takeProfitPrice) * 100;
+		} else {
+			pricePercent = PriceUtil.getFallFluctuationPercentage(price, takeProfitPrice) * 100;
 		}
 		return pricePercent;
 	}

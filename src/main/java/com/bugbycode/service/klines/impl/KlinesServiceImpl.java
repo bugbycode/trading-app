@@ -402,6 +402,9 @@ public class KlinesServiceImpl implements KlinesService {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								takeProfitCode = FibCode.FIB618;
+								if(tradeStyle == TradeStyle.CONSERVATIVE) {
+									takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+								}
 							}
 							
 							stopLoss = new BigDecimal(
@@ -420,7 +423,8 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 							
 							//根据交易风格设置盈利限制
-							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType != AutoTradeType.FIB_RET) {
+							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType != AutoTradeType.FIB_RET
+									 && autoTradeType != AutoTradeType.PRICE_ACTION) {
 								double dbProfitLimit = u.getProfitLimit() / 100;
 								if(profitPercent > dbProfitLimit) {
 									profitPercent = dbProfitLimit;
@@ -620,6 +624,9 @@ public class KlinesServiceImpl implements KlinesService {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								takeProfitCode = FibCode.FIB618;
+								if(tradeStyle == TradeStyle.CONSERVATIVE) {
+									takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+								}
 							}
 							
 							stopLoss = new BigDecimal(
@@ -639,7 +646,8 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 							
 							//根据交易风格设置盈利限制
-							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType != AutoTradeType.FIB_RET) {
+							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType != AutoTradeType.FIB_RET
+									 && autoTradeType != AutoTradeType.PRICE_ACTION) {
 								double dbProfitLimit = u.getProfitLimit() / 100;
 								if(profitPercent > dbProfitLimit) {
 									profitPercent = dbProfitLimit;
@@ -1020,10 +1028,6 @@ public class KlinesServiceImpl implements KlinesService {
 		//二级回撤
 		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
-			percent = PriceUtil.getFallFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
-			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
-			subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
-			
 			//市价做空
 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
 			
@@ -1031,8 +1035,19 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			for(User u : uList) {
 				
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				
 				double profit = u.getProfit();
+				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
+				
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					takeProfitCode = secondFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
+				}
+				
+				percent = PriceUtil.getFallFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
 				if(percent < profit) {
 					continue;
@@ -1051,18 +1066,26 @@ public class KlinesServiceImpl implements KlinesService {
 			
 		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
-			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
-			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
-			subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
-			
 			//市价做多
 			marketPlace(pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
 			
 			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 			
 			for(User u : uList) {
+				
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				
 				double profit = u.getProfit();
+				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
+
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					takeProfitCode = secondFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
+				}
+				
+				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
 				if(percent < profit) {
 					continue;
@@ -1084,10 +1107,6 @@ public class KlinesServiceImpl implements KlinesService {
 		//一级回撤
 		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
 			
-			percent = PriceUtil.getFallFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
-			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
-			subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
-
 			//市价做空
 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION);
 			
@@ -1095,8 +1114,19 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			for(User u : uList) {
 				
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				
 				double profit = u.getProfit();
+				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
+				
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					takeProfitCode = firstFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
+				}
+				
+				percent = PriceUtil.getFallFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
 				if(percent < profit) {
 					continue;
@@ -1115,18 +1145,26 @@ public class KlinesServiceImpl implements KlinesService {
 			
 		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesList)) {
 			
-			percent = PriceUtil.getRiseFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
-			String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
-			subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
-			
 			//市价做多
 			marketPlace(pair, PositionSide.LONG, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION);
 			
 			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 			
 			for(User u : uList) {
+				
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				
 				double profit = u.getProfit();
+				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
+				
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					takeProfitCode = firstFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
+				}
+				
+				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
 				if(percent < profit) {
 					continue;

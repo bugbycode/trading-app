@@ -13,6 +13,46 @@ public class FibInfo {
 	private FibLevel level;
 	
 	/**
+	 * 价格行为止盈点位
+	 * @param price 当前价格
+	 * @param profit 用户盈利预期
+	 * @param profitLimit 用户止盈百分比限制
+	 * @return
+	 */
+	public FibCode getDeclineAndStrengthTakeProfit(double price, double profit, double profitLimit) {
+		
+		FibCode result = null;
+		
+		QuotationMode qm = this.getQuotationMode() == QuotationMode.LONG ? QuotationMode.SHORT : QuotationMode.LONG;
+		
+		double percent_382 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB382), qm);
+		double percent_5 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB5), qm);
+		double percent_618 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB618), qm);
+		
+		if(percent_382 >= profit && percent_382 <= profitLimit) {
+			result = FibCode.FIB382;
+		} else if(percent_5 >= profit && percent_5 <= profitLimit) {
+			result = FibCode.FIB5;
+		} else if(percent_618 >= profit && percent_618 <= profitLimit) {
+			result = FibCode.FIB618;
+		}
+		
+		if(result == null) {
+			if(percent_382 >= profit) {
+				result = FibCode.FIB382;
+			} else if(percent_5 >= profit) {
+				result = FibCode.FIB5;
+			} else if(percent_618 >= profit) {
+				result = FibCode.FIB618;
+			} else {
+				result = FibCode.FIB618;
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * 止盈点位 V9 (保守的交易风格) </br>
 	 * 
 	 * 1、当【盈利百分比】大于【用户止盈百分比限制】则止盈点位为下一个回撤点位 </br>
