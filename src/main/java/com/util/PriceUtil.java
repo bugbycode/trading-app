@@ -1536,11 +1536,15 @@ public class PriceUtil {
 	public static boolean verifyPowerful_v4(FibInfo fibInfo, List<Klines> list) {
 		boolean result = false;
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
-			Klines current = getLastKlines(list);
+			/*Klines current = getLastKlines(list);
 			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
 				result = isBreachLong(current, fib236Price);
+			}*/
+			QuotationMode qm = fibInfo.getQuotationMode();
+			if(qm == QuotationMode.SHORT) {
+				result = isBuying(list) || isSellingExhaustion(list);
 			}
 		}
 		
@@ -1556,11 +1560,15 @@ public class PriceUtil {
 	public static boolean verifyDecliningPrice_v4(FibInfo fibInfo, List<Klines> list) {
 		boolean result = false;
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
-			Klines current = getLastKlines(list);
+			/*Klines current = getLastKlines(list);
 			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
 				result = isBreachShort(current, fib236Price);
+			}*/
+			QuotationMode qm = fibInfo.getQuotationMode();
+			if(qm == QuotationMode.LONG) {
+				result = isSelling(list) || isBuyingExhaustion(list);
 			}
 		}
 		return result;
