@@ -973,7 +973,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibInfo fibInfo = fu.getFibInfo();
 		
 		if(fibInfo == null) {
-			logger.info("无法计算出" + pair + "斐波那契回撤信息");
+			logger.debug("无法计算出" + pair + "斐波那契回撤信息");
 			return;
 		}
 		
