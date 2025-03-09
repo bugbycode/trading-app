@@ -401,7 +401,7 @@ public class FibUtil_v3 {
 	}
 	
 	/**
-	 * 根据一级回撤校验是否可开仓
+	 * 根据一级回撤校验是否可开仓（价格行为指标使用）
 	 * @param firstFibInfo 一级斐波那契回撤
 	 * @param currentPrice 当前价格
 	 * @return
@@ -409,8 +409,7 @@ public class FibUtil_v3 {
 	public boolean verifyFirstFibOpen(FibInfo firstFibInfo,double currentPrice) {
 		boolean flag = false;
 		if(firstFibInfo != null) {
-			double first_fibPrice = firstFibInfo.getFibValue(FibCode.FIB618);
-			//double first_fib1Price = firstFibInfo.getFibValue(FibCode.FIB1);
+			double first_fibPrice = firstFibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = firstFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
 				flag = currentPrice <= first_fibPrice;

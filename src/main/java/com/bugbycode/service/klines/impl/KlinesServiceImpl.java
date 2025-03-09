@@ -1025,7 +1025,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibCode takeProfitCode = FibCode.FIB618;
 		
 		//二级回撤
-		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList)/* && fu.verifyFirstFibOpen(firstFibInfo, closePrice)*/) {
+		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			//市价做空
 			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
@@ -1063,7 +1063,7 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 			
-		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) /*&& fu.verifyFirstFibOpen(firstFibInfo, closePrice)*/) {
+		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			//市价做多
 			marketPlace(pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
