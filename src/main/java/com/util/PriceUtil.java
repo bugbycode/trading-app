@@ -1542,9 +1542,12 @@ public class PriceUtil {
 			if(qm == QuotationMode.SHORT) {
 				result = isBreachLong(current, fib236Price);
 			}*/
+			Klines current = getLastKlines(list);
+			double closePrice = current.getClosePriceDoubleValue();
+			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
-				result = isBuying(list) || isSellingExhaustion(list);
+				result = (isBuying(list) || isSellingExhaustion(list)) && closePrice < fib382Price;
 			}
 		}
 		
@@ -1566,9 +1569,12 @@ public class PriceUtil {
 			if(qm == QuotationMode.LONG) {
 				result = isBreachShort(current, fib236Price);
 			}*/
+			Klines current = getLastKlines(list);
+			double closePrice = current.getClosePriceDoubleValue();
+			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				result = isSelling(list) || isBuyingExhaustion(list);
+				result = (isSelling(list) || isBuyingExhaustion(list)) && closePrice > fib382Price;
 			}
 		}
 		return result;
