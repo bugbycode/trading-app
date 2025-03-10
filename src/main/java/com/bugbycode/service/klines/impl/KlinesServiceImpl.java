@@ -54,7 +54,6 @@ import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
-import com.util.FibUtil;
 import com.util.FibUtil_v3;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
@@ -186,9 +185,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		return result;
 	}
-
+	
 	@Override
-	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
+	public void openLong(FibUtil_v3 fu,FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
+		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
 		
@@ -196,18 +196,33 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		//开盘、收盘、最低、最高价格
 		double closePrice = hitKline.getClosePriceDoubleValue();
+		//double openPrice = hitKline.getOpenPrice();
+		//double lowPrice = hitKline.getLowPriceDoubleValue();
+		//double hightPrice = hitKline.getHighPrice();
 		double currentPrice = closePrice;
+		
+		//次级回撤信息
+		FibLevel level = fibInfo.getLevel();
+		FibInfo childFibInfo = null;
+		if(level == FibLevel.LEVEL_1) {
+			childFibInfo = fu.getSecondFibInfo(fibInfo);
+		} else if(level == FibLevel.LEVEL_2) {
+			childFibInfo = fu.getThirdFibInfo(fibInfo);
+		} else if(level == FibLevel.LEVEL_3) {
+			childFibInfo = fu.getFourthFibInfo(fibInfo);
+		}
 		
 		//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(PriceUtil.isLong_v3(fibInfo.getFibValue(code), klinesList_hit)
+			if(PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
+					&& fu.verifyParentOpen(fibInfo, code, childFibInfo)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
-				this.tradingTaskPool.add(new TradingTask(this, pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET));
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET));
 				
 				//
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
@@ -217,7 +232,7 @@ public class KlinesServiceImpl implements KlinesService {
 					//根据交易风格设置盈利限制
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					
-					FibCode closePpositionCode = fibInfo.getTakeProfit_v8(code);//止盈点位
+					FibCode closePpositionCode = fibInfo.getTakeProfit_v7(code);//止盈点位
 					
 					//保守的交易风格
 					if(tradeStyle == TradeStyle.CONSERVATIVE) {
@@ -233,7 +248,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//止盈价
 					double profitPrice = fibInfo.getFibValue(closePpositionCode);
-					
+
 					//开仓订阅提醒
 					String subject = String.format("%s永续合约%s(%s)[%s]做多机会(PNL:%s%%) %s", pair, code.getDescription(),
 							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
@@ -258,37 +273,52 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
+	public void openShort(FibUtil_v3 fu,FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
 		//开盘、收盘、最低、最高价格
 		double closePrice = hitKline.getClosePriceDoubleValue();
+		//double openPrice = hitKline.getOpenPrice();
+		//double lowPrice = hitKline.getLowPrice();
+		//double hightPrice = hitKline.getHighPriceDoubleValue();
 		double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
 		FibCode[] codes = FibCode.values();
+		
+		//次级回撤信息
+		FibLevel level = fibInfo.getLevel();
+		FibInfo childFibInfo = null;
+		if(level == FibLevel.LEVEL_1) {
+			childFibInfo = fu.getSecondFibInfo(fibInfo);
+		} else if(level == FibLevel.LEVEL_2) {
+			childFibInfo = fu.getThirdFibInfo(fibInfo);
+		} else if(level == FibLevel.LEVEL_3) {
+			childFibInfo = fu.getFourthFibInfo(fibInfo);
+		}
 		
 		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(PriceUtil.isShort_v3(fibInfo.getFibValue(code), klinesList_hit)
+			if(PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
+					&& fu.verifyParentOpen(fibInfo, code, childFibInfo)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				
 				//市价做空
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET));
-				
+
 				//
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
-					
+
 					//根据交易风格设置盈利限制
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					
-					FibCode closePpositionCode = fibInfo.getTakeProfit_v8(code);//止盈点位
+					FibCode closePpositionCode = fibInfo.getTakeProfit_v7(code);//止盈点位
 					
 					//保守的交易风格
 					if(tradeStyle == TradeStyle.CONSERVATIVE) {
@@ -385,7 +415,7 @@ public class KlinesServiceImpl implements KlinesService {
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
 								
-								takeProfitCode = fibInfo.getTakeProfit_v8(code);
+								takeProfitCode = fibInfo.getTakeProfit_v7(code);
 								
 								//根据交易风格设置盈利限制
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
@@ -607,7 +637,7 @@ public class KlinesServiceImpl implements KlinesService {
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
 
-								takeProfitCode = fibInfo.getTakeProfit_v8(code);
+								takeProfitCode = fibInfo.getTakeProfit_v7(code);
 								
 								//根据交易风格设置盈利限制
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
@@ -956,41 +986,109 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresFibMonitor(List<Klines> klinesList) {
-		
-		if(CollectionUtils.isEmpty(klinesList)) {
-			return;
-		}
-		
-		List<Klines> list_1h = PriceUtil.to1HFor15MKlines(klinesList);
-
-		Klines last = PriceUtil.getLastKlines(list_1h);
+	public void futuresFibMonitor(List<Klines> klinesList,List<Klines> klinesList_hit) {
+		Klines last = PriceUtil.getLastKlines(klinesList);
 		String pair = last.getPair();
 		
-		int minute = DateFormatUtil.getMinute(last.getEndTime());
-		if(minute != 59) {
-			list_1h.remove(last);
+		FibUtil_v3 fu = new FibUtil_v3(klinesList);
+		FibInfo firstFibInfo = fu.getFibInfo();
+		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
+		FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
+		FibInfo fourthFibInfo = fu.getFourthFibInfo(thirdFibInfo);
+		
+		//获取最后一天之后的所有参考价格k线信息
+		List<Klines> today_hit = PriceUtil.getLastDayAfterKline(last, klinesList_hit);
+		//当日最高价k线
+		Klines today_high_klines = PriceUtil.getMaxPriceKLine(today_hit);
+		//当日最低价k线
+		Klines today_low_klines = PriceUtil.getMinPriceKLine(today_hit);
+		
+		QuotationMode qm = null;
+		
+		if(firstFibInfo == null) {
+			logger.debug("无法计算出{}一级斐波那契回撤信息", pair);
+		} else {
+			logger.debug("{}一级斐波那契回撤：{}", pair, firstFibInfo.toString());
+			qm = firstFibInfo.getQuotationMode();
+			//
+			List<Klines> fibAfterKlines = fu.getFibAfterKlines();
+			if(qm == QuotationMode.LONG) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+				
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
+				openLong(fu, firstFibInfo, afterLowKlines, klinesList_hit);
+			} else if(qm == QuotationMode.SHORT) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+				
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
+				openShort(fu, firstFibInfo, afterHighKlines,klinesList_hit);
+			}
 		}
 		
-		FibUtil fu = new FibUtil(list_1h);
-		
-		FibInfo fibInfo = fu.getFibInfo();
-		
-		if(fibInfo == null) {
-			logger.debug("无法计算出" + pair + "斐波那契回撤信息");
-			return;
+		if(secondFibInfo == null) {
+			logger.debug("无法计算出{}二级斐波那契回撤信息", pair);
+		} else {
+			logger.debug("{}二级斐波那契回撤：{}", pair, secondFibInfo.toString());
+			qm = secondFibInfo.getQuotationMode();
+			//
+			List<Klines> fibAfterKlines = fu.getSecondFibAfterKlines();
+			if(qm == QuotationMode.LONG) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
+				openLong(fu, secondFibInfo, afterLowKlines, klinesList_hit);
+			} else if(qm == QuotationMode.SHORT) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
+				openShort(fu, secondFibInfo, afterHighKlines,klinesList_hit);
+			}
 		}
 		
-		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
+		if(thirdFibInfo == null) {
+			logger.debug("无法计算出{}三级斐波那契回撤信息", pair);
+		} else {
+			logger.debug("{}三级斐波那契回撤：{}", pair, thirdFibInfo.toString());
+			qm = thirdFibInfo.getQuotationMode();
+			List<Klines> fibAfterKlines = fu.getThirdFibAfterKlines();
+			if(qm == QuotationMode.LONG) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
+				openLong(fu, thirdFibInfo, afterLowKlines, klinesList_hit);
+			} else if(qm == QuotationMode.SHORT) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
+				openShort(fu, thirdFibInfo, afterHighKlines,klinesList_hit);
+			}
+		}
 		
-		QuotationMode qm = fibInfo.getQuotationMode();
-		
-		if(qm == QuotationMode.LONG) {
-			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong(fibInfo, afterLowKlines, klinesList);
-		} else if(qm == QuotationMode.SHORT) {
-			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort(fibInfo, afterHighKlines, klinesList);
+		if(fourthFibInfo == null) {
+			logger.debug("无法计算出{}四级斐波那契回撤信息", pair);
+		} else {
+			logger.debug("{}四级斐波那契回撤：{}", pair, fourthFibInfo.toString());
+			qm = fourthFibInfo.getQuotationMode();
+			List<Klines> fibAfterKlines = fu.getFourthFibAfterKlines();
+			if(qm == QuotationMode.LONG) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+
+				afterLowKlines = PriceUtil.getMinPriceKlines(today_low_klines, afterLowKlines);
+				
+				openLong(fu, fourthFibInfo, afterLowKlines, klinesList_hit);
+			} else if(qm == QuotationMode.SHORT) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+
+				afterHighKlines = PriceUtil.getMaxPriceKlines(today_high_klines, afterHighKlines);
+				
+				openShort(fu, fourthFibInfo, afterHighKlines,klinesList_hit);
+			}
 		}
 	}
 	
