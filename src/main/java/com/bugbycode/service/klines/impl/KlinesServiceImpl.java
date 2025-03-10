@@ -217,7 +217,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
+			if(PriceUtil.isLong_v3(fibInfo.getFibValue(code), klinesList_hit)
 					&& fu.verifyParentOpen(fibInfo, code, childFibInfo)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
@@ -303,7 +303,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
+			if(PriceUtil.isShort_v3(fibInfo.getFibValue(code), klinesList_hit)
 					&& fu.verifyParentOpen(fibInfo, code, childFibInfo)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				
