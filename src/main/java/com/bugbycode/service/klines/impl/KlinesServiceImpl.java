@@ -51,6 +51,7 @@ import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
+import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.FibUtil;
@@ -79,6 +80,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private WorkTaskPool emailWorkTaskPool;
+	
+	@Autowired
+	private WorkTaskPool tradingTaskPool;
 	
 	@Autowired
 	private KlinesRepository klinesRepository;
@@ -203,7 +207,7 @@ public class KlinesServiceImpl implements KlinesService {
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
-				marketPlace(pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET);
+				this.tradingTaskPool.add(new TradingTask(this, pair,PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET));
 				
 				//
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
@@ -274,8 +278,8 @@ public class KlinesServiceImpl implements KlinesService {
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				
 				//市价做空
-				marketPlace(pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET);
-
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET));
+				
 				//
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
@@ -1028,7 +1032,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			//市价做空
-			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION));
 			
 			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 			
@@ -1066,7 +1070,7 @@ public class KlinesServiceImpl implements KlinesService {
 		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
 			
 			//市价做多
-			marketPlace(pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION);
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION));
 			
 			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 			
@@ -1107,7 +1111,7 @@ public class KlinesServiceImpl implements KlinesService {
 		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
 			
 			//市价做空
-			marketPlace(pair, PositionSide.SHORT, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION);
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION));
 			
 			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 			
@@ -1145,7 +1149,7 @@ public class KlinesServiceImpl implements KlinesService {
 		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesList)) {
 			
 			//市价做多
-			marketPlace(pair, PositionSide.LONG, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION);
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION));
 			
 			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 			
@@ -1290,7 +1294,8 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, recEmail);
 				
 				FibInfo fibInfo = new FibInfo(areaLowPrice, areaHighPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
-				marketPlace(pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
+				
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX));
 			}
 			
 			if(PriceUtil.isBreachLong(current, areaLowPrice)) {
@@ -1305,7 +1310,8 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, recEmail);
 				
 				FibInfo fibInfo = new FibInfo(areaHighPrice, areaLowPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
-				marketPlace(pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX);
+				
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX));
 			}
 		}
 	}
@@ -1341,15 +1347,17 @@ public class KlinesServiceImpl implements KlinesService {
 					LongOrShortType type = LongOrShortType.resolve(info.getLongOrShortType());
 					
 					if(type == LongOrShortType.SHORT) {//做空
+						
 						FibInfo fibInfo = new FibInfo(lowValue, highValue, klines.getDecimalNum(), FibLevel.LEVEL_1);
-						logger.debug(fibInfo);
-						marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+						
+						this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
 					}
 					
 					if(type == LongOrShortType.LONG) { // 做多
+						
 						FibInfo fibInfo = new FibInfo(highValue, lowValue, klines.getDecimalNum(), FibLevel.LEVEL_1);
-						logger.debug(fibInfo);
-						marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+						
+						this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
 					}
 				}
 			}
@@ -1399,10 +1407,15 @@ public class KlinesServiceImpl implements KlinesService {
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 
 				FibInfo fibInfo = new FibInfo(price1, price0, klines.getDecimalNum(), FibLevel.LEVEL_1);
+				
 				if(upOrLowStr.equals("上")) {//做空
-					marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				} else {//做多
-					marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				}
 			}
 			
@@ -1420,9 +1433,13 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				FibInfo fibInfo = new FibInfo(price0, price1, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				if(upOrLowStr.equals("上")) {//做空
-					marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				} else {//做多
-					marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				}
 			}
 			
@@ -1476,14 +1493,18 @@ public class KlinesServiceImpl implements KlinesService {
 					double highValue = high.getHighPriceDoubleValue();
 					double lowValue = fibLow.getLowPriceDoubleValue();
 					FibInfo fibInfo = new FibInfo(highValue, lowValue, klines.getDecimalNum(), FibLevel.LEVEL_1);
-					marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				} else {//做空
 					List<Klines> fib_klines_list = PriceUtil.subList(low, list);
 					Klines fibHigh = PriceUtil.getMaxPriceKLine(fib_klines_list);
 					double lowValue = low.getLowPriceDoubleValue();
 					double highValue = fibHigh.getHighPriceDoubleValue();
 					FibInfo fibInfo = new FibInfo(lowValue, highValue, klines.getDecimalNum(), FibLevel.LEVEL_1);
-					marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				}
 			}
 		}
@@ -1535,9 +1556,13 @@ public class KlinesServiceImpl implements KlinesService {
 				FibInfo fibInfo = new FibInfo(line1Price, line0Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
 				if(upOrLowStr.equals("上")) { //做空
-					marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				} else { //做多
-					marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				}
 			}
 			
@@ -1561,9 +1586,13 @@ public class KlinesServiceImpl implements KlinesService {
 				FibInfo fibInfo = new FibInfo(line0Price, line1Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
 				if(upOrLowStr.equals("上")) { //做空
-					marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				} else { //做多
-					marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				}
 			}
 		}
@@ -1683,9 +1712,13 @@ public class KlinesServiceImpl implements KlinesService {
 				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				if(upOrLowStr.equals("上")) {//做空
-					marketPlace(info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				} else {
-					marketPlace(info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT);
+					
+					this.tradingTaskPool.add(new TradingTask(this, info.getSymbol(), PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.DEFAULT));
+					
 				}
 			}
 		}
@@ -1723,7 +1756,7 @@ public class KlinesServiceImpl implements KlinesService {
 				String text = StringUtil.formatLongMessage(klines.getPair(), price, stopLossDoubleValue, takeProfitDoubleValue, klines.getDecimalNum());
 				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
-				marketPlace(pair, PositionSide.LONG, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT);
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT));
 				
 				shapeRepository.deleteById(info.getId());
 			}
@@ -1763,7 +1796,7 @@ public class KlinesServiceImpl implements KlinesService {
 				String text = StringUtil.formatLongMessage(klines.getPair(), price, stopLossDoubleValue, takeProfitDoubleValue, klines.getDecimalNum());
 				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
-				marketPlace(pair, PositionSide.SHORT, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT);
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT));
 				
 				shapeRepository.deleteById(info.getId());
 			}
