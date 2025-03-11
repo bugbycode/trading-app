@@ -969,6 +969,13 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
 		
+		Klines last = PriceUtil.getLastKlines(klinesList_1h);
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			klinesList_1h.remove(last);
+		}
+		
 		FibUtil_v3 fu = new FibUtil_v3(klinesList_1h);
 		FibInfo fibInfo = fu.getFibInfo();
 		
