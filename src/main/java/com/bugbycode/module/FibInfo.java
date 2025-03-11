@@ -53,7 +53,7 @@ public class FibInfo {
 	}
 	
 	/**
-	 * 止盈点位 V9 (保守的交易风格) </br>
+	 * 止盈点位 V3 (保守的交易风格) </br>
 	 * 
 	 * 1、当【盈利百分比】大于【用户止盈百分比限制】则止盈点位为下一个回撤点位 </br>
 	 * 2、当下一个回撤点位止盈时【盈利百分比】小于【用户盈利预期】时则止盈点位保持不变 </br>
@@ -64,9 +64,9 @@ public class FibInfo {
 	 * @param profitLimit 用户止盈百分比限制
 	 * @return 止盈的斐波那契回撤点位
 	 */
-	public FibCode getTakeProfit_v9(FibCode code, double price, double profit, double profitLimit) {
+	public FibCode getTakeProfit_v3(FibCode code, double price, double profit, double profitLimit) {
 		
-		FibCode takeProfit = getTakeProfit_v8(code);
+		FibCode takeProfit = getTakeProfit_v2(code);
 		FibCode next = getNextFibCode(code);
 		
 		double pricePercent = PriceUtil.getPercent(price, takeProfit, this); //价格波动幅度
@@ -80,11 +80,11 @@ public class FibInfo {
 	}
 	
 	/**
-	 * 止盈点位 V8
+	 * 止盈点位 V2
 	 * @param code 开仓时所处的斐波那契回撤点位
 	 * @return 止盈的斐波那契回撤点位
 	 */
-	public FibCode getTakeProfit_v8(FibCode code) {
+	public FibCode getTakeProfit_v2(FibCode code) {
 		FibCode takeProfit = FibCode.FIB382;
 		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
 			takeProfit = FibCode.FIB2_618;
@@ -105,11 +105,11 @@ public class FibInfo {
 	}
 	
 	/**
-	 * 止盈点位 V7
+	 * 止盈点位 V1
 	 * @param code 开仓时所处的斐波那契回撤点位
 	 * @return 止盈的斐波那契回撤点位
 	 */
-	public FibCode getTakeProfit_v7(FibCode code) {
+	public FibCode getTakeProfit_v1(FibCode code) {
 		FibCode takeProfit = FibCode.FIB382;
 		if(level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) {
 			if(code == FibCode.FIB4_618) {//4.618 -> 2.618
@@ -154,210 +154,6 @@ public class FibInfo {
 		}
 		
 		return takeProfit;
-	}
-	
-	/**
-	 * 止盈点位 V6
-	 * @param code 开仓时所处的斐波那契回撤点位
-	 * @return 止盈的斐波那契回撤点位
-	 */
-	public FibCode getTakeProfit_v6(FibCode code) {
-		FibCode takeProfit = FibCode.FIB382;
-		if(code == FibCode.FIB4_618) {//4.618 -> 2.618
-			takeProfit = FibCode.FIB2_618;
-		} else if(code == FibCode.FIB2_618) { // 2.618 -> 2
-			takeProfit = FibCode.FIB2;
-		} else if(code == FibCode.FIB2) { // 2 -> 1.618
-			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB1_618) { // 1.618 -> 1
-			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.618
-			takeProfit = FibCode.FIB618;
-		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
-			takeProfit = FibCode.FIB5;
-		}
-		return takeProfit;
-	}
-	
-	/**
-	 * 止盈点位 V5
-	 * @param code 开仓时所处的斐波那契回撤点位
-	 * @return 止盈的斐波那契回撤点位
-	 */
-	public FibCode getTakeProfit_v5(FibCode code) {
-		FibCode takeProfit = FibCode.FIB382;
-		if(code == FibCode.FIB4_618) {//4 -> 2.618
-			takeProfit = FibCode.FIB2_618;
-		} else if(code == FibCode.FIB2_618) { // 2.618 -> 2
-			takeProfit = FibCode.FIB2;
-		} else if(code == FibCode.FIB2) { // 2 -> 1.618
-			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB1_618) { // 1.618 -> 1
-			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.618
-			takeProfit = FibCode.FIB618;
-		}
-		return takeProfit;
-	}
-	
-	/**
-	 * 止盈点位 V4
-	 * @param code 开仓时所处的斐波那契回撤点位
-	 * @return 止盈的斐波那契回撤点位
-	 */
-	public FibCode getTakeProfit_v4(FibCode code) {
-		FibCode takeProfit = FibCode.FIB382;
-		if(code == FibCode.FIB4_618) {
-			takeProfit = FibCode.FIB1_618;
-		} else if(code.gt(FibCode.FIB1)) {
-			takeProfit = FibCode.FIB1;
-		} else if(code.equalsValue(FibCode.FIB786) || code.equalsValue(FibCode.FIB1)) {
-			takeProfit = FibCode.FIB5;
-		}
-		return takeProfit;
-	}
-	
-	/**
-	 * 止盈点位 V3
-	 * @param code 开仓时所处的斐波那契回撤点位
-	 * @return 止盈的斐波那契回撤点位
-	 */
-	public FibCode getTakeProfit_v3(FibCode code) {
-		FibCode takeProfit = FibCode.FIB382;
-		if(code == FibCode.FIB4_618) {
-			takeProfit = FibCode.FIB1_618;
-		} else if(code.gt(FibCode.FIB1)) {
-			takeProfit = FibCode.FIB1;
-		}
-		return takeProfit;
-	}
-	
-	/**
-	 * 止盈点位 V2
-	 * @param code 开仓时所处的斐波那契回撤点位
-	 * @return 止盈的斐波那契回撤点位
-	 */
-	public FibCode getTakeProfit_v2(FibCode code) {
-		FibCode takeProfit = FibCode.FIB382;
-		if(code == FibCode.FIB4_618) {
-			takeProfit = FibCode.FIB2_618;
-		} else if(code.getValue() > FibCode.FIB1.getValue()) {
-			takeProfit = FibCode.FIB1;
-		}
-		return takeProfit;
-	}
-	
-	/**
-	 * 止盈点位
-	 * @param code 开仓时所处的斐波那契回撤点位
-	 * @return 止盈的斐波那契回撤点位
-	 */
-	public FibCode getTakeProfit(FibCode code) {
-		
-		FibCode takeProfit;
-		
-		switch (level) {
-		
-		case LEVEL_1:
-			
-			switch (code) {
-			
-			case FIB1:
-				takeProfit = FibCode.FIB786;
-				break;
-			case FIB786:
-				takeProfit = FibCode.FIB618;
-				break;
-			case FIB66:
-				takeProfit = FibCode.FIB5;
-				break;
-			case FIB618:
-				takeProfit = FibCode.FIB5;
-				break;
-			case FIB5:
-				takeProfit = FibCode.FIB382;
-				break;
-			case FIB382:
-				takeProfit = FibCode.FIB236;
-				break;
-			default:
-				takeProfit = FibCode.FIB382;
-				break;
-			}
-			
-			break;
-			
-		case LEVEL_2:
-			
-			switch (code) {
-			
-			case FIB1:
-				takeProfit = FibCode.FIB786;
-				break;
-			case FIB786:
-				takeProfit = FibCode.FIB618;
-				break;
-			case FIB66:
-				takeProfit = FibCode.FIB5;
-				break;
-			case FIB618:
-				takeProfit = FibCode.FIB5;
-				break;
-			case FIB5:
-				takeProfit = FibCode.FIB382;
-				break;
-			case FIB382:
-				takeProfit = FibCode.FIB236;
-			default:
-				takeProfit = FibCode.FIB382;
-				break;
-			}
-			break;
-		default:
-			takeProfit = FibCode.FIB382;
-			break;
-		}
-		
-		return takeProfit;
-	}
-	
-	/**
-	 * 止盈点位
-	 * @param offset
-	 * @param codes
-	 * @return
-	 */
-	public FibCode getTakeProfit(int offset,FibCode[] codes) {
-		int index = offset;
-		FibCode current = codes[index];
-		if(this.level == FibLevel.LEVEL_1) {//1级回撤
-			if(current == FibCode.FIB66 || current == FibCode.FIB786) {
-				index += 2;
-			} else {
-				index++;
-			}
-		} else { // 2级 或 3级回撤
-			if(current == FibCode.FIB66 || current == FibCode.FIB786) {
-				index += 3;
-			} else if(current == FibCode.FIB5) {//0.5 ~ 0.382
-				index++;
-			} else {
-				index += 2;
-			}
-		}
-		
-		return codes[index];
-	}
-	
-	/**
-	 * 校验是否为回踩单开仓点位
-	 * @param code
-	 * @return
-	 */
-	public boolean verifyStepBack(FibCode code) {
-		//一级0位置分别对应回撤0.382 0.5 0.618 0.786
-		return code == FibCode.FIB1_618 || code == FibCode.FIB2 || code == FibCode.FIB2_618
-				 || code == FibCode.FIB4_618;
 	}
 	
 	/**
