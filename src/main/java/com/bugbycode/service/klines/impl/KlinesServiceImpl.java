@@ -1960,48 +1960,32 @@ public class KlinesServiceImpl implements KlinesService {
 
 	@Override
 	public void volumeMonitor(List<Klines> list) {
+		
 		if(CollectionUtils.isEmpty(list) || list.size() < 3) {
 			return;
 		}
 		
-		PriceUtil.calculateEMA_7_25_99(list);
+		List<Klines> list_1h = PriceUtil.to1HFor15MKlines(list);
 		
-		int size = list.size();
-		int index = size - 1;
+		Klines last = PriceUtil.getLastKlines(list_1h);
+		String pair = last.getPair();
 		
-		Klines k0 = list.get(index);
-		String pair = k0.getPair();
-		
-		double ema7 = k0.getEma7();
-		double ema25 = k0.getEma25();
-		double ema99 = k0.getEma99();
+		/*
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			return;
+		}*/
 		
 		String subject = "";
-		String text = k0.toString();
+		String text = last.toString();
 		
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		if(PriceUtil.isBuying(list) && ema7 < ema25 && ema7 < ema99) {
-			
-			subject = String.format("%s永续合约出现买盘 %s", pair, dateStr);
-		
-		} else if(PriceUtil.isBuyingExhaustion(list) && ema7 > ema25 && ema7 > ema99) {
-			
-			subject = String.format("%s永续合约买盘衰竭 %s", pair, dateStr);
-			
-		} else if(PriceUtil.isSelling(list) && ema7 > ema25 && ema7 > ema99) {
-			
-			subject = String.format("%s永续合约出现卖盘 %s", pair, dateStr);
-			
-		} else if(PriceUtil.isSellingExhaustion(list) && ema7 < ema25 && ema7 < ema99) {
-			
-			subject = String.format("%s永续合约卖盘衰竭 %s", pair, dateStr);
-			
-		} else if(PriceUtil.isFall_v3(list) && PriceUtil.isRelease(list)) {//下跌
+		if(PriceUtil.isFall_v3(list_1h) && PriceUtil.isRelease(list_1h)) {//下跌
 			
 			subject = String.format("%s永续合约放量下跌 %s", pair, dateStr);
 			
-		} else if(PriceUtil.isRise_v3(list) && PriceUtil.isRelease(list)) { //上涨
+		} else if(PriceUtil.isRise_v3(list_1h) && PriceUtil.isRelease(list_1h)) { //上涨
 			
 			subject = String.format("%s永续合约放量上涨 %s", pair, dateStr);
 			
