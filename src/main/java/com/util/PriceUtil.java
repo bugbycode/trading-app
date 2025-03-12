@@ -1547,10 +1547,12 @@ public class PriceUtil {
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
 			Klines current = getLastKlines(list);
 			double closePrice = current.getClosePriceDoubleValue();
+			double openPrice = current.getOpenPriceDoubleValue();
+			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
 			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
-				result = (isBullishSwallowing(list) || verifyPowerful(list)) && closePrice < fib382Price;
+				result = (isBullishSwallowing(list) || verifyPowerful(list)) && openPrice <= fib236Price && closePrice < fib382Price;
 			}
 		}
 		
@@ -1568,10 +1570,12 @@ public class PriceUtil {
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
 			Klines current = getLastKlines(list);
 			double closePrice = current.getClosePriceDoubleValue();
+			double openPrice = current.getOpenPriceDoubleValue();
+			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
 			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				result = (isPutInto(list) || verifyDecliningPrice(list)) && closePrice > fib382Price;
+				result = (isPutInto(list) || verifyDecliningPrice(list)) && openPrice >= fib236Price && closePrice > fib382Price;
 			}
 		}
 		return result;
