@@ -1,7 +1,6 @@
 package com.bugbycode.service.klines.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -1003,9 +1002,9 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void declineAndStrengthCheck(List<Klines> klinesListData) {
+	public void declineAndStrengthCheck(List<Klines> klinesList) {
 		
-		if(CollectionUtils.isEmpty(klinesListData)) {
+		if(CollectionUtils.isEmpty(klinesList)) {
 			return;
 		}
 		
@@ -1013,20 +1012,9 @@ public class KlinesServiceImpl implements KlinesService {
 		String subject = "";//邮件主题
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		List<Klines> klinesList_tmp = new ArrayList<Klines>();
-		klinesList_tmp.addAll(klinesListData);
-		
-		List<Klines> klinesList = PriceUtil.to1HFor15MKlines(klinesList_tmp);
-		
 		Klines lastKlines = PriceUtil.getLastKlines(klinesList);
-		
 		String pair = lastKlines.getPair();
 		double closePrice = lastKlines.getClosePriceDoubleValue();
-		
-		int minute = DateFormatUtil.getMinute(lastKlines.getEndTime());
-		if(minute != 59) {
-			return;
-		}
 		
 		FibUtil_v3 fu = new FibUtil_v3(klinesList);
 		

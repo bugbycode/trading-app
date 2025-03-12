@@ -409,7 +409,7 @@ public class FibUtil_v3 {
 	public boolean verifyFirstFibOpen(FibInfo firstFibInfo,double currentPrice) {
 		boolean flag = false;
 		if(firstFibInfo != null) {
-			double first_fibPrice = firstFibInfo.getFibValue(FibCode.FIB5);
+			double first_fibPrice = firstFibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = firstFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
 				flag = currentPrice <= first_fibPrice;

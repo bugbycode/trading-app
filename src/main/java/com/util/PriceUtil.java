@@ -1384,37 +1384,46 @@ public class PriceUtil {
 	}
 	
 	/**
-	 * 校验价格是否出现颓势
+	 * 校验价格是否出现颓势 </br>
+	 * 
+	 * 1、前4根k线连续上涨且当前k线收盘价小于等于前两根k线实体部分最低价格
+	 * 
 	 * @param list
 	 * @return
 	 */
 	public static boolean verifyDecliningPrice(List<Klines> list) {
-		boolean flag = false;
+		
 		int lastIndex = list.size() - 1;
 		Klines k0 = list.get(lastIndex);
 		Klines k1 = list.get(lastIndex - 1);
 		Klines k2 = list.get(lastIndex - 2);
-		if(isRise_V2(k1, k2) && verifyDecliningPrice(k0, k1)) {
-			flag = true;
-		}
-		return flag;
+		Klines k3 = list.get(lastIndex - 2);
+		Klines k4 = list.get(lastIndex - 2);
+		
+		return (isRise(k3, k4) && isRise(k2, k3) && isRise(k1, k2)) 
+				&& k0.getBodyLowPriceDoubleValue() <= k1.getBodyLowPriceDoubleValue()
+				&& k0.getBodyLowPriceDoubleValue() <= k2.getBodyLowPriceDoubleValue();
 	}
 	
 	/**
-	 * 校验价格是否出现强势
+	 * 校验价格是否出现强势</br>
+	 * 
+	 * 1、前4根k线连续下跌且当前k线收盘价大于等于前两根k线实体部分最高价格
+	 * 
 	 * @param list
 	 * @return
 	 */
 	public static boolean verifyPowerful(List<Klines> list) {
-		boolean flag = false;
 		int lastIndex = list.size() - 1;
 		Klines k0 = list.get(lastIndex);
 		Klines k1 = list.get(lastIndex - 1);
 		Klines k2 = list.get(lastIndex - 2);
-		if(isFall_V2(k1, k2) && verifyPowerful(k0, k1)) {
-			flag = true;
-		}
-		return flag;
+		Klines k3 = list.get(lastIndex - 2);
+		Klines k4 = list.get(lastIndex - 2);
+		
+		return (isFall(k3, k4) && isFall(k2, k3) && isFall(k1, k2)) 
+				&& k0.getBodyLowPriceDoubleValue() >= k1.getBodyLowPriceDoubleValue()
+				&& k0.getBodyLowPriceDoubleValue() >= k2.getBodyLowPriceDoubleValue();
 	}
 	
 	/**
@@ -1538,11 +1547,10 @@ public class PriceUtil {
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
 			Klines current = getLastKlines(list);
 			double closePrice = current.getClosePriceDoubleValue();
-			double ema7 = current.getEma7();
-			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
+			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
-				result = isBreachLong(current, fib236Price) && closePrice >= ema7;
+				result = (isBullishSwallowing(list) || verifyPowerful(list)) && closePrice < fib382Price;
 			}
 		}
 		
@@ -1560,10 +1568,10 @@ public class PriceUtil {
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
 			Klines current = getLastKlines(list);
 			double closePrice = current.getClosePriceDoubleValue();
-			double ema7 = current.getEma7();			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
+			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				result = isBreachShort(current, fib236Price) && closePrice <= ema7;
+				result = (isPutInto(list) || verifyDecliningPrice(list)) && closePrice > fib382Price;
 			}
 		}
 		return result;
@@ -2063,6 +2071,42 @@ public class PriceUtil {
 		Klines k3 = list.get(index - 3);
 		
 		return (isRise_v3(k1, k2) && isRise_v3(k2, k3)) && isReduced(k1, k2, k3) && k0.getVDoubleValue() > k1.getVDoubleValue();
+	}
+	
+	/**
+	 * 是否出现看涨吞没 <br/>
+	 * 
+	 * 1、出现买盘信号或卖盘衰竭信号且最后一根k线收盘价大于等于前一根k线开盘价
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static boolean isBullishSwallowing(List<Klines> list) {
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		
+		return (isBuying(list) || isSellingExhaustion(list)) && k0.getClosePriceDoubleValue() >= k1.getOpenPriceDoubleValue();
+	}
+	
+	/**
+	 * 是否出现看跌吞没 <br/>
+	 * 
+	 * 1、出现卖盘信号或买盘衰竭信号且最后一根k线收盘价小于等于前一根k线开盘价
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static boolean isPutInto(List<Klines> list) {
+		int size = list.size();
+		int index = size - 1;
+		
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index - 1);
+		
+		return (isSelling(list) || isBuyingExhaustion(list)) && k0.getClosePriceDoubleValue() <= k1.getOpenPriceDoubleValue();
 	}
 	
 	/**
