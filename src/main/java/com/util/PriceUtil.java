@@ -1401,8 +1401,8 @@ public class PriceUtil {
 		Klines k4 = list.get(lastIndex - 2);
 		
 		return (isRise(k3, k4) && isRise(k2, k3) && isRise(k1, k2)) 
-				&& k0.getBodyLowPriceDoubleValue() <= k1.getBodyLowPriceDoubleValue()
-				&& k0.getBodyLowPriceDoubleValue() <= k2.getBodyLowPriceDoubleValue();
+				&& k0.getClosePriceDoubleValue() <= k1.getBodyLowPriceDoubleValue()
+				&& k0.getClosePriceDoubleValue() <= k2.getBodyLowPriceDoubleValue();
 	}
 	
 	/**
@@ -1422,8 +1422,8 @@ public class PriceUtil {
 		Klines k4 = list.get(lastIndex - 2);
 		
 		return (isFall(k3, k4) && isFall(k2, k3) && isFall(k1, k2)) 
-				&& k0.getBodyLowPriceDoubleValue() >= k1.getBodyLowPriceDoubleValue()
-				&& k0.getBodyLowPriceDoubleValue() >= k2.getBodyLowPriceDoubleValue();
+				&& k0.getClosePriceDoubleValue() >= k1.getBodyLowPriceDoubleValue()
+				&& k0.getClosePriceDoubleValue() >= k2.getBodyLowPriceDoubleValue();
 	}
 	
 	/**
