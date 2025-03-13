@@ -201,7 +201,7 @@ public class FibInfo {
 	public boolean verifyOpenFibCode(FibCode code) {
 		QuotationMode mode = this.getQuotationMode();
 		boolean result = false;
-		if(level == FibLevel.LEVEL_1) {//震荡行情
+		if(level == FibLevel.LEVEL_1 && code.lte(FibCode.FIB1)) {//震荡行情
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG
 				&& code.lte(FibCode.FIB1)) {//多头行情做多
