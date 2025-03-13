@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
+import com.bugbycode.module.CountertrendTradingStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
@@ -113,6 +114,7 @@ public class UserController extends BaseController{
 		RecvCrossUnPnlStatus recvCrossUnPnlStatus = RecvCrossUnPnlStatus.valueOf(data.getRecvCrossUnPnl());
 		TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(data.getTradeStepBack());
 		TradeStyle tradeStyle = TradeStyle.valueOf(data.getTradeStyle());
+		CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(data.getCountertrendTrading());
 		
 		if(data.getCutLoss() == 0) {
 			data.setCutLoss(3);
@@ -142,7 +144,7 @@ public class UserController extends BaseController{
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
 					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
 					drawTrade.getValue(), recvTradeStatus.getValue(), recvCrossUnPnlStatus.getValue(), data.getRecvCrossUnPnlPercent(), 
-					tradeStepBackStatus.getValue(), tradeStyle.getValue(), data.getProfitLimit());
+					tradeStepBackStatus.getValue(), tradeStyle.getValue(), data.getProfitLimit(), countertrendTradingStatus.getValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -160,6 +162,7 @@ public class UserController extends BaseController{
 			user.setTradeStepBack(tradeStepBackStatus.getValue());
 			user.setTradeStyle(tradeStyle.getValue());
 			user.setProfitLimit(data.getProfitLimit());
+			user.setCountertrendTrading(countertrendTradingStatus.getValue());
 			
 			json.put("message", "修改成功");
 		} else {

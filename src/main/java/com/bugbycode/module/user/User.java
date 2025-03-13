@@ -72,6 +72,8 @@ public class User implements UserDetails {
 	
 	private int volumeMonitor = 0; //是否启用量价分析 0：否 1：是
 	
+	private int countertrendTrading = 0; //是否交易逆势单 0：否 1：是
+	
 	public String getId() {
 		return id;
 	}
@@ -289,6 +291,14 @@ public class User implements UserDetails {
 		this.volumeMonitor = volumeMonitor;
 	}
 	
+	public int getCountertrendTrading() {
+		return countertrendTrading;
+	}
+
+	public void setCountertrendTrading(int countertrendTrading) {
+		this.countertrendTrading = countertrendTrading;
+	}
+
 	public void copyAIInfo(User user) {
 		this.setRiseAndFallMonitor(user.getRiseAndFallMonitor());
 		this.setHighOrLowMonitor(user.getHighOrLowMonitor());

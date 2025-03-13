@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.CountertrendTradingStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -218,6 +219,13 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
+					//是否交易逆势单
+					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
+					//空头走势不做多
+					if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_3) {
+						continue;
+					}
+					
 					//根据交易风格设置盈利限制
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					
@@ -292,6 +300,13 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 
+					//是否交易逆势单
+					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
+					//多头走势不做空
+					if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_2) {
+						continue;
+					}
+					
 					//根据交易风格设置盈利限制
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					
@@ -355,6 +370,8 @@ public class KlinesServiceImpl implements KlinesService {
 					String dateStr = DateFormatUtil.format(new Date());
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					//是否交易逆势单
+					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
 					
 					//计算预计盈利百分比
 					double profitPercent = 0;
@@ -407,6 +424,12 @@ public class KlinesServiceImpl implements KlinesService {
 								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 									continue;
 								}
+								
+								//空头走势不做多
+								if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_3) {
+									continue;
+								}
+								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
@@ -563,7 +586,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 				}
 			}
-		} else {
+		} else {//做空
 			//只做U本位(USDT)合约
 			if(pair.endsWith("USDT")) {
 				List<User> userList = null;
@@ -580,6 +603,9 @@ public class KlinesServiceImpl implements KlinesService {
 					String dateStr = DateFormatUtil.format(new Date());
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					//是否交易逆势单
+					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
+					
 					//计算预计盈利百分比
 					double profitPercent = 0;
 					
@@ -629,6 +655,12 @@ public class KlinesServiceImpl implements KlinesService {
 								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 									continue;
 								}
+								
+								//多头走势不做空
+								if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_2) {
+									continue;
+								}
+								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
