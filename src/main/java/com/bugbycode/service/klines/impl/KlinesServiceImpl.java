@@ -53,6 +53,7 @@ import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
+import com.util.FibUtil;
 import com.util.FibUtil_v3;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
@@ -205,7 +206,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(PriceUtil.isLong_v3(fibInfo.getFibValue(code), klinesList_hit)
+			if( fibInfo.verifyOpenFibCode(code)
+					&& PriceUtil.isLong_v3(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
@@ -250,7 +252,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					sendEmail(subject, text, u.getUsername());
 				}
-				
+				break;
 			}
 			
 			if(code == fibInfo.getLevel().getStartFibCode()) {
@@ -278,7 +280,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(PriceUtil.isShort_v3(fibInfo.getFibValue(code), klinesList_hit)
+			if( fibInfo.verifyOpenFibCode(code)
+					&& PriceUtil.isShort_v3(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				
 				//市价做空
@@ -323,6 +326,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					sendEmail(subject,text, u.getUsername());
 				}
+				break;
 			}
 
 			
@@ -975,7 +979,7 @@ public class KlinesServiceImpl implements KlinesService {
 			klinesList_1h.remove(last);
 		}
 		
-		FibUtil_v3 fu = new FibUtil_v3(klinesList_1h);
+		FibUtil fu = new FibUtil(klinesList_1h);
 		FibInfo fibInfo = fu.getFibInfo();
 		
 		if(fibInfo == null) {

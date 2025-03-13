@@ -127,13 +127,14 @@ public class FibUtil {
 		
 		if(thirdFlag != null) {
 			List<Klines> fisrtSubList = PriceUtil.subList(thirdFlag, firstFlag, list);
+			
 			//做多情况
 			if(ps == PositionSide.LONG) {
 				//寻找斐波那契回撤起始点（低点）
 				Klines fibStartKlines = PriceUtil.getMinPriceKLine(fisrtSubList);
 				//终端（高点）
 				Klines fibEndKlines = PriceUtil.getMaxPriceKLine(PriceUtil.subList(fibStartKlines, last, list));
-				fib = new FibInfo(fibStartKlines.getLowPriceDoubleValue(), fibEndKlines.getHighPriceDoubleValue(), last.getDecimalNum(), FibLevel.LEVEL_5);
+				fib = new FibInfo(fibStartKlines.getLowPriceDoubleValue(), fibEndKlines.getHighPriceDoubleValue(), last.getDecimalNum(), getFibLevel(fibStartKlines, fibEndKlines));
 				
 				this.afterFlag = fibEndKlines;
 			} else 
@@ -143,7 +144,7 @@ public class FibUtil {
 				Klines fibStartKlines = PriceUtil.getMaxPriceKLine(fisrtSubList);
 				//终端（低点）
 				Klines fibEndKlines = PriceUtil.getMinPriceKLine(PriceUtil.subList(fibStartKlines, last, list));
-				fib = new FibInfo(fibStartKlines.getHighPriceDoubleValue(), fibEndKlines.getLowPriceDoubleValue(), last.getDecimalNum(), FibLevel.LEVEL_5);
+				fib = new FibInfo(fibStartKlines.getHighPriceDoubleValue(), fibEndKlines.getLowPriceDoubleValue(), last.getDecimalNum(), getFibLevel(fibStartKlines, fibEndKlines));
 				this.afterFlag = fibEndKlines;
 			}
 		}
@@ -206,8 +207,7 @@ public class FibUtil {
 	private boolean verifyHigh(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		double ema99 = k.getEma99();
-		return ema7 > ema25 && ema25 > ema99;
+		return ema7 > ema25;
 	}
 	
 	/**
@@ -218,7 +218,27 @@ public class FibUtil {
 	private boolean verifyLow(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		double ema99 = k.getEma99();
-		return ema7 < ema25 && ema25 < ema99;
+		return ema7 < ema25;
 	}
+	
+	//回撤级别
+	private FibLevel getFibLevel(Klines fibStartKlines, Klines fibEndKlines) {
+		FibLevel level = FibLevel.LEVEL_1;
+		double start_ema25 = fibStartKlines.getEma25();
+		double start_ema99 = fibStartKlines.getEma99();
+		double end_ema25 = fibEndKlines.getEma25();
+		double end_ema99 = fibEndKlines.getEma99();
+		
+		if((start_ema25 < start_ema99 && end_ema25 > end_ema99) 
+				|| (start_ema25 > start_ema99 && end_ema25 < end_ema99)) { //震荡行情
+			level = FibLevel.LEVEL_1;
+		} else if(start_ema25 >= start_ema99 && end_ema25 >= end_ema99) {//多头行情
+			level = FibLevel.LEVEL_2;
+		} else if(start_ema25 <= start_ema99 && end_ema25 <= end_ema99) {//空头行情
+			level = FibLevel.LEVEL_3;
+		}
+		
+		return level;
+	}
+	
 }
