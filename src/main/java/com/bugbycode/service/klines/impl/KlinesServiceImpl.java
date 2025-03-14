@@ -208,7 +208,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode code = codes[offset];//当前斐波那契点位
 			
 			if( fibInfo.verifyOpenFibCode(code)
-					&& PriceUtil.isLong_v3(fibInfo.getFibValue(code), klinesList_hit)
+					&& PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
@@ -289,7 +289,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode code = codes[offset];//当前斐波那契点位
 			
 			if( fibInfo.verifyOpenFibCode(code)
-					&& PriceUtil.isShort_v3(fibInfo.getFibValue(code), klinesList_hit)
+					&& PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				
 				//市价做空
