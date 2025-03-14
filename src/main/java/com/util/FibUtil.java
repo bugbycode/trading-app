@@ -241,4 +241,30 @@ public class FibUtil {
 		return level;
 	}
 	
+	/**
+	 * 校验行情是否发生转变
+	 * @param level
+	 * @param list
+	 * @return
+	 */
+	public boolean verifyMarketChanges(FibLevel level, List<Klines> list) {
+		
+		boolean result= false;
+		
+		Klines last = PriceUtil.getLastKlines(list);
+		
+		double ema7 = last.getEma7();
+		double ema25 = last.getEma25();
+		double ema99 = last.getEma99();
+		
+		//多头转空头
+		if(level == FibLevel.LEVEL_2 && ema7 <= ema99 && ema25 <= ema99) {
+			result = true;
+		} else if(level == FibLevel.LEVEL_3 && ema7 >= ema99 && ema25 >= ema99) {//空头转多头
+			result = true;
+		}
+		
+		return result;
+	}
+	
 }

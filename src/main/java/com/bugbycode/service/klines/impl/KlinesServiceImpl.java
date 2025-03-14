@@ -1018,6 +1018,12 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		FibLevel level = fibInfo.getLevel();
+		//行情框架发生转变的情况不做交易
+		if(fu.verifyMarketChanges(level, klinesList_1h)) {
+			return;
+		}
+		
 		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
 		
 		QuotationMode qm = fibInfo.getQuotationMode();
