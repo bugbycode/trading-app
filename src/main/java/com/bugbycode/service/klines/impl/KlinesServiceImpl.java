@@ -1055,11 +1055,19 @@ public class KlinesServiceImpl implements KlinesService {
 		String subject = "";//邮件主题
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		Klines lastKlines = PriceUtil.getLastKlines(klinesList);
-		String pair = lastKlines.getPair();
-		double closePrice = lastKlines.getClosePriceDoubleValue();
+		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
 		
-		FibUtil_v2 fu = new FibUtil_v2(klinesList);
+		Klines last = PriceUtil.getLastKlines(klinesList_1h);
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			return;
+		}
+		
+		String pair = last.getPair();
+		double closePrice = last.getClosePriceDoubleValue();
+		
+		FibUtil_v2 fu = new FibUtil_v2(klinesList_1h);
 		
 		FibInfo firstFibInfo = fu.getFibInfo();
 		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
@@ -1068,7 +1076,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibCode takeProfitCode = FibCode.FIB618;
 		
 		//二级回撤
-		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) /*&& fu.verifyFirstFibOpen(firstFibInfo, closePrice)*/) {
+		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList_1h) /*&& fu.verifyFirstFibOpen(firstFibInfo, closePrice)*/) {
 			
 			//市价做空
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION));
@@ -1106,7 +1114,7 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 			
-		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) /*&& fu.verifyFirstFibOpen(firstFibInfo, closePrice)*/) {
+		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList_1h) /*&& fu.verifyFirstFibOpen(firstFibInfo, closePrice)*/) {
 			
 			//市价做多
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION));
@@ -1147,7 +1155,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		//一级回撤
-		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
+		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList_1h)) {
 			
 			//市价做空
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION));
@@ -1185,7 +1193,7 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 			
-		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesList)) {
+		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesList_1h)) {
 			
 			//市价做多
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION));
