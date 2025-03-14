@@ -2157,4 +2157,16 @@ public class PriceUtil {
 		}
 		return pricePercent;
 	}
+	
+	/**
+	 * 校验波动幅度是否满足用户设定的阈值
+	 * @param pricePercent 价格波动幅度
+	 * @param nextPricePercent 下一个点位价格波动幅度
+	 * @param profit 盈利过滤
+	 * @param profitLimit 盈利限制
+	 * @return
+	 */
+	public static boolean checkPercent(double pricePercent, double nextPricePercent, double profit, double profitLimit) {
+		return pricePercent > profitLimit && nextPricePercent >= profit;
+	}
 }
