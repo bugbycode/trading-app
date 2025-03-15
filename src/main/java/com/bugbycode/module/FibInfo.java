@@ -90,14 +90,10 @@ public class FibInfo {
 			takeProfit = FibCode.FIB2_618;
 		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
 			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618 || code == FibCode.FIB1_272) { // 2/1.618/1.272 - 1
+		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
 			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.5/0.618
-			if(level == FibLevel.LEVEL_1) {
-				takeProfit = FibCode.FIB5;
-			} else {
-				takeProfit = FibCode.FIB618;
-			}
+		} else if(code == FibCode.FIB1) { // 1 -> 0.382
+			takeProfit = FibCode.FIB382;
 		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
 			takeProfit = FibCode.FIB382;
 		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
@@ -232,16 +228,24 @@ public class FibInfo {
 		
 		FibCode result = FibCode.FIB0;
 		
-		FibCode codes[] = FibCode.values();
-		for(int index = 0; index < codes.length; index++) {
-			FibCode code = codes[index];
-			if(code == current && code != FibCode.FIB0) {
-				if(code == FibCode.FIB786 || code == FibCode.FIB66) {
-					result = codes[index + 2];
-				} else {
-					result = codes[index + 1];
+		if(current == FibCode.FIB1) {
+			result = FibCode.FIB618;
+		} else if(current == FibCode.FIB786) {
+			result = FibCode.FIB5;
+		} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
+			result = FibCode.FIB382;
+		} else {
+			FibCode codes[] = FibCode.values();
+			for(int index = 0; index < codes.length; index++) {
+				FibCode code = codes[index];
+				if(code == current && code != FibCode.FIB0) {
+					if(code == FibCode.FIB786 || code == FibCode.FIB66) {
+						result = codes[index + 2];
+					} else {
+						result = codes[index + 1];
+					}
+					break;
 				}
-				break;
 			}
 		}
 		
