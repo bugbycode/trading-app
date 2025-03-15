@@ -1553,12 +1553,18 @@ public class PriceUtil {
 			double parent_closePrice = parent.getClosePriceDoubleValue();
 			double closePrice = current.getClosePriceDoubleValue();
 			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
-			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
+			double fib5Price = fibInfo.getFibValue(FibCode.FIB5);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
-				result = isBreachLong(current, fib236Price) 
-						&& ( isBreachLong(current, ema7) || parent_closePrice >= parent_ema7 ) 
-						&& closePrice < fib382Price;
+				result = (
+						
+						( isBreachLong(current, fib236Price) && ( isBreachLong(current, ema7) || parent_closePrice >= parent_ema7 ) )
+						
+						|| 
+						
+						( isBreachLong(parent, fib236Price) && parent_closePrice < parent_ema7 && closePrice >= ema7)
+						
+						) && closePrice < fib5Price;
 			}
 		}
 		
@@ -1582,12 +1588,18 @@ public class PriceUtil {
 			double parent_closePrice = parent.getClosePriceDoubleValue();
 			double closePrice = current.getClosePriceDoubleValue();
 			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
-			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
+			double fib5Price = fibInfo.getFibValue(FibCode.FIB5);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				result = isBreachShort(current, fib236Price) 
-						&& ( isBreachShort(current, ema7) || parent_closePrice <= parent_ema7 ) 
-						&& closePrice > fib382Price;
+				result = ( 
+						
+						( isBreachShort(current, fib236Price) && ( isBreachShort(current, ema7) || parent_closePrice <= parent_ema7 ) )
+						
+						|| 
+						
+						( isBreachShort(parent, fib236Price) && parent_closePrice > parent_ema7 && closePrice <= ema7 )
+						
+						) && closePrice > fib5Price;
 			}
 		}
 		return result;
