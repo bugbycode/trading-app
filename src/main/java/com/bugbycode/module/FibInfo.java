@@ -204,13 +204,13 @@ public class FibInfo {
 		if(level == FibLevel.LEVEL_1 && code.lte(FibCode.FIB1)) {//震荡行情
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG
-				&& code.lte(FibCode.FIB1)) {//多头行情做多
+				&& code.lte(FibCode.FIB786)) {//多头行情做多
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.SHORT
 				&& code.gte(FibCode.FIB1)) { //多头行情做空
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT
-				&& code.lte(FibCode.FIB1)) { //空头行情做空
+				&& code.lte(FibCode.FIB786)) { //空头行情做空
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.LONG
 				&& code.gte(FibCode.FIB1)) { //空头行情做多
