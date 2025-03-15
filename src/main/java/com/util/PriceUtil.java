@@ -1556,7 +1556,7 @@ public class PriceUtil {
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
 				result = isBreachLong(current, fib236Price) 
-						&& ( isBreachLong(current, ema7) || ( isBreachLong(parent, parent_ema7)  && current.isRise() ) ) 
+						&& ( isBreachLong(current, ema7) || isBreachLong(parent, parent_ema7) ) 
 						&& closePrice < fib382Price;
 			}
 		}
@@ -1584,7 +1584,7 @@ public class PriceUtil {
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
 				result = isBreachShort(current, fib236Price) 
-						&& ( isBreachShort(current, ema7) || ( isBreachShort(parent, parent_ema7) && current.isFall() ) ) 
+						&& ( isBreachShort(current, ema7) || isBreachShort(parent, parent_ema7) ) 
 						&& closePrice > fib382Price;
 			}
 		}
