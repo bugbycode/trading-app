@@ -1549,13 +1549,14 @@ public class PriceUtil {
 			Klines parent = list.get(index - 1);
 			Klines current = getLastKlines(list);
 			double ema7 = current.getEma7();
+			double parent_ema7 = parent.getEma7();
 			double closePrice = current.getClosePriceDoubleValue();
 			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
 			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
 				result = isBreachLong(current, fib236Price) 
-						&& ((isBreachLong(current, ema7) && current.isRise()) || isBreachLong(parent, ema7)) 
+						&& ( isBreachLong(current, ema7) || ( isBreachLong(parent, parent_ema7)  && current.isRise() ) ) 
 						&& closePrice < fib382Price;
 			}
 		}
@@ -1576,13 +1577,14 @@ public class PriceUtil {
 			Klines parent = list.get(index - 1);
 			Klines current = getLastKlines(list);
 			double ema7 = current.getEma7();
+			double parent_ema7 = parent.getEma7();
 			double closePrice = current.getClosePriceDoubleValue();
 			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
 			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
 				result = isBreachShort(current, fib236Price) 
-						&& ((isBreachShort(current, ema7) && current.isFall()) || isBreachShort(parent, ema7)) 
+						&& ( isBreachShort(current, ema7) || ( isBreachShort(parent, parent_ema7) && current.isFall() ) ) 
 						&& closePrice > fib382Price;
 			}
 		}
