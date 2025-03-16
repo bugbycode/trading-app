@@ -90,12 +90,12 @@ public class FibInfo {
 			takeProfit = FibCode.FIB2_618;
 		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
 			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
+		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618 || code == FibCode.FIB1_272) { // 2/1.618/1.272 - 1
 			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.382
-			takeProfit = FibCode.FIB382;
-		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
-			takeProfit = FibCode.FIB382;
+		} else if(code == FibCode.FIB1) { // 1 -> 0.618
+			takeProfit = FibCode.FIB618;
+		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
+			takeProfit = FibCode.FIB5;
 		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
 			takeProfit = FibCode.FIB382;
 		} else if(code == FibCode.FIB5) { // 0.5 -> 0.382
@@ -203,17 +203,15 @@ public class FibInfo {
 		boolean result = false;
 		if(level == FibLevel.LEVEL_1 && code.lte(FibCode.FIB1)) {//震荡行情
 			result = true;
-		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG
-				&& code.lte(FibCode.FIB786)) {//多头行情做多
+		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG) {//多头行情做多
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.SHORT
-				&& code.gte(FibCode.FIB1)) { //多头行情做空
+				&& code.equalsValue(FibCode.FIB1)) { //多头行情做空
 			result = true;
-		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT
-				&& code.lte(FibCode.FIB786)) { //空头行情做空
+		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT) { //空头行情做空
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.LONG
-				&& code.gte(FibCode.FIB1)) { //空头行情做多
+				&& code.equalsValue(FibCode.FIB1)) { //空头行情做多
 			result = true;
 		}
 		return result;
@@ -228,24 +226,16 @@ public class FibInfo {
 		
 		FibCode result = FibCode.FIB0;
 		
-		if(current == FibCode.FIB1) {
-			result = FibCode.FIB618;
-		} else if(current == FibCode.FIB786) {
-			result = FibCode.FIB5;
-		} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
-			result = FibCode.FIB382;
-		} else {
-			FibCode codes[] = FibCode.values();
-			for(int index = 0; index < codes.length; index++) {
-				FibCode code = codes[index];
-				if(code == current && code != FibCode.FIB0) {
-					if(code == FibCode.FIB786 || code == FibCode.FIB66) {
-						result = codes[index + 2];
-					} else {
-						result = codes[index + 1];
-					}
-					break;
+		FibCode codes[] = FibCode.values();
+		for(int index = 0; index < codes.length; index++) {
+			FibCode code = codes[index];
+			if(code == current && code != FibCode.FIB0) {
+				if(code == FibCode.FIB786 || code == FibCode.FIB66) {
+					result = codes[index + 2];
+				} else {
+					result = codes[index + 1];
 				}
+				break;
 			}
 		}
 		
