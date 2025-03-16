@@ -1545,26 +1545,13 @@ public class PriceUtil {
 	public static boolean verifyPowerful_v4(FibInfo fibInfo, List<Klines> list) {
 		boolean result = false;
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
-			int index = list.size() - 1;
-			Klines parent = list.get(index - 1);
 			Klines current = getLastKlines(list);
-			double ema7 = current.getEma7();
-			double parent_ema7 = parent.getEma7();
-			double parent_closePrice = parent.getClosePriceDoubleValue();
 			double closePrice = current.getClosePriceDoubleValue();
 			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
-			double fib5Price = fibInfo.getFibValue(FibCode.FIB5);
+			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
-				result = (
-						
-						( isBreachLong(current, fib236Price) && ( isBreachLong(current, ema7) || parent_closePrice >= parent_ema7 ) )
-						
-						|| 
-						
-						( isBreachLong(parent, fib236Price) && parent_closePrice < parent_ema7 && closePrice >= ema7)
-						
-						) && closePrice < fib5Price;
+				result = isBreachLong(current, fib236Price) && closePrice < fib382Price;
 			}
 		}
 		
@@ -1580,26 +1567,13 @@ public class PriceUtil {
 	public static boolean verifyDecliningPrice_v4(FibInfo fibInfo, List<Klines> list) {
 		boolean result = false;
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
-			int index = list.size() - 1;
-			Klines parent = list.get(index - 1);
 			Klines current = getLastKlines(list);
-			double ema7 = current.getEma7();
-			double parent_ema7 = parent.getEma7();
-			double parent_closePrice = parent.getClosePriceDoubleValue();
 			double closePrice = current.getClosePriceDoubleValue();
 			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
-			double fib5Price = fibInfo.getFibValue(FibCode.FIB5);
+			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				result = ( 
-						
-						( isBreachShort(current, fib236Price) && ( isBreachShort(current, ema7) || parent_closePrice <= parent_ema7 ) )
-						
-						|| 
-						
-						( isBreachShort(parent, fib236Price) && parent_closePrice > parent_ema7 && closePrice <= ema7 )
-						
-						) && closePrice > fib5Price;
+				result = isBreachShort(current, fib236Price) && closePrice > fib382Price;
 			}
 		}
 		return result;

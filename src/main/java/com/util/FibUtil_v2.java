@@ -258,7 +258,8 @@ public class FibUtil_v2 {
 	private boolean verifyHigh(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		return ema7 > ema25;
+		double ema99 = k.getEma25();
+		return ema7 > ema25 && ema25 > ema99;
 	}
 	
 	/**
@@ -269,7 +270,8 @@ public class FibUtil_v2 {
 	private boolean verifyLow(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		return ema7 < ema25;
+		double ema99 = k.getEma25();
+		return ema7 < ema25 && ema25 < ema99;
 	}
 	
 	/**
@@ -281,7 +283,7 @@ public class FibUtil_v2 {
 	public boolean verifyFirstFibOpen(FibInfo firstFibInfo,double currentPrice) {
 		boolean flag = false;
 		if(firstFibInfo != null) {
-			double first_fibPrice = firstFibInfo.getFibValue(FibCode.FIB5);
+			double first_fibPrice = firstFibInfo.getFibValue(FibCode.FIB618);
 			//double first_fib1Price = firstFibInfo.getFibValue(FibCode.FIB1);
 			QuotationMode qm = firstFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
