@@ -1934,7 +1934,7 @@ public class KlinesServiceImpl implements KlinesService {
                     	//创建同步标识
                     	FileUtil.createFile(fileName);
                 	} else {
-                		logger.info("{}交易对{}级别{}~{}缺失部分已是最新数据", current.getPair(), current.getInterval(), 
+                		logger.debug("{}交易对{}级别{}~{}缺失部分已是最新数据", current.getPair(), current.getInterval(), 
                 				DateFormatUtil.format(startTime), DateFormatUtil.format(endTime));
                 	}
                 }
