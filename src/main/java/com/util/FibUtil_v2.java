@@ -258,7 +258,7 @@ public class FibUtil_v2 {
 	private boolean verifyHigh(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		double ema99 = k.getEma25();
+		double ema99 = k.getEma99();
 		return ema7 > ema25 && ema25 > ema99;
 	}
 	
@@ -270,7 +270,7 @@ public class FibUtil_v2 {
 	private boolean verifyLow(Klines k) {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		double ema99 = k.getEma25();
+		double ema99 = k.getEma99();
 		return ema7 < ema25 && ema25 < ema99;
 	}
 	
