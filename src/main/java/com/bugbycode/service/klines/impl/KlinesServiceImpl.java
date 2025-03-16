@@ -1022,7 +1022,6 @@ public class KlinesServiceImpl implements KlinesService {
 		FibLevel level = fibInfo.getLevel();
 		//行情框架发生转变的情况不做交易
 		if(fu.verifyMarketChanges(level, klinesList_1h)) {
-			logger.info("{}永续合约行情框架发生转变", last.getPair());
 			return;
 		}
 		
