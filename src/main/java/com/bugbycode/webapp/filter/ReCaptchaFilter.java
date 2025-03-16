@@ -74,12 +74,11 @@ public class ReCaptchaFilter extends OncePerRequestFilter {
 					
 					JSONObject json = new JSONObject(result.getBody());
 					
-					logger.info(json.toString());
-					
 					if(json.has("success")) {
 						boolean success = json.getBoolean("success");
 						if(!success) {
 							responseFaild(response);
+							logger.info(json.toString());
 						}
 					} else {
 						responseFaild(response);
