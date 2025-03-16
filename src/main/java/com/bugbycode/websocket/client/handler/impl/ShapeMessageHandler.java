@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -46,9 +47,16 @@ public class ShapeMessageHandler implements MessageHandler {
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
+		
+		String pair = result.getString("ps");
+		
 		int decimalNum = new BigDecimal(openPriceStr).scale();
 		
-		Klines kline = new Klines(result.getString("ps"), klinesJson.getLong("t"), klinesJson.getString("o"), 
+		if(AppConfig.SYMBOL_EXCHANGE_INFO.get(pair) != null) {
+			decimalNum = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair).getDecimalNum();
+		}
+		
+		Klines kline = new Klines(pair, klinesJson.getLong("t"), klinesJson.getString("o"), 
 				klinesJson.getString("h"), klinesJson.getString("l"), klinesJson.getString("c"), klinesJson.getLong("T"),
 				client.getCoinPairSet().getInerval().getDescption(), decimalNum, klinesJson.getString("v"), klinesJson.getLong("n"),
 				klinesJson.getString("q"), klinesJson.getString("V"), klinesJson.getString("Q"));

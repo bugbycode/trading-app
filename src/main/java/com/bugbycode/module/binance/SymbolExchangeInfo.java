@@ -29,6 +29,8 @@ public class SymbolExchangeInfo {
 	private double lot_market_maxQty;//数量上限, 最大数量
 	
 	private double min_notional;//最小名义价值
+	
+	private String tickSize;//订单最小价格间隔
 
 	public String getId() {
 		return id;
@@ -100,6 +102,27 @@ public class SymbolExchangeInfo {
 
 	public void setMin_notional(double min_notional) {
 		this.min_notional = min_notional;
+	}
+	
+	public String getTickSize() {
+		return tickSize;
+	}
+
+	public void setTickSize(String tickSize) {
+		this.tickSize = tickSize;
+	}
+
+	public int getDecimalNum() {
+		
+		char[] arr = this.tickSize.toCharArray();
+		int index = arr.length - 1;
+		for(; index >= 0; index--) {
+			if(arr[index] != '0') {
+				break;
+			}
+		}
+		
+		return new BigDecimal(tickSize.substring(0, index + 1)).scale();
 	}
 	
 	/**

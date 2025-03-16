@@ -64,6 +64,8 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 								info.setLot_market_maxQty(f.getDouble("maxQty"));
 							} else if("MIN_NOTIONAL".equals(filterType)) {//最小名义价值
 								info.setMin_notional(f.getDouble("notional"));
+							} else if("PRICE_FILTER".equals(filterType)) {// 订单最小价格间隔
+								info.setTickSize(f.getString("tickSize"));
 							}
 						});
 						

@@ -11,6 +11,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Klines;
 
 public class CommandUtil {
@@ -76,6 +77,11 @@ public class CommandUtil {
 					JSONArray klJson = jsonArr.getJSONArray(index);
 					//decimalNum = klJson.getString(1).substring(klJson.getString(1).indexOf(".") + 1).length();
 					decimalNum = new BigDecimal(klJson.getString(1)).scale();
+					
+					if(AppConfig.SYMBOL_EXCHANGE_INFO.get(pair) != null) {
+						decimalNum = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair).getDecimalNum();
+					}
+					
 					Klines kl = new Klines(pair,klJson.getLong(0),
 							klJson.getString(1),klJson.getString(2),
 							klJson.getString(3),klJson.getString(4),
