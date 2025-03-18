@@ -972,6 +972,8 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		PriceUtil.calculateEMA_7_25_99(klinesList);
+		
 		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
 		
 		Klines last = PriceUtil.getLastKlines(klinesList_1h);
