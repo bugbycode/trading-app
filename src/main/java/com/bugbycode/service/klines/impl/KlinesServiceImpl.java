@@ -411,7 +411,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfitCode = FibCode.FIB5;
+								takeProfitCode = FibCode.FIB618;
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
 									takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
 								}
@@ -635,7 +635,7 @@ public class KlinesServiceImpl implements KlinesService {
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfitCode = FibCode.FIB5;
+								takeProfitCode = FibCode.FIB618;
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
 									takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
 								}
@@ -1016,7 +1016,7 @@ public class KlinesServiceImpl implements KlinesService {
 		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
 		
 		double percent = 0;
-		FibCode takeProfitCode = FibCode.FIB5;
+		FibCode takeProfitCode = FibCode.FIB618;
 		
 		//二级回撤
 		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
