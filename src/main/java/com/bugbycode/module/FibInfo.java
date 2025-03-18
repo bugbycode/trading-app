@@ -228,16 +228,22 @@ public class FibInfo {
 		
 		FibCode result = FibCode.FIB0;
 		
-		FibCode codes[] = FibCode.values();
-		for(int index = 0; index < codes.length; index++) {
-			FibCode code = codes[index];
-			if(code == current && code != FibCode.FIB0) {
-				if(code == FibCode.FIB786 || code == FibCode.FIB66) {
-					result = codes[index + 2];
-				} else {
-					result = codes[index + 1];
+		if(current == FibCode.FIB1) {
+			result = FibCode.FIB618;
+		} else if(current == FibCode.FIB786) {
+			result = FibCode.FIB5;
+		} else {
+			FibCode codes[] = FibCode.values();
+			for(int index = 0; index < codes.length; index++) {
+				FibCode code = codes[index];
+				if(code == current && code != FibCode.FIB0) {
+					if(code == FibCode.FIB786 || code == FibCode.FIB66) {
+						result = codes[index + 2];
+					} else {
+						result = codes[index + 1];
+					}
+					break;
 				}
-				break;
 			}
 		}
 		
