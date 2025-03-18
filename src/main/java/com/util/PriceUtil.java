@@ -1729,6 +1729,47 @@ public class PriceUtil {
 	 * @param list k线
 	 * @return
 	 */
+	public static boolean isLong_v4(double price, List<Klines> list) {
+		
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		Klines k2 = list.get(index -2);
+		Klines k3 = list.get(index -3);
+		Klines k4 = list.get(index -4);
+		
+		double ema7 = k0.getEma7();
+		return (isBreachLong(k0, price) || isBreachLong(k1, price) || isBreachLong(k2, price) || isBreachLong(k3, price) || isBreachLong(k4, price))
+				&& k0.getClosePriceDoubleValue() >= ema7;
+	}
+	
+	/**
+	 * 判断是否可做空
+	 * @param price 价格
+	 * @param list k线
+	 * @return
+	 */
+	public static boolean isShort_v4(double price, List<Klines> list) {
+		
+		int index = list.size() - 1;
+		Klines k0 = list.get(index);
+		Klines k1 = list.get(index -1);
+		Klines k2 = list.get(index -2);
+		Klines k3 = list.get(index -3);
+		Klines k4 = list.get(index -4);
+		
+		double ema7 = k0.getEma7();
+		
+		return (isBreachShort(k0, price) || isBreachShort(k1, price) || isBreachShort(k2, price) || isBreachShort(k3, price) || isBreachShort(k4, price))
+				&& k0.getClosePriceDoubleValue() <= ema7;
+	}
+	
+	/**
+	 * 判断是否可做多
+	 * @param price 价格
+	 * @param list k线
+	 * @return
+	 */
 	public static boolean isLong_v3(double price, List<Klines> list) {
 		
 		int index = list.size() - 1;
