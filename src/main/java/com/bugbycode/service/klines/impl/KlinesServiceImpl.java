@@ -53,7 +53,6 @@ import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
-import com.util.FibUtil;
 import com.util.FibUtil_v2;
 import com.util.FibUtil_v3;
 import com.util.FileUtil;
@@ -972,16 +971,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
-		
-		Klines last = PriceUtil.getLastKlines(klinesList_1h);
-		
-		int minute = DateFormatUtil.getMinute(last.getEndTime());
-		if(minute != 59) {
-			klinesList_1h.remove(last);
-		}
-		
-		FibUtil fu = new FibUtil(klinesList_1h);
+		FibUtil_v3 fu = new FibUtil_v3(klinesList);
 		
 		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
 		
