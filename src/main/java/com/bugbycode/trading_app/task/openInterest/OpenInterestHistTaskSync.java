@@ -67,7 +67,7 @@ public class OpenInterestHistTaskSync {
 					JSONObject json = (JSONObject) item;
 					
 					OpenInterestHist oih = new OpenInterestHist();
-					oih.setPair(json.getString("symbol"));
+					oih.setSymbol(json.getString("symbol"));
 					oih.setSumOpenInterest(json.getString("sumOpenInterest"));
 					oih.setSumOpenInterestValue(json.getString("sumOpenInterestValue"));
 					oih.setTimestamp(json.getLong("timestamp"));

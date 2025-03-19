@@ -33,15 +33,15 @@ public class OpenInterestHistRepositoryImpl implements OpenInterestHistRepositor
 	}
 
 	@Override
-	public OpenInterestHist findOneByPair(String pair) {
-		return template.findOne(Query.query(Criteria.where("pair").is(pair)), OpenInterestHist.class);
+	public OpenInterestHist findOneBySymbol(String symbol) {
+		return template.findOne(Query.query(Criteria.where("symbol").is(symbol)), OpenInterestHist.class);
 	}
 
 	@Override
 	public void save(OpenInterestHist oih) {
 		try {
-			String pair = oih.getPair();
-			OpenInterestHist tmp = findOneByPair(pair);
+			String symbol = oih.getSymbol();
+			OpenInterestHist tmp = findOneBySymbol(symbol);
 			if(tmp == null) {
 				template.insert(oih);
 			} else {
@@ -52,7 +52,7 @@ public class OpenInterestHistRepositoryImpl implements OpenInterestHistRepositor
 				update.set("sumOpenInterestValue", oih.getSumOpenInterestValue());
 				update.set("timestamp", oih.getTimestamp());
 				
-				template.updateFirst(Query.query(Criteria.where("pair").is(pair)), update, OpenInterestHist.class);
+				template.updateFirst(Query.query(Criteria.where("symbol").is(symbol)), update, OpenInterestHist.class);
 			}
 		} catch (Exception e) {
 			logger.error("保存历史合约持仓量信息时出现异常", e);
