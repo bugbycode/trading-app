@@ -74,31 +74,37 @@ public class MessageHandlerImpl implements MessageHandler{
 		
 		if(client.isFinish()) {
 			client.close();
-			//全部同步完成时执行
-			if(AppConfig.SYNC_15M_KLINES_RECORD.isEmpty() && kline.getInervalType() == Inerval.INERVAL_15M) {
+			synchronized (AppConfig.SYNC_15M_KLINES_FINISH) {
 				
-				try {
+				//全部同步完成时执行
+				if(!AppConfig.SYNC_15M_KLINES_FINISH.isEmpty() && AppConfig.SYNC_15M_KLINES_RECORD.isEmpty() && kline.getInervalType() == Inerval.INERVAL_15M) {
 					
-					LinkedList<String> pairs_linked = new LinkedList<String>();
-					
-					List<OpenInterestHist> list = openInterestHistRepository.query();
-					
-					for(OpenInterestHist oih : list) {
-						if(AppConfig.SYNC_15M_KLINES_FINISH.contains(oih.getSymbol())) {
-							pairs_linked.addLast(oih.getSymbol());
+					try {
+						
+						LinkedList<String> pairs_linked = new LinkedList<String>();
+						
+						List<OpenInterestHist> list = openInterestHistRepository.query();
+						
+						for(OpenInterestHist oih : list) {
+							if(AppConfig.SYNC_15M_KLINES_FINISH.contains(oih.getSymbol())) {
+								pairs_linked.addLast(oih.getSymbol());
+							}
 						}
-					}
+						
+						int linked_size = pairs_linked.size();
+						while(!pairs_linked.isEmpty()) {
+							logger.info(pairs_linked.removeFirst());
+						}
+						
+						logger.info("总共同步了15分钟级别{}种交易对k线信息", linked_size);
 					
-					int linked_size = pairs_linked.size();
-					while(!pairs_linked.isEmpty()) {
-						logger.info(pairs_linked.removeFirst());
+					} catch (Exception e) {
+						logger.error("处理同步k线结果时出现异常", e);
+					} finally {
+						AppConfig.SYNC_15M_KLINES_FINISH.clear();
 					}
-					
-					logger.info("总共同步了15分钟级别{}种交易对k线信息", linked_size);
-				
-				} catch (Exception e) {
-					logger.error("处理同步k线结果时出现异常", e);
 				}
+				
 			}
 		}
 	}
