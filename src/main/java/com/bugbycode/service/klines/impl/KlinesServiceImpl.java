@@ -1034,6 +1034,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibInfo fibInfo = fu.getFibInfo();
 		
+		if(fibInfo == null) {
+			return;
+		}
+		
 		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
 		
 		QuotationMode qm = fibInfo.getQuotationMode();
