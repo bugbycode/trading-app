@@ -1,6 +1,7 @@
 package com.bugbycode.trading_app.task.sync;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -11,8 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
@@ -44,6 +47,9 @@ public class FuturesKlinesWebSocketTask {
 	@Autowired
 	private BinanceExchangeService binanceExchangeService;
 	
+	@Autowired
+	private OpenInterestHistRepository openInterestHistRepository;
+	
 	/**
 	 * 14分47秒开始执行 每15分钟执行一次
 	 */
@@ -52,6 +58,9 @@ public class FuturesKlinesWebSocketTask {
 		
 		logger.debug("FuturesKlinesWebSocketTask start.");
 		
+		AppConfig.SYNC_15M_KLINES_RECORD.clear();
+		AppConfig.SYNC_15M_KLINES_FINISH.clear();
+		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
 		Set<String> pairs = binanceExchangeService.exchangeInfo();
@@ -59,6 +68,9 @@ public class FuturesKlinesWebSocketTask {
 		CoinPairSet set = new CoinPairSet(inerval);
 		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
 		for(String coin : pairs) {
+			
+			AppConfig.SYNC_15M_KLINES_RECORD.put(coin, new Date().getTime());
+			
 			set.add(coin);
 			if(set.isFull()) {
 				coinList.add(set);
@@ -71,7 +83,7 @@ public class FuturesKlinesWebSocketTask {
 		}
 		
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, analysisWorkTaskPool);
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool);
 		}
 		
 		logger.debug("FuturesKlinesWebSocketTask end.");

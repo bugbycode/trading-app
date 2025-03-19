@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.bugbycode.module.Inerval;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
@@ -44,6 +45,9 @@ public class SyncFuturesLastDayKlinesWebSocketTask {
 	@Autowired
 	private BinanceExchangeService binanceExchangeService;
 	
+	@Autowired
+	private OpenInterestHistRepository openInterestHistRepository;
+	
 	/**
 	 * 每天早上 7:59:46 执行一次任务
 	 */
@@ -70,7 +74,7 @@ public class SyncFuturesLastDayKlinesWebSocketTask {
 		}
 		
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, analysisWorkTaskPool);
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool);
 		}
 		
 		logger.debug("SyncFuturesLastDayKlinesWebSocketTask end.");

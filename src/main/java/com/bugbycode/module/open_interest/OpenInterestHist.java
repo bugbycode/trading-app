@@ -2,6 +2,8 @@ package com.bugbycode.module.open_interest;
 
 import org.springframework.data.annotation.Id;
 
+import com.util.DateFormatUtil;
+
 /**
  * 历史合约持仓量
  */
@@ -69,6 +71,12 @@ public class OpenInterestHist {
 
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	@Override
+	public String toString() {
+		return "交易对：" + symbol + ", 持仓总数量：" + sumOpenInterest
+				+ ", 持仓总价值：" + sumOpenInterestValue + ", 更新时间：" + DateFormatUtil.format(timestamp);
 	}
 	
 	

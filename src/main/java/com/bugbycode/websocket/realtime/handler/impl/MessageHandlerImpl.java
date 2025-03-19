@@ -2,6 +2,7 @@ package com.bugbycode.websocket.realtime.handler.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,13 +12,17 @@ import org.springframework.stereotype.Service;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.SortType;
+import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.sync.work.AnalysisKlinesTask;
 import com.bugbycode.trading_app.task.sync.work.SyncKlinesTask;
 import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoint;
 import com.bugbycode.websocket.realtime.handler.MessageHandler;
+import com.util.OpenInterestHistComparator;
 
 @Service("messageHandler")
 public class MessageHandlerImpl implements MessageHandler{
@@ -26,7 +31,7 @@ public class MessageHandlerImpl implements MessageHandler{
 	
 	@Override
 	public void handleMessage(String message, PerpetualWebSocketClientEndpoint client, KlinesService klinesService, 
-			KlinesRepository klinesRepository,WorkTaskPool analysisWorkTaskPool) {
+			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, WorkTaskPool analysisWorkTaskPool) {
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
@@ -60,10 +65,30 @@ public class MessageHandlerImpl implements MessageHandler{
 					analysisWorkTaskPool.add(new AnalysisKlinesTask(kline.getPair(), klinesService, klinesRepository));
 				}
 			}
+			
+			if(kline.getInervalType() == Inerval.INERVAL_15M) {
+				//移除批次
+				AppConfig.SYNC_15M_KLINES_RECORD.remove(pair);
+				//添加同步完成的交易对
+				AppConfig.SYNC_15M_KLINES_FINISH.add(pair);
+			}
 		};
 		
 		if(client.isFinish()) {
 			client.close();
+			//全部同步完成时执行
+			if(AppConfig.SYNC_15M_KLINES_RECORD.isEmpty()) {
+				try {
+					List<OpenInterestHist> list = openInterestHistRepository.query();
+					list.sort(new OpenInterestHistComparator(SortType.DESC));
+					for(OpenInterestHist oih : list) {
+						logger.info(oih);
+					}
+					logger.info("总共同步了15分钟级别{}种交易对k线信息", AppConfig.SYNC_15M_KLINES_FINISH.size());
+				} catch (Exception e) {
+					logger.error("处理同步k线结果时出现异常", e);
+				}
+			}
 		}
 	}
 	

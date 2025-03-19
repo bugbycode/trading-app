@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.websocket.realtime.handler.MessageHandler;
@@ -46,14 +47,18 @@ public class PerpetualWebSocketClientEndpoint {
     
     private KlinesRepository klinesRepository;
     
+    private OpenInterestHistRepository openInterestHistRepository;
+    
     public PerpetualWebSocketClientEndpoint(CoinPairSet coinPairSet,MessageHandler messageHandler, 
-    		KlinesService klinesService, KlinesRepository klinesRepository, WorkTaskPool analysisWorkTaskPool) {
+    		KlinesService klinesService, KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, 
+    		WorkTaskPool analysisWorkTaskPool) {
     	this.coinPairSet = coinPairSet;
     	this.messageHandler = messageHandler;
         this.container = ContainerProvider.getWebSocketContainer();
         this.analysisWorkTaskPool = analysisWorkTaskPool;
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
+        this.openInterestHistRepository = openInterestHistRepository;
         try {
             this.connectToServer();
         } catch (Exception e) {
@@ -83,7 +88,7 @@ public class PerpetualWebSocketClientEndpoint {
 
     @OnMessage
     public void onMessage(String message) {
-    	this.messageHandler.handleMessage(message, this, klinesService, klinesRepository, this.analysisWorkTaskPool);
+    	this.messageHandler.handleMessage(message, this, klinesService, klinesRepository, openInterestHistRepository, this.analysisWorkTaskPool);
     }
     
     public void sendMessage(String message) {
