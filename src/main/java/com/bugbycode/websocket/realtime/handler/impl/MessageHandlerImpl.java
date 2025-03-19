@@ -2,6 +2,7 @@ package com.bugbycode.websocket.realtime.handler.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -74,13 +75,27 @@ public class MessageHandlerImpl implements MessageHandler{
 		if(client.isFinish()) {
 			client.close();
 			//全部同步完成时执行
-			if(AppConfig.SYNC_15M_KLINES_RECORD.isEmpty()) {
+			if(AppConfig.SYNC_15M_KLINES_RECORD.isEmpty() && kline.getInervalType() == Inerval.INERVAL_15M) {
+				
 				try {
+					
+					LinkedList<String> pairs_linked = new LinkedList<String>();
+					
 					List<OpenInterestHist> list = openInterestHistRepository.query();
+					
 					for(OpenInterestHist oih : list) {
-						logger.info(oih);
+						if(AppConfig.SYNC_15M_KLINES_FINISH.contains(oih.getSymbol())) {
+							pairs_linked.addLast(oih.getSymbol());
+						}
 					}
-					logger.info("总共同步了15分钟级别{}种交易对k线信息", AppConfig.SYNC_15M_KLINES_FINISH.size());
+					
+					int linked_size = pairs_linked.size();
+					while(!pairs_linked.isEmpty()) {
+						logger.info(pairs_linked.removeFirst());
+					}
+					
+					logger.info("总共同步了15分钟级别{}种交易对k线信息", linked_size);
+				
 				} catch (Exception e) {
 					logger.error("处理同步k线结果时出现异常", e);
 				}
