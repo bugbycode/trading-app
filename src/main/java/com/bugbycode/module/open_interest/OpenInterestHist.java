@@ -12,7 +12,7 @@ public class OpenInterestHist {
 	@Id
 	private String id;
 	
-	private String symbol;//交易对
+	private String pair;//交易对
 	
 	private String sumOpenInterest;//持仓总数量
 	
@@ -24,10 +24,10 @@ public class OpenInterestHist {
 		
 	}
 
-	public OpenInterestHist(String id, String symbol, String sumOpenInterest, String sumOpenInterestValue,
+	public OpenInterestHist(String id, String pair, String sumOpenInterest, String sumOpenInterestValue,
 			long timestamp) {
 		this.id = id;
-		this.symbol = symbol;
+		this.pair = pair;
 		this.sumOpenInterest = sumOpenInterest;
 		this.sumOpenInterestValue = sumOpenInterestValue;
 		this.timestamp = timestamp;
@@ -41,12 +41,12 @@ public class OpenInterestHist {
 		this.id = id;
 	}
 
-	public String getSymbol() {
-		return symbol;
+	public String getPair() {
+		return pair;
 	}
 
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
+	public void setPair(String pair) {
+		this.pair = pair;
 	}
 
 	public String getSumOpenInterest() {
@@ -75,7 +75,7 @@ public class OpenInterestHist {
 
 	@Override
 	public String toString() {
-		return "交易对：" + symbol + ", 持仓总数量：" + sumOpenInterest
+		return "交易对：" + this.getPair() + ", 持仓总数量：" + sumOpenInterest
 				+ ", 持仓总价值：" + sumOpenInterestValue + ", 更新时间：" + DateFormatUtil.format(timestamp);
 	}
 	

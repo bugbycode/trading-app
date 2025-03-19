@@ -17,10 +17,10 @@ public interface OpenInterestHistRepository {
 	
 	/**
 	 * 根据交易对查询合约持仓量信息
-	 * @param symbol
+	 * @param pair
 	 * @return
 	 */
-	public OpenInterestHist findOneBySymbol(String symbol); 
+	public OpenInterestHist findOneByPair(String pair); 
 	
 	/**
 	 * 添加一条合约持仓量信息
