@@ -51,7 +51,7 @@ public class OpenInterestHistRepositoryImpl implements OpenInterestHistRepositor
 				template.updateFirst(Query.query(Criteria.where("symbol").is(symbol)), update, OpenInterestHist.class);
 			}
 		} catch (Exception e) {
-			logger.info("保存历史合约持仓量信息时出现异常", e);
+			logger.error("保存历史合约持仓量信息时出现异常", e);
 		}
 	}
 
@@ -60,7 +60,7 @@ public class OpenInterestHistRepositoryImpl implements OpenInterestHistRepositor
 		try {
 			template.remove(Query.query(Criteria.where("id").is(id)), OpenInterestHist.class);
 		} catch (Exception e) {
-			logger.info("根据ID删除历史合约持仓量信息时出现异常", e);
+			logger.error("根据ID删除历史合约持仓量信息时出现异常", e);
 		}
 	}
 
