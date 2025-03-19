@@ -39,7 +39,7 @@ public class OpenInterestHistRepositoryImpl implements OpenInterestHistRepositor
 			String symbol = oih.getSymbol();
 			OpenInterestHist tmp = findOneBySymbol(symbol);
 			if(tmp == null) {
-				template.insert(tmp);
+				template.insert(oih);
 			} else {
 				
 				Update update = new Update();
