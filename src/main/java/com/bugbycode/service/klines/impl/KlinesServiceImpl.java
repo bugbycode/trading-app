@@ -1038,6 +1038,8 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		PriceUtil.calculateEMA_7_25_99(klinesList_1h);
+		
 		//行情框架发生转变的情况不做交易
 		if(fu.verifyMarketChanges(fibInfo.getLevel(), klinesList_1h)) {
 			return;
