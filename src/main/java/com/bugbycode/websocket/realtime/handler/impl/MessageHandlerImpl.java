@@ -59,9 +59,6 @@ public class MessageHandlerImpl implements MessageHandler{
 				analysisWorkTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository));
 			} else {
 				klinesRepository.insert(kline);
-				if(kline.getInervalType() == Inerval.INERVAL_15M) {
-					analysisWorkTaskPool.add(new AnalysisKlinesTask(kline.getPair(), klinesService, klinesRepository));
-				}
 			}
 			
 			if(kline.getInervalType() == Inerval.INERVAL_15M) {
@@ -86,17 +83,23 @@ public class MessageHandlerImpl implements MessageHandler{
 						List<OpenInterestHist> list = openInterestHistRepository.query();
 						
 						for(OpenInterestHist oih : list) {
+							
 							if(AppConfig.SYNC_15M_KLINES_FINISH.contains(oih.getSymbol())) {
+								
 								pairs_linked.addLast(oih.getSymbol());
+								
 							}
 						}
 						
 						int linked_size = pairs_linked.size();
+						
 						while(!pairs_linked.isEmpty()) {
-							logger.info(pairs_linked.removeFirst());
+							
+							analysisWorkTaskPool.add(new AnalysisKlinesTask(pairs_linked.removeFirst(), klinesService, klinesRepository));
+							
 						}
 						
-						logger.info("总共同步了15分钟级别{}种交易对k线信息", linked_size);
+						logger.debug("总共同步了15分钟级别{}种交易对k线信息", linked_size);
 					
 					} catch (Exception e) {
 						logger.error("处理同步k线结果时出现异常", e);
