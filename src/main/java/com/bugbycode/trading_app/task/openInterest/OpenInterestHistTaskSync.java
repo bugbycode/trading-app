@@ -1,4 +1,4 @@
-package com.bugbycode.trading_app.openInterest;
+package com.bugbycode.trading_app.task.openInterest;
 
 import java.util.Set;
 
