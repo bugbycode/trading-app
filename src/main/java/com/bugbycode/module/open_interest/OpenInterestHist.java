@@ -16,14 +16,14 @@ public class OpenInterestHist {
 	
 	private String sumOpenInterestValue;//持仓总价值
 	
-	private String timestamp;
+	private long timestamp;
 	
 	public OpenInterestHist() {
 		
 	}
 
 	public OpenInterestHist(String id, String symbol, String sumOpenInterest, String sumOpenInterestValue,
-			String timestamp) {
+			long timestamp) {
 		this.id = id;
 		this.symbol = symbol;
 		this.sumOpenInterest = sumOpenInterest;
@@ -63,11 +63,11 @@ public class OpenInterestHist {
 		this.sumOpenInterestValue = sumOpenInterestValue;
 	}
 
-	public String getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(String timestamp) {
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
 	

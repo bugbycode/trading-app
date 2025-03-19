@@ -70,7 +70,7 @@ public class OpenInterestHistTaskSync {
 					oih.setSymbol(json.getString("symbol"));
 					oih.setSumOpenInterest(json.getString("sumOpenInterest"));
 					oih.setSumOpenInterestValue(json.getString("sumOpenInterestValue"));
-					oih.setTimestamp(json.getString("timestamp"));
+					oih.setTimestamp(json.getLong("timestamp"));
 					
 					openInterestHistRepository.save(oih);
 					
