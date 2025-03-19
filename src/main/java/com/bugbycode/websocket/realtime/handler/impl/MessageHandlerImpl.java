@@ -56,7 +56,6 @@ public class MessageHandlerImpl implements MessageHandler{
 			long count = klinesRepository.count(kline.getPair(), Inerval.INERVAL_1D);
 			if(count == 0) {
 				analysisWorkTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository));
-				return;
 			} else {
 				klinesRepository.insert(kline);
 				if(kline.getInervalType() == Inerval.INERVAL_15M) {
