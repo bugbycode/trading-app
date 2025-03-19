@@ -222,6 +222,14 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//是否交易逆势单
 					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
+					
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+						continue;
+					}
+					
 					//空头走势不做多
 					if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_3) {
 						continue;
@@ -303,6 +311,14 @@ public class KlinesServiceImpl implements KlinesService {
 
 					//是否交易逆势单
 					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
+					
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+						continue;
+					}
+					
 					//多头走势不做空
 					if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_2) {
 						continue;
