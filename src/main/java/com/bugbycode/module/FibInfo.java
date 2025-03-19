@@ -203,17 +203,20 @@ public class FibInfo {
 	public boolean verifyOpenFibCode(FibCode code) {
 		QuotationMode mode = this.getQuotationMode();
 		boolean result = false;
-		if(level == FibLevel.LEVEL_1 && code.lte(FibCode.FIB1)) {//震荡行情
+		if(level == FibLevel.LEVEL_1 
+				&& code.lte(FibCode.FIB1) && code.gte(FibCode.FIB382)) {//震荡行情 1 ~ 0.382
 			result = true;
-		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG) {//多头行情做多
+		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG
+				 && code.lte(FibCode.FIB1) && code.gte(FibCode.FIB382)) {//多头行情做多 1 ~ 0.382
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.SHORT
-				&& code.equalsValue(FibCode.FIB1)) { //多头行情做空
+				&& code.gte(FibCode.FIB618)) { //多头行情做空 4.618 ~ 0.618
 			result = true;
-		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT) { //空头行情做空
+		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT
+				 && code.lte(FibCode.FIB1) && code.gte(FibCode.FIB382)) { //空头行情做空 1 ~ 0.382
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.LONG
-				&& code.equalsValue(FibCode.FIB1)) { //空头行情做多
+				&& code.gte(FibCode.FIB618)) { //空头行情做多 4.618 ~ 0.618
 			result = true;
 		}
 		return result;
