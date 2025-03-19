@@ -210,13 +210,13 @@ public class FibInfo {
 				 && code.gte(FibCode.FIB618)) {//多头行情做多 4.618 ~ 0.618
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.SHORT
-				&& code.lte(FibCode.FIB1) && code.gte(FibCode.FIB618)) { //多头行情做空 1 ~ 0.618
+				&& code == FibCode.FIB1) { //多头行情做空 只做最高点
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT
 				 && code.gte(FibCode.FIB618)) { //空头行情做空 4.618 ~ 0.618
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.LONG
-				&& code.lte(FibCode.FIB1) && code.gte(FibCode.FIB618)) { //空头行情做多 1 ~ 0.618
+				&& code == FibCode.FIB1) { //空头行情做多 只做最低点
 			result = true;
 		}
 		return result;
