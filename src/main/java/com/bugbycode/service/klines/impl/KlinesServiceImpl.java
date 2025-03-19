@@ -1032,9 +1032,9 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibUtil fu = new FibUtil(klinesList_1h);
 		
-		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
-		
 		FibInfo fibInfo = fu.getFibInfo();
+		
+		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
 		
 		QuotationMode qm = fibInfo.getQuotationMode();
 		
