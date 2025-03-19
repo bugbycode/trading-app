@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.bugbycode.module.SortType;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
+import com.util.OpenInterestHistComparator;
 
 import jakarta.annotation.Resource;
 
@@ -25,7 +27,9 @@ public class OpenInterestHistRepositoryImpl implements OpenInterestHistRepositor
 	
 	@Override
 	public List<OpenInterestHist> query() {
-		return template.findAll(OpenInterestHist.class);
+		List<OpenInterestHist> list = template.findAll(OpenInterestHist.class);
+		list.sort(new OpenInterestHistComparator(SortType.DESC));
+		return list;
 	}
 
 	@Override

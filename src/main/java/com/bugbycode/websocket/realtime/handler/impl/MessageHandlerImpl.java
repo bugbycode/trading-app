@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.SortType;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
@@ -22,7 +21,6 @@ import com.bugbycode.trading_app.task.sync.work.AnalysisKlinesTask;
 import com.bugbycode.trading_app.task.sync.work.SyncKlinesTask;
 import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoint;
 import com.bugbycode.websocket.realtime.handler.MessageHandler;
-import com.util.OpenInterestHistComparator;
 
 @Service("messageHandler")
 public class MessageHandlerImpl implements MessageHandler{
@@ -80,7 +78,6 @@ public class MessageHandlerImpl implements MessageHandler{
 			if(AppConfig.SYNC_15M_KLINES_RECORD.isEmpty()) {
 				try {
 					List<OpenInterestHist> list = openInterestHistRepository.query();
-					list.sort(new OpenInterestHistComparator(SortType.DESC));
 					for(OpenInterestHist oih : list) {
 						logger.info(oih);
 					}
