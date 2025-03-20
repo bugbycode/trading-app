@@ -53,7 +53,7 @@ public class OpenInterestHistTaskSync {
 				
 				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(AppConfig.REST_BASE_URL + "/futures/data/openInterestHist")
 						.queryParam("symbol", symbol)
-						.queryParam("period", Inerval.INERVAL_1D.getDescption())
+						.queryParam("period", Inerval.INERVAL_15M.getDescption())
 						.queryParam("limit", 1);
 				
 				String url = uriBuilder.toUriString();
