@@ -204,7 +204,7 @@ public class FibInfo {
 		QuotationMode mode = this.getQuotationMode();
 		boolean result = false;
 		if(level == FibLevel.LEVEL_1 
-				&& code.lte(FibCode.FIB1) && code.gte(FibCode.FIB618)) {//震荡行情 1 ~ 0.618
+				&& code == FibCode.FIB1) {//震荡行情 只做高低点
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG
 				 && code.gte(FibCode.FIB618)) {//多头行情做多 4.618 ~ 0.618

@@ -1071,6 +1071,11 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		KlinesComparator kc = new KlinesComparator(SortType.ASC);
+		klinesList.sort(kc);
+		
+		PriceUtil.calculateEMA_7_25_99(klinesList);
+		
 		String text = "";//邮件内容
 		String subject = "";//邮件主题
 		String dateStr = DateFormatUtil.format(new Date());
