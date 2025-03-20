@@ -43,6 +43,8 @@ public class Klines {
 	private String iv;//主动买入的成交量
 	
 	private String iq;//主动买入的成交额
+	
+	private Double bbPercentB = 0.5;//BB %B
 
 	public Klines(String pair,long startTime, String openPrice, String highPrice, String lowPrice, 
 			String closePrice, long endTime,String interval,int decimalNum, String v, Long n, String q,
@@ -335,7 +337,15 @@ public class Klines {
     	return Double.valueOf(getBodyLowPrice());
     }
     
-    /**
+    public Double getBbPercentB() {
+		return bbPercentB == null ? 0.5 : bbPercentB;
+	}
+
+	public void setBbPercentB(Double bbPercentB) {
+		this.bbPercentB = bbPercentB;
+	}
+
+	/**
      * 校验时间级别
      * @param inerval
      * @return

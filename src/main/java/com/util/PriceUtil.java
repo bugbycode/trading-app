@@ -1738,7 +1738,7 @@ public class PriceUtil {
 		Klines k3 = list.get(index -3);
 		Klines k4 = list.get(index -4);
 		
-		double ema7 = k0.getEma7();
+		double ema7 = k0.getEma7();
 		return (isBreachLong(k0, price) || isBreachLong(k1, price) || isBreachLong(k2, price) || isBreachLong(k3, price) || isBreachLong(k4, price))
 				&& k0.getClosePriceDoubleValue() >= ema7 && k0.getClosePriceDoubleValue() >= price;
 	}
@@ -2208,4 +2208,119 @@ public class PriceUtil {
 	public static boolean checkPercent(double pricePercent, double nextPricePercent, double profit, double profitLimit) {
 		return pricePercent > profitLimit && nextPricePercent >= profit;
 	}
+	
+	/**
+	 * 计算N日简单移动平均（SMA）
+	 * @param kLines
+	 * @param period
+	 * @return
+	 */
+    public static double calculateSMA(List<Klines> kLines, int period) {
+        double sum = 0.0;
+        for (int i = 0; i < period; i++) {
+            sum += kLines.get(kLines.size() - 1 - i).getClosePriceDoubleValue();
+        }
+        return sum / period;
+    }
+    
+    /**
+     * 计算标准差
+     * 
+     * @param kLines
+     * @param period
+     * @param sma
+     * @return
+     */
+    public static double calculateStdDev(List<Klines> kLines, int period, double sma) {
+        double sum = 0.0;
+        for (int i = 0; i < period; i++) {
+            double diff = kLines.get(kLines.size() - 1 - i).getClosePriceDoubleValue() - sma;
+            sum += diff * diff;
+        }
+        return Math.sqrt(sum / period);
+    }
+    
+    /**
+     * 计算N日简单移动平均（SMA）
+     * @param kLines
+     * @param period
+     * @param index
+     * @return
+     */
+    public static double calculateSMA(List<Klines> kLines, int period, int index) {
+        double sum = 0.0;
+        for (int i = 0; i < period; i++) {
+            sum += kLines.get(index - i).getClosePriceDoubleValue();
+        }
+        return sum / period;
+    }
+
+    /**
+     * 计算标准差
+     * @param kLines
+     * @param period
+     * @param sma
+     * @param index
+     * @return
+     */
+    public static double calculateStdDev(List<Klines> kLines, int period, double sma, int index) {
+        double sum = 0.0;
+        for (int i = 0; i < period; i++) {
+            double diff = kLines.get(index - i).getClosePriceDoubleValue() - sma;
+            sum += diff * diff;
+        }
+        return Math.sqrt(sum / period);
+    }
+
+    /**
+     * 计算布林带的上下轨
+     * @param kLines
+     * @param period
+     * @param index
+     * @return
+     */
+    public static double[] calculateBollingerBands(List<Klines> kLines, int period, int index) {
+        double sma = calculateSMA(kLines, period, index);
+        double stdDev = calculateStdDev(kLines, period, sma, index);
+
+        double upperBand = sma + 2 * stdDev;
+        double lowerBand = sma - 2 * stdDev;
+
+        return new double[]{upperBand, lowerBand};
+    }
+
+    // 计算BB %B
+    public static double calculateBBPercentB(double currentPrice, double upperBand, double lowerBand) {
+        if (upperBand == lowerBand) {
+            return 0.5; // 避免除以零的错误，返回中间值
+        }
+        return (currentPrice - lowerBand) / (upperBand - lowerBand);
+    }
+
+    /**
+     * 计算所有K线的BB %B值
+     * @param kLines
+     * @param period
+     */
+    public static void calculateAllBBPercentB(List<Klines> kLines, int period) {
+        
+        if (kLines.size() < period) {
+            return;
+        }
+        
+        // 从第period个K线开始计算（确保有足够的历史数据）
+        for (int i = period - 1; i < kLines.size(); i++) {
+            double[] bollingerBands = calculateBollingerBands(kLines, period, i);
+            double upperBand = bollingerBands[0];
+            double lowerBand = bollingerBands[1];
+
+            // 当前价格为当前K线的收盘价
+            double currentPrice = kLines.get(i).getClosePriceDoubleValue();
+
+            // 计算BB %B并添加到结果列表
+            double bbPercentB = calculateBBPercentB(currentPrice, upperBand, lowerBand);
+            
+            kLines.get(i).setBbPercentB(bbPercentB);
+        }
+    }
 }
