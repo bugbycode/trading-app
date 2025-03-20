@@ -12,6 +12,8 @@ public class FibInfo {
 	
 	private FibLevel level;
 	
+	private Klines last;
+	
 	/**
 	 * 价格行为止盈点位
 	 * @param price 当前价格
@@ -195,11 +197,19 @@ public class FibInfo {
 		return level;
 	}
 	
+	public Klines getLast() {
+		return last;
+	}
+
+	public void setLast(Klines last) {
+		this.last = last;
+	}
+
 	/**
 	 * 校验点位是否可开仓
 	 * @param code 当前回撤点
 	 * @return
-	 */
+	 
 	public boolean verifyOpenFibCode(FibCode code) {
 		QuotationMode mode = this.getQuotationMode();
 		boolean result = false;
@@ -219,6 +229,34 @@ public class FibInfo {
 				&& code == FibCode.FIB1) { //空头行情做多 只做最低点
 			result = true;
 		}
+		return result;
+	}*/
+	
+	/**
+	 * 校验点位是否可开仓
+	 * @param code 当前点位
+	 * @return
+	 */
+	public boolean verifyOpenFibCode(FibCode code) {
+		boolean result = false;
+		QuotationMode mode = this.getQuotationMode();
+		if(last != null) {
+			double ema25 = last.getEma25();
+			double ema99 = last.getEma99();
+			
+			if(mode == QuotationMode.LONG) {
+				//当ema25 小于 ema99 时做多只做最低点(1.0) ema25大于等于ema99 时做多点位不受限
+				if((ema25 < ema99 && code == FibCode.FIB1) || ema25 >= ema99) {
+					result = true;
+				}
+			} else if(mode == QuotationMode.SHORT) {
+				//当ema25大于ema99 时做空只做最高点(1.0) ema25小于等于ema99 时做空点位不受限
+				if((ema25 > ema99 && code == FibCode.FIB1) || ema25 <= ema99) {
+					result = true;
+				}
+			}
+		}
+		
 		return result;
 	}
 	

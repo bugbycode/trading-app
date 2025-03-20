@@ -17,7 +17,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
-import com.bugbycode.module.CountertrendTradingStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -209,7 +208,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode code = codes[offset];//当前斐波那契点位
 			
 			if( fibInfo.verifyOpenFibCode(code)
-					&& PriceUtil.isLong_v4(fibInfo.getFibValue(code), klinesList_hit)
+					&& PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
 				
 				//市价做多
@@ -220,18 +219,10 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					//是否交易逆势单
-					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
-					
 					//回踩单判断
 					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 					
 					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-						continue;
-					}
-					
-					//空头走势不做多
-					if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_3) {
 						continue;
 					}
 					
@@ -298,7 +289,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode code = codes[offset];//当前斐波那契点位
 			
 			if( fibInfo.verifyOpenFibCode(code)
-					&& PriceUtil.isShort_v4(fibInfo.getFibValue(code), klinesList_hit)
+					&& PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
 				
 				//市价做空
@@ -309,18 +300,10 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 
-					//是否交易逆势单
-					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
-					
 					//回踩单判断
 					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 					
 					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-						continue;
-					}
-					
-					//多头走势不做空
-					if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_2) {
 						continue;
 					}
 					
@@ -387,8 +370,6 @@ public class KlinesServiceImpl implements KlinesService {
 					String dateStr = DateFormatUtil.format(new Date());
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					//是否交易逆势单
-					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
 					
 					//计算预计盈利百分比
 					double profitPercent = 0;
@@ -439,11 +420,6 @@ public class KlinesServiceImpl implements KlinesService {
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-									continue;
-								}
-								
-								//空头走势不做多
-								if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_3) {
 									continue;
 								}
 								
@@ -620,8 +596,6 @@ public class KlinesServiceImpl implements KlinesService {
 					String dateStr = DateFormatUtil.format(new Date());
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					//是否交易逆势单
-					CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(u.getCountertrendTrading());
 					
 					//计算预计盈利百分比
 					double profitPercent = 0;
@@ -670,11 +644,6 @@ public class KlinesServiceImpl implements KlinesService {
 								//回踩单判断
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-									continue;
-								}
-								
-								//多头走势不做空
-								if(countertrendTradingStatus == CountertrendTradingStatus.CLOSE && fibInfo.getLevel() == FibLevel.LEVEL_2) {
 									continue;
 								}
 								
@@ -1019,9 +988,10 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		PriceUtil.calculateEMA_7_25_99(klinesList);
-		
 		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
+		
+		PriceUtil.calculateEMA_7_25_99(klinesList);
+		PriceUtil.calculateEMA_7_25_99(klinesList_1h);
 		
 		Klines last = PriceUtil.getLastKlines(klinesList_1h);
 		
@@ -1037,13 +1007,9 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fibInfo == null) {
 			return;
 		}
-		
-		PriceUtil.calculateEMA_7_25_99(klinesList_1h);
-		
-		//行情框架发生转变的情况不做交易
-		if(fu.verifyMarketChanges(fibInfo.getLevel(), klinesList_1h)) {
-			return;
-		}
+		logger.info("pair:{}, ema7:{}, ema25:{}, ema99:{}", last.getPair(), last.getEma7(), last.getEma25(), last.getEma99());
+		//附加最后一根k线
+		fibInfo.setLast(last);
 		
 		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
 		
