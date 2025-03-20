@@ -1007,7 +1007,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fibInfo == null) {
 			return;
 		}
-		logger.info("pair:{}, ema7:{}, ema25:{}, ema99:{}", last.getPair(), last.getEma7(), last.getEma25(), last.getEma99());
+		
 		//附加最后一根k线
 		fibInfo.setLast(last);
 		
