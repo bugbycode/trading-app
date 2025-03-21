@@ -76,7 +76,7 @@ public class FibUtil_v4 {
 		
 		boolean result = false;
 		
-		int index = list.size();
+		int index = list.size() - 1;
 		Klines last = list.get(index);
 		Klines parent = list.get(index - 1);
 		
