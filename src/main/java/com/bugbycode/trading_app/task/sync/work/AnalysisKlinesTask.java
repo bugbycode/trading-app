@@ -78,6 +78,9 @@ public class AnalysisKlinesTask implements Runnable{
             
             //标志性高低点分析
             klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
+            
+            //指数均线
+            klinesService.futuresEmaRiseAndFallMonitor(klines_list_15m);
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
