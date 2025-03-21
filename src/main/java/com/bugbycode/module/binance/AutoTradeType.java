@@ -13,9 +13,9 @@ public enum AutoTradeType {
 	PRICE_ACTION(1,"价格行为"),
 	
 	/**
-	 * EMA指标
+	 * 指数均线
 	 */
-	EMA_INDEX(2,"EMA指标"),
+	EMA_INDEX(2,"指数均线"),
 	
 	/**
 	 * 盘整区间

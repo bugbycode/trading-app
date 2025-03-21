@@ -450,6 +450,9 @@ public class KlinesServiceImpl implements KlinesService {
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
+								if(tradeStyle == TradeStyle.CONSERVATIVE) {
+									takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+								}
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
@@ -476,7 +479,7 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							//根据交易风格设置盈利限制
 							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType != AutoTradeType.FIB_RET
-									 && autoTradeType != AutoTradeType.PRICE_ACTION) {
+									 && autoTradeType != AutoTradeType.PRICE_ACTION && autoTradeType != AutoTradeType.EMA_INDEX) {
 								double dbProfitLimit = u.getProfitLimit() / 100;
 								if(profitPercent > dbProfitLimit) {
 									profitPercent = dbProfitLimit;
@@ -681,6 +684,9 @@ public class KlinesServiceImpl implements KlinesService {
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
+								if(tradeStyle == TradeStyle.CONSERVATIVE) {
+									takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+								}
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 								takeProfitCode = FibCode.FIB618;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
@@ -708,7 +714,7 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							//根据交易风格设置盈利限制
 							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType != AutoTradeType.FIB_RET
-									 && autoTradeType != AutoTradeType.PRICE_ACTION) {
+									 && autoTradeType != AutoTradeType.PRICE_ACTION && autoTradeType != AutoTradeType.EMA_INDEX) {
 								double dbProfitLimit = u.getProfitLimit() / 100;
 								if(profitPercent > dbProfitLimit) {
 									profitPercent = dbProfitLimit;
@@ -1045,6 +1051,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(mode == QuotationMode.SHORT) {
 			
+			tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX));
+			
 			for(User u : userList) {
 				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 				double profit = u.getProfit();
@@ -1071,6 +1079,8 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(subject, text, u.getUsername());
 			}
 		} else if(mode == QuotationMode.LONG) {
+			
+			tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX));
 			
 			for(User u : userList) {
 				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());

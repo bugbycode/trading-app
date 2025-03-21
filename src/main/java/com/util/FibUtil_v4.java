@@ -52,7 +52,7 @@ public class FibUtil_v4 {
 				Klines startKlines = PriceUtil.getMaxPriceKLine(fibList);
 				List<Klines> afterList = PriceUtil.subList(startKlines, fibList);
 				Klines endKlines = PriceUtil.getMinPriceKLine(afterList);
-				fibInfo = new FibInfo(startKlines.getHighPriceDoubleValue(), endKlines.getBodyLowPriceDoubleValue(), startKlines.getDecimalNum(), FibLevel.LEVEL_1);
+				fibInfo = new FibInfo(startKlines.getHighPriceDoubleValue(), endKlines.getLowPriceDoubleValue(), startKlines.getDecimalNum(), FibLevel.LEVEL_1);
 			}
 			
 		} else if(ema25 < ema99 && PriceUtil.isBreachShort(last, ema99)) { //做空
@@ -68,7 +68,7 @@ public class FibUtil_v4 {
 				Klines startKlines = PriceUtil.getMinPriceKLine(fibList);
 				List<Klines> afterList = PriceUtil.subList(startKlines, fibList);
 				Klines endKlines = PriceUtil.getMaxPriceKLine(afterList);
-				fibInfo = new FibInfo(startKlines.getBodyLowPriceDoubleValue(), endKlines.getHighPriceDoubleValue(), startKlines.getDecimalNum(), FibLevel.LEVEL_1);
+				fibInfo = new FibInfo(startKlines.getLowPriceDoubleValue(), endKlines.getHighPriceDoubleValue(), startKlines.getDecimalNum(), FibLevel.LEVEL_1);
 			}
 		}
 		return fibInfo;
