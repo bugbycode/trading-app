@@ -1563,7 +1563,7 @@ public class PriceUtil {
 			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			double bbPercentB = parent.getBbPercentB();
 			if(qm == QuotationMode.SHORT) {
-				result = bbPercentB < 0.1 && current.isRise() && closePrice < fib382Price;
+				result = bbPercentB < 0.1 && current.isRise() && parent.isFall() && closePrice < fib382Price;
 			}
 		}
 		
@@ -1600,7 +1600,7 @@ public class PriceUtil {
 			double bbPercentB = parent.getBbPercentB();
 			
 			if(qm == QuotationMode.LONG) {
-				result = bbPercentB > 0.9 && current.isFall() && closePrice > fib382Price;
+				result = bbPercentB > 0.9 && current.isFall() && parent.isRise() && closePrice > fib382Price;
 			}
 		}
 		return result;
@@ -1765,7 +1765,7 @@ public class PriceUtil {
 		Klines k3 = list.get(index -3);
 		Klines k4 = list.get(index -4);
 		
-		double ema7 = k0.getEma7();
+		double ema7 = k0.getEma7();
 		return (isBreachLong(k0, price) || isBreachLong(k1, price) || isBreachLong(k2, price) || isBreachLong(k3, price) || isBreachLong(k4, price))
 				&& k0.getClosePriceDoubleValue() >= ema7 && k0.getClosePriceDoubleValue() >= price;
 	}
