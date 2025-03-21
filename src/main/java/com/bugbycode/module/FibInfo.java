@@ -132,18 +132,18 @@ public class FibInfo {
 			takeProfit = FibCode.FIB2_618;
 		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
 			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
+		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618 || code == FibCode.FIB1_272) { // 2/1.618/1.272 - 1
 			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.5
-			takeProfit = FibCode.FIB5;
+		} else if(code == FibCode.FIB1) { // 1 -> 0.618
+			takeProfit = FibCode.FIB618;
 			if(level == FibLevel.LEVEL_1) {//震荡行情
-				takeProfit = FibCode.FIB382;
+				takeProfit = FibCode.FIB618;
 			} else if((mode == QuotationMode.LONG && level == FibLevel.LEVEL_2)
 					|| (mode == QuotationMode.SHORT && level == FibLevel.LEVEL_3)) { //多头行情做多或空头行情做空的情况
-				takeProfit = FibCode.FIB382;
+				takeProfit = FibCode.FIB5;
 			} else if((mode == QuotationMode.LONG && level == FibLevel.LEVEL_3)
 					|| (mode == QuotationMode.SHORT && level == FibLevel.LEVEL_2)) { //空头行情做多或多头行情做空的情况（逆势交易）
-				takeProfit = FibCode.FIB5;
+				takeProfit = FibCode.FIB618;
 			}
 		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
 			takeProfit = FibCode.FIB382;
