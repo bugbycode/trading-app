@@ -87,6 +87,7 @@ public class FibInfo {
 	 * @return 止盈的斐波那契回撤点位
 	 */
 	public FibCode getTakeProfit_v2(FibCode code) {
+		QuotationMode mode = this.getQuotationMode();
 		FibCode takeProfit = FibCode.FIB0;
 		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
 			takeProfit = FibCode.FIB2_618;
@@ -96,6 +97,15 @@ public class FibInfo {
 			takeProfit = FibCode.FIB1;
 		} else if(code == FibCode.FIB1) { // 1 -> 0.5
 			takeProfit = FibCode.FIB5;
+			if(level == FibLevel.LEVEL_1) {//震荡行情
+				takeProfit = FibCode.FIB5;
+			} else if((mode == QuotationMode.LONG && level == FibLevel.LEVEL_2)
+					|| (mode == QuotationMode.SHORT && level == FibLevel.LEVEL_3)) { //多头行情做多或空头行情做空的情况
+				takeProfit = FibCode.FIB382;
+			} else if((mode == QuotationMode.LONG && level == FibLevel.LEVEL_3)
+					|| (mode == QuotationMode.SHORT && level == FibLevel.LEVEL_2)) { //空头行情做多或多头行情做空的情况（逆势交易）
+				takeProfit = FibCode.FIB618;
+			}
 		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
 			takeProfit = FibCode.FIB382;
 		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
