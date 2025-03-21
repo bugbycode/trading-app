@@ -104,7 +104,7 @@ public class FibInfo {
 				takeProfit = FibCode.FIB382;
 			} else if((mode == QuotationMode.LONG && level == FibLevel.LEVEL_3)
 					|| (mode == QuotationMode.SHORT && level == FibLevel.LEVEL_2)) { //空头行情做多或多头行情做空的情况（逆势交易）
-				takeProfit = FibCode.FIB618;
+				takeProfit = FibCode.FIB5;
 			}
 		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
 			takeProfit = FibCode.FIB382;
