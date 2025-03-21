@@ -1042,7 +1042,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fibInfo == null) {
 			return;
 		}
-		logger.info("{} - {}", pair, fibInfo.toString());
+		logger.debug("{} - {}", pair, fibInfo.toString());
 		double percent = 0;
 		FibCode takeProfitCode = FibCode.FIB618;
 		List<User> userList = userRepository.queryAllUserByEmaRiseAndFall(MonitorStatus.OPEN);
