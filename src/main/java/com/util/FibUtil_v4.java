@@ -40,7 +40,8 @@ public class FibUtil_v4 {
 		
 		if(ema25 > ema99 && PriceUtil.isBreachLong(last, ema99)) { // 做多
 			
-			for(Klines k : list) {
+			for(int i = list.size() - 1; i >= 0; i--) {
+				Klines k = list.get(i);
 				if(k.getEma25() < k.getEma99()) {
 					fibList = PriceUtil.subList(k, list);
 					break;
@@ -55,7 +56,8 @@ public class FibUtil_v4 {
 			}
 			
 		} else if(ema25 < ema99 && PriceUtil.isBreachShort(last, ema99)) { //做空
-			for(Klines k : list) {
+			for(int i = list.size() - 1; i >= 0; i--) {
+				Klines k = list.get(i);
 				if(k.getEma25() > k.getEma99()) {
 					fibList = PriceUtil.subList(k, list);
 					break;
