@@ -1140,9 +1140,9 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		//行情框架发生转变时不做交易
-		if(fu.verifyMarketChanges(fibInfo.getLevel(), klinesList_1h)) {
+		/*if(fu.verifyMarketChanges(fibInfo.getLevel(), klinesList_1h)) {
 			return;
-		}
+		}*/
 		
 		//附加最后一根k线
 		fibInfo.setLast(last);

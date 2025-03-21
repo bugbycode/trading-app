@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.EMAType;
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
@@ -24,6 +25,8 @@ public class FibUtil {
 	private List<Klines> list;
 	
 	private Klines afterFlag;
+	
+	private FibInfo parentFibInfo;
 
 	public FibUtil(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
@@ -134,9 +137,36 @@ public class FibUtil {
 				Klines fibStartKlines = PriceUtil.getMinPriceKLine(fisrtSubList);
 				//终端（高点）
 				Klines fibEndKlines = PriceUtil.getMaxPriceKLine(PriceUtil.subList(fibStartKlines, last, list));
-				fib = new FibInfo(fibStartKlines.getLowPriceDoubleValue(), fibEndKlines.getHighPriceDoubleValue(), last.getDecimalNum(), getFibLevel(fibStartKlines, fibEndKlines));
 				
 				this.afterFlag = fibEndKlines;
+				
+				List<Klines> parentFibKlines = PriceUtil.subList(list.get(0), fibStartKlines, list);
+				
+				if(!CollectionUtils.isEmpty(parentFibKlines) && parentFibKlines.size() > 30) {
+					this.parentFibInfo = new FibUtil(parentFibKlines).getFibInfo();
+				}
+				
+				FibLevel level = null;
+				if(this.parentFibInfo != null) {
+					double parent_fib0 = this.parentFibInfo.getFibValue(FibCode.FIB0);
+					double parent_fib1 = this.parentFibInfo.getFibValue(FibCode.FIB1);
+					//创出更高的高点
+					if(parent_fib0 < fibEndKlines.getHighPriceDoubleValue()) {
+						level = FibLevel.LEVEL_2;
+					} else if(parent_fib1 > fibStartKlines.getLowPriceDoubleValue()) {//创出更低的低点
+						level = FibLevel.LEVEL_3;
+					}
+				}
+				
+				if(level == null && this.parentFibInfo != null) {
+					fib = this.parentFibInfo;
+				} else {
+					if(level == null) {
+						level = FibLevel.LEVEL_1;
+					}
+					fib = new FibInfo(fibStartKlines.getLowPriceDoubleValue(), fibEndKlines.getHighPriceDoubleValue(), last.getDecimalNum(), level);
+				}
+				
 			} else 
 			//做空情况
 			if(ps == PositionSide.SHORT) {
@@ -144,12 +174,42 @@ public class FibUtil {
 				Klines fibStartKlines = PriceUtil.getMaxPriceKLine(fisrtSubList);
 				//终端（低点）
 				Klines fibEndKlines = PriceUtil.getMinPriceKLine(PriceUtil.subList(fibStartKlines, last, list));
-				fib = new FibInfo(fibStartKlines.getHighPriceDoubleValue(), fibEndKlines.getLowPriceDoubleValue(), last.getDecimalNum(), getFibLevel(fibStartKlines, fibEndKlines));
+				
 				this.afterFlag = fibEndKlines;
+				
+				List<Klines> parentFibKlines = PriceUtil.subList(list.get(0), fibStartKlines, list);
+				
+				if(!CollectionUtils.isEmpty(parentFibKlines) && parentFibKlines.size() > 30) {
+					this.parentFibInfo = new FibUtil(parentFibKlines).getFibInfo();
+				}
+				
+				FibLevel level = null;
+				if(this.parentFibInfo != null) {
+					double parent_fib0 = this.parentFibInfo.getFibValue(FibCode.FIB0);
+					double parent_fib1 = this.parentFibInfo.getFibValue(FibCode.FIB1);
+					//创出更低的低点
+					if(parent_fib0 > fibEndKlines.getLowPriceDoubleValue()) {
+						level = FibLevel.LEVEL_3;
+					} else if(parent_fib1 < fibStartKlines.getHighPriceDoubleValue()) {//创出更高的高点
+						level = FibLevel.LEVEL_2;
+					}
+				}
+				if(level == null && this.parentFibInfo != null) {
+					fib = this.parentFibInfo;
+				} else {
+					if(level == null) {
+						level = FibLevel.LEVEL_1;
+					}
+					fib = new FibInfo(fibStartKlines.getHighPriceDoubleValue(), fibEndKlines.getLowPriceDoubleValue(), last.getDecimalNum(), level);
+				}
 			}
 		}
 		
 		return fib;
+	}
+	
+	public FibInfo getParentFibInfo() {
+		return this.parentFibInfo;
 	}
 	
 	/**
@@ -222,7 +282,7 @@ public class FibUtil {
 	}
 	
 	//回撤级别
-	private FibLevel getFibLevel(Klines fibStartKlines, Klines fibEndKlines) {
+	public FibLevel getFibLevel(Klines fibStartKlines, Klines fibEndKlines) {
 		FibLevel level = FibLevel.LEVEL_1;
 		double start_ema25 = fibStartKlines.getEma25();
 		double start_ema99 = fibStartKlines.getEma99();
