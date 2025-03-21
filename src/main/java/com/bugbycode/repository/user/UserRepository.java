@@ -61,14 +61,14 @@ public interface UserRepository {
 	public List<User> queryAllUserByRiseAndFallMonitor(MonitorStatus status);
 	
 	/**
-	 * 根据订阅开仓机会状态查询所有用户
+	 * 根据订阅价格行为状态查询所有用户
 	 * @param status
 	 * @return
 	 */
 	public List<User> queryAllUserByEmaMonitor(MonitorStatus status);
 	
 	/**
-	 * 根据订阅行情异动状态查询所有用户
+	 * 根据订阅指数均线状态查询所有用户
 	 * @param status
 	 * @return
 	 */

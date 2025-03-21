@@ -57,6 +57,7 @@ import com.util.DateFormatUtil;
 import com.util.FibUtil;
 import com.util.FibUtil_v2;
 import com.util.FibUtil_v3;
+import com.util.FibUtil_v4;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
@@ -1008,6 +1009,95 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
 			 	sendEmail(subject, text, recEmail);
+			}
+		}
+	}
+	
+	@Override
+	public void futuresEmaRiseAndFallMonitor(List<Klines> klinesList) {
+		if(CollectionUtils.isEmpty(klinesList)) {
+			return;
+		}
+		
+		Klines last = PriceUtil.getLastKlines(klinesList);
+		String pair = last.getPair();
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		double closePrice = last.getClosePriceDoubleValue();
+		
+		FibUtil_v4 fu = new FibUtil_v4(klinesList);
+		
+		if(!fu.verify()) {
+			return;
+		}
+		
+		FibInfo fibInfo = fu.getFibInfo();
+		
+		if(fibInfo == null) {
+			return;
+		}
+		logger.info("{} - {}", pair, fibInfo.toString());
+		double percent = 0;
+		FibCode takeProfitCode = FibCode.FIB618;
+		List<User> userList = userRepository.queryAllUserByEmaRiseAndFall(MonitorStatus.OPEN);
+		
+		QuotationMode mode = fibInfo.getQuotationMode();
+		
+		if(mode == QuotationMode.SHORT) {
+			
+			for(User u : userList) {
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				double profit = u.getProfit();
+				double profitLimit = u.getProfitLimit();
+				double cutLoss = u.getCutLoss();
+				
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(closePrice, profit, profitLimit);
+				}
+				
+				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(takeProfitCode)) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				
+				String subject = String.format("%s永续合约做多交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+				
+				if(percent < profit) {
+					continue;
+				}
+				
+				String text = StringUtil.formatLongMessage(pair, closePrice, fibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
+				text += "，预计盈利：" + percentStr + "%";
+				text += "\n\n" + fibInfo.toString();
+				
+				sendEmail(subject, text, u.getUsername());
+			}
+		} else if(mode == QuotationMode.LONG) {
+			
+			for(User u : userList) {
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				double profit = u.getProfit();
+				double profitLimit = u.getProfitLimit();
+				double cutLoss = u.getCutLoss();
+				
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(closePrice, profit, profitLimit);
+				}
+				
+				percent = PriceUtil.getFallFluctuationPercentage(closePrice, fibInfo.getFibValue(takeProfitCode)) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				
+				String subject = String.format("%s永续合约做空交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+				
+				if(percent < profit) {
+					continue;
+				}
+				
+				String text = StringUtil.formatShortMessage(pair, closePrice, fibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), takeProfitCode);
+				
+				text += "，预计盈利：" + percentStr + "%";
+				
+				text += "\n\n" + fibInfo.toString();
+				
+				sendEmail(subject, text, u.getUsername());
 			}
 		}
 	}

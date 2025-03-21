@@ -15,6 +15,45 @@ public class FibInfo {
 	private Klines last;
 	
 	/**
+	 * 指数均线指标止盈点位
+	 * @param price 当前价格
+	 * @param profit 用户盈利预期
+	 * @param profitLimit 用户止盈百分比限制
+	 * @return
+	 */
+	public FibCode getEmaEmaRiseAndFallTakeProfit(double price, double profit, double profitLimit) {
+		
+		FibCode result = FibCode.FIB618;
+		
+		QuotationMode qm = this.getQuotationMode() == QuotationMode.LONG ? QuotationMode.SHORT : QuotationMode.LONG;
+		double percent_618 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB618), qm);
+		double percent_786 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB786), qm);
+		double percent_1 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB1), qm);
+		
+		if(percent_618 >= profit && percent_618 <= profitLimit) {
+			result = FibCode.FIB618;
+		} else if(percent_786 >= profit && percent_786 <= profitLimit) {
+			result = FibCode.FIB786;
+		} else if(percent_1 >= profit && percent_1 <= profitLimit) {
+			result = FibCode.FIB1;
+		}
+		
+		if(result == null) {
+			if(percent_618 >= profit) {
+				result = FibCode.FIB618;
+			} else if(percent_786 >= profit) {
+				result = FibCode.FIB786;
+			} else if(percent_1 >= profit) {
+				result = FibCode.FIB1;
+			} else {
+				result = FibCode.FIB618;
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * 价格行为止盈点位
 	 * @param price 当前价格
 	 * @param profit 用户盈利预期

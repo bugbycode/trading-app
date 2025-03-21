@@ -80,6 +80,12 @@ public interface KlinesService {
 	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
 	
 	/**
+	 * 指数均线监控
+	 * @param klinesList
+	 */
+	public void futuresEmaRiseAndFallMonitor(List<Klines> klinesList);
+	
+	/**
 	 * 斐波那契回撤点位监控
 	 * 
 	 * @param klinesList

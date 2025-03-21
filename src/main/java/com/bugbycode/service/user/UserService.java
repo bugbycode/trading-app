@@ -34,7 +34,7 @@ public interface UserService extends UserDetailsService{
 	public String getEmaMonitorUserEmail();
 	
 	/**
-	 * 获取所有订阅行情异动邮箱账号信息
+	 * 获取所有订阅指数均线监控邮箱账号信息
 	 * @return
 	 */
 	public String getEmaRiseAndFallUserEmail();

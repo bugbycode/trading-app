@@ -30,7 +30,7 @@ public class User implements UserDetails {
 	
 	private int riseAndFallMonitor = 0; //是否订阅涨跌幅监控 0：否 1：是
 	
-	private int emaMonitor = 0;//是否订阅开仓机会监控 0：否 1：是
+	private int emaMonitor = 0;//是否订阅价格行为监控 0：否 1：是
 	
 	private int emaRiseAndFall = 0;//是否订阅行情异动监控 0：否 1：是
 	
