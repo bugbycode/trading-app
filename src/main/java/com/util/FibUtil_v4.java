@@ -78,38 +78,18 @@ public class FibUtil_v4 {
 		
 		boolean result = false;
 		
-		int index = list.size() - 1;
-		Klines last = list.get(index);
-		Klines parent = list.get(index - 1);
+		Klines last = PriceUtil.getLastKlines(list);
 		
 		double ema25 = last.getEma25();
 		double ema99 = last.getEma99();
 		
-		if(ema25 > ema99 && isLong(last, parent)) {//做多
+		if(ema25 > ema99 && PriceUtil.isOversold(list)) {//做多
 			result = true;
-		} else if(ema25 < ema99 && isShort(last, parent)) {//做空
+		} else if(ema25 < ema99 && PriceUtil.isOverbuying(list)) {//做空
 			result = true;
 		}
 		
 		return result;
 	}
 	
-	private boolean isLong(Klines last, Klines parent) {
-		
-		double ema99 = last.getEma99();
-		
-		double parent_ema99 = parent.getEma99();
-		
-		return ( PriceUtil.isBreachLong(last, ema99) && last.isRise() ) || 
-				( PriceUtil.isBreachLong(parent, parent_ema99) && parent.isFall() && last.isRise() );
-	}
-	
-	private boolean isShort(Klines last, Klines parent) {
-		double ema99 = last.getEma99();
-		
-		double parent_ema99 = parent.getEma99();
-		
-		return ( PriceUtil.isBreachShort(last, ema99) && last.isFall() ) || 
-				( PriceUtil.isBreachShort(parent, parent_ema99) && parent.isRise() && last.isFall() );
-	}
 }

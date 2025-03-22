@@ -1738,7 +1738,7 @@ public class PriceUtil {
 		Klines k3 = list.get(index -3);
 		Klines k4 = list.get(index -4);
 		
-		double ema7 = k0.getEma7();
+		double ema7 = k0.getEma7();
 		return (isBreachLong(k0, price) || isBreachLong(k1, price) || isBreachLong(k2, price) || isBreachLong(k3, price) || isBreachLong(k4, price))
 				&& k0.getClosePriceDoubleValue() >= ema7 && k0.getClosePriceDoubleValue() >= price;
 	}
@@ -2330,5 +2330,32 @@ public class PriceUtil {
      */
     public static void calculateAllBBPercentB(List<Klines> kLines) {
     	calculateAllBBPercentB(kLines, 20);
+    }
+    
+    /**
+     * 是否出现超买
+     * @param list
+     * @return
+     */
+    public static boolean isOverbuying(List<Klines> list) {
+    	
+    	int index = list.size() - 1;
+    	Klines last = list.get(index);
+    	Klines parent = list.get(index - 1);
+    	
+    	return parent.isRise() && parent.getBbPercentB() >= 0.9 && last.isFall();
+    }
+    
+    /**
+     * 是否出现超卖
+     * @param list
+     * @return
+     */
+    public static boolean isOversold(List<Klines> list) {
+    	int index = list.size() - 1;
+    	Klines last = list.get(index);
+    	Klines parent = list.get(index - 1);
+    	
+    	return parent.isFall() && parent.getBbPercentB() <= 0.1 && last.isRise();
     }
 }
