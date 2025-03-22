@@ -26,26 +26,31 @@ public class FibInfo {
 		FibCode result = FibCode.FIB618;
 		
 		QuotationMode qm = this.getQuotationMode() == QuotationMode.LONG ? QuotationMode.SHORT : QuotationMode.LONG;
+		double percent_5 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB5), qm);
 		double percent_618 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB618), qm);
 		double percent_786 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB786), qm);
-		double percent_1 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB1), qm);
+		//double percent_1 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB1), qm);
 		
-		if(percent_618 >= profit && percent_618 <= profitLimit) {
+		if(percent_5 >= profit && percent_5 <= profitLimit) {
+			result = FibCode.FIB5;
+		} else if(percent_618 >= profit && percent_618 <= profitLimit) {
 			result = FibCode.FIB618;
 		} else if(percent_786 >= profit && percent_786 <= profitLimit) {
 			result = FibCode.FIB786;
-		} else if(percent_1 >= profit && percent_1 <= profitLimit) {
+		}/* else if(percent_1 >= profit && percent_1 <= profitLimit) {
 			result = FibCode.FIB1;
-		}
+		}*/
 		
 		if(result == null) {
-			if(percent_618 >= profit) {
+			if(percent_5 >= profit) {
+				result = FibCode.FIB5;
+			} else if(percent_618 >= profit) {
 				result = FibCode.FIB618;
 			} else if(percent_786 >= profit) {
 				result = FibCode.FIB786;
-			} else if(percent_1 >= profit) {
+			}/* else if(percent_1 >= profit) {
 				result = FibCode.FIB1;
-			} else {
+			}*/ else {
 				result = FibCode.FIB618;
 			}
 		}
