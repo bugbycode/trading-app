@@ -1138,7 +1138,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fibInfo == null) {
 			return;
 		}
-		
+		logger.info("{} - {}", last.getPair(), fibInfo.toString());
 		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
 		QuotationMode qm = fibInfo.getQuotationMode();
