@@ -1547,11 +1547,11 @@ public class PriceUtil {
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
 			Klines current = getLastKlines(list);
 			double closePrice = current.getClosePriceDoubleValue();
-			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
+			//double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
 			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT) {
-				result = isBreachLong(current, fib236Price) && closePrice < fib382Price;
+				result = PriceUtil.isOversold(list) && closePrice < fib382Price;
 			}
 		}
 		
@@ -1569,11 +1569,11 @@ public class PriceUtil {
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
 			Klines current = getLastKlines(list);
 			double closePrice = current.getClosePriceDoubleValue();
-			double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
+			//double fib236Price = fibInfo.getFibValue(FibCode.FIB236);
 			double fib382Price = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode qm = fibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				result = isBreachShort(current, fib236Price) && closePrice > fib382Price;
+				result = PriceUtil.isOverbuying(list) && closePrice > fib382Price;
 			}
 		}
 		return result;
@@ -1738,7 +1738,7 @@ public class PriceUtil {
 		Klines k3 = list.get(index -3);
 		Klines k4 = list.get(index -4);
 		
-		double ema7 = k0.getEma7();
+		double ema7 = k0.getEma7();
 		return (isBreachLong(k0, price) || isBreachLong(k1, price) || isBreachLong(k2, price) || isBreachLong(k3, price) || isBreachLong(k4, price))
 				&& k0.getClosePriceDoubleValue() >= ema7 && k0.getClosePriceDoubleValue() >= price;
 	}
