@@ -39,7 +39,7 @@ public class FibUtil_v4 {
 
 		List<Klines> fibList = new ArrayList<Klines>();
 		
-		if(ema25 > ema99 && PriceUtil.isBreachLong(last, ema99)) { // 做多
+		if(ema25 > ema99) { // 做多
 			
 			for(int i = list.size() - 1; i >= 0; i--) {
 				Klines k = list.get(i);
@@ -56,7 +56,7 @@ public class FibUtil_v4 {
 				fibInfo = new FibInfo(startKlines.getHighPriceDoubleValue(), endKlines.getLowPriceDoubleValue(), startKlines.getDecimalNum(), FibLevel.LEVEL_1);
 			}
 			
-		} else if(ema25 < ema99 && PriceUtil.isBreachShort(last, ema99)) { //做空
+		} else if(ema25 < ema99) { //做空
 			for(int i = list.size() - 1; i >= 0; i--) {
 				Klines k = list.get(i);
 				if(k.getEma25() > k.getEma99()) {
