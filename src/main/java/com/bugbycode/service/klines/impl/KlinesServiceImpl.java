@@ -54,7 +54,7 @@ import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
-import com.util.FibUtil;
+import com.util.FibInfoFactory;
 import com.util.FibUtil_v2;
 import com.util.FibUtil_v3;
 import com.util.FibUtil_v4;
@@ -1131,23 +1131,15 @@ public class KlinesServiceImpl implements KlinesService {
 			klinesList_1h.remove(last);
 		}
 		
-		FibUtil fu = new FibUtil(klinesList_1h);
+		FibInfoFactory factory = new FibInfoFactory(klinesList_1h);
 		
-		FibInfo fibInfo = fu.getFibInfo();
+		FibInfo fibInfo = factory.getFibInfo();
 		
 		if(fibInfo == null) {
 			return;
 		}
 		
-		//行情框架发生转变时不做交易
-		/*if(fu.verifyMarketChanges(fibInfo.getLevel(), klinesList_1h)) {
-			return;
-		}*/
-		
-		//附加最后一根k线
-		fibInfo.setLast(last);
-		
-		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
+		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
 		QuotationMode qm = fibInfo.getQuotationMode();
 		

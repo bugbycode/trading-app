@@ -12,8 +12,6 @@ public class FibInfo {
 	
 	private FibLevel level;
 	
-	private Klines last;
-	
 	/**
 	 * 指数均线指标止盈点位
 	 * @param price 当前价格
@@ -142,10 +140,10 @@ public class FibInfo {
 		} else if(code == FibCode.FIB1) { // 1 -> 0.618
 			takeProfit = FibCode.FIB618;
 			if(level == FibLevel.LEVEL_1) {//震荡行情
-				takeProfit = FibCode.FIB618;
+				takeProfit = FibCode.FIB5;
 			} else if((mode == QuotationMode.LONG && level == FibLevel.LEVEL_2)
 					|| (mode == QuotationMode.SHORT && level == FibLevel.LEVEL_3)) { //多头行情做多或空头行情做空的情况
-				takeProfit = FibCode.FIB5;
+				takeProfit = FibCode.FIB382;
 			} else if((mode == QuotationMode.LONG && level == FibLevel.LEVEL_3)
 					|| (mode == QuotationMode.SHORT && level == FibLevel.LEVEL_2)) { //空头行情做多或多头行情做空的情况（逆势交易）
 				takeProfit = FibCode.FIB618;
@@ -250,14 +248,6 @@ public class FibInfo {
 	public FibLevel getLevel() {
 		return level;
 	}
-	
-	public Klines getLast() {
-		return last;
-	}
-
-	public void setLast(Klines last) {
-		this.last = last;
-	}
 
 	/**
 	 * 校验点位是否可开仓
@@ -284,34 +274,6 @@ public class FibInfo {
 		}
 		return result;
 	}
-	
-	/**
-	 * 校验点位是否可开仓
-	 * @param code 当前点位
-	 * @return
-	
-	public boolean verifyOpenFibCode(FibCode code) {
-		boolean result = false;
-		QuotationMode mode = this.getQuotationMode();
-		if(last != null) {
-			double ema25 = last.getEma25();
-			double ema99 = last.getEma99();
-			
-			if(mode == QuotationMode.LONG) {
-				//当ema25 小于 ema99 时做多只做最低点(1.0) ema25大于等于ema99 时做多点位不受限
-				if((ema25 < ema99 && code == FibCode.FIB1) || ema25 >= ema99) {
-					result = true;
-				}
-			} else if(mode == QuotationMode.SHORT) {
-				//当ema25大于ema99 时做空只做最高点(1.0) ema25小于等于ema99 时做空点位不受限
-				if((ema25 > ema99 && code == FibCode.FIB1) || ema25 <= ema99) {
-					result = true;
-				}
-			}
-		}
-		
-		return result;
-	} */
 	
 	/**
 	 * 获取下一个点位 点位顺序为： 1 -> 0.786 -> 0.618 -> 0.5 -> 0.382 -> 0.236 -> 0
