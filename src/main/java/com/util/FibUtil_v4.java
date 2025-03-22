@@ -30,6 +30,7 @@ public class FibUtil_v4 {
 		this.list.sort(kc);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateAllBBPercentB(list);
 		
 		Klines last = PriceUtil.getLastKlines(list);
 		
