@@ -54,7 +54,7 @@ import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
-import com.util.FibInfoFactory;
+import com.util.FibUtil;
 import com.util.FibUtil_v2;
 import com.util.FibUtil_v3;
 import com.util.FibUtil_v4;
@@ -1131,15 +1131,15 @@ public class KlinesServiceImpl implements KlinesService {
 			klinesList_1h.remove(last);
 		}
 		
-		FibInfoFactory factory = new FibInfoFactory(klinesList_1h);
+		FibUtil fu = new FibUtil(klinesList_1h);
 		
-		FibInfo fibInfo = factory.getFibInfo();
+		FibInfo fibInfo = fu.getFibInfo();
 		
 		if(fibInfo == null) {
 			return;
 		}
 		
-		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
+		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
 		
 		QuotationMode qm = fibInfo.getQuotationMode();
 		
