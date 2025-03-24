@@ -54,8 +54,8 @@ import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
+import com.util.DeclineAndStrengthFibUtil;
 import com.util.FibUtil;
-import com.util.FibUtil_v2;
 import com.util.FibUtil_v3;
 import com.util.FibUtil_v4;
 import com.util.FileUtil;
@@ -1165,72 +1165,37 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		KlinesComparator kc = new KlinesComparator(SortType.ASC);
-		klinesList.sort(kc);
-		
-		PriceUtil.calculateEMA_7_25_99(klinesList);
-		PriceUtil.calculateAllBBPercentB(klinesList);
+		klinesList.sort(new KlinesComparator(SortType.ASC));
 		
 		String text = "";//邮件内容
 		String subject = "";//邮件主题
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		Klines last = PriceUtil.getLastKlines(klinesList);
+		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
+		
+		Klines last = PriceUtil.getLastKlines(klinesList_1h);
 		
 		String pair = last.getPair();
 		double closePrice = last.getClosePriceDoubleValue();
 		
-		FibUtil_v2 fu = new FibUtil_v2(klinesList);
-		
-		FibInfo firstFibInfo = fu.getFibInfo();
-		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
-		
-		double percent = 0;
-		FibCode takeProfitCode = FibCode.FIB618;
-		
-		//二级回撤
-		if(PriceUtil.verifyDecliningPrice_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
-			
-			//市价做空
-			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION));
-			
-			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
-			
-			for(User u : uList) {
-				
-				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-				
-				double profit = u.getProfit();
-				double profitLimit = u.getProfitLimit();
-				double cutLoss = u.getCutLoss();
-				
-				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = secondFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
-				}
-				
-				percent = PriceUtil.getFallFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
-				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
-				subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
-				
-				if(percent < profit) {
-					continue;
-				}
-				
-				text = StringUtil.formatShortMessage(pair, closePrice, secondFibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), takeProfitCode);
-				
-				text += "，预计盈利：" + percentStr + "%";
-				
-				if(secondFibInfo != null) {
-					text += "\n\n" + secondFibInfo.toString();
-				}
-				
-				sendEmail(subject, text, u.getUsername());
-			}
-			
-		} else if(PriceUtil.verifyPowerful_v4(secondFibInfo, klinesList) && fu.verifyFirstFibOpen(firstFibInfo, closePrice)) {
-			
-			//市价做多
-			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, secondFibInfo, AutoTradeType.PRICE_ACTION));
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			klinesList_1h.remove(last);
+		}
+
+        DeclineAndStrengthFibUtil dsf = new DeclineAndStrengthFibUtil(klinesList_1h);
+        
+        FibInfo firstFibInfo = dsf.getFirstFibInfo();
+        
+        if(firstFibInfo == null) {
+        	return;
+        }
+        
+        FibCode takeProfitCode = FibCode.FIB618;
+        
+        if(dsf.isOpenLong(klinesList)) {//做多
+        	//市价做多
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION));
 			
 			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 			
@@ -1243,10 +1208,10 @@ public class KlinesServiceImpl implements KlinesService {
 				double cutLoss = u.getCutLoss();
 
 				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = secondFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
+					takeProfitCode = firstFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
 				}
 				
-				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, secondFibInfo.getFibValue(takeProfitCode)) * 100;
+				double percent = PriceUtil.getRiseFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
 				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
 				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
@@ -1254,23 +1219,15 @@ public class KlinesServiceImpl implements KlinesService {
 					continue;
 				}
 				
-				text = StringUtil.formatLongMessage(pair, closePrice, secondFibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
+				text = StringUtil.formatLongMessage(pair, closePrice, firstFibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
 				
 				text += "，预计盈利：" + percentStr + "%";
-				
-				if(secondFibInfo != null) {
-					text += "\n\n" + secondFibInfo.toString();
-				}
+				text += "\n\n" + firstFibInfo.toString();
 				
 				sendEmail(subject, text, u.getUsername());
 			}
-			
-		}
-		
-		//一级回撤
-		else if(PriceUtil.verifyDecliningPrice_v4(firstFibInfo, klinesList)) {
-			
-			//市价做空
+        } else if(dsf.isOpenShort(klinesList)) {//做空
+        	//市价做空
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION));
 			
 			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
@@ -1287,7 +1244,7 @@ public class KlinesServiceImpl implements KlinesService {
 					takeProfitCode = firstFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
 				}
 				
-				percent = PriceUtil.getFallFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
+				double percent = PriceUtil.getFallFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
 				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
 				subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
@@ -1298,54 +1255,11 @@ public class KlinesServiceImpl implements KlinesService {
 				text = StringUtil.formatShortMessage(pair, closePrice, firstFibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), takeProfitCode);
 				
 				text += "，预计盈利：" + percentStr + "%";
-				
-				if(firstFibInfo != null) {
-					text += "\n\n" + firstFibInfo.toString();
-				}
+				text += "\n\n" + firstFibInfo.toString();
 				
 				sendEmail(subject, text, u.getUsername());
 			}
-			
-		} else if(PriceUtil.verifyPowerful_v4(firstFibInfo, klinesList)) {
-			
-			//市价做多
-			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, firstFibInfo, AutoTradeType.PRICE_ACTION));
-			
-			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
-			
-			for(User u : uList) {
-				
-				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-				
-				double profit = u.getProfit();
-				double profitLimit = u.getProfitLimit();
-				double cutLoss = u.getCutLoss();
-				
-				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = firstFibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
-				}
-				
-				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, firstFibInfo.getFibValue(takeProfitCode)) * 100;
-				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
-				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
-				
-				if(percent < profit) {
-					continue;
-				}
-				
-				text = StringUtil.formatLongMessage(pair, closePrice, firstFibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
-				
-				text += "，预计盈利：" + percentStr + "%";
-				
-				if(firstFibInfo != null) {
-					text += "\n\n" + firstFibInfo.toString();
-				}
-				
-				sendEmail(subject, text, u.getUsername());
-			}
-			
-		}
-		
+        }
 	}
 
 	@Override
