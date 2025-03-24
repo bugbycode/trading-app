@@ -1738,7 +1738,7 @@ public class PriceUtil {
 		Klines k3 = list.get(index -3);
 		Klines k4 = list.get(index -4);
 		
-		double ema7 = k0.getEma7();
+		double ema7 = k0.getEma7();
 		return (isBreachLong(k0, price) || isBreachLong(k1, price) || isBreachLong(k2, price) || isBreachLong(k3, price) || isBreachLong(k4, price))
 				&& k0.getClosePriceDoubleValue() >= ema7 && k0.getClosePriceDoubleValue() >= price;
 	}
@@ -2357,5 +2357,27 @@ public class PriceUtil {
     	Klines parent = list.get(index - 1);
     	
     	return parent.isFall() && parent.getBbPercentB() <= 0.1 && last.isRise();
+    }
+    
+    public static  Klines findByStartTime(long time, List<Klines> list) {
+    	Klines result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		for(Klines k : list) {
+    			if(k.getStartTime() == time) {
+    				result = k;
+    				break;
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
+    public static  List<Klines> subList(long time, List<Klines> list){
+    	List<Klines> data = new ArrayList<Klines>();
+    	Klines start = findByStartTime(time, list);
+    	if(start != null) {
+    		data = subList(start, list);
+    	}
+    	return data;
     }
 }

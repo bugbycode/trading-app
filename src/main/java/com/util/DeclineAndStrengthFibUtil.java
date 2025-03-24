@@ -1,6 +1,7 @@
 package com.util;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -232,15 +233,14 @@ public class DeclineAndStrengthFibUtil {
 			
 			double first_382 = this.firstFibInfo.getFibValue(FibCode.FIB382);
 			
-			Klines afterLowKlines = null;
-			if(!CollectionUtils.isEmpty(secondAfterKlines)) {
-				Klines first = secondAfterKlines.get(0);
-				afterLowKlines = PriceUtil.getMinPriceKLine(PriceUtil.subList(first, list_hit));
-			} else {
-				afterLowKlines = PriceUtil.getMinPriceKLine(PriceUtil.subList(secondFibEndKlines, list_hit));
-			}
+			Date secondAfterStartTime = DateFormatUtil.getStartTimeBySetSecond(DateFormatUtil.parse(DateFormatUtil.format(secondFibEndKlines.getEndTime())), 1);
 			
-			if(price < first_382) {
+			List<Klines> afterData = PriceUtil.subList(secondAfterStartTime.getTime(), list_hit);
+			
+			if(price < first_382 && !CollectionUtils.isEmpty(afterData) && afterData.size() > 4) {
+				
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(afterData);
+				
 				FibCode[] codes = FibCode.values();
 				
 				for(int offset = 0; offset < codes.length; offset++) {
@@ -277,15 +277,14 @@ public class DeclineAndStrengthFibUtil {
 			
 			double first_382 = this.firstFibInfo.getFibValue(FibCode.FIB382);
 			
-			Klines afterHightKlines = null;
-			if(!CollectionUtils.isEmpty(secondAfterKlines)) {
-				Klines first = secondAfterKlines.get(0);
-				afterHightKlines = PriceUtil.getMaxPriceKLine(PriceUtil.subList(first, list_hit));
-			} else {
-				afterHightKlines = PriceUtil.getMaxPriceKLine(PriceUtil.subList(secondFibEndKlines, list_hit));
-			}
+			Date secondAfterStartTime = DateFormatUtil.getStartTimeBySetSecond(DateFormatUtil.parse(DateFormatUtil.format(secondFibEndKlines.getEndTime())), 1);
 			
-			if(price > first_382) {
+			List<Klines> afterData = PriceUtil.subList(secondAfterStartTime.getTime(), list_hit);
+			
+			if(price > first_382 && !CollectionUtils.isEmpty(afterData) && afterData.size() > 4) {
+				
+				Klines afterHightKlines = PriceUtil.getMaxPriceKLine(afterData);
+				
 				FibCode[] codes = FibCode.values();
 				
 				for(int offset = 0; offset < codes.length; offset++) {
