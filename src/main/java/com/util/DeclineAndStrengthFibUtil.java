@@ -224,7 +224,7 @@ public class DeclineAndStrengthFibUtil {
 	 * @param data
 	 * @return
 	 */
-	private boolean verify_ema7_lt_ema25(List<Klines> data) {
+	public boolean verify_ema7_lt_ema25(List<Klines> data) {
 		boolean result = false;
 		if(!CollectionUtils.isEmpty(data)) {
 			for(Klines k : data) {
@@ -242,7 +242,7 @@ public class DeclineAndStrengthFibUtil {
 	 * @param data
 	 * @return
 	 */
-	private boolean verify_ema7_gt_ema25(List<Klines> data) {
+	public boolean verify_ema7_gt_ema25(List<Klines> data) {
 		boolean result = false;
 		if(!CollectionUtils.isEmpty(data)) {
 			for(Klines k : data) {
@@ -274,7 +274,7 @@ public class DeclineAndStrengthFibUtil {
 			List<Klines> afterData = PriceUtil.subList(secondAfterStartTime.getTime(), list_hit);
 			
 			if(price < first_382 && !CollectionUtils.isEmpty(afterData) 
-					&& afterData.size() > 4 && verify_ema7_gt_ema25(afterData)) {
+					&& afterData.size() > 4) {
 				
 				Klines afterLowKlines = PriceUtil.getMinPriceKLine(afterData);
 				
@@ -319,7 +319,7 @@ public class DeclineAndStrengthFibUtil {
 			List<Klines> afterData = PriceUtil.subList(secondAfterStartTime.getTime(), list_hit);
 			
 			if(price > first_382 && !CollectionUtils.isEmpty(afterData) 
-					&& afterData.size() > 4 && verify_ema7_lt_ema25(afterData)) {
+					&& afterData.size() > 4) {
 				
 				Klines afterHightKlines = PriceUtil.getMaxPriceKLine(afterData);
 				
