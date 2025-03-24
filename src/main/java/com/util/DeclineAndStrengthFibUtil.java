@@ -220,6 +220,42 @@ public class DeclineAndStrengthFibUtil {
 	}
 	
 	/**
+	 * 校验是否包含ema7小于ema25的k线
+	 * @param data
+	 * @return
+	 */
+	private boolean verify_ema7_lt_ema25(List<Klines> data) {
+		boolean result = false;
+		if(!CollectionUtils.isEmpty(data)) {
+			for(Klines k : data) {
+				if(k.getEma7() < k.getEma25()) {
+					result = true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * 校验是否包含ema7大于ema25的k线
+	 * @param data
+	 * @return
+	 */
+	private boolean verify_ema7_gt_ema25(List<Klines> data) {
+		boolean result = false;
+		if(!CollectionUtils.isEmpty(data)) {
+			for(Klines k : data) {
+				if(k.getEma7() > k.getEma25()) {
+					result = true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * 判断是否可做多
 	 * @param list_hit 参考k线
 	 * @return
@@ -237,7 +273,8 @@ public class DeclineAndStrengthFibUtil {
 			
 			List<Klines> afterData = PriceUtil.subList(secondAfterStartTime.getTime(), list_hit);
 			
-			if(price < first_382 && !CollectionUtils.isEmpty(afterData) && afterData.size() > 4) {
+			if(price < first_382 && !CollectionUtils.isEmpty(afterData) 
+					&& afterData.size() > 4 && verify_ema7_gt_ema25(afterData)) {
 				
 				Klines afterLowKlines = PriceUtil.getMinPriceKLine(afterData);
 				
@@ -281,7 +318,8 @@ public class DeclineAndStrengthFibUtil {
 			
 			List<Klines> afterData = PriceUtil.subList(secondAfterStartTime.getTime(), list_hit);
 			
-			if(price > first_382 && !CollectionUtils.isEmpty(afterData) && afterData.size() > 4) {
+			if(price > first_382 && !CollectionUtils.isEmpty(afterData) 
+					&& afterData.size() > 4 && verify_ema7_lt_ema25(afterData)) {
 				
 				Klines afterHightKlines = PriceUtil.getMaxPriceKLine(afterData);
 				
