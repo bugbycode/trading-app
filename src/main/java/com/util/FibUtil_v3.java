@@ -289,7 +289,7 @@ public class FibUtil_v3 {
 	 * @param thirdFibInfo
 	 * @return
 	 */
-	public FibInfo getFfifthFibInfo(FibInfo fourthFibInfo) {
+	public FibInfo getFifthFibInfo(FibInfo fourthFibInfo) {
 		FibInfo fibInfo = null;
 		if(fourthFibInfo != null) {
 			double startPrice = fourthFibInfo.getFibValue(FibCode.FIB0);
