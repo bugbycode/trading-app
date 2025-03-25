@@ -1317,7 +1317,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		List<Klines> todayKlines = PriceUtil.getTodayKlines(klinesList);
 		Klines afterLowKlines = PriceUtil.getMinPriceKLine(todayKlines);
-		Klines afterHighKlines = PriceUtil.getMaxPriceKLine(klinesList);
+		Klines afterHighKlines = PriceUtil.getMaxPriceKLine(todayKlines);
 		
 		FibUtil_v3 fu = new FibUtil_v3(list_1d);
 		FibInfo firstFibInfo = fu.getFibInfo();
