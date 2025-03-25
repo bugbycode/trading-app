@@ -136,16 +136,12 @@ public class FibInfo {
 			takeProfit = FibCode.FIB1_618;
 		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
 			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.618
-			if(level == FibLevel.LEVEL_1) {//震荡行情
-				takeProfit = FibCode.FIB5;
-			} else {
-				takeProfit = FibCode.FIB618;
-			}
-		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
+		} else if(code == FibCode.FIB1) { // 1 -> 0.5
 			takeProfit = FibCode.FIB5;
-		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
+		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
 			takeProfit = FibCode.FIB382;
+		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.236
+			takeProfit = FibCode.FIB236;
 		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
 			takeProfit = FibCode.FIB236;
 		} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
@@ -251,18 +247,16 @@ public class FibInfo {
 	public boolean verifyOpenFibCode(FibCode code) {
 		QuotationMode mode = this.getQuotationMode();
 		boolean result = false;
-		if(level == FibLevel.LEVEL_1 && (code == FibCode.FIB1 || code == FibCode.FIB786)) {//震荡行情 只做高低点
+		if(level == FibLevel.LEVEL_1 && code.lte(FibCode.FIB1) && code.gte(FibCode.FIB618)) {//震荡行情 只做高低点 1~0.618
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG
-				 && (code == FibCode.FIB618 || code == FibCode.FIB786 || 
-				 (code.gte(FibCode.FIB1_618) && code.lte(FibCode.FIB4_618)) ) ) {//多头行情做多 0.786 ~ 0.618 4.618 ~ 1.618
+				 && code.gte(FibCode.FIB618) ) {//多头行情做多 0.618 ~ 4.618
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.SHORT
 				&& code == FibCode.FIB1) { //多头行情做空 只做最高点
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT
-				 && (code == FibCode.FIB618 || code == FibCode.FIB786 || 
-				 (code.gte(FibCode.FIB1_618) && code.lte(FibCode.FIB4_618)) ) ) { //空头行情做空 0.786 ~ 0.618 4.618 ~ 1.618
+				&& code.gte(FibCode.FIB618) ) { //空头行情做空  0.618 ~ 4.618
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.LONG
 				&& code == FibCode.FIB1) { //空头行情做多 只做最低点
