@@ -104,19 +104,19 @@ public class FibUtil_v3 {
 					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
 							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						firstFlag = k;
-						logger.info(firstFlag);
+						logger.debug(firstFlag);
 					}
 				} else if(secondFlag == null) {//寻找第二个标志性k线
 					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
 							&& verifyLow(k3) && verifyLow(k4)*/) {
 						secondFlag = k;
-						logger.info(secondFlag);
+						logger.debug(secondFlag);
 					}
 				} else if(thirdFlag == null) {//寻找第三个标志性k线
 					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
 							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						thirdFlag = k;
-						logger.info(thirdFlag);
+						logger.debug(thirdFlag);
 					}
 				}
 				
@@ -132,19 +132,19 @@ public class FibUtil_v3 {
 					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
 							&& verifyLow(k3) && verifyLow(k4)*/) {
 						firstFlag = k;
-						logger.info(firstFlag);
+						logger.debug(firstFlag);
 					}
 				} else if(secondFlag == null) {//寻找第二个标志性k线
 					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
 							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						secondFlag = k;
-						logger.info(secondFlag);
+						logger.debug(secondFlag);
 					}
 				} else if(thirdFlag == null) {//寻找第三个标志性k线
 					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
 							&& verifyLow(k3) && verifyLow(k4)*/) {
 						thirdFlag = k;
-						logger.info(thirdFlag);
+						logger.debug(thirdFlag);
 					}
 				}
 				
@@ -494,39 +494,6 @@ public class FibUtil_v3 {
 			}
 		}
 		return flag;
-	}
-	
-	/**
-	 * 校验回撤点是否可开仓
-	 * 
-	 * @param fibInfo 斐波那契回撤信息
-	 * @param hitCode 开仓的回撤点
-	 * @param childFibInfo 次级斐波那契回撤信息
-	 * @return
-	 */
-	public boolean verifyParentOpen(FibInfo fibInfo, FibCode hitCode,FibInfo childFibInfo) {
-		boolean result = false;
-		if(fibInfo == null || hitCode == null) {
-			result = false;
-		} else if(childFibInfo == null) {
-			result = true;
-		} else {
-			//行情模式
-			QuotationMode qm = fibInfo.getQuotationMode();
-			double codePrice = fibInfo.getFibValue(hitCode);
-			//次级斐波那契回撤结束点价格
-			double childFibEndPrice = childFibInfo.getFibValue(FibCode.FIB0);
-			if(qm == QuotationMode.LONG) {
-				if(childFibEndPrice > codePrice) {
-					result = true;
-				}
-			} else if(qm == QuotationMode.SHORT) {
-				if(childFibEndPrice < codePrice) {
-					result = true;
-				}
-			}
-		}
-		return result;
 	}
 
 	public Klines getAfterFlag() {
