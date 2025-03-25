@@ -20,7 +20,9 @@ public enum FibLevel {
 	 */
 	LEVEL_3(3,"Lv3",FibCode.FIB618),
 	
-	LEVEL_4(3,"Lv4",FibCode.FIB618);
+	LEVEL_4(4,"Lv4",FibCode.FIB618),
+	
+	LEVEL_5(5,"Lv5",FibCode.FIB618);
 	
 	private int value;
 	

@@ -32,6 +32,8 @@ public class FibUtil_v3 {
 	private Klines thirdFibAfterFlag;
 	
 	private Klines fourthFibAfterFlag;
+	
+	private Klines fifthFibAfterFlag;
 
 	private Klines firstStart;
 	
@@ -48,6 +50,10 @@ public class FibUtil_v3 {
 	private Klines fourthStart;
 	
 	private Klines fourthEnd;
+	
+	private Klines fifthStart;
+	
+	private Klines fifthEnd;
 	
 	public FibUtil_v3(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
@@ -98,19 +104,19 @@ public class FibUtil_v3 {
 					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
 							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						firstFlag = k;
-						logger.debug(firstFlag);
+						logger.info(firstFlag);
 					}
 				} else if(secondFlag == null) {//寻找第二个标志性k线
 					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
 							&& verifyLow(k3) && verifyLow(k4)*/) {
 						secondFlag = k;
-						logger.debug(secondFlag);
+						logger.info(secondFlag);
 					}
 				} else if(thirdFlag == null) {//寻找第三个标志性k线
 					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
 							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						thirdFlag = k;
-						logger.debug(thirdFlag);
+						logger.info(thirdFlag);
 					}
 				}
 				
@@ -126,19 +132,19 @@ public class FibUtil_v3 {
 					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
 							&& verifyLow(k3) && verifyLow(k4)*/) {
 						firstFlag = k;
-						logger.debug(firstFlag);
+						logger.info(firstFlag);
 					}
 				} else if(secondFlag == null) {//寻找第二个标志性k线
 					if(verifyHigh(k) /*&& verifyHigh(k1) && verifyHigh(k2)
 							&& verifyHigh(k3) && verifyHigh(k4)*/) {
 						secondFlag = k;
-						logger.debug(secondFlag);
+						logger.info(secondFlag);
 					}
 				} else if(thirdFlag == null) {//寻找第三个标志性k线
 					if(verifyLow(k) /*&& verifyLow(k1) && verifyLow(k2)
 							&& verifyLow(k3) && verifyLow(k4)*/) {
 						thirdFlag = k;
-						logger.debug(thirdFlag);
+						logger.info(thirdFlag);
 					}
 				}
 				
@@ -279,6 +285,39 @@ public class FibUtil_v3 {
 	}
 	
 	/**
+	 * 获取第五级斐波那契回撤信息
+	 * @param thirdFibInfo
+	 * @return
+	 */
+	public FibInfo getFfifthFibInfo(FibInfo fourthFibInfo) {
+		FibInfo fibInfo = null;
+		if(fourthFibInfo != null) {
+			double startPrice = fourthFibInfo.getFibValue(FibCode.FIB0);
+			double endPrice = 0;
+			List<Klines> fibAfterKlines = getFourthFibAfterKlines();
+			if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+				this.fifthStart = this.fourthEnd;
+				//三级斐波那契回撤行情模式 LONG/SHORT
+				QuotationMode qm = fourthFibInfo.getQuotationMode();
+				if(qm == QuotationMode.LONG) {//多头 找低点
+					Klines lowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+					endPrice = lowKlines.getLowPriceDoubleValue();
+					this.fifthFibAfterFlag = lowKlines;
+					this.fifthEnd = lowKlines;
+				} else {//空头 找高点
+					Klines highKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+					endPrice = highKlines.getHighPriceDoubleValue();
+					this.fifthFibAfterFlag = highKlines;
+					this.fifthEnd = highKlines;
+				}
+				
+				fibInfo = new FibInfo(startPrice, endPrice, fourthFibInfo.getDecimalPoint(), FibLevel.LEVEL_5);
+			}
+		}
+		return fibInfo;
+	}
+	
+	/**
 	 * 获取斐波那契回撤之后的所有k线信息
 	 * 
 	 * @return
@@ -342,6 +381,22 @@ public class FibUtil_v3 {
 		return afterList;
 	}
 	
+	/**
+	 * 获取第五级斐波那契回撤之后的所有k线信息
+	 * 
+	 * @return
+	 */
+	public List<Klines> getFifthFibAfterKlines() {
+		List<Klines> afterList = new ArrayList<Klines>();
+		if(this.fifthFibAfterFlag != null) {
+			Klines last = PriceUtil.getAfterKlines(fifthFibAfterFlag, list);
+			if(last != null) {
+				afterList = PriceUtil.subList(last, list);
+			}
+		}
+		return afterList;
+	}
+	
 	private PositionSide getPositionSide(Klines k) {
 		PositionSide ps = PositionSide.DEFAULT;
 		
@@ -360,9 +415,9 @@ public class FibUtil_v3 {
 	 * @return
 	 */
 	private boolean verifyLong(Klines k) {
-		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		return ema7 < ema25;
+		double ema99 = k.getEma99();
+		return ema25 < ema99;
 	}
 	
 	/**
@@ -371,9 +426,9 @@ public class FibUtil_v3 {
 	 * @return
 	 */
 	private boolean verifyShort(Klines k) {
-		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
-		return ema7 > ema25;
+		double ema99 = k.getEma99();
+		return ema25 > ema99;
 	}
 	
 	/**
@@ -493,6 +548,10 @@ public class FibUtil_v3 {
 		return fourthFibAfterFlag;
 	}
 
+	public Klines getFifthFibAfterFlag() {
+		return fifthFibAfterFlag;
+	}
+
 	public Klines getFirstStart() {
 		return firstStart;
 	}
@@ -523,5 +582,13 @@ public class FibUtil_v3 {
 
 	public Klines getFourthEnd() {
 		return fourthEnd;
+	}
+
+	public Klines getFifthStart() {
+		return fifthStart;
+	}
+
+	public Klines getFifthEnd() {
+		return fifthEnd;
 	}
 }
