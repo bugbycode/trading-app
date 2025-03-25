@@ -509,23 +509,18 @@ public class FibUtil_v3 {
 		if(parentHitCode == null || childFibInfo == null || parentFibInfo == null) {
 			result = true;
 		} else {
-			FibLevel level = parentFibInfo.getLevel();
-			if(level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) {
-				result = true;
-			} else {
-				//行情模式
-				QuotationMode qm = parentFibInfo.getQuotationMode();
-				double codePrice = parentFibInfo.getFibValue(parentHitCode);
-				//次级斐波那契回撤结束点价格
-				double childFibEndPrice = childFibInfo.getFibValue(FibCode.FIB0);
-				if(qm == QuotationMode.LONG) {
-					if(childFibEndPrice > codePrice) {
-						result = true;
-					}
-				} else if(qm == QuotationMode.SHORT) {
-					if(childFibEndPrice < codePrice) {
-						result = true;
-					}
+			//行情模式
+			QuotationMode qm = parentFibInfo.getQuotationMode();
+			double codePrice = parentFibInfo.getFibValue(parentHitCode);
+			//次级斐波那契回撤结束点价格
+			double childFibEndPrice = childFibInfo.getFibValue(FibCode.FIB0);
+			if(qm == QuotationMode.LONG) {
+				if(childFibEndPrice > codePrice) {
+					result = true;
+				}
+			} else if(qm == QuotationMode.SHORT) {
+				if(childFibEndPrice < codePrice) {
+					result = true;
 				}
 			}
 		}
