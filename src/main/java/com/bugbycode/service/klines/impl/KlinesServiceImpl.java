@@ -1176,13 +1176,21 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		Klines last = PriceUtil.getLastKlines(klinesList);
+		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
+		
+		Klines last = PriceUtil.getLastKlines(klinesList_1h);
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			return;
+		}
+		
 		String pair = last.getPair();
 		String dateStr = DateFormatUtil.format(new Date());
 		
 		double closePrice = last.getClosePriceDoubleValue();
 		
-		FibUtil_v4 fu = new FibUtil_v4(klinesList);
+		FibUtil_v4 fu = new FibUtil_v4(klinesList_1h);
 		
 		if(!fu.verify()) {
 			return;
