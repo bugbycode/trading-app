@@ -1738,7 +1738,7 @@ public class PriceUtil {
 		Klines k3 = list.get(index -3);
 		Klines k4 = list.get(index -4);
 		
-		double ema7 = k0.getEma7();
+		double ema7 = k0.getEma7();
 		return (isBreachLong(k0, price) || isBreachLong(k1, price) || isBreachLong(k2, price) || isBreachLong(k3, price) || isBreachLong(k4, price))
 				&& k0.getClosePriceDoubleValue() >= ema7 && k0.getClosePriceDoubleValue() >= price;
 	}
@@ -2380,4 +2380,18 @@ public class PriceUtil {
     	}
     	return data;
     }
+    
+    /**
+	 * 判断价格是否到达预期的价格
+	 * @param klines 当前k线
+	 * @param price 预期的价格
+	 * @return
+	 */
+	public static boolean hitPrice(Klines klines,double price) {
+		boolean result = false;
+		if(Double.valueOf(klines.getHighPrice()) >= price && Double.valueOf(klines.getLowPrice()) <= price) {
+			result = true;
+		}
+		return result;
+	}
 }

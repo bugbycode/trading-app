@@ -1617,7 +1617,7 @@ public class KlinesServiceImpl implements KlinesService {
 					klines.getPair(),PriceUtil.formatDoubleDecimal(price,klines.getDecimalNum()),
 					DateFormatUtil.format(time * 1000),klines.getClosePrice());
 			
-			if(hitPrice(klines, price)) {
+			if(PriceUtil.hitPrice(klines, price)) {
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				//所有k线信息
@@ -1650,20 +1650,6 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 	}
 	
-	/**
-	 * 判断价格是否到达预期的价格
-	 * @param klines 当前k线
-	 * @param price 预期的价格
-	 * @return
-	 */
-	private boolean hitPrice(Klines klines,double price) {
-		boolean result = false;
-		if(Double.valueOf(klines.getHighPrice()) >= price && Double.valueOf(klines.getLowPrice()) <= price) {
-			result = true;
-		}
-		return result;
-	}
-
 	@Override
 	public void rectangle(Klines klines, ShapeInfo info) {
 		//价格坐标
@@ -1679,7 +1665,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			String upOrLowStr = "";
 			
-			if(hitPrice(klines, price0)) {
+			if(PriceUtil.hitPrice(klines, price0)) {
 				upOrLowStr = price0 > price1 ? "上" : "下";
 				String dateStr = DateFormatUtil.format(new Date());
 				String subject = String.format("%s永续合约价格已到达盘整区%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),dateStr);
@@ -1704,7 +1690,7 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 			}
 			
-			if(hitPrice(klines, price1)) {
+			if(PriceUtil.hitPrice(klines, price1)) {
 				upOrLowStr = price1 > price0 ? "上" : "下";
 				String dateStr = DateFormatUtil.format(new Date());
 				String subject = String.format("%s永续合约价格已到达盘整区%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),dateStr);
@@ -1758,7 +1744,7 @@ public class KlinesServiceImpl implements KlinesService {
 					klines.getClosePrice(),
 					PriceUtil.formatDoubleDecimal(resultPrice,klines.getDecimalNum()));
 			logger.debug(text);
-			if(hitPrice(klines, resultPrice)) {
+			if(PriceUtil.hitPrice(klines, resultPrice)) {
 				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
 				
 				long startTime = time0 < time1 ? (time0 * 1000) : (time1 * 1000);
@@ -1822,7 +1808,7 @@ public class KlinesServiceImpl implements KlinesService {
 			logger.debug(String.format("价格1：%s，价格2：%s，时间：%s", line0Price,line1Price,DateFormatUtil.format(klines.getStartTime())));
 			
 			//第一条直线
-			if(hitPrice(klines, line0Price)) {
+			if(PriceUtil.hitPrice(klines, line0Price)) {
 				upOrLowStr = line0Price > line1Price ? "上" : "下";
 				String dateStr = DateFormatUtil.format(new Date());
 				String subject = String.format("%s永续合约价格已到达平行通道%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(line0Price,klines.getDecimalNum()),dateStr);
@@ -1852,7 +1838,7 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 			
 			//第二条直线
-			if(hitPrice(klines, line1Price)) {
+			if(PriceUtil.hitPrice(klines, line1Price)) {
 				upOrLowStr = line1Price > line0Price ? "上" : "下";
 				String dateStr = DateFormatUtil.format(new Date());
 				String subject = String.format("%s永续合约价格已到达平行通道%s边缘%s %s", klines.getPair(), upOrLowStr, PriceUtil.formatDoubleDecimal(line1Price,klines.getDecimalNum()),dateStr);
@@ -1955,7 +1941,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibInfo fibInfo = null;
 			
 			//k线经过ac直线时
-			if(hitPrice(klines, acPrice)) {
+			if(PriceUtil.hitPrice(klines, acPrice)) {
 				upOrLowStr = acPrice > bdPrice ? "上" : "下";
 				subject = String.format("%s永续合约价格到达%s%s边缘%s %s", 
 						klines.getPair(), 
@@ -1966,7 +1952,7 @@ public class KlinesServiceImpl implements KlinesService {
 				fibInfo = new FibInfo(bdPrice, acPrice, klines.getDecimalNum(), FibLevel.LEVEL_1);
 			}
 			
-			if(hitPrice(klines, bdPrice)) {
+			if(PriceUtil.hitPrice(klines, bdPrice)) {
 				upOrLowStr = bdPrice > acPrice ? "上" : "下";
 				subject = String.format("%s永续合约价格到达%s%s边缘%s %s", 
 						klines.getPair(), 
@@ -2029,7 +2015,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			String pair = klines.getPair();
 			
-			if(hitPrice(klines, price)) {
+			if(PriceUtil.hitPrice(klines, price)) {
 				String subject = String.format("%s永续合约(%s)做多交易计划 %s", 
 						klines.getPair(),
 						PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
@@ -2069,7 +2055,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			String pair = klines.getPair();
 			
-			if(hitPrice(klines, price)) {
+			if(PriceUtil.hitPrice(klines, price)) {
 				String subject = String.format("%s永续合约(%s)做空交易计划 %s", 
 						klines.getPair(),
 						PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
@@ -2110,7 +2096,7 @@ public class KlinesServiceImpl implements KlinesService {
 				boolean visible = levelObj.getBoolean("visible");
 				double coeff = levelObj.getDouble("coeff");
 				double price = fib.getFibValue(coeff);
-				if(visible && hitPrice(klines, price)) {
+				if(visible && PriceUtil.hitPrice(klines, price)) {
 					String subject = String.format("%s永续合约价格已到达%s(%s) %s",
 							klines.getPair(),
 							coeff,
