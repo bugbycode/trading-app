@@ -736,7 +736,7 @@ public class KlinesServiceImpl implements KlinesService {
 						String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
 						
 						if(autoTradeType == AutoTradeType.FIB_RET && fibInfo != null) {
-							subject_ = String.format("%s多头仓位已买入[%s][%s(%s)][PNL:%s%%] %s", 
+							subject_ = String.format("%s多头仓位已下单[%s][%s(%s)][PNL:%s%%] %s", 
 									pair, 
 									fibInfo.getLevel().getLabel(),
 									codes[offset].getDescription(), 
@@ -744,7 +744,7 @@ public class KlinesServiceImpl implements KlinesService {
 									pnlStr, 
 									dateStr);
 						} else {
-							subject_ = String.format("%s多头仓位已买入[PNL:%s%%] %s", pair, pnlStr, dateStr);
+							subject_ = String.format("%s多头仓位已下单[PNL:%s%%] %s", pair, pnlStr, dateStr);
 						}
 						
 						String text_ = StringUtil.formatLongMessage_v2(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
@@ -759,7 +759,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 					} catch (Exception e) {
-						sendEmail("创建" + pair + "多头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
+						sendEmail("下单" + pair + "多头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
 						logger.error(e.getMessage(), e);
 					}
 					
@@ -966,7 +966,7 @@ public class KlinesServiceImpl implements KlinesService {
 						String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
 						
 						if(autoTradeType == AutoTradeType.FIB_RET && fibInfo != null) {
-							subject_ = String.format("%s空头仓位已卖出[%s][%s(%s)][PNL:%s%%] %s", 
+							subject_ = String.format("%s空头仓位已下单[%s][%s(%s)][PNL:%s%%] %s", 
 									pair, 
 									fibInfo.getLevel().getLabel(),
 									codes[offset].getDescription(), 
@@ -974,7 +974,7 @@ public class KlinesServiceImpl implements KlinesService {
 									pnlStr, 
 									dateStr);
 						} else {
-							subject_ = String.format("%s空头仓位已卖出[PNL:%s%%] %s", pair, pnlStr, dateStr);
+							subject_ = String.format("%s空头仓位已下单[PNL:%s%%] %s", pair, pnlStr, dateStr);
 						}
 						
 						String text_ = StringUtil.formatShortMessage_v2(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
@@ -989,7 +989,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 					} catch (Exception e) {
-						sendEmail("创建" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
+						sendEmail("下单" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
 						logger.error(e.getMessage(), e);
 					}
 					
