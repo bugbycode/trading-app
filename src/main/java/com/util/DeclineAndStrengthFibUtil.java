@@ -268,13 +268,15 @@ public class DeclineAndStrengthFibUtil {
 			double price = last.getClosePriceDoubleValue();
 			
 			double first_382 = this.firstFibInfo.getFibValue(FibCode.FIB382);
+			double first_236 = this.firstFibInfo.getFibValue(FibCode.FIB236);
+			double second_0 = this.secondFibInfo.getFibValue(FibCode.FIB0);
 			
 			Date secondAfterStartTime = DateFormatUtil.getStartTimeBySetSecond(DateFormatUtil.parse(DateFormatUtil.format(secondFibEndKlines.getEndTime())), 1);
 			
 			List<Klines> afterData = PriceUtil.subList(secondAfterStartTime.getTime(), list_hit);
 			
 			if(price < first_382 && !CollectionUtils.isEmpty(afterData) 
-					&& afterData.size() > 4) {
+					&& second_0 >= first_236) {
 				
 				Klines afterLowKlines = PriceUtil.getMinPriceKLine(afterData);
 				
@@ -313,13 +315,15 @@ public class DeclineAndStrengthFibUtil {
 			double price = last.getClosePriceDoubleValue();
 			
 			double first_382 = this.firstFibInfo.getFibValue(FibCode.FIB382);
+			double first_236 = this.firstFibInfo.getFibValue(FibCode.FIB236);
+			double second_0 = this.secondFibInfo.getFibValue(FibCode.FIB0);
 			
 			Date secondAfterStartTime = DateFormatUtil.getStartTimeBySetSecond(DateFormatUtil.parse(DateFormatUtil.format(secondFibEndKlines.getEndTime())), 1);
 			
 			List<Klines> afterData = PriceUtil.subList(secondAfterStartTime.getTime(), list_hit);
 			
 			if(price > first_382 && !CollectionUtils.isEmpty(afterData) 
-					&& afterData.size() > 4) {
+					&& second_0 <= first_236) {
 				
 				Klines afterHightKlines = PriceUtil.getMaxPriceKLine(afterData);
 				
