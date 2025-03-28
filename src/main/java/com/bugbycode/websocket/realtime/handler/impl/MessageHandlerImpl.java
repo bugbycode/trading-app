@@ -55,8 +55,8 @@ public class MessageHandlerImpl implements MessageHandler{
 			logger.debug(kline);
 			
 			//15分钟k线分析
-			long count = klinesRepository.count(kline.getPair(), Inerval.INERVAL_1D);
-			if(count == 0) {
+			boolean isEmpty = klinesRepository.isEmpty(kline.getPair(), Inerval.INERVAL_1D);
+			if(isEmpty) {
 				workTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository));
 			} else {
 				klinesRepository.insert(kline);

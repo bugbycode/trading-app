@@ -85,6 +85,12 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 	public long count(String pair, Inerval interval) {
 		return template.count(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval.getDescption())).with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class);
 	}
+	
+	@Override
+	public boolean isEmpty(String pair,Inerval interval) {
+		Klines result = template.findOne(Query.query(Criteria.where("pair").is(pair).and("interval").is(interval.getDescption())), Klines.class);
+		return result == null;
+	}
 
 	@Override
 	public List<Klines> findLastKlinesByPair(String pair, Inerval interval, int limit) {

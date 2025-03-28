@@ -86,6 +86,14 @@ public interface KlinesRepository {
     public long count(String pair,Inerval interval);
     
     /**
+     * 判断是否有数据
+     * @param pair 交易对
+     * @param interval 时间级别
+     * @return
+     */
+    public boolean isEmpty(String pair,Inerval interval);
+    
+    /**
      * 查询最新的一部分k线信息
      * @param pair 交易对
      * @param interval 时间级别
