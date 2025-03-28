@@ -37,6 +37,9 @@ public class SyncFuturesLastDayKlinesWebSocketTask {
 	private WorkTaskPool analysisWorkTaskPool;
 	
 	@Autowired
+	private WorkTaskPool workTaskPool;
+	
+	@Autowired
 	private KlinesRepository klinesRepository;
 	
 	@Autowired
@@ -74,7 +77,7 @@ public class SyncFuturesLastDayKlinesWebSocketTask {
 		}
 		
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool);
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
 		}
 		
 		logger.debug("SyncFuturesLastDayKlinesWebSocketTask end.");

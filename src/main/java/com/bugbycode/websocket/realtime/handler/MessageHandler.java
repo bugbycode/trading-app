@@ -9,6 +9,7 @@ import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoin
 public interface MessageHandler {
 	
 	public void handleMessage(String message,PerpetualWebSocketClientEndpoint client, KlinesService klinesService, 
-			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, WorkTaskPool analysisWorkTaskPool);
+			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, 
+			WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool);
 	
 }

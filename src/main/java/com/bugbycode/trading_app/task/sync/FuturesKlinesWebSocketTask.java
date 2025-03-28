@@ -39,6 +39,9 @@ public class FuturesKlinesWebSocketTask {
 	private WorkTaskPool analysisWorkTaskPool;
 	
 	@Autowired
+	private WorkTaskPool workTaskPool;
+	
+	@Autowired
 	private KlinesRepository klinesRepository;
 	
 	@Autowired
@@ -83,7 +86,7 @@ public class FuturesKlinesWebSocketTask {
 		}
 		
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool);
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
 		}
 		
 		logger.debug("FuturesKlinesWebSocketTask end.");

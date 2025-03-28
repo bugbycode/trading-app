@@ -43,6 +43,8 @@ public class PerpetualWebSocketClientEndpoint {
     
     private WorkTaskPool analysisWorkTaskPool;
     
+    private WorkTaskPool workTaskPool;
+    
     private KlinesService klinesService;
     
     private KlinesRepository klinesRepository;
@@ -51,11 +53,12 @@ public class PerpetualWebSocketClientEndpoint {
     
     public PerpetualWebSocketClientEndpoint(CoinPairSet coinPairSet,MessageHandler messageHandler, 
     		KlinesService klinesService, KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, 
-    		WorkTaskPool analysisWorkTaskPool) {
+    		WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool) {
     	this.coinPairSet = coinPairSet;
     	this.messageHandler = messageHandler;
         this.container = ContainerProvider.getWebSocketContainer();
         this.analysisWorkTaskPool = analysisWorkTaskPool;
+        this.workTaskPool = workTaskPool;
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
         this.openInterestHistRepository = openInterestHistRepository;
@@ -88,7 +91,7 @@ public class PerpetualWebSocketClientEndpoint {
 
     @OnMessage
     public void onMessage(String message) {
-    	this.messageHandler.handleMessage(message, this, klinesService, klinesRepository, openInterestHistRepository, this.analysisWorkTaskPool);
+    	this.messageHandler.handleMessage(message, this, klinesService, klinesRepository, openInterestHistRepository, this.analysisWorkTaskPool, this.workTaskPool);
     }
     
     public void sendMessage(String message) {

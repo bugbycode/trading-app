@@ -30,7 +30,8 @@ public class MessageHandlerImpl implements MessageHandler{
 	
 	@Override
 	public void handleMessage(String message, PerpetualWebSocketClientEndpoint client, KlinesService klinesService, 
-			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, WorkTaskPool analysisWorkTaskPool) {
+			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, WorkTaskPool analysisWorkTaskPool,
+			WorkTaskPool workTaskPool) {
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
@@ -56,7 +57,7 @@ public class MessageHandlerImpl implements MessageHandler{
 			//15分钟k线分析
 			long count = klinesRepository.count(kline.getPair(), Inerval.INERVAL_1D);
 			if(count == 0) {
-				analysisWorkTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository));
+				workTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository));
 			} else {
 				klinesRepository.insert(kline);
 			}
