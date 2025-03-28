@@ -68,7 +68,7 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.futuresConsolidationAreaMonitor(klines_list_1d, klines_list_15m);
             
             //涨跌分析
-            klinesService.futuresRiseAndFall(klines_list_15m);
+            //klinesService.futuresRiseAndFall(klines_list_15m);
 
             //价格行为分析
             klinesService.declineAndStrengthCheck(klines_list_15m);
@@ -80,7 +80,7 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
             
             //指数均线
-            klinesService.futuresEmaRiseAndFallMonitor(klines_list_15m);
+            //klinesService.futuresEmaRiseAndFallMonitor(klines_list_15m);
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
