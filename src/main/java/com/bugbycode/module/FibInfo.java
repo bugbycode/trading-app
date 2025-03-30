@@ -138,13 +138,13 @@ public class FibInfo {
 		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
 			takeProfit = FibCode.FIB1;
 		} else if(code == FibCode.FIB1) { // 1 -> 0.618
-			if(level == FibLevel.LEVEL_4) {
+			if(level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) {
 				takeProfit = FibCode.FIB382;
 			} else {
 				takeProfit = FibCode.FIB618;
 			}
 		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
-			if(level == FibLevel.LEVEL_4) {
+			if(level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) {
 				takeProfit = FibCode.FIB382;
 			} else {
 				takeProfit = FibCode.FIB5;
