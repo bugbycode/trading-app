@@ -129,6 +129,7 @@ public class FibInfo {
 	 * @return 止盈的斐波那契回撤点位
 	 */
 	public FibCode getTakeProfit_v2(FibCode code) {
+		FibLevel level = this.getLevel();
 		FibCode takeProfit = FibCode.FIB0;
 		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
 			takeProfit = FibCode.FIB2_618;
@@ -137,9 +138,17 @@ public class FibInfo {
 		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
 			takeProfit = FibCode.FIB1;
 		} else if(code == FibCode.FIB1) { // 1 -> 0.618
-			takeProfit = FibCode.FIB618;
+			if(level == FibLevel.LEVEL_4) {
+				takeProfit = FibCode.FIB382;
+			} else {
+				takeProfit = FibCode.FIB618;
+			}
 		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
-			takeProfit = FibCode.FIB5;
+			if(level == FibLevel.LEVEL_4) {
+				takeProfit = FibCode.FIB382;
+			} else {
+				takeProfit = FibCode.FIB5;
+			}
 		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
 			takeProfit = FibCode.FIB382;
 		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
