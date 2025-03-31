@@ -1323,6 +1323,8 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		Klines last = PriceUtil.getLastKlines(list_1d);
+		
 		List<Klines> todayKlines = PriceUtil.getTodayKlines(klinesList);
 		Klines afterLowKlines = PriceUtil.getMinPriceKLine(todayKlines);
 		Klines afterHighKlines = PriceUtil.getMaxPriceKLine(todayKlines);
@@ -1334,13 +1336,18 @@ public class KlinesServiceImpl implements KlinesService {
 		FibInfo fourthFibInfo = fu.getFourthFibInfo(thirdFibInfo);
 		FibInfo fifthFibInfo = fu.getFifthFibInfo(fourthFibInfo);
 		
+		FibInfo firstChild = fu.checkChildFibInfo(last, fu.getSecondEnd(), secondFibInfo);
+		FibInfo secondChild = fu.checkChildFibInfo(last, fu.getThirdEnd(), thirdFibInfo);
+		FibInfo thirdChild = fu.checkChildFibInfo(last, fu.getFourthEnd(), fourthFibInfo);
+		FibInfo fourthChild = fu.checkChildFibInfo(last, fu.getFifthEnd(), fifthFibInfo);
+		
 		//一级
 		if(firstFibInfo != null) {
 			QuotationMode qm = firstFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				openLong_v2(firstFibInfo, secondFibInfo, afterLowKlines, klinesList);
+				openLong_v2(firstFibInfo, firstChild, afterLowKlines, klinesList);
 			} else {
-				openShort_v2(firstFibInfo, secondFibInfo, afterHighKlines, klinesList);
+				openShort_v2(firstFibInfo, firstChild, afterHighKlines, klinesList);
 			}
 		}
 		
@@ -1348,9 +1355,9 @@ public class KlinesServiceImpl implements KlinesService {
 		if(secondFibInfo != null) {
 			QuotationMode qm = secondFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				openLong_v2(secondFibInfo, thirdFibInfo, afterLowKlines, klinesList);
+				openLong_v2(secondFibInfo, secondChild, afterLowKlines, klinesList);
 			} else {
-				openShort_v2(secondFibInfo, thirdFibInfo, afterHighKlines, klinesList);
+				openShort_v2(secondFibInfo, secondChild, afterHighKlines, klinesList);
 			}
 		}
 		
@@ -1358,9 +1365,9 @@ public class KlinesServiceImpl implements KlinesService {
 		if(thirdFibInfo != null) {
 			QuotationMode qm = thirdFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				openLong_v2(thirdFibInfo, fourthFibInfo, afterLowKlines, klinesList);
+				openLong_v2(thirdFibInfo, thirdChild, afterLowKlines, klinesList);
 			} else {
-				openShort_v2(thirdFibInfo, fourthFibInfo, afterHighKlines, klinesList);
+				openShort_v2(thirdFibInfo, thirdChild, afterHighKlines, klinesList);
 			}
 		}
 		
@@ -1368,9 +1375,9 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fourthFibInfo != null) {
 			QuotationMode qm = fourthFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				openLong_v2(fourthFibInfo, fifthFibInfo, afterLowKlines, klinesList);
+				openLong_v2(fourthFibInfo, fourthChild, afterLowKlines, klinesList);
 			} else {
-				openShort_v2(fourthFibInfo, fifthFibInfo, afterHighKlines, klinesList);
+				openShort_v2(fourthFibInfo, fourthChild, afterHighKlines, klinesList);
 			}
 		}
 	}

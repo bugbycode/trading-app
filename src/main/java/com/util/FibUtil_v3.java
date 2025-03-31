@@ -555,4 +555,8 @@ public class FibUtil_v3 {
 	public Klines getFifthEnd() {
 		return fifthEnd;
 	}
+	
+	public FibInfo checkChildFibInfo(Klines last, Klines fibEndKlines, FibInfo childFibInfo) {
+		return last.isEquals(fibEndKlines) ? null : childFibInfo;
+	}
 }
