@@ -1341,13 +1341,18 @@ public class KlinesServiceImpl implements KlinesService {
 		FibInfo thirdChild = fu.checkChildFibInfo(last, fu.getFourthEnd(), fourthFibInfo);
 		FibInfo fourthChild = fu.checkChildFibInfo(last, fu.getFifthEnd(), fifthFibInfo);
 		
+		List<Klines> firstAfter = fu.getFibAfterKlines();
+		List<Klines> secondAfter = fu.getSecondFibAfterKlines();
+		List<Klines> thirdAfter = fu.getThirdFibAfterKlines();
+		List<Klines> fourthAfter = fu.getFourthFibAfterKlines();
+		
 		//一级
 		if(firstFibInfo != null) {
 			QuotationMode qm = firstFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				openLong_v2(firstFibInfo, firstChild, afterLowKlines, klinesList);
+				openLong_v2(firstFibInfo, firstChild, PriceUtil.getMinPriceKlines(PriceUtil.getMinPriceKLine(firstAfter), afterLowKlines), klinesList);
 			} else {
-				openShort_v2(firstFibInfo, firstChild, afterHighKlines, klinesList);
+				openShort_v2(firstFibInfo, firstChild, PriceUtil.getMaxPriceKlines(PriceUtil.getMaxPriceKLine(firstAfter), afterHighKlines), klinesList);
 			}
 		}
 		
@@ -1355,9 +1360,9 @@ public class KlinesServiceImpl implements KlinesService {
 		if(secondFibInfo != null) {
 			QuotationMode qm = secondFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				openLong_v2(secondFibInfo, secondChild, afterLowKlines, klinesList);
+				openLong_v2(secondFibInfo, secondChild, PriceUtil.getMinPriceKlines(PriceUtil.getMinPriceKLine(secondAfter), afterLowKlines), klinesList);
 			} else {
-				openShort_v2(secondFibInfo, secondChild, afterHighKlines, klinesList);
+				openShort_v2(secondFibInfo, secondChild, PriceUtil.getMaxPriceKlines(PriceUtil.getMaxPriceKLine(secondAfter), afterHighKlines), klinesList);
 			}
 		}
 		
@@ -1365,9 +1370,9 @@ public class KlinesServiceImpl implements KlinesService {
 		if(thirdFibInfo != null) {
 			QuotationMode qm = thirdFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				openLong_v2(thirdFibInfo, thirdChild, afterLowKlines, klinesList);
+				openLong_v2(thirdFibInfo, thirdChild, PriceUtil.getMinPriceKlines(PriceUtil.getMinPriceKLine(thirdAfter), afterLowKlines), klinesList);
 			} else {
-				openShort_v2(thirdFibInfo, thirdChild, afterHighKlines, klinesList);
+				openShort_v2(thirdFibInfo, thirdChild, PriceUtil.getMaxPriceKlines(PriceUtil.getMaxPriceKLine(thirdAfter), afterHighKlines), klinesList);
 			}
 		}
 		
@@ -1375,9 +1380,9 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fourthFibInfo != null) {
 			QuotationMode qm = fourthFibInfo.getQuotationMode();
 			if(qm == QuotationMode.LONG) {
-				openLong_v2(fourthFibInfo, fourthChild, afterLowKlines, klinesList);
+				openLong_v2(fourthFibInfo, fourthChild, PriceUtil.getMinPriceKlines(PriceUtil.getMinPriceKLine(fourthAfter), afterLowKlines), klinesList);
 			} else {
-				openShort_v2(fourthFibInfo, fourthChild, afterHighKlines, klinesList);
+				openShort_v2(fourthFibInfo, fourthChild, PriceUtil.getMaxPriceKlines(PriceUtil.getMaxPriceKLine(fourthAfter), afterHighKlines), klinesList);
 			}
 		}
 	}
