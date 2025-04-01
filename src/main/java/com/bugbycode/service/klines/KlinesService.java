@@ -64,30 +64,12 @@ public interface KlinesService {
 	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
-	 * 合约做多
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param childrenFibInfo 次级回撤信息
-	 * @param afterLowKlines 回撤之后的最低k线
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openLong_v2(FibInfo fibInfo, FibInfo childrenFibInfo, Klines afterLowKlines, List<Klines> klinesList_hit);
-	
-	/**
 	 * 合约做空
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterHighKlines 回撤之后的最高k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
 	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
-	
-	/**
-	 * 合约做空
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param childrenFibInfo 次级回撤信息
-	 * @param afterHighKlines 回撤之后的最高k线
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openShort_v2(FibInfo fibInfo, FibInfo childrenFibInfo, Klines afterHighKlines, List<Klines> klinesList_hit);
 	
 	/**
 	 * 标志性高低点价格监控
@@ -109,14 +91,6 @@ public interface KlinesService {
 	 * @param klinesList
 	 */
 	public void futuresFibMonitor(List<Klines> klinesList);
-	
-	/**
-	 * 斐波那契回撤点位监控（日线级别） v2
-	 * 
-	 * @param list_1d
-	 * @param klinesList
-	 */
-	public void futuresFibMonitor_v2(List<Klines> list_1d, List<Klines> klinesList);
 
 	/**
 	 * 监控k线涨跌

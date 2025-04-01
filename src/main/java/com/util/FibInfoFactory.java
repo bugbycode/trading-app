@@ -3,8 +3,11 @@ package com.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.util.CollectionUtils;
+
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
+import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 
@@ -19,7 +22,9 @@ public class FibInfoFactory {
 	
 	public FibInfoFactory(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
-		this.list.addAll(list);
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+		}
 	}
 	
 	public FibInfo getFibInfo() {
@@ -33,6 +38,8 @@ public class FibInfoFactory {
 			FibInfo parent_fib = parent_fu.getFibInfo();
 			
 			if(parent_fib != null) {
+
+				FibLevel level = current.getLevel();
 				
 				double c_0 = current.getFibValue(FibCode.FIB0);
 				double c_1 = current.getFibValue(FibCode.FIB1);
@@ -40,14 +47,20 @@ public class FibInfoFactory {
 				double p_1 = parent_fib.getFibValue(FibCode.FIB1);
 				
 				if(mode == QuotationMode.LONG) {
-					if(p_0 >= c_0 && p_1 <= c_1) {
-						current = parent_fib;
+					if(c_0 > p_0) { //更高的高点
+						level = FibLevel.LEVEL_2;
+					} else if(c_1 < p_1) {//更低的低点
+						level = FibLevel.LEVEL_3;
 					}
-				} else if(mode == QuotationMode.SHORT) {
-					if(p_1 >= c_1 && p_0 <= c_0) {
-						current = parent_fib;
+				} else {
+					if(c_0 < p_0) {//更低的低点
+						level = FibLevel.LEVEL_3;
+					} else if(c_1 > p_1) {//更高的高点
+						level = FibLevel.LEVEL_2;
 					}
 				}
+				
+				current = new FibInfo(current.getFibValue(FibCode.FIB1), current.getFibValue(FibCode.FIB0), current.getDecimalPoint(), level);
 			}
 		}
 		

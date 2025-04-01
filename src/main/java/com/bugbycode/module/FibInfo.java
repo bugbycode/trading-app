@@ -129,26 +129,17 @@ public class FibInfo {
 	 * @return 止盈的斐波那契回撤点位
 	 */
 	public FibCode getTakeProfit_v2(FibCode code) {
-		FibLevel level = this.getLevel();
 		FibCode takeProfit = FibCode.FIB0;
 		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
 			takeProfit = FibCode.FIB2_618;
 		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
 			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
+		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618 || code == FibCode.FIB1_272) { // 2/1.618/1.272 - 1
 			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.618
-			if(level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) {
-				takeProfit = FibCode.FIB382;
-			} else {
-				takeProfit = FibCode.FIB618;
-			}
-		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
-			if(level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) {
-				takeProfit = FibCode.FIB382;
-			} else {
-				takeProfit = FibCode.FIB5;
-			}
+		} else if(code == FibCode.FIB1) { // 1 -> 0.5
+			takeProfit = FibCode.FIB5;
+		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
+			takeProfit = FibCode.FIB382;
 		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
 			takeProfit = FibCode.FIB382;
 		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
@@ -256,19 +247,19 @@ public class FibInfo {
 	public boolean verifyOpenFibCode(FibCode code) {
 		QuotationMode mode = this.getQuotationMode();
 		boolean result = false;
-		if(level == FibLevel.LEVEL_1 && code.lte(FibCode.FIB1) && code.gte(FibCode.FIB618)) {//震荡行情 只做高低点 1~0.618
+		if(level == FibLevel.LEVEL_1 && code == FibCode.FIB1) {//震荡行情 只做高低点
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG
-				 && code.gte(FibCode.FIB618) ) {//多头行情做多 0.618 ~ 4.618
+				 && code.gte(FibCode.FIB382) ) {//多头行情做多 0.382 ~ 4.618
 			result = true;
 		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.SHORT
-				&& code == FibCode.FIB1) { //多头行情做空 只做最高点
+				&& code.gte(FibCode.FIB1)) { //多头行情做空 只做最高点 1~4.618
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT
-				&& code.gte(FibCode.FIB618) ) { //空头行情做空  0.618 ~ 4.618
+				&& code.gte(FibCode.FIB382) ) { //空头行情做空  0.382 ~ 4.618
 			result = true;
 		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.LONG
-				&& code == FibCode.FIB1) { //空头行情做多 只做最低点
+				&& code.gte(FibCode.FIB1)) { //空头行情做多 只做最低点 1~4.618
 			result = true;
 		}
 		return result;
@@ -280,11 +271,10 @@ public class FibInfo {
 	 * @return
 	 */
 	public FibCode getNextFibCode(FibCode current) {
-		FibLevel level = this.getLevel();
 		FibCode result = FibCode.FIB0;
-		if((level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) && current == FibCode.FIB1) {
+		if(current == FibCode.FIB1) {
 			result = FibCode.FIB618;
-		} else if((level == FibLevel.LEVEL_3 || level == FibLevel.LEVEL_4) && current == FibCode.FIB786) {
+		} else if(current == FibCode.FIB786) {
 			result = FibCode.FIB5;
 		} else {
 			FibCode codes[] = FibCode.values();

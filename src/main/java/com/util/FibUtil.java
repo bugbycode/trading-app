@@ -139,7 +139,7 @@ public class FibUtil {
 				//终端（高点）
 				fibEndKlines = PriceUtil.getMaxPriceKLine(PriceUtil.subList(fibStartKlines, last, list));
 				
-				fib = new FibInfo(fibStartKlines.getLowPriceDoubleValue(), fibEndKlines.getHighPriceDoubleValue(), last.getDecimalNum(), getFibLevel(fibStartKlines, fibEndKlines));
+				fib = new FibInfo(fibStartKlines.getLowPriceDoubleValue(), fibEndKlines.getHighPriceDoubleValue(), last.getDecimalNum(), FibLevel.LEVEL_1);
 				
 				this.afterFlag = fibEndKlines;
 				
@@ -151,7 +151,7 @@ public class FibUtil {
 				//终端（低点）
 				fibEndKlines = PriceUtil.getMinPriceKLine(PriceUtil.subList(fibStartKlines, last, list));
 				
-				fib = new FibInfo(fibStartKlines.getHighPriceDoubleValue(), fibEndKlines.getLowPriceDoubleValue(), last.getDecimalNum(), getFibLevel(fibStartKlines, fibEndKlines));
+				fib = new FibInfo(fibStartKlines.getHighPriceDoubleValue(), fibEndKlines.getLowPriceDoubleValue(), last.getDecimalNum(), FibLevel.LEVEL_1);
 				
 				this.afterFlag = fibEndKlines;
 				
@@ -228,26 +228,6 @@ public class FibUtil {
 		double ema7 = k.getEma7();
 		double ema25 = k.getEma25();
 		return ema7 < ema25;
-	}
-	
-	private FibLevel getFibLevel(Klines fibStartKlines, Klines fibEndKlines) {
-		
-		FibLevel level = FibLevel.LEVEL_1;
-		
-		double start_ema25 = fibStartKlines.getEma25();
-		double start_ema99 = fibStartKlines.getEma99();
-		double end_ema25 = fibStartKlines.getEma25();
-		double end_ema99 = fibStartKlines.getEma99();
-		
-		if((start_ema25 < start_ema99 && end_ema25 > end_ema99) || (start_ema25 > start_ema99 && end_ema25 < end_ema99)) {
-			level = FibLevel.LEVEL_1;
-		} else if(start_ema25 > start_ema99 && end_ema25 > end_ema99) {
-			level = FibLevel.LEVEL_2;
-		} else if(start_ema25 < start_ema99 && end_ema25 < end_ema99) {
-			level = FibLevel.LEVEL_3;
-		}
-		
-		return level;
 	}
 
 	public Klines getFibStartKlines() {
