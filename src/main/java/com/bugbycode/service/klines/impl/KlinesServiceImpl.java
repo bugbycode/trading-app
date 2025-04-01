@@ -1143,6 +1143,10 @@ public class KlinesServiceImpl implements KlinesService {
 		FibInfoFactory factory = new FibInfoFactory(klinesList_1h);
         FibInfo fibInfo = factory.getFibInfo();
 		
+        if(fibInfo == null) {
+        	return;
+        }
+        
 		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
 		QuotationMode qm = fibInfo.getQuotationMode();
