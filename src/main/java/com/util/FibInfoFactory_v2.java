@@ -29,13 +29,13 @@ public class FibInfoFactory_v2 {
 	}
 	
 	public FibInfo getFibInfo() {
-		FibUtil_v3 fu = new FibUtil_v3(list);
+		FibUtil_Strengthen fu = new FibUtil_Strengthen(list);
 		FibInfo current = fu.getFibInfo();
-		Klines split_end = fu.getFirstStart();
+		Klines split_end = fu.getFibStartKlines();
 		if(!(current == null || split_end == null || list.size() < 99)) {
 			QuotationMode mode = current.getQuotationMode();
-			List<Klines> parentList = PriceUtil.subList(list.get(0), fu.getFirstStart(), list);
-			FibUtil_v3 parent_fu = new FibUtil_v3(parentList);
+			List<Klines> parentList = PriceUtil.subList(list.get(0), fu.getFibStartKlines(), list);
+			FibUtil_Strengthen parent_fu = new FibUtil_Strengthen(parentList);
 			FibInfo parent_fib = parent_fu.getFibInfo();
 			
 			if(parent_fib != null) {

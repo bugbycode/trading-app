@@ -21,7 +21,7 @@ public class FibInfo {
 	 */
 	public FibCode getEmaEmaRiseAndFallTakeProfit(double price, double profit, double profitLimit) {
 		
-		FibCode result = FibCode.FIB618;
+		FibCode result = null;
 		
 		QuotationMode qm = this.getQuotationMode() == QuotationMode.LONG ? QuotationMode.SHORT : QuotationMode.LONG;
 		//double percent_5 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB5), qm);
@@ -326,6 +326,12 @@ public class FibInfo {
 			}
 		}
 		return result;
+	}
+	
+	public boolean equals(FibInfo info) {
+		
+		return info != null && this.getFibValue(FibCode.FIB0) == info.getFibValue(FibCode.FIB0)
+				 && this.getFibValue(FibCode.FIB1) == info.getFibValue(FibCode.FIB1);
 	}
 
 	@Override
