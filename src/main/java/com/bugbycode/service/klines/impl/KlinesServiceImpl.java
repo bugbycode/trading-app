@@ -56,6 +56,7 @@ import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.DeclineAndStrengthFibUtil;
 import com.util.FibInfoFactory;
+import com.util.FibInfoFactory_v2;
 import com.util.FibUtil_v3;
 import com.util.FibUtil_v4;
 import com.util.FileUtil;
@@ -190,7 +191,9 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
+	public boolean openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
+		
+		boolean result = false;
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
@@ -212,7 +215,7 @@ public class KlinesServiceImpl implements KlinesService {
 			if( fibInfo.verifyOpenFibCode(code)
 					&& PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
-				
+				result = true;
 				//市价做多
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET));
 				
@@ -277,9 +280,13 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			}
 		}
+		
+		return result;
 	}
 	
-	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
+	public boolean openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
+		
+		boolean result = false;
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
@@ -301,6 +308,8 @@ public class KlinesServiceImpl implements KlinesService {
 			if( fibInfo.verifyOpenFibCode(code)
 					&& PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
+				
+				result = true;
 				
 				//市价做空
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET));
@@ -367,6 +376,8 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			}
 		}
+		
+		return result;
 	}
 	
 	@Override
@@ -1140,6 +1151,8 @@ public class KlinesServiceImpl implements KlinesService {
 			klinesList_1h.remove(last);
 		}
 		
+		boolean execute_result = false;
+		
 		FibInfoFactory factory = new FibInfoFactory(klinesList_1h);
         FibInfo fibInfo = factory.getFibInfo();
 		
@@ -1155,13 +1168,43 @@ public class KlinesServiceImpl implements KlinesService {
 
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 			
-			openLong(fibInfo, afterLowKlines, klinesList);
+			execute_result = openLong(fibInfo, afterLowKlines, klinesList);
 			
 		} else if(qm == QuotationMode.SHORT) {
 			
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			
-			openShort(fibInfo, afterHighKlines, klinesList);
+			execute_result = openShort(fibInfo, afterHighKlines, klinesList);
+			
+		}
+		
+		if(execute_result) {
+			return;
+		}
+		
+		FibInfoFactory_v2 factory_v2 = new FibInfoFactory_v2(klinesList_1h);
+		
+		FibInfo fibInfo_v2 = factory_v2.getFibInfo();
+		
+        if(fibInfo_v2 == null) {
+        	return;
+        }
+        
+        List<Klines> fibAfterKlines_v2 = factory_v2.getFibAfterKlines();
+		
+		QuotationMode qm_v2 = fibInfo_v2.getQuotationMode();
+		
+		if(qm_v2 == QuotationMode.LONG) {
+
+			Klines afterLowKlines_v2 = PriceUtil.getMinPriceKLine(fibAfterKlines_v2);
+			
+			execute_result = openLong(fibInfo_v2, afterLowKlines_v2, klinesList);
+			
+		} else if(qm_v2 == QuotationMode.SHORT) {
+			
+			Klines afterHighKlines_v2 = PriceUtil.getMaxPriceKLine(fibAfterKlines_v2);
+			
+			execute_result = openShort(fibInfo_v2, afterHighKlines_v2, klinesList);
 			
 		}
 	}

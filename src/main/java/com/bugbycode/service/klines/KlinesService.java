@@ -60,16 +60,18 @@ public interface KlinesService {
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterLowKlines 回撤之后的最低k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
+	 * @return 
 	 */
-	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	public boolean openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterHighKlines 回撤之后的最高k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
+	 * @return 
 	 */
-	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public boolean openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 标志性高低点价格监控
