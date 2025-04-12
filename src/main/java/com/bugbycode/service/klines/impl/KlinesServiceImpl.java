@@ -1186,7 +1186,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibInfo fibInfo_v2 = factory_v2.getFibInfo();
 		
-        if(fibInfo_v2 == null) {
+        if(fibInfo_v2 == null || fibInfo_v2.equals(fibInfo)) {
         	return;
         }
         
