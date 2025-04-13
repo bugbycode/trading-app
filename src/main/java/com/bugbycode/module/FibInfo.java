@@ -1,5 +1,7 @@
 package com.bugbycode.module;
 
+import java.util.List;
+
 import com.util.PriceUtil;
 
 public class FibInfo {
@@ -11,6 +13,8 @@ public class FibInfo {
 	private int decimalPoint;
 	
 	private FibLevel level;
+	
+	private List<Klines> fibAfterKlines;
 	
 	/**
 	 * 指数均线指标止盈点位
@@ -327,6 +331,14 @@ public class FibInfo {
 		}
 		return result;
 	}
+
+	public List<Klines> getFibAfterKlines() {
+		return fibAfterKlines;
+	}
+
+	public void setFibAfterKlines(List<Klines> fibAfterKlines) {
+		this.fibAfterKlines = fibAfterKlines;
+	}
 	
 	public boolean equals(FibInfo info) {
 		
@@ -379,6 +391,5 @@ public class FibInfo {
 		
 		return formatBufBefor.toString() + formatBuf.toString() + "\n\nExtension: " + extensionBuffer.toString();
 	}
-    
     
 }
