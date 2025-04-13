@@ -22,7 +22,6 @@ package com.util;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -150,12 +149,9 @@ public class RandomUtil extends Object {
         StringBuffer sbValueBeforeMD5 = new StringBuffer();
 
         try {
-            md5 = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error: " + e);
-        }
-
-        try {
+        	
+        	md5 = MessageDigest.getInstance("MD5");
+        	
             long time = System.currentTimeMillis();
             long rand = 0;
 

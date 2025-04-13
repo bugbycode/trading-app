@@ -79,12 +79,14 @@ public class InitConfig implements ApplicationRunner {
 		
 		private final Logger logger = LogManager.getLogger(HttpResponseErrorHandler.class);
 		
+		@SuppressWarnings("null")
 		@Override
 		public boolean hasError(ClientHttpResponse response) throws IOException {
 			return response.getStatusCode().value() == HttpStatus.Series.CLIENT_ERROR.value() 
 		               || response.getStatusCode().value() == HttpStatus.Series.SERVER_ERROR.value();
 		}
 		
+		@SuppressWarnings("null")
 		@Override
 		public void handleError(ClientHttpResponse response) throws IOException {
 			logger.error("Error response received with status code: " + response.getStatusCode());

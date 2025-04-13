@@ -40,6 +40,7 @@ public class ReCaptchaFilter extends OncePerRequestFilter {
 		this.restTemplate = restTemplate;
 	}
 	
+	@SuppressWarnings("null")
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
