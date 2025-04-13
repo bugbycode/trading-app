@@ -1738,7 +1738,7 @@ public class PriceUtil {
 		Klines k3 = list.get(index -3);
 		Klines k4 = list.get(index -4);
 		
-		double ema7 = k0.getEma7();
+		double ema7 = k0.getEma7();
 		return (isBreachLong(k0, price) || isBreachLong(k1, price) || isBreachLong(k2, price) || isBreachLong(k3, price) || isBreachLong(k4, price))
 				&& k0.getClosePriceDoubleValue() >= ema7 && k0.getClosePriceDoubleValue() >= price;
 	}
@@ -2389,9 +2389,49 @@ public class PriceUtil {
 	 */
 	public static boolean hitPrice(Klines klines,double price) {
 		boolean result = false;
-		if(Double.valueOf(klines.getHighPrice()) >= price && Double.valueOf(klines.getLowPrice()) <= price) {
+		if(klines.getHighPriceDoubleValue() >= price && klines.getLowPriceDoubleValue() <= price) {
 			result = true;
 		}
+		return result;
+	}
+	
+	/**
+	 * 判断开仓点是否交易过
+	 * @param code 开仓点
+	 * @param fibInfo 回撤信息
+	 * @return
+	 */
+	public static boolean isTraded(FibCode code,FibInfo fibInfo) {
+		
+		boolean result = false;
+		
+		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
+		fibAfterKlines.sort(new KlinesComparator(SortType.ASC));
+		
+		//止盈点
+		FibCode takeProfitCode = fibInfo.getTakeProfit_v2(code);
+		
+		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			Klines hitCodeKlines = null;
+			Klines hitTakeProfitCodeKlines = null;
+			for(int index = 0; index < fibAfterKlines.size(); index++) {
+				Klines k = fibAfterKlines.get(index);
+				//判断是否命中开仓价
+				if(hitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(code))) {
+					hitCodeKlines = k;
+				}
+				//判断是否命中止盈价
+				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(takeProfitCode))) {
+					hitTakeProfitCodeKlines = k;
+				}
+				
+				if(!(hitCodeKlines == null || hitTakeProfitCodeKlines == null)) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
 		return result;
 	}
 }

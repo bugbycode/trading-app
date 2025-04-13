@@ -214,7 +214,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if( fibInfo.verifyOpenFibCode(code)
 					&& PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
-					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)) {
+					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
+					&& !PriceUtil.isTraded(code, fibInfo)) {
 				result = true;
 				//市价做多
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET));
@@ -307,7 +308,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if( fibInfo.verifyOpenFibCode(code)
 					&& PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
-					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)) {
+					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
+					&& !PriceUtil.isTraded(code, fibInfo)) {
 				
 				result = true;
 				
@@ -1162,6 +1164,8 @@ public class KlinesServiceImpl implements KlinesService {
         
 		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
+		fibInfo.setFibAfterKlines(fibAfterKlines);
+		
 		QuotationMode qm = fibInfo.getQuotationMode();
 		
 		if(qm == QuotationMode.LONG) {
@@ -1192,6 +1196,8 @@ public class KlinesServiceImpl implements KlinesService {
         
         List<Klines> fibAfterKlines_v2 = factory_v2.getFibAfterKlines();
 		
+        fibInfo_v2.setFibAfterKlines(fibAfterKlines_v2);
+        
 		QuotationMode qm_v2 = fibInfo_v2.getQuotationMode();
 		
 		if(qm_v2 == QuotationMode.LONG) {
