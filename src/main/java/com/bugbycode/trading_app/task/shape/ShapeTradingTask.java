@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.repository.shape.ShapeRepository;
@@ -50,6 +51,11 @@ public class ShapeTradingTask {
 	 */
 	@Scheduled(cron = "45 4/5 * * * ?")
 	public void executeShapeTask() {
+		
+		if(AppConfig.DEBUG) {
+			return;
+		}
+		
 		logger.debug("ShapeTradingTask executeShapeTask start.");
 		Inerval inerval = Inerval.INERVAL_5M;
 		

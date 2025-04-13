@@ -59,6 +59,10 @@ public class FuturesKlinesWebSocketTask {
 	@Scheduled(cron = "47 14/15 * * * ?")
 	public void runWebsocketClient() {
 		
+		if(AppConfig.DEBUG) {
+			return;
+		}
+		
 		logger.debug("FuturesKlinesWebSocketTask start.");
 		
 		AppConfig.SYNC_15M_KLINES_RECORD.clear();

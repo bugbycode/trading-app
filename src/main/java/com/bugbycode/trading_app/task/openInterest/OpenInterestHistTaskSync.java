@@ -45,6 +45,10 @@ public class OpenInterestHistTaskSync {
 	@Scheduled(cron = "30 2/4 * * * ?")
 	public void executeTask() {
 		
+		if(AppConfig.DEBUG) {
+			return;
+		}
+		
 		Set<String> symbolSet = binanceExchangeService.exchangeInfo();
 		
 		for(String symbol : symbolSet) {

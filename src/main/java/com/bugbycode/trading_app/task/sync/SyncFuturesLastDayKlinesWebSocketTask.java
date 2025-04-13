@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
@@ -56,6 +57,11 @@ public class SyncFuturesLastDayKlinesWebSocketTask {
 	 */
 	@Scheduled(cron = "46 59 7 * * ?")
 	public void runWebsocketClient() {
+		
+		if(AppConfig.DEBUG) {
+			return;
+		}
+		
 		logger.debug("SyncFuturesLastDayKlinesWebSocketTask start.");
 		
 		Inerval inerval = Inerval.INERVAL_1D;

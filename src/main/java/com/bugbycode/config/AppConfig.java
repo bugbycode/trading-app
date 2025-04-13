@@ -12,6 +12,8 @@ import com.bugbycode.module.binance.SymbolExchangeInfo;
 
 public class AppConfig {
 	
+	public static boolean DEBUG = false;
+	
 	public static String REST_BASE_URL;
 	
 	public static String WEBSOCKET_URL;
