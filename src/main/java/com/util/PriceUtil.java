@@ -2409,7 +2409,7 @@ public class PriceUtil {
 		fibAfterKlines.sort(new KlinesComparator(SortType.ASC));
 		
 		//止盈点
-		FibCode takeProfitCode = fibInfo.getTakeProfit_v2(code);
+		FibCode takeProfitCode = fibInfo.getTakeProfit_v1(code);
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
 			Klines hitCodeKlines = null;
