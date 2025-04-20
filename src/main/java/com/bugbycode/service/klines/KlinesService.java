@@ -178,6 +178,12 @@ public interface KlinesService {
 	public void declineAndStrengthCheck(List<Klines> klinesList);
 	
 	/**
+	 * 检查是否出现颓势或强势价格行为 V2
+	 * @param klinesList
+	 */
+	public void declineAndStrengthCheck_v2(List<Klines> klinesList);
+	
+	/**
      * 校验K线是否出现重复或缺失
      * @param list k线集合
      * @return true 表示没有重复或缺失 false 表示出现重复或缺失k线

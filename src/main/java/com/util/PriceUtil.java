@@ -467,6 +467,42 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断以往的价格是否低于当前回撤点位
+	 * @param afterLowKlines 最低价
+	 * @param openPriceList 开仓点位价格 由大到小排序
+	 * @param offset
+	 * @return
+	 */
+	public static boolean isObsoleteLong(Klines afterLowKlines,List<Double> openPriceList,int offset) {
+		boolean result = false;
+		if(!ObjectUtils.isEmpty(afterLowKlines) && offset < 2) {
+			double nexPrice = openPriceList.get(offset + 1);
+			if(afterLowKlines.getLowPriceDoubleValue() <= nexPrice) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * 判断以往的价格是否低于当前回撤点位
+	 * @param afterHighKlines 最高价
+	 * @param openPriceList 开仓点位价格 由小到大排序
+	 * @param offset
+	 * @return
+	 */
+	public static boolean isObsoleteShort(Klines afterHighKlines,List<Double> openPriceList,int offset) {
+		boolean result = false;
+		if(!ObjectUtils.isEmpty(afterHighKlines) && offset < 2) {
+			double nexPrice = openPriceList.get(offset + 1);
+			if(afterHighKlines.getHighPriceDoubleValue() >= nexPrice) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * 是否出现突破条件价的价格行为</br></br>
 	 * 1. 开盘价、收盘价大于等于条件价且最低价小于等于条件价</br> 
 	 * 2. 开盘价小于等于条件价 收盘价大于等于条件价</br>
@@ -2433,5 +2469,25 @@ public class PriceUtil {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * 判断是否为低点
+	 * @param current 当前k线
+	 * @param next 前一根k线
+	 * @return
+	 */
+	public static boolean isLow(Klines current, Klines next) {
+		return  next.isFall() && current.isRise() && (current.getBbPercentB() <= 0 || next.getBbPercentB() <= 0);
+	}
+	
+	/**
+	 * 判断是否为高点
+	 * @param current 当前k线
+	 * @param next 前一根k线
+	 * @return
+	 */
+	public static boolean isHigh(Klines current, Klines next) {
+		return  next.isRise() && current.isFall() && (current.getBbPercentB() >= 1 || next.getBbPercentB() >= 1);
 	}
 }

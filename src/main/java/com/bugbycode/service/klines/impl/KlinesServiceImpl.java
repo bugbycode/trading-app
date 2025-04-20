@@ -55,6 +55,7 @@ import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.DeclineAndStrengthFibUtil;
+import com.util.DeclineAndStrengthFibUtil_v2;
 import com.util.FibInfoFactory;
 import com.util.FibInfoFactory_v2;
 import com.util.FibUtil_v3;
@@ -1318,6 +1319,114 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				sendEmail(subject, text, u.getUsername());
 			}
+        }
+	}
+	
+	@Override
+	public void declineAndStrengthCheck_v2(List<Klines> klinesList) {
+		if(CollectionUtils.isEmpty(klinesList)) {
+			return;
+		}
+		
+		klinesList.sort(new KlinesComparator(SortType.ASC));
+		
+		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
+		
+		PriceUtil.calculateAllBBPercentB(klinesList_1h);
+		
+		String text = "";//邮件内容
+		String subject = "";//邮件主题
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		Klines last = PriceUtil.getLastKlines(klinesList_1h);
+		
+		String pair = last.getPair();
+		double closePrice = last.getClosePriceDoubleValue();
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			klinesList_1h.remove(last);
+		}
+
+        DeclineAndStrengthFibUtil_v2 dsf = new DeclineAndStrengthFibUtil_v2(klinesList_1h);
+        
+        FibInfo fibInfo = dsf.getFibInfo();
+        
+        if(fibInfo == null) {
+        	return;
+        }
+        
+        QuotationMode qm = fibInfo.getQuotationMode();
+        FibCode takeProfitCode = FibCode.FIB618;
+        
+        if(dsf.verifyOpen(klinesList)) {
+        	if(qm == QuotationMode.SHORT) {//做多
+        		//市价做多
+    			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.PRICE_ACTION));
+    			
+    			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+    			
+    			for(User u : uList) {
+    				
+    				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+    				
+    				double profit = u.getProfit();
+    				double profitLimit = u.getProfitLimit();
+    				double cutLoss = u.getCutLoss();
+
+    				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+    					takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
+    				}
+    				
+    				double percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(takeProfitCode)) * 100;
+    				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+    				subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+    				
+    				if(percent < profit) {
+    					continue;
+    				}
+    				
+    				text = StringUtil.formatLongMessage(pair, closePrice, fibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
+    				
+    				text += "，预计盈利：" + percentStr + "%";
+    				text += "\n\n" + fibInfo.toString();
+    				
+    				sendEmail(subject, text, u.getUsername());
+    			}
+        	} else {
+        		//市价做空
+    			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.PRICE_ACTION));
+    			
+    			List<User> uList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+    			
+    			for(User u : uList) {
+    				
+    				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+    				
+    				double profit = u.getProfit();
+    				double profitLimit = u.getProfitLimit();
+    				double cutLoss = u.getCutLoss();
+    				
+    				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+    					takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(closePrice, profit, profitLimit);
+    				}
+    				
+    				double percent = PriceUtil.getFallFluctuationPercentage(closePrice, fibInfo.getFibValue(takeProfitCode)) * 100;
+    				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+    				subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, percentStr, dateStr);
+    				
+    				if(percent < profit) {
+    					continue;
+    				}
+    				
+    				text = StringUtil.formatShortMessage(pair, closePrice, fibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), takeProfitCode);
+    				
+    				text += "，预计盈利：" + percentStr + "%";
+    				text += "\n\n" + fibInfo.toString();
+    				
+    				sendEmail(subject, text, u.getUsername());
+    			}
+        	}
         }
 	}
 
