@@ -57,7 +57,6 @@ import com.util.DateFormatUtil;
 import com.util.DeclineAndStrengthFibUtil;
 import com.util.DeclineAndStrengthFibUtil_v2;
 import com.util.FibInfoFactory;
-import com.util.FibInfoFactory_v2;
 import com.util.FibUtil_v3;
 import com.util.FibUtil_v4;
 import com.util.FileUtil;
@@ -214,7 +213,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode code = codes[offset];//当前斐波那契点位
 			
 			if( fibInfo.verifyOpenFibCode(code)
-					&& PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
+					&& PriceUtil.isLong_v3(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
 					&& !PriceUtil.isTraded(code, fibInfo)) {
 				result = true;
@@ -308,7 +307,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode code = codes[offset];//当前斐波那契点位
 			
 			if( fibInfo.verifyOpenFibCode(code)
-					&& PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
+					&& PriceUtil.isShort_v3(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
 					&& !PriceUtil.isTraded(code, fibInfo)) {
 				
@@ -1154,7 +1153,7 @@ public class KlinesServiceImpl implements KlinesService {
 			klinesList_1h.remove(last);
 		}
 		
-		boolean execute_result = false;
+		//boolean execute_result = false;
 		
 		FibInfoFactory factory = new FibInfoFactory(klinesList_1h);
         FibInfo fibInfo = factory.getFibInfo();
@@ -1173,16 +1172,16 @@ public class KlinesServiceImpl implements KlinesService {
 
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 			
-			execute_result = openLong(fibInfo, afterLowKlines, klinesList);
+			openLong(fibInfo, afterLowKlines, klinesList);
 			
 		} else if(qm == QuotationMode.SHORT) {
 			
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			
-			execute_result = openShort(fibInfo, afterHighKlines, klinesList);
+			openShort(fibInfo, afterHighKlines, klinesList);
 			
 		}
-		
+		/*
 		if(execute_result) {
 			return;
 		}
@@ -1213,7 +1212,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			execute_result = openShort(fibInfo_v2, afterHighKlines_v2, klinesList);
 			
-		}
+		}*/
 	}
 	
 	@Override
