@@ -173,11 +173,11 @@ public class DeclineAndStrengthFibUtil_v2 {
 			double closePrice = last.getClosePriceDoubleValue();
 			for(int index = 0; index < openPriceList.size(); index++) {
 				double price = openPriceList.get(index);
-				if(qm == QuotationMode.SHORT && PriceUtil.isBreachLong(last, price) 
+				if(qm == QuotationMode.SHORT && (PriceUtil.isBreachLong(last, price) || PriceUtil.isLong_v2(price, hitList)) 
 						&& !PriceUtil.isObsoleteLong(afterLowKlines, openPriceList, index)
 						&& closePrice < fib382Price) {
 					result = true;
-				} else if(qm == QuotationMode.LONG && PriceUtil.isBreachShort(last, price) 
+				} else if(qm == QuotationMode.LONG && (PriceUtil.isBreachShort(last, price) || PriceUtil.isShort_v2(price, hitList)) 
 						&& !PriceUtil.isObsoleteShort(afterHighKlines, openPriceList, index)
 						&& closePrice > fib382Price) {
 					result = true;
