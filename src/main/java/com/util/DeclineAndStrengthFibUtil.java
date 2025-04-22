@@ -290,7 +290,7 @@ public class DeclineAndStrengthFibUtil {
 						continue;
 					}
 					
-					if(PriceUtil.isLong_v2(secondFibInfo.getFibValue(code), list_hit)
+					if(PriceUtil.isLong_v3(secondFibInfo.getFibValue(code), list_hit)
 							&& !PriceUtil.isObsoleteLong(secondFibInfo, afterLowKlines, codes, offset)) {
 						result = true;
 						break;
@@ -337,7 +337,7 @@ public class DeclineAndStrengthFibUtil {
 						continue;
 					}
 					
-					if(PriceUtil.isShort_v2(secondFibInfo.getFibValue(code), list_hit)
+					if(PriceUtil.isShort_v3(secondFibInfo.getFibValue(code), list_hit)
 							&& !PriceUtil.isObsoleteShort(secondFibInfo, afterHightKlines, codes, offset)) {
 						result = true;
 						break;
