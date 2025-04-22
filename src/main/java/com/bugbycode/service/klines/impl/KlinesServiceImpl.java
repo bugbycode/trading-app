@@ -1322,26 +1322,32 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void declineAndStrengthCheck_v2(List<Klines> list_1d,List<Klines> list_15m) {
-		if(CollectionUtils.isEmpty(list_1d) || CollectionUtils.isEmpty(list_15m)) {
+	public void declineAndStrengthCheck_v2(List<Klines> klinesList) {
+		if(CollectionUtils.isEmpty(klinesList)) {
 			return;
 		}
 		
-		list_1d.sort(new KlinesComparator(SortType.ASC));
-		list_15m.sort(new KlinesComparator(SortType.ASC));
+		klinesList.sort(new KlinesComparator(SortType.ASC));
 		
-		PriceUtil.calculateAllBBPercentB(list_1d);
+		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
+		
+		PriceUtil.calculateAllBBPercentB(klinesList_1h);
 		
 		String text = "";//邮件内容
 		String subject = "";//邮件主题
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		Klines last = PriceUtil.getLastKlines(list_1d);
+		Klines last = PriceUtil.getLastKlines(klinesList_1h);
 		
 		String pair = last.getPair();
 		double closePrice = last.getClosePriceDoubleValue();
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			klinesList_1h.remove(last);
+		}
 
-        DeclineAndStrengthFibUtil_v2 dsf = new DeclineAndStrengthFibUtil_v2(list_1d);
+        DeclineAndStrengthFibUtil_v2 dsf = new DeclineAndStrengthFibUtil_v2(klinesList_1h);
         
         FibInfo fibInfo = dsf.getFibInfo();
         
@@ -1352,7 +1358,7 @@ public class KlinesServiceImpl implements KlinesService {
         QuotationMode qm = fibInfo.getQuotationMode();
         FibCode takeProfitCode = FibCode.FIB618;
         
-        if(dsf.verifyOpen(list_15m)) {
+        if(dsf.verifyOpen(klinesList)) {
         	if(qm == QuotationMode.SHORT) {//做多
         		//市价做多
     			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.PRICE_ACTION));
