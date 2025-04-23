@@ -1045,27 +1045,29 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		int minute = DateFormatUtil.getMinute(last.getEndTime());
 		if(minute != 59) {
-			return;
+			klinesList_1h.remove(last);
 		}
 		
 		String pair = last.getPair();
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		double closePrice = last.getClosePriceDoubleValue();
+		Klines last_15m = PriceUtil.getLastKlines(klinesList);
+		
+		double closePrice = last_15m.getClosePriceDoubleValue();
 		
 		FibUtil_v4 fu = new FibUtil_v4(klinesList_1h);
 		
-		if(!fu.verify()) {
-			return;
-		}
-		
 		FibInfo fibInfo = fu.getFibInfo();
 		
-		if(fibInfo == null) {
+		logger.info("{} - {}", pair, fibInfo);
+		logger.info("{} - {}", pair, fu.getOpenPriceList());
+		
+		if(fibInfo == null || !fu.verifyOpen(klinesList)) {
 			return;
 		}
-		logger.debug("{} - {}", pair, fibInfo.toString());
+		
 		double percent = 0;
+		
 		FibCode takeProfitCode = FibCode.FIB618;
 		List<User> userList = userRepository.queryAllUserByEmaRiseAndFall(MonitorStatus.OPEN);
 		
