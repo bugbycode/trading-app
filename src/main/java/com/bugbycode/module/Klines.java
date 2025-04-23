@@ -282,6 +282,42 @@ public class Klines {
     public boolean isEquals(Klines klines0) {
     	return klines0 != null && klines0.getStartTime() == this.getStartTime();
     }
+    
+    /**
+     * 大于 当前开盘时间比klines0的开盘时间新
+     * @param klines0
+     * @return
+     */
+    public boolean gt(Klines klines0) {
+    	return klines0 != null && this.getStartTime() > klines0.getStartTime();
+    }
+    
+    /**
+     * 大于等于 当前开盘时间比klines0的开盘时间新
+     * @param klines0
+     * @return
+     */
+    public boolean gte(Klines klines0) {
+    	return klines0 != null && this.getStartTime() >= klines0.getStartTime();
+    }
+    
+    /**
+     * 小于 当前开盘时间比klines0的开盘时间旧
+     * @param klines0
+     * @return
+     */
+    public boolean lt(Klines klines0) {
+    	return klines0 != null && this.getStartTime() < klines0.getStartTime();
+    }
+    
+    /**
+     * 小于等于 当前开盘时间比klines0的开盘时间旧
+     * @param klines0
+     * @return
+     */
+    public boolean lte(Klines klines0) {
+    	return klines0 != null && this.getStartTime() <= klines0.getStartTime();
+    }
 	
     /**
      * 判断是否包含
