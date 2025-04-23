@@ -92,12 +92,6 @@ public class FibUtil_v4 {
 			return;
 		}
 		
-		Klines endKlineAfter = PriceUtil.getAfterKlines(endKlines, list);
-		
-		if(endKlineAfter != null) {
-			this.fibAfterKlines = PriceUtil.subList(endKlineAfter, list);
-		}
-		
 		QuotationMode qm = this.fibInfo.getQuotationMode();
 		
 		for(int index = this.list.size() - 1; index > 0; index--) {
@@ -120,6 +114,10 @@ public class FibUtil_v4 {
 				openPriceList.add(PriceUtil.getMinPrice(c_body_low, n_body_low));//实体部分低点最低价
 				openPriceList.sort(new PriceComparator(SortType.DESC));
 				
+				if(current.gt(endKlines)) {
+					endKlines = current;
+				}
+				
 				break;
 			} else if(qm == QuotationMode.LONG && PriceUtil.isHigh(current, next)){//做空
 				
@@ -128,8 +126,18 @@ public class FibUtil_v4 {
 				openPriceList.add(PriceUtil.getMaxPrice(c_body_low, n_body_low));//实体部分低点最高价
 				openPriceList.sort(new PriceComparator(SortType.ASC));
 				
+				if(current.gt(endKlines)) {
+					endKlines = current;
+				}
+				
 				break;
 			}
+		}
+		
+		Klines endKlineAfter = PriceUtil.getAfterKlines(endKlines, list);
+		
+		if(endKlineAfter != null) {
+			this.fibAfterKlines = PriceUtil.subList(endKlineAfter, list);
 		}
 	}
 	
