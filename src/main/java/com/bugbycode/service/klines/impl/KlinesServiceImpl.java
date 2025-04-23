@@ -1059,8 +1059,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibInfo fibInfo = fu.getFibInfo();
 		
-		logger.info("{} - {}", pair, fibInfo);
-		logger.info("{} - {}", pair, fu.getOpenPriceList());
+		logger.debug("{} - {}", pair, fibInfo);
+		logger.debug("{} - {}", pair, fu.getOpenPriceList());
 		
 		if(fibInfo == null || !fu.verifyOpen(klinesList)) {
 			return;
