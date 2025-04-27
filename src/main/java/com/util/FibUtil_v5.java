@@ -24,6 +24,8 @@ public class FibUtil_v5 {
 	
 	private FibInfo fibInfo;
 	
+	private List<Klines> fibAfterKlines;
+	
 	public FibUtil_v5(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list)) {
@@ -81,29 +83,50 @@ public class FibUtil_v5 {
 			return;
 		}
 		
+		Klines start = null;
+		Klines end = null;
+		
 		if(ps == PositionSide.LONG) {//多头
 			//寻找高低点之间最低点
-			Klines start = PriceUtil.getMinPriceKLine(subFirstList);
+			start = PriceUtil.getMinPriceKLine(subFirstList);
 			List<Klines> subSecondList = PriceUtil.subList(start, list);
 			//寻找终点（高点）
-			Klines end = PriceUtil.getMaxPriceKLine(subSecondList);
+			end = PriceUtil.getMaxPriceKLine(subSecondList);
 			
 			fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
 			
 		} else if(ps == PositionSide.SHORT) {//空头
 			//寻找高低点之间最高点
-			Klines start = PriceUtil.getMaxPriceKLine(subFirstList);
+			start = PriceUtil.getMaxPriceKLine(subFirstList);
 			List<Klines> subSecondList = PriceUtil.subList(start, list);
 			//寻找终点（低点）
-			Klines end = PriceUtil.getMinPriceKLine(subSecondList);
+			end = PriceUtil.getMinPriceKLine(subSecondList);
 			
 			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+			
+		}
+
+		logger.debug(fibInfo);
+		
+		if(fibInfo == null) {
+			return;
 		}
 		
-		logger.debug(fibInfo);
+		Klines last = PriceUtil.getAfterKlines(end, list);
+		if(last == null) {
+			return;
+		}
+		
+		this.fibAfterKlines = PriceUtil.subList(last, list);
+		
+		fibInfo.setFibAfterKlines(fibAfterKlines);
 	}
 
 	public FibInfo getFibInfo() {
 		return fibInfo;
+	}
+
+	public List<Klines> getFibAfterKlines() {
+		return fibAfterKlines;
 	}
 }
