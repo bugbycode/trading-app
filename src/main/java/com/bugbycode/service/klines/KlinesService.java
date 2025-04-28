@@ -102,10 +102,9 @@ public interface KlinesService {
 	
 	/**
 	 * 盘整区点位监控
-	 * @param klinesList 盘整区k线信息（日线级别）
-	 * @param hitKlinesList 参考价格k线信息（15分钟）
+	 * @param klinesList 参考价格k线信息（15分钟）
 	 */
-	public void futuresConsolidationAreaMonitor(List<Klines> klinesList,List<Klines> hitKlinesList);
+	public void futuresConsolidationAreaMonitor(List<Klines> klinesList);
 	
 	/**
 	 * 发送邮件

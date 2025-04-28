@@ -52,6 +52,7 @@ import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
+import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.DeclineAndStrengthFibUtil;
 import com.util.DeclineAndStrengthFibUtil_v2;
@@ -441,7 +442,10 @@ public class KlinesServiceImpl implements KlinesService {
 									takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
 								}
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-								takeProfitCode = FibCode.FIB618;
+								takeProfitCode = FibCode.FIB382;
+								if(tradeStyle == TradeStyle.CONSERVATIVE) {
+									takeProfitCode = fibInfo.getConsolidationAreaTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+								}
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								takeProfitCode = FibCode.FIB618;
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
@@ -465,8 +469,7 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 							
 							//根据交易风格设置盈利限制
-							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType != AutoTradeType.FIB_RET
-									 && autoTradeType != AutoTradeType.PRICE_ACTION && autoTradeType != AutoTradeType.EMA_INDEX) {
+							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
 								double dbProfitLimit = u.getProfitLimit() / 100;
 								if(profitPercent > dbProfitLimit) {
 									profitPercent = dbProfitLimit;
@@ -668,7 +671,10 @@ public class KlinesServiceImpl implements KlinesService {
 									takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
 								}
 							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-								takeProfitCode = FibCode.FIB618;
+								takeProfitCode = FibCode.FIB382;
+								if(tradeStyle == TradeStyle.CONSERVATIVE) {
+									takeProfitCode = fibInfo.getConsolidationAreaTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+								}
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								takeProfitCode = FibCode.FIB618;
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
@@ -693,8 +699,7 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 							
 							//根据交易风格设置盈利限制
-							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType != AutoTradeType.FIB_RET
-									 && autoTradeType != AutoTradeType.PRICE_ACTION && autoTradeType != AutoTradeType.EMA_INDEX) {
+							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
 								double dbProfitLimit = u.getProfitLimit() / 100;
 								if(profitPercent > dbProfitLimit) {
 									profitPercent = dbProfitLimit;
@@ -1423,61 +1428,96 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresConsolidationAreaMonitor(List<Klines> klinesList,List<Klines> hitKlinesList) {
-		Klines last = PriceUtil.getLastKlines(klinesList);
+	public void futuresConsolidationAreaMonitor(List<Klines> klinesList) {
+		
+		if(CollectionUtils.isEmpty(klinesList)) {
+			return;
+		}
+		
+		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
+		
+		Klines last = PriceUtil.getLastKlines(klinesList_1h);
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			klinesList_1h.remove(last);
+		}
+		
+		Klines lastKlines = PriceUtil.getLastKlines(klinesList);
+		double closePrice = lastKlines.getClosePriceDoubleValue();
+		
+		ConsolidationAreaFibUtil cf = new ConsolidationAreaFibUtil(klinesList_1h);
+		
+		if(!cf.verifyOpen(klinesList_1h)) {
+			return;
+		}
+		
+		List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
+		
+		FibInfo fibInfo = cf.getFibInfo();
+		QuotationMode qm = fibInfo.getQuotationMode();
+		
 		String pair = last.getPair();
-		
-		Klines current = PriceUtil.getLastKlines(hitKlinesList);
-		double closePrice = current.getClosePriceDoubleValue();
-		
-		FibUtil_v3 fu = new FibUtil_v3(klinesList);
-		FibInfo firstFibInfo = fu.getFibInfo();
-		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
-		FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
-		FibInfo fourthFibInfo = fu.getFourthFibInfo(thirdFibInfo);
-		
-		String subject = "";
-		String text = "";
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		if(fourthFibInfo != null) {
-			double t_price = thirdFibInfo.getFibValue(FibCode.FIB1);
-			double f_price = fourthFibInfo.getFibValue(FibCode.FIB1);
-			double areaHighPrice = PriceUtil.getMaxPrice(t_price, f_price);
-			double areaLowPrice = PriceUtil.getMinPrice(t_price, f_price);
-			
-			if(PriceUtil.isBreachShort(current, areaHighPrice)) { //高点做空
-				String recEmail = userDetailsService.getAreaMonitorUserEmail();
+		if(qm == QuotationMode.LONG) {
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX));
+			for(User u : userList) {
+				FibCode takeProfitCode = FibCode.FIB382;
+				double profit = u.getProfit();
+				double profitLimit = u.getProfitLimit();
+				double cutLoss = u.getCutLoss();
+				//根据交易风格设置盈利限制
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					takeProfitCode = fibInfo.getConsolidationAreaTakeProfit(closePrice, profit, profitLimit);
+				}
 				
-				subject = String.format("%s永续合约盘整区高点(%s)做空交易机会 %s", pair, areaHighPrice, dateStr);
-				text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
-						pair,
-						PriceUtil.formatDoubleDecimal(areaLowPrice,current.getDecimalNum()),
-						PriceUtil.formatDoubleDecimal(areaHighPrice,current.getDecimalNum()),
-						closePrice);
-				sendEmail(subject, text, recEmail);
+				double percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(takeProfitCode)) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				String subject = String.format("%s永续合约盘整区做多机会(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
-				FibInfo fibInfo = new FibInfo(areaLowPrice, areaHighPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
+				if(percent < profit) {
+					continue;
+				}
 				
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX));
+				String text = StringUtil.formatLongMessage(pair, closePrice, fibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
+				
+				text += "，预计盈利：" + percentStr + "%";
+				text += "\n\n" + fibInfo.toString();
+				
+				sendEmail(subject, text, u.getUsername());
 			}
-			
-			if(PriceUtil.isBreachLong(current, areaLowPrice)) {
-				String recEmail = userDetailsService.getAreaMonitorUserEmail();
+		} else {
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX));
+			for(User u : userList) {
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				FibCode takeProfitCode = FibCode.FIB382;
+				double profit = u.getProfit();
+				double profitLimit = u.getProfitLimit();
+				double cutLoss = u.getCutLoss();
 				
-				subject = String.format("%s永续合约盘整区低点(%s)做多交易机会 %s", pair, areaLowPrice, dateStr);
-				text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
-						pair,
-						PriceUtil.formatDoubleDecimal(areaLowPrice,current.getDecimalNum()),
-						PriceUtil.formatDoubleDecimal(areaHighPrice,current.getDecimalNum()),
-						closePrice);
-				sendEmail(subject, text, recEmail);
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					takeProfitCode = fibInfo.getConsolidationAreaTakeProfit(closePrice, profit, profitLimit);
+				}
 				
-				FibInfo fibInfo = new FibInfo(areaHighPrice, areaLowPrice, current.getDecimalNum(), FibLevel.LEVEL_1);
+				double percent = PriceUtil.getFallFluctuationPercentage(closePrice, fibInfo.getFibValue(takeProfitCode)) * 100;
+				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
+				String subject = String.format("%s永续合约盘整区做空机会(PNL:%s%%) %s", pair, percentStr, dateStr);
 				
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX));
+				if(percent < profit) {
+					continue;
+				}
+				
+				String text = StringUtil.formatShortMessage(pair, closePrice, fibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), takeProfitCode);
+				
+				text += "，预计盈利：" + percentStr + "%";
+				text += "\n\n" + fibInfo.toString();
+				
+				sendEmail(subject, text, u.getUsername());
 			}
 		}
+		
 	}
 	
 	@Override

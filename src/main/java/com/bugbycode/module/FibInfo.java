@@ -61,6 +61,38 @@ public class FibInfo {
 	}
 	
 	/**
+	 * 盘整区止盈点位
+	 * @param price 当前价格
+	 * @param profit 用户盈利预期
+	 * @param profitLimit 用户止盈百分比限制
+	 * @return
+	 */
+	public FibCode getConsolidationAreaTakeProfit(double price, double profit, double profitLimit) {
+		FibCode result = null;
+		QuotationMode qm = this.getQuotationMode();
+		double percent_382 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB382), qm);
+		double percent_5 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB5), qm);
+		
+		if(percent_5 >= profit && percent_5 <= profitLimit) {
+			result = FibCode.FIB5;
+		} else if(percent_382 >= profit && percent_382 <= profitLimit) {
+			result = FibCode.FIB382;
+		}
+		
+		if(result == null) {
+			if(percent_5 >= profit) {
+				result = FibCode.FIB5;
+			} else if(percent_382 >= profit) {
+				result = FibCode.FIB382;
+			} else {
+				result = FibCode.FIB382;
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * 价格行为止盈点位
 	 * @param price 当前价格
 	 * @param profit 用户盈利预期
