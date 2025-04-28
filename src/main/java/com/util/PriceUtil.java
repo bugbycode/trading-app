@@ -2564,12 +2564,12 @@ public class PriceUtil {
 		boolean result = false;
 		
 		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
-		fibAfterKlines.sort(new KlinesComparator(SortType.ASC));
 		
 		//止盈点
 		FibCode takeProfitCode = fibInfo.getTakeProfit_v1(code);
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			fibAfterKlines.sort(new KlinesComparator(SortType.ASC));
 			Klines hitCodeKlines = null;
 			Klines hitTakeProfitCodeKlines = null;
 			for(int index = 0; index < fibAfterKlines.size(); index++) {
