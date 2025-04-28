@@ -93,7 +93,7 @@ public class FibUtil_v5 {
 			//寻找终点（高点）
 			end = PriceUtil.getMaxPriceKLine(subSecondList);
 			
-			fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+			fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_3);
 			
 		} else if(ps == PositionSide.SHORT) {//空头
 			//寻找高低点之间最高点
@@ -102,7 +102,7 @@ public class FibUtil_v5 {
 			//寻找终点（低点）
 			end = PriceUtil.getMinPriceKLine(subSecondList);
 			
-			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_3);
 			
 		}
 
