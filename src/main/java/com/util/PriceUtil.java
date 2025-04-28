@@ -127,12 +127,90 @@ public class PriceUtil {
 		return result;
 	}
 	
+	public static Klines getMaxLowPriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getLowPriceDoubleValue() < klinesList.get(index).getLowPriceDoubleValue()) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static Klines getMaxBodyHighPriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getBodyHighPriceDoubleValue() < klinesList.get(index).getBodyHighPriceDoubleValue()) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static Klines getMaxBodyLowPriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getBodyLowPriceDoubleValue() < klinesList.get(index).getBodyLowPriceDoubleValue()) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
 	public static Klines getMinPriceKLine(List<Klines> klinesList) {
 		Klines result = null;
 		if(!CollectionUtils.isEmpty(klinesList)) {
 			result = klinesList.get(0);
 			for(int index = 1;index < klinesList.size();index++) {
 				if(Double.valueOf(result.getLowPrice()) > Double.valueOf(klinesList.get(index).getLowPrice())) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static Klines getMinHighPriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getHighPriceDoubleValue() > klinesList.get(index).getHighPriceDoubleValue()) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static Klines getMinBodyHighPriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getBodyHighPriceDoubleValue() > klinesList.get(index).getBodyHighPriceDoubleValue()) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static Klines getMinBodyLowPriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getBodyLowPriceDoubleValue() > klinesList.get(index).getBodyLowPriceDoubleValue()) {
 					result = klinesList.get(index);
 				}
 			}
@@ -1931,6 +2009,28 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 获取实体最低价k线
+	 * @param k0
+	 * @param k1
+	 * @return
+	 */
+	public static Klines getMinBodyHighPriceKlines(Klines k0, Klines k1) {
+		if(!(k0 == null || k1 == null)) {
+			if(k0.getBodyLowPriceDoubleValue() < k1.getBodyLowPriceDoubleValue()) {
+				return k0;
+			} else {
+				return k1;
+			}
+		} else if(k0 != null && k1 == null) {
+			return k0;
+		} else if(k0 == null && k1 != null) {
+			return k1;
+		} else {
+			return null;
+		}
+	}
+	
+	/**
 	 * 获取最高价k线
 	 * @param k0
 	 * @param k1
@@ -1939,6 +2039,28 @@ public class PriceUtil {
 	public static Klines getMaxPriceKlines(Klines k0, Klines k1) {
 		if(!(k0 == null || k1 == null)) {
 			if(k0.getHighPriceDoubleValue() > k1.getHighPriceDoubleValue()) {
+				return k0;
+			} else {
+				return k1;
+			}
+		} else if(k0 != null && k1 == null) {
+			return k0;
+		} else if(k0 == null && k1 != null) {
+			return k1;
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * 获取实体最高价k线
+	 * @param k0
+	 * @param k1
+	 * @return
+	 */
+	public static Klines getMaxBodyHighPriceKlines(Klines k0, Klines k1) {
+		if(!(k0 == null || k1 == null)) {
+			if(k0.getBodyHighPriceDoubleValue() > k1.getBodyHighPriceDoubleValue()) {
 				return k0;
 			} else {
 				return k1;
