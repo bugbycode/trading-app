@@ -155,7 +155,7 @@ public class ConsolidationAreaFibUtil {
 		boolean result = false;
 		if(fibInfo != null) {
 			QuotationMode qm = fibInfo.getQuotationMode();
-			double fib786Price = fibInfo.getFibValue(FibCode.FIB786);
+			double fib618Price = fibInfo.getFibValue(FibCode.FIB618);
 			List<Klines> afterList = getFibAfterKlines();
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(afterList);
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(afterList);
@@ -165,11 +165,11 @@ public class ConsolidationAreaFibUtil {
 				double price = openPriceList.get(index);
 				if(qm == QuotationMode.LONG && (PriceUtil.isBreachLong(last, price) || PriceUtil.isLong_v2(price, hitList)) 
 						&& !PriceUtil.isObsoleteLong(afterLowKlines, openPriceList, index)
-						&& closePrice <= fib786Price) {
+						&& closePrice <= fib618Price) {
 					result = true;
 				} else if(qm == QuotationMode.SHORT && (PriceUtil.isBreachShort(last, price) || PriceUtil.isShort_v2(price, hitList)) 
 						&& !PriceUtil.isObsoleteShort(afterHighKlines, openPriceList, index)
-						&& closePrice >= fib786Price) {
+						&& closePrice >= fib618Price) {
 					result = true;
 				}
 			}
