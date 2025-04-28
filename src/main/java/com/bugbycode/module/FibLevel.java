@@ -13,12 +13,12 @@ public enum FibLevel {
 	/**
 	 * LONG
 	 */
-	LEVEL_2(2,"Lv2",FibCode.FIB382),
+	LEVEL_2(2,"Lv2",FibCode.FIB5),
 	
 	/**
 	 * SHORT
 	 */
-	LEVEL_3(3,"Lv3",FibCode.FIB382),
+	LEVEL_3(3,"Lv3",FibCode.FIB618),
 	
 	LEVEL_4(4,"Lv4",FibCode.FIB618),
 	
