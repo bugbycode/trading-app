@@ -71,13 +71,13 @@ public class AnalysisKlinesTask implements Runnable{
             //klinesService.futuresRiseAndFall(klines_list_15m);
 
             //价格行为分析
-            klinesService.declineAndStrengthCheck(klines_list_15m);
+            //klinesService.declineAndStrengthCheck(klines_list_15m);
             
             //量价分析
             klinesService.volumeMonitor(klines_list_15m);
             
             //标志性高低点分析
-            klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
+            //klinesService.futuresHighOrLowMonitor(klines_list_1d, klines_list_15m);
             
             //指数均线
             klinesService.futuresEmaRiseAndFallMonitor(klines_list_15m);
