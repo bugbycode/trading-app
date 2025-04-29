@@ -57,15 +57,17 @@ public interface KlinesRepository {
     /**
      * 根据ID删除一条k线信息
      * @param _id
+     * @param collectionName
      */
-    public void remove(String _id);
+    public void remove(String _id, String collectionName);
 
     /**
      * 根据ID查询一条K线信息
      * @param _id
+     * @param collectionName
      * @return
      */
-    public Klines findById(String _id);
+    public Klines findById(String _id, String collectionName);
     
     /**
      * 根据交易对名称分页查询所有k线信息
@@ -110,5 +112,5 @@ public interface KlinesRepository {
      * @param endTime 结束时间
      * @return
      */
-    public List<Klines> findByTimeLimit(String pair,Inerval inerval,long startTime, long endTime);
+    public List<Klines> findByTimeLimit(String pair,Inerval interval,long startTime, long endTime);
 }

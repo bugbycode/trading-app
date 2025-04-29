@@ -2096,7 +2096,7 @@ public class KlinesServiceImpl implements KlinesService {
                     result = false;
                     String _id = current.getId();
                     if(StringUtil.isNotEmpty(_id)){
-                    	klinesRepository.remove(_id);
+                    	klinesRepository.remove(_id, StringUtil.formatCollectionName(current));
                         logger.info("重复k线已从数据库中删除");
                     }
                 }

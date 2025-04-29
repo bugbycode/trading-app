@@ -4,6 +4,8 @@ import java.util.Set;
 
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
+import com.bugbycode.module.Inerval;
+import com.bugbycode.module.Klines;
 
 public class StringUtil {
 	
@@ -154,5 +156,13 @@ public class StringUtil {
 			}
 		}
 		return result;
+	}
+	
+	public static String formatCollectionName(String pair,Inerval interval) {
+		return pair + "_" + interval.getDescption();
+	}
+	
+	public static String formatCollectionName(Klines k) {
+		return formatCollectionName(k.getPair(), k.getInervalType());
 	}
 }
