@@ -12,6 +12,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.repository.indexes.IndexesRepository;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.util.StringUtil;
 
@@ -22,12 +23,17 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 
     @Resource
 	private MongoOperations template;
+    
+    @Resource
+    private IndexesRepository indexesRepository;
 
     @Override
     public void insert(Klines klines) {
         Klines tmp = findOneByStartTime(klines.getStartTime(),klines.getPair(),klines.getInervalType());
         if(tmp == null) {
-            template.insert(klines, StringUtil.formatCollectionName(klines));
+        	String collectionName = StringUtil.formatCollectionName(klines);
+            template.insert(klines, collectionName);
+            indexesRepository.createKlinesIndexes(collectionName);
         }
     }
 
@@ -39,20 +45,29 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 
     @Override
     public Klines findOneByStartTime(long startTime,String pair, Inerval interval) {
-        return template.findOne(Query.query(Criteria.where("pair").is(pair)
-        .and("startTime").is(startTime).and("interval").is(interval.getDescption())), Klines.class, StringUtil.formatCollectionName(pair, interval));
+        return template.findOne(Query.query(
+        		Criteria.where("pair").is(pair)
+        		.and("interval").is(interval.getDescption())
+        		.and("startTime").is(startTime)
+        		), Klines.class, StringUtil.formatCollectionName(pair, interval));
     }
 
     @Override
     public void remove(long startTime,String pair, Inerval interval) {
-        template.remove(Query.query(Criteria.where("pair").is(pair).and("startTime").is(startTime)
-        .and("interval").is(interval.getDescption())), Klines.class, StringUtil.formatCollectionName(pair, interval));
+        template.remove(Query.query(
+        		Criteria.where("pair").is(pair)
+        		.and("interval").is(interval.getDescption())
+        		.and("startTime").is(startTime)
+        ), Klines.class, StringUtil.formatCollectionName(pair, interval));
     }
 
     @Override
     public List<Klines> findByPairAndGtStartTime(String pair, long startTime, Inerval interval) {
-        return template.find(Query.query(Criteria.where("pair").is(pair).and("startTime").gte(startTime)
-            .and("interval").is(interval.getDescption()))
+        return template.find(Query.query(
+        		Criteria.where("pair").is(pair)
+        		.and("interval").is(interval.getDescption())
+        		.and("startTime").gte(startTime)
+            )
             .with(Sort.by(Sort.Direction.ASC,"startTime")), Klines.class, StringUtil.formatCollectionName(pair, interval));
     }
 
