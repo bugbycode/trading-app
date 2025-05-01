@@ -26,10 +26,26 @@ public class FibUtil_v5 {
 	
 	private List<Klines> fibAfterKlines;
 	
+	private int calculateFibIndex;
+	
 	public FibUtil_v5(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
+			this.calculateFibIndex = this.list.size() - 1;
+			this.init();
+		}
+	}
+	
+	public FibUtil_v5(List<Klines> list, int calculateFibIndex) {
+		this.list = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+			if(calculateFibIndex > this.list.size() || calculateFibIndex < 1) {
+				this.calculateFibIndex = this.list.size() - 1;
+			} else {
+				this.calculateFibIndex = calculateFibIndex;
+			}
 			this.init();
 		}
 	}
@@ -49,7 +65,7 @@ public class FibUtil_v5 {
 		Klines first_index = null;
 		Klines second_index = null;
 		
-		for(int index = list.size() - 1; index > 0; index--) {
+		for(int index = this.calculateFibIndex; index > 0; index--) {
 			Klines current = list.get(index);
 			Klines next = list.get(index - 1);
 			if(second_index == null) {
@@ -65,9 +81,11 @@ public class FibUtil_v5 {
 			if(first_index == null && second_index != null) {
 				if(ps == PositionSide.LONG && PriceUtil.isLow(current, next)) {
 					first_index = next;
+					this.calculateFibIndex = index;
 					break;
 				} else if(ps == PositionSide.SHORT && PriceUtil.isHigh(current, next)) {
 					first_index = next;
+					this.calculateFibIndex = index;
 					break;
 				}
 			}
@@ -105,12 +123,12 @@ public class FibUtil_v5 {
 			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_3);
 			
 		}
-
-		logger.debug(fibInfo);
 		
 		if(fibInfo == null) {
 			return;
 		}
+
+		logger.debug(fibInfo);
 		
 		Klines last = PriceUtil.getAfterKlines(end, list);
 		if(last == null) {
@@ -128,5 +146,9 @@ public class FibUtil_v5 {
 
 	public List<Klines> getFibAfterKlines() {
 		return fibAfterKlines;
+	}
+
+	public int getCalculateFibIndex() {
+		return calculateFibIndex;
 	}
 }

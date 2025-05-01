@@ -1125,21 +1125,32 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibUtil_v5 fu = new FibUtil_v5(klinesList_1h);
 		
+		boolean executeResult = futuresFibMonitor(fu, klinesList);
+		
+		if(!(executeResult || fu.getFibInfo() == null)) {
+			fu = new FibUtil_v5(klinesList_1h, fu.getCalculateFibIndex());
+			futuresFibMonitor(fu, klinesList);
+		}
+	}
+	
+	@Override
+	public boolean futuresFibMonitor(FibUtil_v5 fu, List<Klines> klinesList) {
+		
 		FibInfo fibInfo = fu.getFibInfo();
 		
 		List<Klines> fibAfterKlines = fu.getFibAfterKlines();
 		
 		if(fibInfo == null) {
-			return;
+			return false;
 		}
 		
 		QuotationMode mode = fibInfo.getQuotationMode();
 		if(mode == QuotationMode.LONG) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong(fibInfo, afterLowKlines, klinesList);
+			return openLong(fibInfo, afterLowKlines, klinesList);
 		} else {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort(fibInfo, afterHighKlines, klinesList);
+			return openShort(fibInfo, afterHighKlines, klinesList);
 		}
 	}
 	

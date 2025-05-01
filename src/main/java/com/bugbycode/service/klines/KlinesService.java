@@ -10,6 +10,7 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.trading.PositionSide;
+import com.util.FibUtil_v5;
 
 public interface KlinesService {
 	
@@ -93,6 +94,15 @@ public interface KlinesService {
 	 * @param klinesList
 	 */
 	public void futuresFibMonitor(List<Klines> klinesList);
+	
+	/**
+	 * 斐波那契回撤点位监控
+	 * 
+	 * @param fu
+	 * @param klinesList
+	 * @return
+	 */
+	public boolean futuresFibMonitor(FibUtil_v5 fu, List<Klines> klinesList);
 
 	/**
 	 * 监控k线涨跌
