@@ -1125,9 +1125,12 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibUtil_v5 fu = new FibUtil_v5(klinesList_1h);
 		
+		fu = new FibUtil_v5(klinesList_1h, fu.getCalculateFibIndex());
+		
 		futuresFibMonitor(fu, klinesList);
 		
-		/*boolean executeResult = futuresFibMonitor(fu, klinesList);
+		/*
+		boolean executeResult = futuresFibMonitor(fu, klinesList);
 		
 		if(!(executeResult || fu.getFibInfo() == null)) {
 			fu = new FibUtil_v5(klinesList_1h, fu.getCalculateFibIndex());
