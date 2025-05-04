@@ -1621,6 +1621,36 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现强势
+	 * @param k0 当前k线
+	 * @param k1 前一根k线
+	 * @param k2 前前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v2(Klines k0, Klines k1, Klines k2) {
+		boolean flag = false;
+		if(k0.isRise() && k1.isFall() && k2.isFall() && k0.getClosePriceDoubleValue() >= k1.getOpenPriceDoubleValue()) {
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
+	 * 判断是否出现颓势
+	 * @param k0 当前k线
+	 * @param k1 前一根k线
+	 * @param k2 前前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v2(Klines k0, Klines k1, Klines k2) {
+		boolean flag = false;
+		if(k0.isFall() && k1.isRise() && k2.isRise() && k0.getClosePriceDoubleValue() <= k1.getOpenPriceDoubleValue()) {
+			flag = true;
+		}
+		return flag;
+	}
+	
+	/**
 	 * 判断是否出现颓势 V3
 	 * @param list
 	 * @return

@@ -55,7 +55,7 @@ import com.util.CommandUtil;
 import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.DeclineAndStrengthFibUtil;
-import com.util.DeclineAndStrengthFibUtil_v2;
+import com.util.DeclineAndStrengthFibUtil_v3;
 import com.util.FibUtil_v3;
 import com.util.FibUtil_v4;
 import com.util.FibUtil_v5;
@@ -1281,7 +1281,7 @@ public class KlinesServiceImpl implements KlinesService {
 			klinesList_1h.remove(last);
 		}
 
-        DeclineAndStrengthFibUtil_v2 dsf = new DeclineAndStrengthFibUtil_v2(klinesList_1h);
+        DeclineAndStrengthFibUtil_v3 dsf = new DeclineAndStrengthFibUtil_v3(klinesList_1h);
         
         FibInfo fibInfo = dsf.getFibInfo();
         
