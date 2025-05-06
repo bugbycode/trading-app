@@ -48,15 +48,16 @@ public class EmaFibUtil {
 		//最后一根k线
 		Klines last = PriceUtil.getLastKlines(list);
 		double ema25 = last.getEma25();
+		double ema99 = last.getEma99();
 		
 		Klines second = null;
 		Klines first = null;
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		if(PriceUtil.isBreachLong(last, ema25)) {//做多
+		if(PriceUtil.isBreachLong(last, ema99) || PriceUtil.isBreachLong(last, ema25)) {//做多
 			ps = PositionSide.LONG;
-		} else if(PriceUtil.isBreachShort(last, ema25)) {//做空
+		} else if(PriceUtil.isBreachShort(last, ema99) || PriceUtil.isBreachShort(last, ema25)) {//做空
 			ps = PositionSide.SHORT;
 		}
 		
