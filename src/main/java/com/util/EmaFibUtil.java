@@ -139,12 +139,14 @@ public class EmaFibUtil {
 		boolean result = false;
 		if(this.fibInfo != null) {
 			Klines last = PriceUtil.getLastKlines(hitList);
+			double ema25 = last.getEma25();
+			double ema99 = last.getEma99();
 			double closePrice = last.getClosePriceDoubleValue();
 			double fib5Price = this.fibInfo.getFibValue(FibCode.FIB5);
 			QuotationMode qm = this.fibInfo.getQuotationMode();
-			if(qm == QuotationMode.SHORT && closePrice <= fib5Price) {//做多
+			if(qm == QuotationMode.SHORT && closePrice <= fib5Price && ema25 > ema99) {//做多
 				result = true;
-			} else if(qm == QuotationMode.LONG && closePrice >= fib5Price) {//做空
+			} else if(qm == QuotationMode.LONG && closePrice >= fib5Price && ema25 < ema99) {//做空
 				result = true;
 			}
 		}
