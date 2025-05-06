@@ -98,22 +98,22 @@ public class EmaFibUtil {
 		Klines after = null;
 		if(ps == PositionSide.LONG) {//先寻找高点再寻找低点
 			start = PriceUtil.getMaxPriceKLine(subList);
-			after = PriceUtil.getAfterKlines(start, subList);
+			after = PriceUtil.getAfterKlines(start, list);
 			if(after == null) {
-				subList_second = PriceUtil.subList(start, subList);
+				subList_second = PriceUtil.subList(start, list);
 			} else {
-				subList_second = PriceUtil.subList(after, subList);
+				subList_second = PriceUtil.subList(after, list);
 			}
 			end = PriceUtil.getMinPriceKLine(subList_second);
 			
 			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
 		} else if(ps == PositionSide.SHORT) {//先寻找低点再寻找高点
 			start = PriceUtil.getMinPriceKLine(subList);
-			after = PriceUtil.getAfterKlines(start, subList);
+			after = PriceUtil.getAfterKlines(start, list);
 			if(after == null) {
-				subList_second = PriceUtil.subList(start, subList);
+				subList_second = PriceUtil.subList(start, list);
 			} else {
-				subList_second = PriceUtil.subList(after, subList);
+				subList_second = PriceUtil.subList(after, list);
 			}
 			end = PriceUtil.getMaxPriceKLine(subList_second);
 			
