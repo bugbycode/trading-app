@@ -55,12 +55,12 @@ public class FibInfoFactory_v3 {
 		Klines second = null;
 		Klines first = null;
 		
-		for(int index = this.list.size() - 1; index > 0; index--) {
+		for(int index = this.list.size() - 2; index > 0; index--) {
 			Klines current = this.list.get(index);
 			if(ps == PositionSide.LONG) {
 				if(second == null) {
 					if(verifyLow(current)) {
-						second = current;
+						second = this.list.get(index + 1);
 					}
 				} else if(first == null) {
 					if(verifyHigh(current)) {
@@ -71,7 +71,7 @@ public class FibInfoFactory_v3 {
 			} else if(ps == PositionSide.SHORT) {
 				if(second == null) {
 					if(verifyHigh(current)) {
-						second = current;
+						second = this.list.get(index + 1);
 					}
 				} else if(first == null) {
 					if(verifyLow(current)) {
