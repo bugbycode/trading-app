@@ -56,8 +56,8 @@ import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.DeclineAndStrengthFibUtil;
 import com.util.DeclineAndStrengthFibUtil_v3;
+import com.util.EmaFibUtil;
 import com.util.FibUtil_v3;
-import com.util.FibUtil_v4;
 import com.util.FibUtil_v5;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
@@ -1009,7 +1009,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(CollectionUtils.isEmpty(klinesList)) {
 			return;
 		}
-		
+		/*
 		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
 		
 		Klines last = PriceUtil.getLastKlines(klinesList_1h);
@@ -1036,6 +1036,24 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fibInfo == null || !fu.verifyOpen(klinesList)) {
 			return;
 		}
+		*/
+		//================================================
+		Klines last = PriceUtil.getLastKlines(klinesList);
+		
+		double closePrice = last.getClosePriceDoubleValue();
+		String pair = last.getPair();
+		String dateStr = DateFormatUtil.format(new Date());
+		
+		EmaFibUtil fu = new EmaFibUtil(klinesList);
+		FibInfo fibInfo = fu.getFibInfo();
+		
+		if(fibInfo == null || !fu.verifyOpen(klinesList)) {
+			return;
+		}
+		
+		logger.info("{} - {}", pair, fibInfo);
+		
+		//================================================
 		
 		double percent = 0;
 		
