@@ -1051,7 +1051,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		logger.info("{} - {}", pair, fibInfo);
+		logger.debug("{} - {}", pair, fibInfo);
 		
 		//================================================
 		
