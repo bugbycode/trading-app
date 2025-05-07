@@ -82,6 +82,10 @@ public class FibInfoFactory_v3 {
 			}
 		}
 		
+		if(first == null || second == null) {
+			return;
+		}
+		
 		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
 		List<Klines> secondSubList = null;
 		Klines start = null;
