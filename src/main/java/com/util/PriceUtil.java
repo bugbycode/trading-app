@@ -1447,6 +1447,17 @@ public class PriceUtil {
 		return false;
 	}
 	
+	public static boolean contains(List<Double> list, double price) {
+		if(!CollectionUtils.isEmpty(list)) {
+			for(double p : list) {
+				if(p == price) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * 校验当前k线是否为最后一天k线
 	 * @param klines
@@ -2641,5 +2652,27 @@ public class PriceUtil {
 	 */
 	public static boolean isHigh(Klines current, Klines next) {
 		return  next.isRise() && current.isFall() && (current.getBbPercentB() >= 1 || next.getBbPercentB() >= 1);
+	}
+	
+	/**
+	 * 是否出现恐慌抛售
+	 * @param k0 最新k线
+	 * @param k1 前一根
+	 * @param k2 ......
+	 * @return
+	 */
+	public static boolean isPanicSell(Klines k0,Klines k1,Klines k2) {
+		return isIncrement(k0, k1, k2) && k0.isFall() && k1.isFall() && k2.isFall();
+	}
+	
+	/**
+	 * 是否出现贪婪买入
+	 * @param k0 最新k线
+	 * @param k1 前一根
+	 * @param k2 ......
+	 * @return
+	 */
+	public static boolean isGreedyBuy(Klines k0,Klines k1,Klines k2) {
+		return isIncrement(k0, k1, k2) && k0.isRise() && k1.isRise() && k2.isRise();
 	}
 }

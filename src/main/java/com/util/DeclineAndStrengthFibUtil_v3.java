@@ -46,6 +46,8 @@ public class DeclineAndStrengthFibUtil_v3 {
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		PriceUtil.calculateAllBBPercentB(list);
 		
 		PositionSide ps = PositionSide.DEFAULT;
@@ -117,25 +119,35 @@ public class DeclineAndStrengthFibUtil_v3 {
 
 		logger.debug(fibInfo);
 		
-		Klines last = PriceUtil.getAfterKlines(end, list);
-		if(last == null) {
+		QuotationMode qm = fibInfo.getQuotationMode();
+		
+		int searchIndex = -1;
+		//寻找恐慌抛售或贪婪买入的情况
+		for(int index = this.list.size() - 1; index > 2; index--) {
+			Klines k0 = this.list.get(index);
+			Klines k1 = this.list.get(index - 1);
+			Klines k2 = this.list.get(index - 2);
+			if(k0.isEquals(start)) {
+				break;
+			}
+			if(qm == QuotationMode.SHORT && PriceUtil.isPanicSell(k0, k1, k2)) {
+				searchIndex = index;
+				break;
+			} else if(qm == QuotationMode.LONG && PriceUtil.isGreedyBuy(k0, k1, k2)) {
+				searchIndex = index;
+				break;
+			}
+		}
+		
+		if(searchIndex == -1) {
 			return;
 		}
 		
-		this.fibAfterKlines = PriceUtil.subList(last, list);
-		
-		fibInfo.setFibAfterKlines(fibAfterKlines);
-		
-		QuotationMode qm = fibInfo.getQuotationMode();
-		
+		int afterIndex = -1;
 		//寻找开仓点
-		for(int index = 0;index < this.list.size(); index++) {
-			Klines k0 = this.list.get(index);
-			if(k0.lt(end)) {
-				continue;
-			}
-			Klines k1 = this.list.get(index - 1);
-			Klines k2 = this.list.get(index - 2);
+		for(int index = searchIndex;index < this.list.size(); index++) {
+			Klines k0 = this.list.get(index);//当前k线
+			Klines k1 = this.list.get(index - 1);//前一根k线
 			
 			double c_high = k0.getHighPriceDoubleValue();
 			double n_high = k1.getHighPriceDoubleValue();
@@ -146,22 +158,39 @@ public class DeclineAndStrengthFibUtil_v3 {
 			double c_body_low = k0.getBodyLowPriceDoubleValue();
 			double n_body_low = k1.getBodyLowPriceDoubleValue();
 			
-			if(qm == QuotationMode.SHORT && PriceUtil.verifyPowerful_v2(k0, k1, k2)) { //做多 寻找强势信号
-				openPriceList.add(PriceUtil.getMinPrice(c_low, n_low));//最低点
-				openPriceList.add(PriceUtil.getMinPrice(c_body_high, n_body_high));//实体部分高点最低价
-				openPriceList.add(PriceUtil.getMinPrice(c_body_low, n_body_low));//实体部分低点最低价
-				openPriceList.add(c_body_high);
+			if(qm == QuotationMode.SHORT && k0.isRise()) { //做多 寻找强势信号
+				addOpenPrice(PriceUtil.getMinPrice(c_low, n_low));//最低点
+				addOpenPrice(PriceUtil.getMinPrice(c_body_high, n_body_high));//实体部分高点最低价
+				addOpenPrice(PriceUtil.getMinPrice(c_body_low, n_body_low));//实体部分低点最低价
+				addOpenPrice(c_body_high);
 				openPriceList.sort(new PriceComparator(SortType.DESC));
+				afterIndex = index;
 				break;
-			} else if(qm == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v2(k0, k1, k2)){//做空 寻找颓势信号
-				openPriceList.add(PriceUtil.getMaxPrice(c_high, n_high));//最高点
-				openPriceList.add(PriceUtil.getMaxPrice(c_body_high, n_body_high));//实体部分高点最高价
-				openPriceList.add(PriceUtil.getMaxPrice(c_body_low, n_body_low));//实体部分低点最高价
-				openPriceList.add(c_body_low);
+			} else if(qm == QuotationMode.LONG && k0.isFall()){//做空 寻找颓势信号
+				addOpenPrice(PriceUtil.getMaxPrice(c_high, n_high));//最高点
+				addOpenPrice(PriceUtil.getMaxPrice(c_body_high, n_body_high));//实体部分高点最高价
+				addOpenPrice(PriceUtil.getMaxPrice(c_body_low, n_body_low));//实体部分低点最高价
+				addOpenPrice(c_body_low);
 				openPriceList.sort(new PriceComparator(SortType.ASC));
+				afterIndex = index;
 				break;
 			}
 		}
+		
+		if(afterIndex == -1) {
+			return;
+		}
+		
+		Klines afterFlag = this.list.get(afterIndex);
+		
+		if(afterFlag.isEquals(last)) {
+			return;
+		}
+		
+		afterFlag = this.list.get(afterIndex + 1);
+		this.fibAfterKlines = PriceUtil.subList(afterFlag, list);
+		
+		fibInfo.setFibAfterKlines(fibAfterKlines);
 	}
 	
 	public boolean verifyOpen(List<Klines> hitList) {
@@ -200,5 +229,11 @@ public class DeclineAndStrengthFibUtil_v3 {
 	
 	public List<Double> getOpenPriceList() {
 		return this.openPriceList;
+	}
+	
+	private void addOpenPrice(double price) {
+		if(!PriceUtil.contains(openPriceList, price)) {
+			openPriceList.add(price);
+		}
 	}
 }
