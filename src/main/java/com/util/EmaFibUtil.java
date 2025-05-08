@@ -22,47 +22,64 @@ public class EmaFibUtil {
 
 	private final Logger logger = LogManager.getLogger(EmaFibUtil.class);
 	
-	private List<Klines> list;
+	private List<Klines> list_15m;
+	
+	private List<Klines> list_1h;
 	
 	private FibInfo fibInfo;
 	
-	public EmaFibUtil(List<Klines> list) {
-		this.list = list;
-		this.list = new ArrayList<Klines>();
-		if(!CollectionUtils.isEmpty(list)) {
-			this.list.addAll(list);
+	public EmaFibUtil(List<Klines> list_15m) {
+		this.list_15m = list_15m;
+		this.list_15m = new ArrayList<Klines>();
+		this.list_1h = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
 			this.init();
 		}
 	}
 
 	private void init() {
-		if(CollectionUtils.isEmpty(this.list)) {
+		if(CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
-		this.list.sort(kc);
+		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateEMA_7_25_99(list);
+		this.list_1h = PriceUtil.to1HFor15MKlines(list_15m);
+		
+		Klines last_1h = PriceUtil.getLastKlines(this.list_1h);
+		
+		int minute = DateFormatUtil.getMinute(last_1h.getEndTime());
+		if(minute != 59) {
+			this.list_1h.remove(last_1h);
+			last_1h = PriceUtil.getLastKlines(this.list_1h);
+		}
+		
+		this.list_1h.sort(kc);
+		
+		PriceUtil.calculateEMA_7_25_99(this.list_1h);
 		
 		//最后一根k线
-		Klines last = PriceUtil.getLastKlines(list);
-		double ema25 = last.getEma25();
-		double ema99 = last.getEma99();
+		Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		double ema25 = last_1h.getEma25();
+		double ema99 = last_1h.getEma99();
+		
+		logger.debug("ema25: {}, ema99: {}", ema25, ema99);
 		
 		Klines second = null;
 		Klines first = null;
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		if(PriceUtil.isBreachLong(last, ema99) || PriceUtil.isBreachLong(last, ema25)) {//做多
+		if(PriceUtil.isBreachLong(last_15m, ema99) || PriceUtil.isBreachLong(last_15m, ema25)) {//做多
 			ps = PositionSide.LONG;
-		} else if(PriceUtil.isBreachShort(last, ema99) || PriceUtil.isBreachShort(last, ema25)) {//做空
+		} else if(PriceUtil.isBreachShort(last_15m, ema99) || PriceUtil.isBreachShort(last_15m, ema25)) {//做空
 			ps = PositionSide.SHORT;
 		}
 		
-		for(int index = this.list.size() - 1; index > 0; index--) {
-			Klines current = this.list.get(index);
+		for(int index = this.list_1h.size() - 1; index > 0; index--) {
+			Klines current = this.list_1h.get(index);
 			if(ps == PositionSide.LONG) {
 				if(second == null) {
 					if(verifyHigh(current)) {
@@ -92,29 +109,29 @@ public class EmaFibUtil {
 			return;
 		}
 		
-		List<Klines> subList = PriceUtil.subList(first, second, list);
+		List<Klines> subList = PriceUtil.subList(first, second, this.list_1h);
 		List<Klines> subList_second = null;
 		Klines start = null;
 		Klines end = null;
 		Klines after = null;
 		if(ps == PositionSide.LONG) {//先寻找高点再寻找低点
 			start = PriceUtil.getMaxPriceKLine(subList);
-			after = PriceUtil.getAfterKlines(start, list);
+			after = PriceUtil.getAfterKlines(start, this.list_1h);
 			if(after == null) {
-				subList_second = PriceUtil.subList(start, list);
+				subList_second = PriceUtil.subList(start, this.list_1h);
 			} else {
-				subList_second = PriceUtil.subList(after, list);
+				subList_second = PriceUtil.subList(after, this.list_1h);
 			}
 			end = PriceUtil.getMinPriceKLine(subList_second);
 			
 			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
 		} else if(ps == PositionSide.SHORT) {//先寻找低点再寻找高点
 			start = PriceUtil.getMinPriceKLine(subList);
-			after = PriceUtil.getAfterKlines(start, list);
+			after = PriceUtil.getAfterKlines(start, this.list_1h);
 			if(after == null) {
-				subList_second = PriceUtil.subList(start, list);
+				subList_second = PriceUtil.subList(start, this.list_1h);
 			} else {
-				subList_second = PriceUtil.subList(after, list);
+				subList_second = PriceUtil.subList(after, this.list_1h);
 			}
 			end = PriceUtil.getMaxPriceKLine(subList_second);
 			
@@ -136,13 +153,14 @@ public class EmaFibUtil {
 		return fibInfo;
 	}
 
-	public boolean verifyOpen(List<Klines> hitList) {
+	public boolean verifyOpen() {
 		boolean result = false;
 		if(this.fibInfo != null) {
-			Klines last = PriceUtil.getLastKlines(hitList);
-			double ema25 = last.getEma25();
-			double ema99 = last.getEma99();
-			double closePrice = last.getClosePriceDoubleValue();
+			Klines last_1h = PriceUtil.getLastKlines(this.list_1h);
+			Klines last_15m = PriceUtil.getLastKlines(this.list_15m);
+			double ema25 = last_1h.getEma25();
+			double ema99 = last_1h.getEma99();
+			double closePrice = last_15m.getClosePriceDoubleValue();
 			double fib5Price = this.fibInfo.getFibValue(FibCode.FIB5);
 			QuotationMode qm = this.fibInfo.getQuotationMode();
 			if(qm == QuotationMode.SHORT && closePrice <= fib5Price && ema25 > ema99) {//做多

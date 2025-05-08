@@ -1006,8 +1006,8 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresEmaRiseAndFallMonitor(List<Klines> klinesList) {
-		if(CollectionUtils.isEmpty(klinesList)) {
+	public void futuresEmaRiseAndFallMonitor(List<Klines> list_15m) {
+		if(CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		/*
@@ -1039,16 +1039,16 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		*/
 		//================================================
-		Klines last = PriceUtil.getLastKlines(klinesList);
+		Klines last = PriceUtil.getLastKlines(list_15m);
 		
 		double closePrice = last.getClosePriceDoubleValue();
 		String pair = last.getPair();
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		EmaFibUtil fu = new EmaFibUtil(klinesList);
+		EmaFibUtil fu = new EmaFibUtil(list_15m);
 		FibInfo fibInfo = fu.getFibInfo();
 		
-		if(fibInfo == null || !fu.verifyOpen(klinesList)) {
+		if(fibInfo == null || !fu.verifyOpen()) {
 			return;
 		}
 		
