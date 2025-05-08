@@ -166,24 +166,48 @@ public class FibInfo {
 	 */
 	public FibCode getTakeProfit_v2(FibCode code) {
 		FibCode takeProfit = FibCode.FIB0;
-		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
-			takeProfit = FibCode.FIB2_618;
-		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
-			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
-			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1_272) {//1.272 - 0.786
-			takeProfit = FibCode.FIB786;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.5
-			takeProfit = FibCode.FIB5;
-		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
-			takeProfit = FibCode.FIB382;
-		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.236
-			takeProfit = FibCode.FIB236;
-		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
-			takeProfit = FibCode.FIB236;
-		} else if(code == FibCode.FIB382) { // 0.382 -> 0
-			takeProfit = FibCode.FIB0;
+		if(this.level == FibLevel.LEVEL_0) {
+			if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+				takeProfit = FibCode.FIB2_618;
+			} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
+				takeProfit = FibCode.FIB1_618;
+			} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
+				takeProfit = FibCode.FIB1;
+			} else if(code == FibCode.FIB1_272) {//1.272 - 0.786
+				takeProfit = FibCode.FIB786;
+			} else if(code == FibCode.FIB1) { // 1 -> 0.5
+				takeProfit = FibCode.FIB5;
+			} else if(code == FibCode.FIB786) { // 0.786 -> 0.618
+				takeProfit = FibCode.FIB618;
+			} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
+				takeProfit = FibCode.FIB382;
+			} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
+				takeProfit = FibCode.FIB236;
+			} else if(code == FibCode.FIB382) { // 0.382 -> 0
+				takeProfit = FibCode.FIB0;
+			} else if(code == FibCode.FIB236) { // 0.236 -> 0
+				takeProfit = FibCode.FIB0;
+			}
+		} else {
+			if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+				takeProfit = FibCode.FIB2_618;
+			} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
+				takeProfit = FibCode.FIB1_618;
+			} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618) { // 2/1.618 - 1
+				takeProfit = FibCode.FIB1;
+			} else if(code == FibCode.FIB1_272) {//1.272 - 0.786
+				takeProfit = FibCode.FIB786;
+			} else if(code == FibCode.FIB1) { // 1 -> 0.5
+				takeProfit = FibCode.FIB5;
+			} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
+				takeProfit = FibCode.FIB382;
+			} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.236
+				takeProfit = FibCode.FIB236;
+			} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
+				takeProfit = FibCode.FIB236;
+			} else if(code == FibCode.FIB382) { // 0.382 -> 0
+				takeProfit = FibCode.FIB0;
+			}
 		}
 		return takeProfit;
 	}
@@ -195,22 +219,44 @@ public class FibInfo {
 	 */
 	public FibCode getTakeProfit_v1(FibCode code) {
 		FibCode takeProfit = FibCode.FIB0;
-		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
-			takeProfit = FibCode.FIB2_618;
-		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
-			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618 || code == FibCode.FIB1_272) { // 2/1.618/1.272 - 1
-			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.618
-			takeProfit = FibCode.FIB618;
-		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
-			takeProfit = FibCode.FIB5;
-		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
-			takeProfit = FibCode.FIB382;
-		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
-			takeProfit = FibCode.FIB236;
-		} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
-			takeProfit = FibCode.FIB236;
+		if(this.level == FibLevel.LEVEL_0) {
+			if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+				takeProfit = FibCode.FIB2_618;
+			} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
+				takeProfit = FibCode.FIB1_618;
+			} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618 || code == FibCode.FIB1_272) { // 2/1.618/1.272 - 1
+				takeProfit = FibCode.FIB1;
+			} else if(code == FibCode.FIB1) { // 1 -> 0.618
+				takeProfit = FibCode.FIB618;
+			} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
+				takeProfit = FibCode.FIB5;
+			} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
+				takeProfit = FibCode.FIB382;
+			} else if(code == FibCode.FIB5) { // 0.5 -> 0.382
+				takeProfit = FibCode.FIB236;
+			} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
+				takeProfit = FibCode.FIB236;
+			} else if(code == FibCode.FIB236) { // 0.236 -> 0
+				takeProfit = FibCode.FIB0;
+			}
+		} else {
+			if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+				takeProfit = FibCode.FIB2_618;
+			} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
+				takeProfit = FibCode.FIB1_618;
+			} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618 || code == FibCode.FIB1_272) { // 2/1.618/1.272 - 1
+				takeProfit = FibCode.FIB1;
+			} else if(code == FibCode.FIB1) { // 1 -> 0.618
+				takeProfit = FibCode.FIB618;
+			} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
+				takeProfit = FibCode.FIB5;
+			} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
+				takeProfit = FibCode.FIB382;
+			} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
+				takeProfit = FibCode.FIB236;
+			} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
+				takeProfit = FibCode.FIB236;
+			}
 		}
 		return takeProfit;
 	}
@@ -337,13 +383,7 @@ public class FibInfo {
 	 */
 	public FibCode getNextFibCode(FibCode current) {
 		FibCode result = FibCode.FIB0;
-		if(current == FibCode.FIB1) {
-			result = FibCode.FIB618;
-		} else if(current == FibCode.FIB786) {
-			result = FibCode.FIB5;
-		} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
-			result = FibCode.FIB382;
-		} else {
+		if(this.level == FibLevel.LEVEL_0) {
 			FibCode codes[] = FibCode.values();
 			for(int index = 0; index < codes.length; index++) {
 				FibCode code = codes[index];
@@ -354,6 +394,27 @@ public class FibInfo {
 						result = codes[index + 1];
 					}
 					break;
+				}
+			}
+		} else {
+			if(current == FibCode.FIB1) {
+				result = FibCode.FIB618;
+			} else if(current == FibCode.FIB786) {
+				result = FibCode.FIB5;
+			} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
+				result = FibCode.FIB382;
+			} else {
+				FibCode codes[] = FibCode.values();
+				for(int index = 0; index < codes.length; index++) {
+					FibCode code = codes[index];
+					if(code == current && code != FibCode.FIB0) {
+						if(code == FibCode.FIB786 || code == FibCode.FIB66) {
+							result = codes[index + 2];
+						} else {
+							result = codes[index + 1];
+						}
+						break;
+					}
 				}
 			}
 		}
