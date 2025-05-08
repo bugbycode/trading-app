@@ -48,6 +48,10 @@ public class EmaFibUtil {
 		
 		this.list_1h = PriceUtil.to1HFor15MKlines(list_15m);
 		
+		if(this.list_1h.size() < 99) {
+			return;
+		}
+		
 		Klines last_1h = PriceUtil.getLastKlines(this.list_1h);
 		
 		int minute = DateFormatUtil.getMinute(last_1h.getEndTime());
