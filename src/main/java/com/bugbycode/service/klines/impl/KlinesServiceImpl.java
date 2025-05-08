@@ -58,6 +58,7 @@ import com.util.DeclineAndStrengthFibUtil;
 import com.util.DeclineAndStrengthFibUtil_v3;
 import com.util.EmaFibUtil;
 import com.util.FibInfoFactory_v3;
+import com.util.FibInfoFactory_v4;
 import com.util.FibUtil_v3;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
@@ -1158,6 +1159,35 @@ public class KlinesServiceImpl implements KlinesService {
 		} else {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			openShort(fibInfo, afterHighKlines, klinesList);
+		}
+	}
+	
+	@Override
+	public void futuresFibMonitor_1d(List<Klines> list_1d, List<Klines> list_15m) {
+		
+		if(CollectionUtils.isEmpty(list_1d) || CollectionUtils.isEmpty(list_15m)) {
+			return;
+		}
+		
+		List<Klines> today_klines = PriceUtil.getTodayKlines(list_15m);
+		
+		FibInfoFactory_v4 factory_v4 = new FibInfoFactory_v4(list_1d, today_klines);
+		
+		FibInfo fibInfo = factory_v4.getFibInfo();
+		
+		List<Klines> fibAfterKlines = factory_v4.getFibAfterKlines();
+		
+		if(fibInfo == null) {
+			return;
+		}
+		
+		QuotationMode mode = fibInfo.getQuotationMode();
+		if(mode == QuotationMode.LONG) {
+			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+			openLong(fibInfo, afterLowKlines, list_15m);
+		} else {
+			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+			openShort(fibInfo, afterHighKlines, list_15m);
 		}
 	}
 	
