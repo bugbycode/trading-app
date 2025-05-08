@@ -72,9 +72,15 @@ public class EmaFibUtil {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		if(PriceUtil.isBreachLong(last_15m, ema99) || PriceUtil.isBreachLong(last_15m, ema25)) {//做多
+		if(PriceUtil.isBreachLong(last_15m, ema99) 
+				|| PriceUtil.isBreachLong(last_15m, ema25) 
+				|| PriceUtil.isLong_v2(ema25, list_15m)
+				|| PriceUtil.isLong_v2(ema99, list_15m)) {//做多
 			ps = PositionSide.LONG;
-		} else if(PriceUtil.isBreachShort(last_15m, ema99) || PriceUtil.isBreachShort(last_15m, ema25)) {//做空
+		} else if(PriceUtil.isBreachShort(last_15m, ema99) 
+				|| PriceUtil.isBreachShort(last_15m, ema25)
+				|| PriceUtil.isShort_v2(ema25, list_15m)
+				|| PriceUtil.isShort_v2(ema99, list_15m)) {//做空
 			ps = PositionSide.SHORT;
 		}
 		
