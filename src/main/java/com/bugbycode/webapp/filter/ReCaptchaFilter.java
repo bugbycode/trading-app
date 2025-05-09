@@ -48,7 +48,7 @@ public class ReCaptchaFilter extends OncePerRequestFilter {
 		String method = request.getMethod();
 		String url = request.getRequestURI();
 		
-		if("POST".equals(method) && url.endsWith("/login")) {
+		if("POST".equals(method) && url.endsWith("/login") && !AppConfig.DEBUG) {
 
 	        String cha_response = request.getParameter("cha_response");
 	        
