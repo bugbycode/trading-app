@@ -1,28 +1,17 @@
 spring: 
-  main: 
-    web-application-type: NONE
+#  main: 
+#    web-application-type: NONE
   datasource:
     mongodb:
-      url: mongodb://trading:trading@localhost:27017
+      url: mongodb://trading:trading%40cai@localhost:27017
       database: trading
-email: 
-  recipient: test@qq.com
-  smtp: 
-    host: smtp.qq.com
-    port: 25
-  auth: 
-    user: test@qq.com
-    password: 12345678
+google:
+  recaptcha:
+    secret: 6LfFqqgqAAAAAMp1-4MDjtlxAt75mZdtlwwxjgr7	
 binance: 
   baseUrl: 
+    websocket: wss://fstream.binance.com
     rest: https://fapi.binance.com
-    websocket: wss://fstream.binance.com/ws/bnbusdt@aggTrade
-  pair: |
-    BTCUSDT,ETHUSDT,DOGEUSDT,BNBUSDT,SOLUSDT,LINKUSDT,ZKUSDT,1000PEPEUSDT,ENSUSDT,
-    XRPUSDT,LTCUSDT,BCHUSDT,FILUSDT,ZECUSDT,ADAUSDT,ETHFIUSDT,TONUSDT,1000BONKUSDT,
-    DOTUSDT,MATICUSDT,OPUSDT,ENAUSDT,AIUSDT,XAIUSDT,ALTUSDT,AVAXUSDT,WIFUSDT,NEARUSDT,
-    APTUSDT,ORDIUSDT,NOTUSDT,WLDUSDT,FTMUSDT,ARBUSDT,ONDOUSDT,RNDRUSDT,LDOUSDT,ETCUSDT,
-    TWTUSDT,SFPUSDT,UNIUSDT,ZROUSDT,IOUSDT,TIAUSDT,BNXUSDT,WUSDT,LPTUSDT,IDUSDT,HOOKUSDT,
-    EDUUSDT,SANDUSDT,SAGAUSDT,AXSUSDT,APEUSDT,MASKUSDT,
+    websocketApi: wss://ws-fapi.binance.com/ws-fapi/v1
 loggin: 
   config: classpath:log4j2.xml

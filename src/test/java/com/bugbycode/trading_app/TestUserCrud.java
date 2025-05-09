@@ -44,7 +44,7 @@ public class TestUserCrud {
 
     @Test
     public void testQueryAutoTradeUser(){
-        List<User> userList = userRepository.queryByAutoTrade(AutoTrade.OPEN, AutoTradeType.PRICE_ACTION);
+        List<User> userList = userRepository.queryByAutoTrade(AutoTrade.OPEN, AutoTradeType.FIB_RET);
         logger.info(new org.json.JSONArray(userList));
     }
 }

@@ -3,6 +3,7 @@ package com.bugbycode.trading_app;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,16 +15,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
+import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
-import com.util.FibUtil;
-import com.util.FibUtil_v2;
-import com.util.FibUtil_v3;
+import com.util.EmaFibUtil;
+import com.util.FibInfoFactory;
 import com.util.PriceUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -38,9 +42,12 @@ public class TestKlinesService {
     @Autowired
     private KlinesRepository klinesRepository;
 
+    @Autowired
+    private BinanceExchangeService binanceExchangeService;
+
     @Before
 	public void befor() {
-		
+		AppConfig.DEBUG = true;
 		System.setProperty("https.proxyHost", "localhost");
 		System.setProperty("https.proxyPort", "50000");
 	}
@@ -87,8 +94,7 @@ public class TestKlinesService {
     public void testFibUtil() {
         String pair = "AVAUSDT";
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 3000);
-        FibUtil fu = new FibUtil(list);
-        logger.info(fu.getFibInfo());
+        
     }
     
     @Test
@@ -104,21 +110,6 @@ public class TestKlinesService {
         logger.info(today_list);
         logger.info(today_list.size());
     	
-        FibUtil_v3 fu = new FibUtil_v3(list);
-        FibInfo fibInfo = fu.getFibInfo();
-        FibInfo secondFibInfo = fu.getSecondFibInfo(fibInfo);
-        FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
-        FibInfo fourthFibInfo = fu.getFourthFibInfo(thirdFibInfo);
-
-        logger.info(fu.getAfterFlag());
-        logger.info(fu.getSecondFibAfterFlag());
-        logger.info(fu.getThirdFibAfterFlag());
-        logger.info(fu.getFourthFibAfterFlag());
-
-        logger.info(fibInfo);
-        logger.info(secondFibInfo);
-        logger.info(thirdFibInfo); 
-        logger.info(fourthFibInfo);
     }
 
     @Test
@@ -128,13 +119,7 @@ public class TestKlinesService {
 
         List<Klines> klinesList = PriceUtil.to1HFor15MKlines(list);
 
-        FibUtil_v2 fu = new FibUtil_v2(klinesList);
-        FibInfo fibInfo = fu.getFibInfo();
-        FibInfo secondFibInfo = fu.getSecondFibInfo(fibInfo);
-
-        logger.info(fibInfo);
-
-        logger.info(secondFibInfo);
+        
     }
 
     @Test
@@ -162,10 +147,23 @@ public class TestKlinesService {
 
     @Test
     public void testFibInfo(){
-        String pair = "BNXUSDT";
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-        FibUtil fu = new FibUtil(list);
-        FibInfo fibInfo = fu.getFibInfo();
+        String pair = "SOLVUSDT";
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,5000);
+        List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(list_15m);
+		
+		Klines last = PriceUtil.getLastKlines(klinesList_1h);
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			klinesList_1h.remove(last);
+		}
+		
+		FibInfoFactory factory_v3 = new FibInfoFactory(klinesList_1h);
+		
+		FibInfo fibInfo = factory_v3.getFibInfo();
+		
+		List<Klines> fibAfterKlines = factory_v3.getFibAfterKlines();
+
         logger.info(fibInfo);
     }
 }

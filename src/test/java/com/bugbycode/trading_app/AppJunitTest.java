@@ -58,7 +58,6 @@ public class AppJunitTest {
 
 	@Test
 	public void testFindById(){
-		Klines klines = klinesRepository.findById("66e45a7e074d3d1e99fa5edf");
-		logger.info(klines);
+		
 	}
 }
