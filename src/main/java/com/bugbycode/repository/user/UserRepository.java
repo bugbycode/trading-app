@@ -134,9 +134,10 @@ public interface UserRepository {
 	 * 根据自动交易启用状态查询所有关联用户信息
 	 * 
 	 * @param autoTrade
+	 * @param autoTradeType
 	 * @return
 	 */
-	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType);
+	public List<User> queryByAutoTrade(AutoTrade autoTrade, AutoTradeType autoTradeType);
 	
 	/**
 	 * 根据画线交易启用状态查询所有关联用户信息

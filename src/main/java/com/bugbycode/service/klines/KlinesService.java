@@ -88,20 +88,6 @@ public interface KlinesService {
 	public void futuresFibMonitor(List<Klines> klinesList);
 	
 	/**
-	 * 斐波那契回撤点位监控 日线级别
-	 * 
-	 * @param list_1d 日线级别k线
-	 * @param list_15m 15分钟级别k线
-	 */
-	public void futuresFibMonitor_1d(List<Klines> list_1d, List<Klines> list_15m);
-	
-	/**
-	 * 盘整区点位监控
-	 * @param klinesList 参考价格k线信息（15分钟）
-	 */
-	public void futuresConsolidationAreaMonitor(List<Klines> klinesList);
-	
-	/**
 	 * 发送邮件
 	 * @param user 发件人信息（SMTP配置）
 	 * @param subject 主题
@@ -165,18 +151,6 @@ public interface KlinesService {
 	 * @param info
 	 */
 	public void fibRetracement(Klines klines,ShapeInfo info);
-	
-	/**
-	 * 检查是否出现颓势或强势价格行为
-	 * @param klinesList
-	 */
-	public void declineAndStrengthCheck(List<Klines> klinesList);
-	
-	/**
-	 * 检查是否出现颓势或强势价格行为 V2
-	 * @param klinesList
-	 */
-	public void declineAndStrengthCheck_v2(List<Klines> klinesList);
 	
 	/**
      * 校验K线是否出现重复或缺失

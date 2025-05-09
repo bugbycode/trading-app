@@ -61,78 +61,6 @@ public class FibInfo {
 	}
 	
 	/**
-	 * 盘整区止盈点位
-	 * @param price 当前价格
-	 * @param profit 用户盈利预期
-	 * @param profitLimit 用户止盈百分比限制
-	 * @return
-	 */
-	public FibCode getConsolidationAreaTakeProfit(double price, double profit, double profitLimit) {
-		FibCode result = null;
-		QuotationMode qm = this.getQuotationMode();
-		double percent_382 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB382), qm);
-		double percent_5 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB5), qm);
-		
-		if(percent_5 >= profit && percent_5 <= profitLimit) {
-			result = FibCode.FIB5;
-		} else if(percent_382 >= profit && percent_382 <= profitLimit) {
-			result = FibCode.FIB382;
-		}
-		
-		if(result == null) {
-			if(percent_5 >= profit) {
-				result = FibCode.FIB5;
-			} else if(percent_382 >= profit) {
-				result = FibCode.FIB382;
-			} else {
-				result = FibCode.FIB382;
-			}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * 价格行为止盈点位
-	 * @param price 当前价格
-	 * @param profit 用户盈利预期
-	 * @param profitLimit 用户止盈百分比限制
-	 * @return
-	 */
-	public FibCode getDeclineAndStrengthTakeProfit(double price, double profit, double profitLimit) {
-		
-		FibCode result = null;
-		
-		QuotationMode qm = this.getQuotationMode() == QuotationMode.LONG ? QuotationMode.SHORT : QuotationMode.LONG;
-		
-		double percent_382 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB382), qm);
-		double percent_5 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB5), qm);
-		double percent_618 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB618), qm);
-		
-		if(percent_382 >= profit && percent_382 <= profitLimit) {
-			result = FibCode.FIB382;
-		} else if(percent_5 >= profit && percent_5 <= profitLimit) {
-			result = FibCode.FIB5;
-		} else if(percent_618 >= profit && percent_618 <= profitLimit) {
-			result = FibCode.FIB618;
-		}
-		
-		if(result == null) {
-			if(percent_382 >= profit) {
-				result = FibCode.FIB382;
-			} else if(percent_5 >= profit) {
-				result = FibCode.FIB5;
-			} else if(percent_618 >= profit) {
-				result = FibCode.FIB618;
-			} else {
-				result = FibCode.FIB5;
-			}
-		}
-		
-		return result;
-	}
-	
-	/**
 	 * 止盈点位 V3 (保守的交易风格) </br>
 	 * 
 	 * 1、当【盈利百分比】大于【用户止盈百分比限制】则止盈点位为下一个回撤点位 </br>
@@ -349,32 +277,6 @@ public class FibInfo {
 	public FibLevel getLevel() {
 		return level;
 	}
-
-	/**
-	 * 校验点位是否可开仓
-	 * @param code 当前回撤点
-	 * @return
-	 */
-	public boolean verifyOpenFibCode(FibCode code) {
-		QuotationMode mode = this.getQuotationMode();
-		boolean result = false;
-		if(level == FibLevel.LEVEL_1 && code.gte(FibCode.FIB1)) {//震荡行情 只做高低点 1~4.618
-			result = true;
-		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.LONG
-				 && code.gte(FibCode.FIB618) ) {//多头行情做多 0.618 ~ 4.618
-			result = true;
-		} else if(level == FibLevel.LEVEL_2 && mode == QuotationMode.SHORT
-				&& code.gte(FibCode.FIB1)) { //多头行情做空 只做最高点 1~4.618
-			result = true;
-		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.SHORT
-				&& code.gte(FibCode.FIB618) ) { //空头行情做空  0.618 ~ 4.618
-			result = true;
-		} else if(level == FibLevel.LEVEL_3 && mode == QuotationMode.LONG
-				&& code.gte(FibCode.FIB1)) { //空头行情做多 只做最低点 1~4.618
-			result = true;
-		}
-		return result;
-	}
 	
 	/**
 	 * 获取下一个点位 点位顺序为： 1 -> 0.786 -> 0.618 -> 0.5 -> 0.382 -> 0.236 -> 0
@@ -419,40 +321,6 @@ public class FibInfo {
 			}
 		}
 		
-		return result;
-	}
-	
-	
-	/**
-	 * 校验回撤点是否可开仓
-	 * 
-	 * @param fibInfo 斐波那契回撤信息
-	 * @param hitCode 开仓的回撤点
-	 * @param childFibInfo 次级斐波那契回撤信息
-	 * @return
-	 */
-	public boolean verifyParentOpen(FibInfo fibInfo, FibCode hitCode,FibInfo childFibInfo) {
-		boolean result = false;
-		if(fibInfo == null || hitCode == null) {
-			result = false;
-		} else if(childFibInfo == null) {
-			result = true;
-		} else {
-			//行情模式
-			QuotationMode qm = fibInfo.getQuotationMode();
-			double codePrice = fibInfo.getFibValue(hitCode);
-			//次级斐波那契回撤结束点价格
-			double childFibEndPrice = childFibInfo.getFibValue(FibCode.FIB0);
-			if(qm == QuotationMode.LONG) {
-				if(childFibEndPrice > codePrice) {
-					result = true;
-				}
-			} else if(qm == QuotationMode.SHORT) {
-				if(childFibEndPrice < codePrice) {
-					result = true;
-				}
-			}
-		}
 		return result;
 	}
 
