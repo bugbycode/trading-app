@@ -46,10 +46,12 @@ public class FibInfoFactory_v3 {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		if(verifyHigh(last)) {
+		if(verifyLong(last)) {
 			ps = PositionSide.LONG;
-		} else if(verifyLow(last)) {
+		} else if(verifyShort(last)) {
 			ps = PositionSide.SHORT;
+		} else {
+			return;
 		}
 		
 		Klines second = null;
@@ -133,6 +135,14 @@ public class FibInfoFactory_v3 {
 	
 	private boolean verifyLow(Klines k) {
 		return k.getEma7() < k.getEma25();
+	}
+	
+	private boolean verifyLong(Klines k) {
+		return k.getEma25() > k.getEma99();
+	}
+	
+	private boolean verifyShort(Klines k) {
+		return k.getEma25() < k.getEma99();
 	}
 
 	public List<Klines> getFibAfterKlines() {
