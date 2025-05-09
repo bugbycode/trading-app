@@ -553,7 +553,7 @@ public class PriceUtil {
 	 */
 	public static boolean isObsoleteLong(Klines afterLowKlines,List<Double> openPriceList,int offset) {
 		boolean result = false;
-		if(!ObjectUtils.isEmpty(afterLowKlines) && offset < 2) {
+		if(!ObjectUtils.isEmpty(afterLowKlines) && offset < openPriceList.size() - 1) {
 			double nexPrice = openPriceList.get(offset + 1);
 			if(afterLowKlines.getLowPriceDoubleValue() <= nexPrice) {
 				result = true;
@@ -571,7 +571,7 @@ public class PriceUtil {
 	 */
 	public static boolean isObsoleteShort(Klines afterHighKlines,List<Double> openPriceList,int offset) {
 		boolean result = false;
-		if(!ObjectUtils.isEmpty(afterHighKlines) && offset < 2) {
+		if(!ObjectUtils.isEmpty(afterHighKlines) && offset < openPriceList.size() - 1) {
 			double nexPrice = openPriceList.get(offset + 1);
 			if(afterHighKlines.getHighPriceDoubleValue() >= nexPrice) {
 				result = true;
