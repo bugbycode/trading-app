@@ -34,6 +34,16 @@ public interface UserRepository {
 	public void updatePassword(String username,String password);
 	
 	/**
+	 * 修改SMTP配置
+	 * @param username
+	 * @param smtpUser
+	 * @param smtpPwd
+	 * @param smtpHost
+	 * @param smtpPort
+	 */
+	public void updateSmtpSetting(String username,String smtpUser,String smtpPwd,String smtpHost,int smtpPort);
+	
+	/**
 	 * 根据用户名删除用户信息
 	 * @param username
 	 */

@@ -32,6 +32,7 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
+import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.BinanceOrderInfo;
@@ -42,7 +43,6 @@ import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
-import com.bugbycode.repository.email.EmailRepository;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.repository.user.UserRepository;
@@ -59,7 +59,6 @@ import com.util.DeclineAndStrengthFibUtil_v3;
 import com.util.EmaFibUtil;
 import com.util.FibInfoFactory_v3;
 import com.util.FibInfoFactory_v4;
-import com.util.FibUtil_v3;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
@@ -99,9 +98,6 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private ShapeRepository shapeRepository;
-	
-	@Autowired
-	private EmailRepository emailRepository;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -264,7 +260,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					text += "\r\n\r\n" + fibInfo.toString();
 					
-					sendEmail(subject, text, u.getUsername());
+					sendEmail(u, subject, text, u.getUsername());
 				}
 				break;
 			}
@@ -351,7 +347,7 @@ public class KlinesServiceImpl implements KlinesService {
 					text += "\r\n\r\n" + fibInfo.toString();
 					
 					
-					sendEmail(subject,text, u.getUsername());
+					sendEmail(u, subject,text, u.getUsername());
 				}
 				break;
 			}
@@ -543,7 +539,7 @@ public class KlinesServiceImpl implements KlinesService {
 								logger.debug("修改持仓模式成功");
 							} else {
 								logger.debug("修改持仓模式失败，失败原因：" + result.getMsg());
-								sendEmail("修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
+								sendEmail(u, "修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
 							}
 						}
 						
@@ -588,11 +584,11 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						if(recvTradeStatus == RecvTradeStatus.OPEN) {
-							sendEmail(subject_, text_, tradeUserEmail);
+							sendEmail(u, subject_, text_, tradeUserEmail);
 						}
 						
 					} catch (Exception e) {
-						sendEmail("下单" + pair + "多头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
+						sendEmail(u, "下单" + pair + "多头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
 						logger.error(e.getMessage(), e);
 					}
 					
@@ -773,7 +769,7 @@ public class KlinesServiceImpl implements KlinesService {
 								logger.debug("修改持仓模式成功");
 							} else {
 								logger.debug("修改持仓模式失败，失败原因：" + result.getMsg());
-								sendEmail("修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
+								sendEmail(u, "修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
 							}
 						}
 						
@@ -820,11 +816,11 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						if(recvTradeStatus == RecvTradeStatus.OPEN) {
-							sendEmail(subject_, text_, tradeUserEmail);
+							sendEmail(u, subject_, text_, tradeUserEmail);
 						}
 						
 					} catch (Exception e) {
-						sendEmail("下单" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
+						sendEmail(u, "下单" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
 						logger.error(e.getMessage(), e);
 					}
 					
@@ -833,176 +829,12 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 	}
 	
-	public void sendEmail(String subject,String text,String recEmail) {
+	public void sendEmail(User user, String subject,String text,String recEmail) {
 		
 	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
-			emailWorkTaskPool.add(new SendMailTask(subject, text, recEmail, emailRepository));
+			emailWorkTaskPool.add(new SendMailTask(user, subject, text, recEmail));
 	 	}
 		
-	}
-
-	@Override
-	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit) {
-		
-		Date now = new Date();
-		String dateStr = DateFormatUtil.format(now);
-		
-		Klines current = PriceUtil.getLastKlines(klinesList_hit);
-		Klines last = PriceUtil.getLastKlines(klinesList);
-		String pair = last.getPair();
-		
-		FibUtil_v3 fu = new FibUtil_v3(klinesList);
-		FibInfo firstFibInfo = fu.getFibInfo();
-		FibInfo secondFibInfo = fu.getSecondFibInfo(firstFibInfo);
-		FibInfo thirdFibInfo = fu.getThirdFibInfo(secondFibInfo);
-		FibInfo fourthFibInfo = fu.getFourthFibInfo(thirdFibInfo);
-		
-		QuotationMode qm = null;
-		double highPrice = 0;
-		double lowPrice = 0;
-		
-		Klines low = null;
-		Klines high = null;
-		
-		if(firstFibInfo != null) {
-			qm = firstFibInfo.getQuotationMode();
-			if(qm == QuotationMode.LONG) {
-				low = fu.getFirstStart();
-				high = fu.getFirstEnd();
-			} else {
-				high = fu.getFirstStart();
-				low = fu.getFirstEnd();
-			}
-			highPrice = high.getHighPriceDoubleValue();
-			lowPrice = low.getLowPriceDoubleValue();
-			//高点做空
-			if(PriceUtil.isBreachShort(current, highPrice)) {
-				String subject = String.format("%s永续合约突破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()),dateStr);
-				
-				String text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(high.getStartTime())), 
-						PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()));
-				
-				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-			 	sendEmail(subject, text, recEmail);
-			}
-			//低点做多
-			if(PriceUtil.isBreachLong(current, lowPrice)) {
-				String subject = String.format("%s永续合约跌破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()),dateStr);
-				
-				String text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(low.getStartTime())), 
-						PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()));
-				
-				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-			 	sendEmail(subject, text, recEmail);
-			}
-		}
-		
-		if(secondFibInfo != null) {
-			qm = secondFibInfo.getQuotationMode();
-			if(qm == QuotationMode.LONG) {
-				low = fu.getSecondStart();
-				high = fu.getSecondEnd();
-			} else {
-				high = fu.getSecondStart();
-				low = fu.getSecondEnd();
-			}
-			highPrice = high.getHighPriceDoubleValue();
-			lowPrice = low.getLowPriceDoubleValue();
-			//高点做空
-			if(PriceUtil.isBreachShort(current, highPrice)) {
-				String subject = String.format("%s永续合约突破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()),dateStr);
-				
-				String text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(high.getStartTime())), 
-						PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()));
-				
-				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-			 	sendEmail(subject, text, recEmail);
-			}
-			//低点做多
-			if(PriceUtil.isBreachLong(current, lowPrice)) {
-				String subject = String.format("%s永续合约跌破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()),dateStr);
-				
-				String text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(low.getStartTime())), 
-						PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()));
-				
-				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-			 	sendEmail(subject, text, recEmail);
-			}
-		}
-		
-		if(thirdFibInfo != null) {
-			qm = thirdFibInfo.getQuotationMode();
-			if(qm == QuotationMode.LONG) {
-				low = fu.getThirdStart();
-				high = fu.getThirdEnd();
-			} else {
-				high = fu.getThirdStart();
-				low = fu.getThirdEnd();
-			}
-			highPrice = high.getHighPriceDoubleValue();
-			lowPrice = low.getLowPriceDoubleValue();
-			//高点做空
-			if(PriceUtil.isBreachShort(current, highPrice)) {
-				String subject = String.format("%s永续合约突破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()),dateStr);
-				
-				String text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(high.getStartTime())), 
-						PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()));
-				
-				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-			 	sendEmail(subject, text, recEmail);
-			}
-			//低点做多
-			if(PriceUtil.isBreachLong(current, lowPrice)) {
-				String subject = String.format("%s永续合约跌破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()),dateStr);
-				
-				String text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(low.getStartTime())), 
-						PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()));
-				
-				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-			 	sendEmail(subject, text, recEmail);
-			}
-		}
-		
-		if(fourthFibInfo != null) {
-			qm = fourthFibInfo.getQuotationMode();
-			if(qm == QuotationMode.LONG) {
-				low = fu.getFourthStart();
-				high = fu.getFourthEnd();
-			} else {
-				high = fu.getFourthStart();
-				low = fu.getFourthEnd();
-			}
-			highPrice = high.getHighPriceDoubleValue();
-			lowPrice = low.getLowPriceDoubleValue();
-			//高点做空
-			if(PriceUtil.isBreachShort(current, highPrice)) {
-				String subject = String.format("%s永续合约突破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()),dateStr);
-				
-				String text = String.format("%s永续合约突破(%s)最高价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(high.getStartTime())), 
-						PriceUtil.formatDoubleDecimal(highPrice, high.getDecimalNum()));
-				
-				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-			 	sendEmail(subject, text, recEmail);
-			}
-			//低点做多
-			if(PriceUtil.isBreachLong(current, lowPrice)) {
-				String subject = String.format("%s永续合约跌破(%s)并收回 %s", pair,PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()),dateStr);
-				
-				String text = String.format("%s永续合约跌破(%s)最低价(%s)并收回", pair, 
-						DateFormatUtil.format_yyyy_mm_dd(new Date(low.getStartTime())), 
-						PriceUtil.formatDoubleDecimal(lowPrice, low.getDecimalNum()));
-				
-				String recEmail = userDetailsService.getHighOrLowMonitorUserEmail();
-			 	sendEmail(subject, text, recEmail);
-			}
-		}
 	}
 	
 	@Override
@@ -1010,34 +842,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
-		/*
-		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
 		
-		Klines last = PriceUtil.getLastKlines(klinesList_1h);
-		
-		int minute = DateFormatUtil.getMinute(last.getEndTime());
-		if(minute != 59) {
-			klinesList_1h.remove(last);
-		}
-		
-		String pair = last.getPair();
-		String dateStr = DateFormatUtil.format(new Date());
-		
-		Klines last_15m = PriceUtil.getLastKlines(klinesList);
-		
-		double closePrice = last_15m.getClosePriceDoubleValue();
-		
-		FibUtil_v4 fu = new FibUtil_v4(klinesList_1h);
-		
-		FibInfo fibInfo = fu.getFibInfo();
-		
-		logger.debug("{} - {}", pair, fibInfo);
-		logger.debug("{} - {}", pair, fu.getOpenPriceList());
-		
-		if(fibInfo == null || !fu.verifyOpen(klinesList)) {
-			return;
-		}
-		*/
 		//================================================
 		Klines last = PriceUtil.getLastKlines(list_15m);
 		
@@ -1090,7 +895,7 @@ public class KlinesServiceImpl implements KlinesService {
 				text += "，预计盈利：" + percentStr + "%";
 				text += "\n\n" + fibInfo.toString();
 				
-				sendEmail(subject, text, u.getUsername());
+				sendEmail(u, subject, text, u.getUsername());
 			}
 		} else if(mode == QuotationMode.LONG) {
 			
@@ -1121,7 +926,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				text += "\n\n" + fibInfo.toString();
 				
-				sendEmail(subject, text, u.getUsername());
+				sendEmail(u, subject, text, u.getUsername());
 			}
 		}
 	}
@@ -1259,7 +1064,7 @@ public class KlinesServiceImpl implements KlinesService {
 				text += "，预计盈利：" + percentStr + "%";
 				text += "\n\n" + firstFibInfo.toString();
 				
-				sendEmail(subject, text, u.getUsername());
+				sendEmail(u, subject, text, u.getUsername());
 			}
         } else if(dsf.isOpenShort(klinesList)) {//做空
         	//市价做空
@@ -1292,7 +1097,7 @@ public class KlinesServiceImpl implements KlinesService {
 				text += "，预计盈利：" + percentStr + "%";
 				text += "\n\n" + firstFibInfo.toString();
 				
-				sendEmail(subject, text, u.getUsername());
+				sendEmail(u, subject, text, u.getUsername());
 			}
         }
 	}
@@ -1366,7 +1171,7 @@ public class KlinesServiceImpl implements KlinesService {
     				text += "，预计盈利：" + percentStr + "%";
     				text += "\n\n" + fibInfo.toString();
     				
-    				sendEmail(subject, text, u.getUsername());
+    				sendEmail(u, subject, text, u.getUsername());
     			}
         	} else {
         		//市价做空
@@ -1399,80 +1204,10 @@ public class KlinesServiceImpl implements KlinesService {
     				text += "，预计盈利：" + percentStr + "%";
     				text += "\n\n" + fibInfo.toString();
     				
-    				sendEmail(subject, text, u.getUsername());
+    				sendEmail(u, subject, text, u.getUsername());
     			}
         	}
         }
-	}
-
-	@Override
-	public void futuresRiseAndFall(List<Klines> klinesList) {
-
-		if(!CollectionUtils.isEmpty(klinesList)){
-			int lastIndex = klinesList.size() - 1;
-
-			Klines currentKlines = klinesList.get(lastIndex);
-
-			String pair = currentKlines.getPair();
-					
-			String percentageStr = PriceUtil.formatDoubleDecimal(PriceUtil.getPriceFluctuationPercentage(klinesList), 2);
-			
-			double pricePercentage = Double.valueOf(percentageStr);
-			
-			String text = "";//邮件内容
-			String subject = "";//邮件主题
-			String dateStr = DateFormatUtil.format(new Date());
-			if(PriceUtil.isFall_v3(klinesList)) {//下跌
-				
-				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
-					if(pricePercentage >= 10) {
-						subject = pair + "永续合约价格大暴跌";
-					} else if(pricePercentage >= 5) {
-						subject = pair + "永续合约价格暴跌";
-					}else if(pricePercentage >= 3) {
-						subject = pair + "永续合约价格大跌";
-					}
-				} else {
-					if(pricePercentage >= 15) {
-						subject = pair + "永续合约价格大暴跌";
-					} else if(pricePercentage >= 10) {
-						subject = pair + "永续合约价格暴跌";
-					}else if(pricePercentage >= 5) {
-						subject = pair + "永续合约价格大跌";
-					}
-				}
-				
-			} else if(PriceUtil.isRise_v3(klinesList)) {
-				if(pair.equals("BTCUSDT") || pair.equals("ETHUSDT") || pair.equals("BNBUSDT")) {
-					if(pricePercentage >= 10) {
-						subject = pair + "永续合约价格大暴涨";
-					} else if(pricePercentage >= 5) {
-						subject = pair + "永续合约价格暴涨";
-					}else if(pricePercentage >= 3) {
-						subject = pair + "永续合约价格大涨";
-					}
-				} else {
-					if(pricePercentage >= 15) {
-						subject = pair + "永续合约价格大暴涨";
-					} else if(pricePercentage >= 10) {
-						subject = pair + "永续合约价格暴涨";
-					}else if(pricePercentage >= 5) {
-						subject = pair + "永续合约价格大涨";
-					}
-				}
-			}
-			
-			if(StringUtil.isNotEmpty(subject)) {
-				
-				subject += percentageStr + "% " + dateStr;
-				
-				text = subject;
-				
-				String recEmail = userDetailsService.getRiseAndFallMonitorUserEmail();
-				
-				sendEmail(subject, text, recEmail);
-			}
-		}
 	}
 	
 	@Override
@@ -1534,7 +1269,7 @@ public class KlinesServiceImpl implements KlinesService {
 				text += "，预计盈利：" + percentStr + "%";
 				text += "\n\n" + fibInfo.toString();
 				
-				sendEmail(subject, text, u.getUsername());
+				sendEmail(u, subject, text, u.getUsername());
 			}
 		} else {
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.AREA_INDEX));
@@ -1562,7 +1297,7 @@ public class KlinesServiceImpl implements KlinesService {
 				text += "，预计盈利：" + percentStr + "%";
 				text += "\n\n" + fibInfo.toString();
 				
-				sendEmail(subject, text, u.getUsername());
+				sendEmail(u, subject, text, u.getUsername());
 			}
 		}
 		
@@ -1585,7 +1320,10 @@ public class KlinesServiceImpl implements KlinesService {
 					DateFormatUtil.format(time * 1000),klines.getClosePrice());
 			
 			if(PriceUtil.hitPrice(klines, price)) {
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+				
+				User user = userRepository.queryByUsername(info.getOwner());
+				
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				
 				//所有k线信息
 				List<Klines> list = klinesRepository.findByPairAndGtStartTime(info.getSymbol(), time * 1000, Inerval.INERVAL_15M);
@@ -1641,8 +1379,10 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
 						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
 						klines.getClosePrice());
+
+				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 
 				FibInfo fibInfo = new FibInfo(price1, price0, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
@@ -1666,8 +1406,10 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price0,klines.getDecimalNum()),
 						PriceUtil.formatDoubleDecimal(price1,klines.getDecimalNum()),
 						klines.getClosePrice());
+
+				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				
 				FibInfo fibInfo = new FibInfo(price0, price1, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				if(upOrLowStr.equals("上")) {//做空
@@ -1712,7 +1454,10 @@ public class KlinesServiceImpl implements KlinesService {
 					PriceUtil.formatDoubleDecimal(resultPrice,klines.getDecimalNum()));
 			logger.debug(text);
 			if(PriceUtil.hitPrice(klines, resultPrice)) {
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+				
+				User user = userRepository.queryByUsername(info.getOwner());
+				
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				
 				long startTime = time0 < time1 ? (time0 * 1000) : (time1 * 1000);
 				long endTime = time0 < time1 ? (time1 * 1000) : (time0 * 1000);
@@ -1788,8 +1533,10 @@ public class KlinesServiceImpl implements KlinesService {
 						PriceUtil.formatDoubleDecimal(price2,klines.getDecimalNum()),
 						DateFormatUtil.format(time2 * 1000),
 						klines.getClosePrice());
+
+				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				
 				FibInfo fibInfo = new FibInfo(line1Price, line0Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
@@ -1819,7 +1566,9 @@ public class KlinesServiceImpl implements KlinesService {
 						DateFormatUtil.format(time2 * 1000),
 						klines.getClosePrice());
 				
-				emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+				User user = userRepository.queryByUsername(info.getOwner());
+				
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				
 				FibInfo fibInfo = new FibInfo(line0Price, line1Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
@@ -1946,8 +1695,10 @@ public class KlinesServiceImpl implements KlinesService {
 					);
 			
 			if(StringUtil.isNotEmpty(subject)) {
+
+				User user = userRepository.queryByUsername(info.getOwner());
 				
-				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				
 				if(upOrLowStr.equals("上")) {//做空
 					
@@ -1992,7 +1743,10 @@ public class KlinesServiceImpl implements KlinesService {
 				double takeProfitDoubleValue = price + profitLevel;
 				
 				String text = StringUtil.formatLongMessage(klines.getPair(), price, stopLossDoubleValue, takeProfitDoubleValue, klines.getDecimalNum());
-				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+
+				User user = userRepository.queryByUsername(info.getOwner());
+				
+				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT));
 				
@@ -2032,7 +1786,10 @@ public class KlinesServiceImpl implements KlinesService {
 				double takeProfitDoubleValue = price - profitLevel;
 				
 				String text = StringUtil.formatLongMessage(klines.getPair(), price, stopLossDoubleValue, takeProfitDoubleValue, klines.getDecimalNum());
-				this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+
+				User user = userRepository.queryByUsername(info.getOwner());
+				
+				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT));
 				
@@ -2070,7 +1827,10 @@ public class KlinesServiceImpl implements KlinesService {
 							PriceUtil.formatDoubleDecimal(price, klines.getDecimalNum()),
 							dateStr);
 					String text = fib.toString();
-					this.emailWorkTaskPool.add(new SendMailTask(subject, text, info.getOwner(), emailRepository));
+					
+					User user = userRepository.queryByUsername(info.getOwner());
+					
+					this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
 				}
 			}
 		}
@@ -2234,8 +1994,10 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		if(StringUtil.isNotEmpty(subject)) {
-			String recEmail = userDetailsService.getVolumeMonitorUserEmail();
-			sendEmail(subject, text, recEmail);
+			List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
+			for(User u : userList) {
+				sendEmail(u, subject, text, u.getUsername());
+			}
 		}
 	}
 }

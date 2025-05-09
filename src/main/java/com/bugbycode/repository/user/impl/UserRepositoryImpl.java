@@ -53,6 +53,16 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("password", MD5Util.md5(password));
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
+	
+	@Override
+	public void updateSmtpSetting(String username,String smtpUser,String smtpPwd,String smtpHost,int smtpPort) {
+		Update update = new Update();
+		update.set("smtpUser", smtpUser);
+		update.set("smtpPwd", smtpPwd);
+		update.set("smtpHost", smtpHost);
+		update.set("smtpPort", smtpPort);
+		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
+	}
 
 	@Override
 	public void deleteByUsername(String username) {

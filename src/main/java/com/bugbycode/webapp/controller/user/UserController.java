@@ -17,6 +17,7 @@ import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.CountertrendTradingStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.RecvTradeStatus;
+import com.bugbycode.module.Regex;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
@@ -28,6 +29,7 @@ import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.webapp.controller.base.BaseController;
 import com.util.MD5Util;
+import com.util.RegexUtil;
 import com.util.StringUtil;
 
 @RestController
@@ -172,6 +174,50 @@ public class UserController extends BaseController{
 		
 		json.put("code", code.getCode());
 		
+		return json.toString();
+	}
+	
+	@PostMapping("/saveSmtpSetting")
+	public String saveSmtpSetting(@RequestBody String jsonStr) {
+		ResultCode code = ResultCode.SUCCESS;
+		JSONObject json = new JSONObject();
+		
+		User user = getUserInfo();
+		
+		User dbUser = userRepository.queryByUsername(user.getUsername());
+		if(dbUser == null) {
+			throw new AccessDeniedException("无权访问");
+		}
+		
+		try {
+			JSONObject data = new JSONObject(jsonStr);
+			String smtpUser = data.getString("smtpUser");
+			String smtpPwd = data.getString("smtpPwd");
+			String smtpHost = data.getString("smtpHost");
+			String smtpPort = data.getString("smtpPort");
+			if(!RegexUtil.test(smtpUser, Regex.EMAIL)) {
+				throw new RuntimeException("请输入邮箱格式的SMTP账号");
+			} else if(StringUtil.isEmpty(smtpPwd)) {
+				throw new RuntimeException("请输入SMTP密码");
+			} else if(!RegexUtil.test(smtpHost, Regex.DOMAIN)) {
+				throw new RuntimeException("请输入域名格式的SMTP服务地址");
+			} else if(!RegexUtil.test(smtpPort, Regex.PORT)) {
+				throw new RuntimeException("请输入由0~65535数字组成的端口号");
+			}
+			
+			userRepository.updateSmtpSetting(user.getUsername(), smtpUser, smtpPwd, smtpHost, Integer.valueOf(smtpPort));
+			
+			user.setSmtpHost(smtpHost);
+			user.setSmtpPort(Integer.valueOf(smtpPort));
+			user.setSmtpUser(smtpUser);
+			user.setSmtpPwd(smtpPwd);
+			
+			json.put("message", "修改成功");
+		} catch (Exception e) {
+			code = ResultCode.ERROR;
+			json.put("message", e.getMessage());
+		}
+		json.put("code", code.getCode());
 		return json.toString();
 	}
 }

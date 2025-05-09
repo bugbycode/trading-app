@@ -74,6 +74,14 @@ public class User implements UserDetails {
 	
 	private int countertrendTrading = 0; //是否交易逆势单 0：否 1：是
 	
+	private String smtpUser = ""; //smtp账号
+	
+	private String smtpPwd = "";//smtp密码
+	
+	private String smtpHost = "smtp.qq.com";//smtp服务
+	
+	private int smtpPort = 587;//smtp端口
+	
 	public String getId() {
 		return id;
 	}
@@ -297,6 +305,38 @@ public class User implements UserDetails {
 
 	public void setCountertrendTrading(int countertrendTrading) {
 		this.countertrendTrading = countertrendTrading;
+	}
+
+	public String getSmtpUser() {
+		return smtpUser;
+	}
+
+	public void setSmtpUser(String smtpUser) {
+		this.smtpUser = smtpUser;
+	}
+
+	public String getSmtpPwd() {
+		return smtpPwd;
+	}
+
+	public void setSmtpPwd(String smtpPwd) {
+		this.smtpPwd = smtpPwd;
+	}
+
+	public String getSmtpHost() {
+		return smtpHost;
+	}
+
+	public void setSmtpHost(String smtpHost) {
+		this.smtpHost = smtpHost;
+	}
+
+	public int getSmtpPort() {
+		return smtpPort;
+	}
+
+	public void setSmtpPort(int smtpPort) {
+		this.smtpPort = smtpPort;
 	}
 
 	public void copyAIInfo(User user) {

@@ -10,6 +10,7 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.trading.PositionSide;
+import com.bugbycode.module.user.User;
 
 public interface KlinesService {
 	
@@ -74,14 +75,6 @@ public interface KlinesService {
 	public boolean openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
-	 * 标志性高低点价格监控
-	 * 
-	 * @param klinesList
-	 * @param klinesList_hit
-	 */
-	public void futuresHighOrLowMonitor(List<Klines> klinesList,List<Klines> klinesList_hit);
-	
-	/**
 	 * 指数均线监控
 	 * @param klinesList
 	 */
@@ -101,12 +94,6 @@ public interface KlinesService {
 	 * @param list_15m 15分钟级别k线
 	 */
 	public void futuresFibMonitor_1d(List<Klines> list_1d, List<Klines> list_15m);
-
-	/**
-	 * 监控k线涨跌
-	 * @param klinesList
-	 */
-	public void futuresRiseAndFall(List<Klines> klinesList);
 	
 	/**
 	 * 盘整区点位监控
@@ -116,11 +103,12 @@ public interface KlinesService {
 	
 	/**
 	 * 发送邮件
+	 * @param user 发件人信息（SMTP配置）
 	 * @param subject 主题
 	 * @param text 内容
 	 * @param recEmail 收件人信息
 	 */
-	public void sendEmail(String subject,String text,String recEmail);
+	public void sendEmail(User user,String subject,String text,String recEmail);
 	
 	/**
 	 * 水平射线绘图分析

@@ -1,6 +1,5 @@
 package com.util;
 
-import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
@@ -11,57 +10,46 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.springframework.util.CollectionUtils;
-
-import com.bugbycode.config.AppConfig;
-import com.bugbycode.module.EmailAuth;
+import com.bugbycode.module.Regex;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
-import com.bugbycode.repository.email.EmailRepository;
+import com.bugbycode.module.user.User;
 
 public class EmailUtil {
 	
-	public static Result<ResultCode, Exception> send(String subject,String text,String rec,EmailRepository emailRepository)  {
+	public static Result<ResultCode, Exception> send(User user, String subject,String text,String rec)  {
 		
 		ResultCode code = ResultCode.SUCCESS;
 		
 		Exception ex = null;
         
         try {
-        	
-        	EmailAuth emailAuth = AppConfig.getEmailAuth();
-        	
-        	if(emailAuth == null) {
-            	
-            	List<EmailAuth> emailAuthList = emailRepository.query();
-            	
-            	if(CollectionUtils.isEmpty(emailAuthList)) {
-        			throw new RuntimeException("邮箱认证未配置");
-        		} else {
-        			AppConfig.setEmailAuth(emailAuthList);
-        		}
-            	
-            	emailAuth = AppConfig.getEmailAuth();
-        	}
 
-        	String user = emailAuth.getUser();
-        	String password = emailAuth.getPassword();
+        	String smtpUser = user.getSmtpUser();
+        	String smtpPwd = user.getSmtpPwd();
+        	String smtpHost = user.getSmtpHost();
+        	int smtpPort = user.getSmtpPort();
+        	
+        	if(!(RegexUtil.test(smtpUser, Regex.EMAIL) && StringUtil.isNotEmpty(smtpPwd)
+        			&& RegexUtil.test(smtpHost, Regex.DOMAIN) && RegexUtil.test(String.valueOf(smtpPort), Regex.PORT))) {
+				throw new RuntimeException("SMTP信息未配置");
+			}
         	
     		Properties props = new Properties();
-            props.put("mail.smtp.host", emailAuth.getHost());
-            props.put("mail.smtp.port", emailAuth.getPort());
+            props.put("mail.smtp.host", smtpHost);
+            props.put("mail.smtp.port", smtpPort);
             props.put("mail.smtp.auth", true);
             props.put("mail.smtp.starttls.enable", true);
             props.put("mail.smtp.ssl.protocols", "TLSv1.2");
             
             Session session = Session.getInstance(props, new Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(user, password);
+                    return new PasswordAuthentication(smtpUser, smtpPwd);
                 }
             });
         	
         	MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(emailAuth.getUser(),"TRADE-BOT"));
+            message.setFrom(new InternetAddress(smtpUser, "TRADE-BOT"));
             
             int sendIndex = 0;
             if(StringUtil.isNotEmpty(rec)) {
@@ -91,8 +79,6 @@ public class EmailUtil {
         	ex = e;
         	code = ResultCode.ERROR;
 		}
-        
-        AppConfig.nexEmailAuth();
         
 		return new Result<ResultCode, Exception>(code, ex);
 	}

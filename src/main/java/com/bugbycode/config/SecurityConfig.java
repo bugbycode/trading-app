@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.handler.LoginFailHandler;
 import com.bugbycode.handler.LoginSuccessHandler;
-import com.bugbycode.repository.email.EmailRepository;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.webapp.filter.ReCaptchaFilter;
 import com.util.MD5Util;
@@ -31,9 +30,6 @@ public class SecurityConfig {
 	
 	@Autowired
 	private WorkTaskPool emailWorkTaskPool;
-
-	@Autowired
-	private EmailRepository emailRepository;
 	
     @Bean
     @ConditionalOnMissingBean(AuthenticationEventPublisher.class)
@@ -58,7 +54,7 @@ public class SecurityConfig {
     	        
     			)
     	.formLogin((form) -> {
-    		form.successHandler(new LoginSuccessHandler(emailWorkTaskPool, emailRepository))
+    		form.successHandler(new LoginSuccessHandler(emailWorkTaskPool))
     		.failureHandler(new LoginFailHandler())
     		//.loginPage("/web")
     		.loginProcessingUrl("/login")
