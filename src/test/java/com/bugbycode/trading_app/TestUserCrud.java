@@ -30,9 +30,9 @@ public class TestUserCrud {
     @Test
     public void testInsert(){
         User user = new User();
-        user.setUsername("bugbycode@gmail.com");
-        user.setPassword(MD5Util.md5("yc007"));
-
+        user.setUsername("test@gmail.com");
+        user.setPassword(MD5Util.md5("123456"));
+        
         User dbUser = userRepository.queryByUsername(user.getUsername());
         if(dbUser != null){
             logger.info("用户已存在");
