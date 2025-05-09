@@ -1,6 +1,9 @@
 package com.bugbycode.trading_app.init;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +44,15 @@ public class InitConfig implements ApplicationRunner {
 		AppConfig.WEBSOCKET_URL = websocketBaseUrl;
 		AppConfig.REST_BASE_URL = restBaseUrl;
 		AppConfig.RECAPTCHA_SECRET = recapt_secret;
+
+		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+        List<String> arguments = runtimeMxBean.getInputArguments();
+
+        boolean isDebugMode = arguments.stream().anyMatch(arg ->
+            arg.contains("-agentlib:jdwp")
+        );
+        
+        AppConfig.DEBUG = isDebugMode;
 	}
 
 	@Bean("restTemplate")
