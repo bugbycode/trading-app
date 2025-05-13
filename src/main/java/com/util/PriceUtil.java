@@ -563,7 +563,7 @@ public class PriceUtil {
 	}
 	
 	/**
-	 * 判断以往的价格是否低于当前回撤点位
+	 * 判断以往的价格是否高于当前回撤点位
 	 * @param afterHighKlines 最高价
 	 * @param openPriceList 开仓点位价格 由小到大排序
 	 * @param offset

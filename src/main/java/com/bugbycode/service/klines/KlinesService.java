@@ -11,6 +11,7 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
+import com.util.PriceActionFactory;
 
 public interface KlinesService {
 	
@@ -87,6 +88,27 @@ public interface KlinesService {
 	 * @param list_15m
 	 */
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_15m);
+	
+	/**
+	 * 价格行为监控
+	 * @param list_1d
+	 * @param list_15m
+	 */
+	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_15m);
+	
+	/**
+	 * 价格行为做多
+	 * @param factory
+	 * @param list_15m
+	 */
+	public void priceActionLong(PriceActionFactory factory, List<Klines> list_15m);
+	
+	/**
+	 * 价格行为做空
+	 * @param factory
+	 * @param list_15m
+	 */
+	public void priceActionShort(PriceActionFactory factory, List<Klines> list_15m);
 	
 	/**
 	 * 发送邮件

@@ -2,6 +2,7 @@ package com.bugbycode.module;
 
 import java.util.List;
 
+import com.util.PriceActionFactory;
 import com.util.PriceUtil;
 
 public class FibInfo {
@@ -15,6 +16,8 @@ public class FibInfo {
 	private FibLevel level;
 	
 	private List<Klines> fibAfterKlines;
+	
+	private PriceActionFactory paf;
 	
 	/**
 	 * 指数均线指标止盈点位
@@ -336,6 +339,14 @@ public class FibInfo {
 		
 		return info != null && this.getFibValue(FibCode.FIB0) == info.getFibValue(FibCode.FIB0)
 				 && this.getFibValue(FibCode.FIB1) == info.getFibValue(FibCode.FIB1);
+	}
+
+	public PriceActionFactory getPaf() {
+		return paf;
+	}
+
+	public void setPaf(PriceActionFactory paf) {
+		this.paf = paf;
 	}
 
 	@Override
