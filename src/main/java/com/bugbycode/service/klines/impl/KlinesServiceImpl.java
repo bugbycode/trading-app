@@ -908,13 +908,13 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresFibMonitor(List<Klines> klinesList) {
+	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_15m) {
 		
-		if(CollectionUtils.isEmpty(klinesList)) {
+		if(CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
-		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(klinesList);
+		List<Klines> klinesList_1h = PriceUtil.to1HFor15MKlines(list_15m);
 		
 		Klines last = PriceUtil.getLastKlines(klinesList_1h);
 		
@@ -934,12 +934,12 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		QuotationMode mode = fibInfo.getQuotationMode();
-		if(mode == QuotationMode.LONG) {
+		if(mode == QuotationMode.LONG && PriceUtil.isRise_v3(list_1d)) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong(fibInfo, afterLowKlines, klinesList);
-		} else {
+			openLong(fibInfo, afterLowKlines, list_15m);
+		} else if(mode == QuotationMode.SHORT && PriceUtil.isFall_v3(list_1d)) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort(fibInfo, afterHighKlines, klinesList);
+			openShort(fibInfo, afterHighKlines, list_15m);
 		}
 	}
 	

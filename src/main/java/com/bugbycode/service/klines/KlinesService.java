@@ -83,9 +83,10 @@ public interface KlinesService {
 	/**
 	 * 斐波那契回撤点位监控
 	 * 
-	 * @param klinesList
+	 * @param list_1d
+	 * @param list_15m
 	 */
-	public void futuresFibMonitor(List<Klines> klinesList);
+	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_15m);
 	
 	/**
 	 * 发送邮件
