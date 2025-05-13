@@ -191,8 +191,10 @@ public interface KlinesService {
      * @param offset 当前所处斐波那契回撤点位索引
      * @param fibInfo 斐波那契回撤点位信息
      * @param autoTradeType 自动交易参考指标
+     * @param decimalNum 价格小数点个数
      */
-    public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, FibInfo fibInfo, AutoTradeType autoTradeType);
+    public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, 
+    		FibInfo fibInfo, AutoTradeType autoTradeType, int decimalNum);
     
     /**
      * 获取最新k线收盘价

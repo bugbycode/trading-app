@@ -31,6 +31,8 @@ public class TradingTask implements Runnable {
 	
 	private AutoTradeType autoTradeType;
 	
+	private int decimalNum;
+	
 	/**
 	 * 
 	 * @param klinesService
@@ -41,8 +43,10 @@ public class TradingTask implements Runnable {
      * @param offset 当前所处斐波那契回撤点位索引
      * @param fibInfo 斐波那契回撤点位信息
      * @param autoTradeType 自动交易参考指标
+     * @param decimalNum 价格小数点个数
 	 */
-	public TradingTask(KlinesService klinesService,String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, FibInfo fibInfo, AutoTradeType autoTradeType) {
+	public TradingTask(KlinesService klinesService,String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, 
+			FibInfo fibInfo, AutoTradeType autoTradeType, int decimalNum) {
 		this.klinesService = klinesService;
 		this.pair = pair;
 		this.ps = ps;
@@ -51,12 +55,13 @@ public class TradingTask implements Runnable {
 		this.offset = offset;
 		this.fibInfo = fibInfo;
 		this.autoTradeType = autoTradeType;
+		this.decimalNum = decimalNum;
 	}
 	
 	@Override
 	public void run() {
 		try {
-			klinesService.marketPlace(pair, ps, stopLossDoubleValue, takeProfitDoubleValue, offset, fibInfo, autoTradeType);
+			klinesService.marketPlace(pair, ps, stopLossDoubleValue, takeProfitDoubleValue, offset, fibInfo, autoTradeType, decimalNum);
 		} catch (Exception e) {
 			logger.error("执行自动交易任务时出现异常", e);
 		}
