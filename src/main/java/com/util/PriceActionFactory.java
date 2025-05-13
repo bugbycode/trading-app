@@ -12,6 +12,9 @@ import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.trading.PositionSide;
 
+/**
+ * 价格行为指标
+ */
 public class PriceActionFactory {
 
 	private List<Klines> list;
@@ -59,7 +62,9 @@ public class PriceActionFactory {
 		//设置开仓点和止盈点
 		if(ps == PositionSide.LONG) {
 			//多头开仓点
-			addOpenPrice(current.getBodyHighPriceDoubleValue());
+			if(current.isRise()) {
+				addOpenPrice(current.getBodyHighPriceDoubleValue());
+			}
 			addOpenPrice(current.getBodyLowPriceDoubleValue());
 			addOpenPrice(current.getLowPriceDoubleValue());
 			if(parent.isFall() && parent.getBodyHighPriceDoubleValue() < current.getBodyHighPriceDoubleValue()) {
@@ -76,8 +81,10 @@ public class PriceActionFactory {
 			fibInfo.setPaf(this);
 		} else if(ps == PositionSide.SHORT) {
 			//空头开仓点
+			if(current.isFall()) {
+				addOpenPrice(current.getBodyLowPriceDoubleValue());
+			}
 			addOpenPrice(current.getBodyHighPriceDoubleValue());
-			addOpenPrice(current.getBodyLowPriceDoubleValue());
 			addOpenPrice(current.getHighPriceDoubleValue());
 			
 			if(parent.isRise() && parent.getBodyLowPriceDoubleValue() > current.getBodyLowPriceDoubleValue()) {
