@@ -436,9 +436,12 @@ public class KlinesServiceImpl implements KlinesService {
 									takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
 								}
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfit = new BigDecimal(fibInfo.getPaf().getTakeProfit());
+								takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(fibInfo.getPaf().getTakeProfit(), decimalNum));
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfit = new BigDecimal(fibInfo.getPaf().getTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit()));
+									takeProfit = new BigDecimal(
+											PriceUtil.formatDoubleDecimal(
+													fibInfo.getPaf().getTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit()),decimalNum)
+											);
 								}
 							}
 							
@@ -662,9 +665,12 @@ public class KlinesServiceImpl implements KlinesService {
 									takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
 								}
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								takeProfit = new BigDecimal(fibInfo.getPaf().getTakeProfit());
+								takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(fibInfo.getPaf().getTakeProfit(), decimalNum));
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfit = new BigDecimal(fibInfo.getPaf().getTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit()));
+									takeProfit = new BigDecimal(
+											PriceUtil.formatDoubleDecimal(
+													fibInfo.getPaf().getTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit()), decimalNum)
+											);
 								}
 							}
 							
