@@ -82,6 +82,18 @@ public class User implements UserDetails {
 	
 	private int smtpPort = 587;//smtp端口
 	
+	//SMTP备用账号 START===============
+	private String smtpUser2 = "";
+	
+	private String smtpPwd2 = "";
+	
+	private String smtpUser3 = "";
+	
+	private String smtpPwd3 = "";
+	//SMTP备用账号 END===============
+	
+	private int smtpIndex = 0;//smtp账号索引 发送邮件时轮换认证使用
+	
 	public String getId() {
 		return id;
 	}
@@ -347,5 +359,45 @@ public class User implements UserDetails {
 		this.setEmaMonitor(user.getEmaMonitor());
 		this.setAreaMonitor(user.getAreaMonitor());
 		this.setVolumeMonitor(user.getVolumeMonitor());
+	}
+
+	public String getSmtpUser2() {
+		return smtpUser2;
+	}
+
+	public void setSmtpUser2(String smtpUser2) {
+		this.smtpUser2 = smtpUser2;
+	}
+
+	public String getSmtpPwd2() {
+		return smtpPwd2;
+	}
+
+	public void setSmtpPwd2(String smtpPwd2) {
+		this.smtpPwd2 = smtpPwd2;
+	}
+
+	public String getSmtpUser3() {
+		return smtpUser3;
+	}
+
+	public void setSmtpUser3(String smtpUser3) {
+		this.smtpUser3 = smtpUser3;
+	}
+
+	public String getSmtpPwd3() {
+		return smtpPwd3;
+	}
+
+	public void setSmtpPwd3(String smtpPwd3) {
+		this.smtpPwd3 = smtpPwd3;
+	}
+
+	public int getSmtpIndex() {
+		return smtpIndex;
+	}
+
+	public void setSmtpIndex(int smtpIndex) {
+		this.smtpIndex = smtpIndex;
 	}
 }

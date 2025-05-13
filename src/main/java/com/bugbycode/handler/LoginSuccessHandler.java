@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import com.bugbycode.module.user.User;
+import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.util.DateFormatUtil;
@@ -28,8 +29,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 	
 	private WorkTaskPool emailWorkTaskPool;
 	
-	public LoginSuccessHandler(WorkTaskPool emailWorkTaskPool) {
+	private UserRepository userRepository;
+	
+	public LoginSuccessHandler(WorkTaskPool emailWorkTaskPool, UserRepository userRepository) {
 		this.emailWorkTaskPool = emailWorkTaskPool;
+		this.userRepository = userRepository;
 	}
 	
 	@Override
@@ -62,7 +66,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 		String subject = String.format("登录告警【%s】-【%s】 %s", user.getUsername(), clientIp, dateStr);
 		String text = String.format("您的账号：%s，在 %s 时成功登录永续合约分析平台，来源地址：%s", user.getUsername(), dateStr, clientIp);
 		
-		this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, user.getUsername()));
+		this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, user.getUsername(), userRepository));
 	}
 
 }

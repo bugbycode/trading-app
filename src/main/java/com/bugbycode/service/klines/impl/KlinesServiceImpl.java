@@ -830,7 +830,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void sendEmail(User user, String subject,String text,String recEmail) {
 		
 	 	if(StringUtil.isNotEmpty(recEmail) && StringUtil.isNotEmpty(subject) && StringUtil.isNotEmpty(text)) {
-			emailWorkTaskPool.add(new SendMailTask(user, subject, text, recEmail));
+			emailWorkTaskPool.add(new SendMailTask(user, subject, text, recEmail, userRepository));
 	 	}
 		
 	}
@@ -1086,7 +1086,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				
 				//所有k线信息
 				List<Klines> list = klinesRepository.findByPairAndGtStartTime(info.getSymbol(), time * 1000, Inerval.INERVAL_15M);
@@ -1145,7 +1145,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 
 				FibInfo fibInfo = new FibInfo(price1, price0, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
@@ -1172,7 +1172,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				
 				FibInfo fibInfo = new FibInfo(price0, price1, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				if(upOrLowStr.equals("上")) {//做空
@@ -1220,7 +1220,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				
 				long startTime = time0 < time1 ? (time0 * 1000) : (time1 * 1000);
 				long endTime = time0 < time1 ? (time1 * 1000) : (time0 * 1000);
@@ -1299,7 +1299,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				
 				FibInfo fibInfo = new FibInfo(line1Price, line0Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
@@ -1331,7 +1331,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				
 				FibInfo fibInfo = new FibInfo(line0Price, line1Price, klines.getDecimalNum(), FibLevel.LEVEL_1);
 				
@@ -1461,7 +1461,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				
 				if(upOrLowStr.equals("上")) {//做空
 					
@@ -1509,7 +1509,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT, klines.getDecimalNum()));
 				
@@ -1552,7 +1552,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 				User user = userRepository.queryByUsername(info.getOwner());
 				
-				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+				this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, stopLossDoubleValue, takeProfitDoubleValue, 0, null, AutoTradeType.DEFAULT, klines.getDecimalNum()));
 				
@@ -1593,7 +1593,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					User user = userRepository.queryByUsername(info.getOwner());
 					
-					this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner()));
+					this.emailWorkTaskPool.add(new SendMailTask(user, subject, text, info.getOwner(), userRepository));
 				}
 			}
 		}

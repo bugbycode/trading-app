@@ -193,11 +193,23 @@ public class UserController extends BaseController{
 			JSONObject data = new JSONObject(jsonStr);
 			String smtpUser = data.getString("smtpUser");
 			String smtpPwd = data.getString("smtpPwd");
+			String smtpUser2 = data.getString("smtpUser2");
+			String smtpPwd2 = data.getString("smtpPwd2");
+			String smtpUser3 = data.getString("smtpUser3");
+			String smtpPwd3 = data.getString("smtpPwd3");
 			String smtpHost = data.getString("smtpHost");
 			String smtpPort = data.getString("smtpPort");
 			if(!RegexUtil.test(smtpUser, Regex.EMAIL)) {
 				throw new RuntimeException("请输入邮箱格式的SMTP账号");
 			} else if(StringUtil.isEmpty(smtpPwd)) {
+				throw new RuntimeException("请输入SMTP密码");
+			}else if(!RegexUtil.test(smtpUser2, Regex.EMAIL)) {
+				throw new RuntimeException("请输入邮箱格式的SMTP账号");
+			} else if(StringUtil.isEmpty(smtpPwd2)) {
+				throw new RuntimeException("请输入SMTP密码");
+			}else if(!RegexUtil.test(smtpUser3, Regex.EMAIL)) {
+				throw new RuntimeException("请输入邮箱格式的SMTP账号");
+			} else if(StringUtil.isEmpty(smtpPwd3)) {
 				throw new RuntimeException("请输入SMTP密码");
 			} else if(!RegexUtil.test(smtpHost, Regex.DOMAIN)) {
 				throw new RuntimeException("请输入域名格式的SMTP服务地址");
@@ -205,12 +217,22 @@ public class UserController extends BaseController{
 				throw new RuntimeException("请输入由0~65535数字组成的端口号");
 			}
 			
-			userRepository.updateSmtpSetting(user.getUsername(), smtpUser, smtpPwd, smtpHost, Integer.valueOf(smtpPort));
+			userRepository.updateSmtpSetting(user.getUsername(), 
+					smtpUser, smtpPwd, 
+					smtpUser2, smtpPwd2, 
+					smtpUser3, smtpPwd3, 
+					smtpHost, Integer.valueOf(smtpPort));
 			
 			user.setSmtpHost(smtpHost);
 			user.setSmtpPort(Integer.valueOf(smtpPort));
 			user.setSmtpUser(smtpUser);
 			user.setSmtpPwd(smtpPwd);
+
+			user.setSmtpUser2(smtpUser2);
+			user.setSmtpPwd2(smtpPwd2);
+
+			user.setSmtpUser3(smtpUser3);
+			user.setSmtpPwd3(smtpPwd3);
 			
 			json.put("message", "修改成功");
 		} catch (Exception e) {

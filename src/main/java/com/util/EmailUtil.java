@@ -10,14 +10,14 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.bugbycode.module.EmailAuth;
 import com.bugbycode.module.Regex;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.ResultCode;
-import com.bugbycode.module.user.User;
 
 public class EmailUtil {
 	
-	public static Result<ResultCode, Exception> send(User user, String subject,String text,String rec)  {
+	public static Result<ResultCode, Exception> send(EmailAuth auth, String subject,String text,String rec)  {
 		
 		ResultCode code = ResultCode.SUCCESS;
 		
@@ -25,10 +25,10 @@ public class EmailUtil {
         
         try {
 
-        	String smtpUser = user.getSmtpUser();
-        	String smtpPwd = user.getSmtpPwd();
-        	String smtpHost = user.getSmtpHost();
-        	int smtpPort = user.getSmtpPort();
+        	String smtpUser = auth.getSmtpUser();
+        	String smtpPwd = auth.getSmtpPwd();
+        	String smtpHost = auth.getHost();
+        	int smtpPort = auth.getPort();
         	
         	if(!(RegexUtil.test(smtpUser, Regex.EMAIL) && StringUtil.isNotEmpty(smtpPwd)
         			&& RegexUtil.test(smtpHost, Regex.DOMAIN) && RegexUtil.test(String.valueOf(smtpPort), Regex.PORT))) {

@@ -55,12 +55,27 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 	
 	@Override
-	public void updateSmtpSetting(String username,String smtpUser,String smtpPwd,String smtpHost,int smtpPort) {
+	public void updateSmtpSetting(String username,
+			String smtpUser,String smtpPwd,
+			String smtpUser2,String smtpPwd2,
+			String smtpUser3,String smtpPwd3,
+			String smtpHost,int smtpPort) {
 		Update update = new Update();
 		update.set("smtpUser", smtpUser);
 		update.set("smtpPwd", smtpPwd);
+		update.set("smtpUser2", smtpUser2);
+		update.set("smtpPwd2", smtpPwd2);
+		update.set("smtpUser3", smtpUser3);
+		update.set("smtpPwd3", smtpPwd3);
 		update.set("smtpHost", smtpHost);
 		update.set("smtpPort", smtpPort);
+		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
+	}
+	
+	@Override
+	public void updateSmtpIndex(String username, int smtpIndex) {
+		Update update = new Update();
+		update.set("smtpIndex", smtpIndex);
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 

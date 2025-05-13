@@ -38,10 +38,18 @@ public interface UserRepository {
 	 * @param username
 	 * @param smtpUser
 	 * @param smtpPwd
+	 * @param smtpUser2
+	 * @param smtpPwd2
+	 * @param smtpUser3
+	 * @param smtpPwd3
 	 * @param smtpHost
 	 * @param smtpPort
 	 */
-	public void updateSmtpSetting(String username,String smtpUser,String smtpPwd,String smtpHost,int smtpPort);
+	public void updateSmtpSetting(String username,
+			String smtpUser,String smtpPwd,
+			String smtpUser2,String smtpPwd2,
+			String smtpUser3,String smtpPwd3,
+			String smtpHost,int smtpPort);
 	
 	/**
 	 * 根据用户名删除用户信息
@@ -160,4 +168,11 @@ public interface UserRepository {
 	 * @return
 	 */
 	public List<User> queryByVolumeMonitorStatus(VolumeMonitorStatus status);
+	
+	/**
+	 * 修改smtp账号索引
+	 * @param username
+	 * @param smtpIndex
+	 */
+	public void updateSmtpIndex(String username, int smtpIndex);
 }
