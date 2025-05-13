@@ -169,4 +169,36 @@ public class PriceActionFactory {
 	public FibInfo getFibInfo() {
 		return this.fibInfo;
 	}
+	
+	/**
+	 * 判断开仓点是否交易过
+	 * @param price 开仓点
+	 * @param today_klines 当天k线
+	 * @return
+	 */
+	public boolean isTraded(double price,List<Klines> today_klines) {
+		boolean result = false;
+		if(!CollectionUtils.isEmpty(today_klines)) {
+			today_klines.sort(new KlinesComparator(SortType.ASC));
+			Klines hitCodeKlines = null;
+			Klines hitTakeProfitCodeKlines = null;
+			for(int index = 0; index < today_klines.size(); index++) {
+				Klines k = today_klines.get(index);
+				//判断是否命中开仓价
+				if(hitCodeKlines == null && PriceUtil.hitPrice(k, price)) {
+					hitCodeKlines = k;
+				}
+				//判断是否命中止盈价
+				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && PriceUtil.hitPrice(k, getTakeProfit())) {
+					hitTakeProfitCodeKlines = k;
+				}
+				
+				if(!(hitCodeKlines == null || hitTakeProfitCodeKlines == null)) {
+					result = true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
 }
