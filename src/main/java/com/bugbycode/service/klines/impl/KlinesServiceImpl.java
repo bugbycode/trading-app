@@ -955,11 +955,17 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		PriceUtil.calculateEMA_7_25_99(list_1d);
+		
+		Klines last_day = PriceUtil.getLastKlines(list_1d);
+		double ema7 = last_day.getEma7();
+		double ema25 = last_day.getEma25();
+		
 		QuotationMode mode = fibInfo.getQuotationMode();
-		if(mode == QuotationMode.LONG && PriceUtil.isRise_v3(list_1d)) {
+		if(mode == QuotationMode.LONG && ema7 > ema25) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 			openLong(fibInfo, afterLowKlines, list_15m);
-		} else if(mode == QuotationMode.SHORT && PriceUtil.isFall_v3(list_1d)) {
+		} else if(mode == QuotationMode.SHORT && ema7 < ema25) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			openShort(fibInfo, afterHighKlines, list_15m);
 		}
@@ -1011,7 +1017,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent, 2);
 					
-					String subject = String.format("%s永续合约%s做多交易机会(PNL:%s%%) %s", pair, currentPrice, pnlStr, dateStr);
+					String subject = String.format("%s永续合约[%s]做多交易机会(PNL:%s%%) %s", pair, currentPrice, pnlStr, dateStr);
 					String text = StringUtil.formatLongMessage_v2(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
 							takeProfitPrice, last.getDecimalNum(), pnlStr);
 					
@@ -1773,7 +1779,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(PriceUtil.isPanicSell(list_1h)) {
 			subject = String.format("%s永续合约恐慌抛售 %s", pair, dateStr);
 		} else if(PriceUtil.isGreedyBuy(list_1h)) {
-			subject = String.format("%s永续合约购买狂热 %s", pair, dateStr);
+			subject = String.format("%s永续合约疯狂购买 %s", pair, dateStr);
 		}
 		
 		if(StringUtil.isNotEmpty(subject)) {
