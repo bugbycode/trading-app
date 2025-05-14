@@ -56,11 +56,18 @@ public class FibInfoFactory {
 		
 		Klines second = null;
 		Klines first = null;
+		Klines searchFlag = null;
 		
 		for(int index = this.list.size() - 2; index > 0; index--) {
 			Klines current = this.list.get(index);
+			
 			if(ps == PositionSide.LONG) {
-				if(second == null) {
+				if(searchFlag == null && verifyHigh(current)) {
+					searchFlag = current;
+				} 
+				if(searchFlag == null) {
+					continue;
+				} else if(second == null) {
 					if(verifyLow(current)) {
 						second = this.list.get(index + 1);
 					}
@@ -71,7 +78,12 @@ public class FibInfoFactory {
 					}
 				}
 			} else if(ps == PositionSide.SHORT) {
-				if(second == null) {
+				if(searchFlag == null && verifyLow(current)) {
+					searchFlag = current;
+				}
+				if(searchFlag == null) {
+					continue;
+				} else if(second == null) {
 					if(verifyHigh(current)) {
 						second = this.list.get(index + 1);
 					}
