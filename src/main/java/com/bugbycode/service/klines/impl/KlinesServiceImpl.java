@@ -954,18 +954,18 @@ public class KlinesServiceImpl implements KlinesService {
 		if(fibInfo == null) {
 			return;
 		}
-		
+		/*
 		PriceUtil.calculateEMA_7_25_99(list_1d);
 		
 		Klines last_day = PriceUtil.getLastKlines(list_1d);
 		double ema7 = last_day.getEma7();
 		double ema25 = last_day.getEma25();
-		
+		*/
 		QuotationMode mode = fibInfo.getQuotationMode();
-		if(mode == QuotationMode.LONG && ema7 > ema25) {
+		if(mode == QuotationMode.LONG) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 			openLong(fibInfo, afterLowKlines, list_15m);
-		} else if(mode == QuotationMode.SHORT && ema7 < ema25) {
+		} else if(mode == QuotationMode.SHORT) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			openShort(fibInfo, afterHighKlines, list_15m);
 		}

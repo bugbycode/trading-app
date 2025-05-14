@@ -102,7 +102,7 @@ public class FibInfoFactory {
 				secondSubList = PriceUtil.subList(after, list);
 			}
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
-			fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+			fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_3);
 		} else if(ps == PositionSide.SHORT) {//
 			start = PriceUtil.getMaxPriceKLine(firstSubList);
 			after = PriceUtil.getAfterKlines(start, list);
@@ -112,7 +112,7 @@ public class FibInfoFactory {
 				secondSubList = PriceUtil.subList(after, list);
 			}
 			end = PriceUtil.getMinPriceKLine(secondSubList);
-			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_3);
 		}
 		
 		if(fibInfo == null) {
