@@ -2675,4 +2675,40 @@ public class PriceUtil {
 	public static boolean isGreedyBuy(Klines k0,Klines k1,Klines k2) {
 		return isIncrement(k0, k1, k2) && k0.isRise() && k1.isRise() && k2.isRise();
 	}
+	
+	/**
+	 * 是否出现恐慌抛售
+	 * @param list
+	 * @return
+	 */
+	public static boolean isPanicSell(List<Klines> list) {
+		int size = list.size();
+		if(size < 4) {
+			return false;
+		}
+		int index = size - 1;
+		Klines last = list.get(index);
+		Klines k0 = list.get(index - 1);
+		Klines k1 = list.get(index - 2);
+		Klines k2 = list.get(index - 3);
+		return isPanicSell(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isRise());
+	}
+	
+	/**
+	 * 是否出现贪婪买入
+	 * @param list
+	 * @return
+	 */
+	public static boolean isGreedyBuy(List<Klines> list) {
+		int size = list.size();
+		if(size < 4) {
+			return false;
+		}
+		int index = size - 1;
+		Klines last = list.get(index);
+		Klines k0 = list.get(index - 1);
+		Klines k1 = list.get(index - 2);
+		Klines k2 = list.get(index - 3);
+		return isGreedyBuy(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isFall());
+	}
 }

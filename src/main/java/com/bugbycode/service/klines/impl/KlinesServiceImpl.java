@@ -1762,5 +1762,25 @@ public class KlinesServiceImpl implements KlinesService {
 				sendEmail(u, subject, text, u.getUsername());
 			}
 		}
+		
+		subject = "";
+		
+		int minute = DateFormatUtil.getMinute(last.getEndTime());
+		if(minute != 59) {
+			return;
+		}
+		
+		if(PriceUtil.isPanicSell(list_1h)) {
+			subject = String.format("%s永续合约恐慌抛售 %s", pair, dateStr);
+		} else if(PriceUtil.isGreedyBuy(list_1h)) {
+			subject = String.format("%s永续合约购买狂热 %s", pair, dateStr);
+		}
+		
+		if(StringUtil.isNotEmpty(subject)) {
+			List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
+			for(User u : userList) {
+				sendEmail(u, subject, text, u.getUsername());
+			}
+		}
 	}
 }
