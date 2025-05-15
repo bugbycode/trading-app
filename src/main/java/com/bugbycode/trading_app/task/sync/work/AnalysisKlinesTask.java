@@ -89,14 +89,14 @@ public class AnalysisKlinesTask implements Runnable{
             //斐波那契回撤分析
             klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
             
-            //量价分析
-            klinesService.volumeMonitor(klines_list_15m);
-            
             //指数均线
             klinesService.futuresEmaRiseAndFallMonitor(klines_list_15m);
             
             //价格行为分析
-            klinesService.futuresPriceAction(klines_list_1d, klines_list_15m);
+            klinesService.futuresPriceAction(klines_list_15m);
+            
+            //量价分析
+            klinesService.volumeMonitor(klines_list_15m);
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
