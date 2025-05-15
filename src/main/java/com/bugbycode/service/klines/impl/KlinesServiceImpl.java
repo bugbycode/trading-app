@@ -1225,7 +1225,7 @@ public class KlinesServiceImpl implements KlinesService {
 			double highBodyPrice = highBody.getBodyHighPriceDoubleValue();
 			double lowBodyPrice = lowBody.getBodyLowPriceDoubleValue();
 			
-			logger.info("{}永续合约盘整区最高价格：{}，最低价格：{}，顶部价格：{}，底部价格：{}", klines.getPair(), highPrice, lowPrice, highBodyPrice, lowBodyPrice);
+			logger.debug("{}永续合约盘整区最高价格：{}，最低价格：{}，顶部价格：{}，底部价格：{}", klines.getPair(), highPrice, lowPrice, highBodyPrice, lowBodyPrice);
 			
 			if(PriceUtil.hitPrice(klines, highPrice)) {
 				String subject = String.format("%s永续合约价格已到达盘整区最高价%s %s", klines.getPair(), PriceUtil.formatDoubleDecimal(highPrice, klines.getDecimalNum()), dateStr);
