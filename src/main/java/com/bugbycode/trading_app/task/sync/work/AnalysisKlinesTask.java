@@ -8,6 +8,8 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
+import com.util.DateFormatUtil;
+import com.util.PriceUtil;
 
 import java.util.List;
 
@@ -59,6 +61,29 @@ public class AnalysisKlinesTask implements Runnable{
             
             if(!klinesService.checkData(klines_list_15m)) {
             	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
+            }
+            
+            //查询1小时级别k线信息
+            List<Klines> klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
+            List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(klines_list_15m);
+        	Klines last_1h = PriceUtil.getLastKlines(klines_list_1h);
+            int minute = DateFormatUtil.getMinute(last_1h.getEndTime());
+    		if(minute != 59) {
+    			klines_list_1h.remove(last_1h);
+    			last_1h = PriceUtil.getLastKlines(klines_list_1h);
+    		}
+            if(CollectionUtils.isEmpty(klines_list_1h_db)) {
+            	if(!CollectionUtils.isEmpty(klines_list_1h)) {
+                	klinesRepository.insert(klines_list_1h);
+                	logger.info("已初始化{}交易对{}条1小时级别k线信息", pair, klines_list_1h.size());
+            	}
+            } else {
+            	klinesRepository.insert(last_1h);
+            }
+            
+            klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
+            if(!CollectionUtils.isEmpty(klines_list_1h_db)) {
+                klinesService.checkData(klines_list_1h_db);
             }
             
             //斐波那契回撤分析
