@@ -16,6 +16,28 @@ public class FibInfo {
 	
 	private List<Klines> fibAfterKlines;
 	
+	public FibCode getAreaTakeProfit(double price, double profit, double profitLimit) {
+		FibCode result = null;
+		QuotationMode qm = this.getQuotationMode();
+		double percent_5 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB5), qm);
+		double percent_618 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB618), qm);
+		if(percent_618 >= profit && percent_618 <= profitLimit) {
+			result = FibCode.FIB618;
+		} else if(percent_5 >= profit && percent_5 <= profitLimit) {
+			result = FibCode.FIB5;
+		}
+		if(result == null) {
+			if(percent_618 >= profit) {
+				result = FibCode.FIB618;
+			} else if(percent_5 >= profit) {
+				result = FibCode.FIB5;
+			} else {
+				result = FibCode.FIB5;
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * 价格行为止盈点位
 	 * @param price 当前价格

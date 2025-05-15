@@ -84,16 +84,20 @@ public class AnalysisKlinesTask implements Runnable{
             klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
             if(!CollectionUtils.isEmpty(klines_list_1h_db)) {
                 klinesService.checkData(klines_list_1h_db);
+                klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
             }
             
             //斐波那契回撤分析
-            klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
+            klinesService.futuresFibMonitor(klines_list_15m);
             
             //指数均线
             klinesService.futuresEmaRiseAndFallMonitor(klines_list_15m);
             
             //价格行为分析
             klinesService.futuresPriceAction(klines_list_15m);
+            
+            //盘整区分析
+            klinesService.consolidationAreaMonitor(klines_list_1h_db, klines_list_15m);
             
             //量价分析
             klinesService.volumeMonitor(klines_list_15m);
