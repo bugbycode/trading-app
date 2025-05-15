@@ -121,7 +121,7 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 
 	@Override
 	public List<Klines> findByTimeLimit(String pair, Inerval interval, long startTime, long endTime) {
-		Criteria c = Criteria.where("pair").is(pair).and("interval").is(interval.getDescption()).and("startTime").gte(startTime).and("startTime").lte(endTime);
+		Criteria c = Criteria.where("pair").is(pair).and("interval").is(interval.getDescption()).and("startTime").gte(startTime).lte(endTime);
 		Query q = Query.query(c);
 		return template.find(q, Klines.class, StringUtil.formatCollectionName(pair, interval));
 	}
