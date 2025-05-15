@@ -166,6 +166,44 @@ public class PriceUtil {
 		return result;
 	}
 	
+	public static Klines getRiseMinBodyHighPriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			for(int index = 1;index < klinesList.size();index++) {
+				Klines current = klinesList.get(index);
+				if(result == null) {
+					if(current.isRise()) {
+						result = current;
+					}
+					continue;
+				}
+				if(result.getBodyHighPriceDoubleValue() > current.getBodyHighPriceDoubleValue() && current.isRise()) {
+					result = current;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static Klines getFallMaxBodyLowPriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			for(int index = 1;index < klinesList.size();index++) {
+				Klines current = klinesList.get(index);
+				if(result == null) {
+					if(current.isFall()) {
+						result = current;
+					}
+					continue;
+				}
+				if(result.getBodyLowPriceDoubleValue() < current.getBodyLowPriceDoubleValue() && current.isFall()) {
+					result = current;
+				}
+			}
+		}
+		return result;
+	}
+	
 	public static Klines getMinPriceKLine(List<Klines> klinesList) {
 		Klines result = null;
 		if(!CollectionUtils.isEmpty(klinesList)) {
