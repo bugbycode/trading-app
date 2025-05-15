@@ -27,6 +27,8 @@ public class ShapeInfo {
 
 	private int longOrShortType;//做多或做空 水平射线使用 0：空 1：多
 	
+	private String interval;//图纸对应的k线时间级别
+	
 	private long createTime; //创建时间
 	
 	private long updateTime; //修改时间
@@ -105,6 +107,18 @@ public class ShapeInfo {
 
 	public void setLongOrShortType(int longOrShortType) {
 		this.longOrShortType = longOrShortType;
+	}
+
+	public String getInterval() {
+		return interval;
+	}
+
+	public void setInterval(String interval) {
+		this.interval = interval;
+	}
+	
+	public Inerval getInervalType() {
+		return Inerval.resolve(this.interval);
 	}
 
 	public long getCreateTime() {

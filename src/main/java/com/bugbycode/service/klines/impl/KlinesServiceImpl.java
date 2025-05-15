@@ -1196,6 +1196,76 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
+	public void fixedRangeValumeProfile(Klines klines,ShapeInfo info) {
+		String dateStr = DateFormatUtil.format(new Date());
+		User user = userRepository.queryByUsername(info.getOwner());
+		if(user == null) {
+			return;
+		}
+		//价格坐标
+		JSONArray pointsJsonArray = new JSONArray(info.getPoints());
+		if(pointsJsonArray.length() > 1) {
+			JSONObject points = pointsJsonArray.getJSONObject(0);
+			//double price0 = points.getDouble("price");
+			long time0 = points.getLong("time") * 1000;
+			
+			JSONObject points1 = pointsJsonArray.getJSONObject(1);
+			//double price1 = points1.getDouble("price");
+			long time1 = points1.getLong("time") * 1000;
+			List<Klines> list = klinesRepository.findByTimeLimit(info.getSymbol(), info.getInervalType(), time0, time1);
+			if(CollectionUtils.isEmpty(list)) {
+				return;
+			}
+			Klines high = PriceUtil.getMaxPriceKLine(list);
+			Klines low = PriceUtil.getMinPriceKLine(list);
+			Klines highBody = PriceUtil.getMaxBodyHighPriceKLine(list);
+			Klines lowBody = PriceUtil.getMinBodyHighPriceKLine(list);
+			double highPrice = high.getHighPriceDoubleValue();
+			double lowPrice = low.getLowPriceDoubleValue();
+			double highBodyPrice = highBody.getBodyHighPriceDoubleValue();
+			double lowBodyPrice = lowBody.getBodyLowPriceDoubleValue();
+			
+			logger.info("{}永续合约盘整区最高价格：{}，最低价格：{}，顶部价格：{}，底部价格：{}", klines.getPair(), highPrice, lowPrice, highBodyPrice, lowBodyPrice);
+			
+			if(PriceUtil.hitPrice(klines, highPrice)) {
+				String subject = String.format("%s永续合约价格已到达盘整区最高价%s %s", klines.getPair(), PriceUtil.formatDoubleDecimal(highPrice, klines.getDecimalNum()), dateStr);
+				String text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(lowPrice,klines.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(highPrice,klines.getDecimalNum()),
+						klines.getClosePrice());
+				sendEmail(user, subject, text, user.getUsername());
+			} else if(PriceUtil.hitPrice(klines, highBodyPrice)) {
+				String subject = String.format("%s永续合约价格到达盘整区顶部 %s", klines.getPair(), dateStr);
+				String text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(lowPrice,klines.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(highPrice,klines.getDecimalNum()),
+						klines.getClosePrice());
+				sendEmail(user, subject, text, user.getUsername());
+			}
+			
+			if(PriceUtil.hitPrice(klines, lowPrice)) {
+				String subject = String.format("%s永续合约价格已到达盘整区最低价%s %s", klines.getPair(), PriceUtil.formatDoubleDecimal(lowPrice, klines.getDecimalNum()), dateStr);
+				String text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(lowPrice,klines.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(highPrice,klines.getDecimalNum()),
+						klines.getClosePrice());
+				sendEmail(user, subject, text, user.getUsername());
+			} else if(PriceUtil.hitPrice(klines, lowBodyPrice)) {
+				String subject = String.format("%s永续合约价格到达盘整区底部 %s", klines.getPair(), dateStr);
+				String text = String.format("%s永续合约盘整区价格区间%s~%s，当前价格：%s", 
+						klines.getPair(),
+						PriceUtil.formatDoubleDecimal(lowPrice,klines.getDecimalNum()),
+						PriceUtil.formatDoubleDecimal(highPrice,klines.getDecimalNum()),
+						klines.getClosePrice());
+				sendEmail(user, subject, text, user.getUsername());
+			}
+		}
+	}
+	
+	@Override
 	public void ray(Klines klines, ShapeInfo info) {
 		//价格坐标
 		JSONArray pointsJsonArray = new JSONArray(info.getPoints());

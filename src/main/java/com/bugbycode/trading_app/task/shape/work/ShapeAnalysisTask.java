@@ -51,6 +51,8 @@ public class ShapeAnalysisTask implements Runnable{
 				klinesService.riskRewardShort(klines, info);
 			} else if(type == ShapeType.LINE_TOOL_FIB_RETRACEMENT) {
 				klinesService.fibRetracement(klines, info);
+			} else if(type == ShapeType.LINE_TOOL_FIXED_RANGE_VOLUME_PROFILE) {
+				klinesService.fixedRangeValumeProfile(klines, info);
 			}
 		} catch (Exception e) {
 			logger.error("执行绘图分析任务时出现异常", e);

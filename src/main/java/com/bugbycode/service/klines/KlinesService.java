@@ -216,4 +216,11 @@ public interface KlinesService {
      * @param list
      */
     public void volumeMonitor(List<Klines> list);
+    
+    /**
+     * 筹码密集区分布
+     * @param klines
+     * @param info
+     */
+    public void fixedRangeValumeProfile(Klines klines,ShapeInfo info);
 }
