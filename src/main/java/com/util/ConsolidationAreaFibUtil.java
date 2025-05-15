@@ -136,7 +136,7 @@ public class ConsolidationAreaFibUtil {
 		if(fibInfo == null) {
 			return;
 		}
-		
+		logger.debug(fibInfo);
 		QuotationMode mode = fibInfo.getQuotationMode();
 		addOpenPrice(fibInfo.getFibValue(FibCode.FIB1));
 		if(mode == QuotationMode.SHORT) {
