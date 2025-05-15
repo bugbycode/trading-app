@@ -77,7 +77,7 @@ public class AnalysisKlinesTask implements Runnable{
                 	klinesRepository.insert(klines_list_1h);
                 	logger.info("已初始化{}交易对{}条1小时级别k线信息", pair, klines_list_1h.size());
             	}
-            } else {
+            } else if(last_1h != null){
             	klinesRepository.insert(last_1h);
             }
             
