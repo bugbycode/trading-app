@@ -233,13 +233,13 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//保守的交易风格
 					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						closePpositionCode = fibInfo.getTakeProfit_v3(code, currentPrice, u.getProfit(), u.getProfitLimit());
+						closePpositionCode = fibInfo.getTakeProfit_v3(code, currentPrice, u.getMonitorProfit(), u.getProfitLimit());
 					}
 					
 					//计算预计盈利百分比
 					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
 					
-					if(profitPercent < u.getProfit()) {
+					if(profitPercent < u.getMonitorProfit()) {
 						continue;
 					}
 					
@@ -320,13 +320,13 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//保守的交易风格
 					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						closePpositionCode = fibInfo.getTakeProfit_v3(code, currentPrice, u.getProfit(), u.getProfitLimit());
+						closePpositionCode = fibInfo.getTakeProfit_v3(code, currentPrice, u.getMonitorProfit(), u.getProfitLimit());
 					}
 					
 					//计算预计盈利百分比
 					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
 					
-					if(profitPercent < u.getProfit()) {
+					if(profitPercent < u.getMonitorProfit()) {
 						continue;
 					}
 					
@@ -873,7 +873,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			for(User u : userList) {
 				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-				double profit = u.getProfit();
+				double profit = u.getMonitorProfit();
 				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
 				
@@ -902,7 +902,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			for(User u : userList) {
 				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-				double profit = u.getProfit();
+				double profit = u.getMonitorProfit();
 				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
 				
@@ -995,13 +995,13 @@ public class KlinesServiceImpl implements KlinesService {
 				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 				//保守的交易风格
 				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = fibInfo.getAreaTakeProfit(currentPrice, u.getProfit(), u.getProfitLimit());
+					takeProfitCode = fibInfo.getAreaTakeProfit(currentPrice, u.getMonitorProfit(), u.getProfitLimit());
 				}
 				
 				double takeProfitPrice = fibInfo.getFibValue(takeProfitCode);
 				//计算预计盈利百分比
 				double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, takeProfitPrice) * 100;
-				if(profitPercent < u.getProfit()) {
+				if(profitPercent < u.getMonitorProfit()) {
 					continue;
 				}
 				
@@ -1022,13 +1022,13 @@ public class KlinesServiceImpl implements KlinesService {
 				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 				//保守的交易风格
 				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = fibInfo.getAreaTakeProfit(currentPrice, u.getProfit(), u.getProfitLimit());
+					takeProfitCode = fibInfo.getAreaTakeProfit(currentPrice, u.getMonitorProfit(), u.getProfitLimit());
 				}
 				
 				double takeProfitPrice = fibInfo.getFibValue(takeProfitCode);
 				//计算预计盈利百分比
 				double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, takeProfitPrice) * 100;
-				if(profitPercent < u.getProfit()) {
+				if(profitPercent < u.getMonitorProfit()) {
 					continue;
 				}
 				String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent, 2);
@@ -1069,13 +1069,13 @@ public class KlinesServiceImpl implements KlinesService {
 				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 				//保守的交易风格
 				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(currentPrice, u.getProfit(), u.getProfitLimit());
+					takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(currentPrice, u.getMonitorProfit(), u.getProfitLimit());
 				}
 				
 				double takeProfitPrice = fibInfo.getFibValue(takeProfitCode);
 				//计算预计盈利百分比
 				double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, takeProfitPrice) * 100;
-				if(profitPercent < u.getProfit()) {
+				if(profitPercent < u.getMonitorProfit()) {
 					continue;
 				}
 				
@@ -1098,13 +1098,13 @@ public class KlinesServiceImpl implements KlinesService {
 				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 				//保守的交易风格
 				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(currentPrice, u.getProfit(), u.getProfitLimit());
+					takeProfitCode = fibInfo.getDeclineAndStrengthTakeProfit(currentPrice, u.getMonitorProfit(), u.getProfitLimit());
 				}
 				
 				double takeProfitPrice = fibInfo.getFibValue(takeProfitCode);
 				//计算预计盈利百分比
 				double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, takeProfitPrice) * 100;
-				if(profitPercent < u.getProfit()) {
+				if(profitPercent < u.getMonitorProfit()) {
 					continue;
 				}
 				String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent, 2);
