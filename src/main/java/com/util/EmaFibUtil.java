@@ -66,6 +66,7 @@ public class EmaFibUtil {
 		
 		//最后一根k线
 		//Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		double ema7 = last_1h.getEma7();
 		double ema25 = last_1h.getEma25();
 		double ema99 = last_1h.getEma99();
 		
@@ -76,15 +77,11 @@ public class EmaFibUtil {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		if(/* PriceUtil.isBreachLong(last_15m, ema99) 
-				|| PriceUtil.isBreachLong(last_15m, ema25)
-				|| PriceUtil.isLong_v2(ema25, list_15m)
-				||*/ PriceUtil.isLong_v2(ema99, list_15m)) {//做多
+		if((PriceUtil.isLong_v2(ema25, list_15m) && ema7 > ema25)
+				|| PriceUtil.isLong_v2(ema99, list_15m)) {//做多
 			ps = PositionSide.LONG;
-		} else if(/*PriceUtil.isBreachShort(last_15m, ema99) 
-				|| PriceUtil.isBreachShort(last_15m, ema25)
-				|| PriceUtil.isShort_v2(ema25, list_15m)
-				||*/ PriceUtil.isShort_v2(ema99, list_15m)) {//做空
+		} else if( (PriceUtil.isShort_v2(ema25, list_15m) && ema7 < ema25)
+				|| PriceUtil.isShort_v2(ema99, list_15m)) {//做空
 			ps = PositionSide.SHORT;
 		}
 		
