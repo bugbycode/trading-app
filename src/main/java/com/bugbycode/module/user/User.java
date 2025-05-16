@@ -92,6 +92,8 @@ public class User implements UserDetails {
 	private String smtpPwd3 = "";
 	//SMTP备用账号 END===============
 	
+	private double monitorProfit = 1;//行情监控振幅过滤
+	
 	private int smtpIndex = 0;//smtp账号索引 发送邮件时轮换认证使用
 	
 	public String getId() {
@@ -359,6 +361,7 @@ public class User implements UserDetails {
 		this.setEmaMonitor(user.getEmaMonitor());
 		this.setAreaMonitor(user.getAreaMonitor());
 		this.setVolumeMonitor(user.getVolumeMonitor());
+		this.setMonitorProfit(user.getMonitorProfit());
 	}
 
 	public String getSmtpUser2() {
@@ -399,5 +402,13 @@ public class User implements UserDetails {
 
 	public void setSmtpIndex(int smtpIndex) {
 		this.smtpIndex = smtpIndex;
+	}
+
+	public double getMonitorProfit() {
+		return monitorProfit;
+	}
+
+	public void setMonitorProfit(double monitorProfit) {
+		this.monitorProfit = monitorProfit;
 	}
 }
