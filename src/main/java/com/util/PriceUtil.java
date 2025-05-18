@@ -2709,4 +2709,24 @@ public class PriceUtil {
 		Klines k2 = list.get(index - 3);
 		return isGreedyBuy(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isFall());
 	}
+	
+	/**
+	 * 判断k线最低价是否低于预期价格
+	 * @param low k线
+	 * @param price 预期价格
+	 * @return
+	 */
+	public static boolean isLowHit(Klines low, double price) {
+		return low != null && low.getLowPriceDoubleValue() <= price;
+	}
+	
+	/**
+	 * 判断k线最高价是否高于预期价格
+	 * @param high k线
+	 * @param price 预期价格
+	 * @return
+	 */
+	public static boolean isHighHit(Klines high, double price) {
+		return high != null && high.getHighPriceDoubleValue() >= price;
+	}
 }

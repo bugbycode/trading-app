@@ -187,6 +187,9 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void openLong(FibInfo fibInfo, List<Klines> klines_1h, List<Klines> klines_15m) {
 		
+		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
+		Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+		
 		Klines last_15m = PriceUtil.getLastKlines(klines_15m);
 		Klines last_1h = PriceUtil.getLastKlines(klines_1h);
 		
@@ -196,7 +199,8 @@ public class KlinesServiceImpl implements KlinesService {
 		double ema99 = last_1h.getEma99();
 		double currentPrice = last_15m.getClosePriceDoubleValue();
 		
-		if(!(PriceUtil.isLong_v2(ema25, klines_15m) || PriceUtil.isLong_v2(ema99, klines_15m))) {
+		if(!( (PriceUtil.isLong_v2(ema25, klines_15m) && !PriceUtil.isLowHit(afterLowKlines, ema99)) 
+				|| PriceUtil.isLong_v2(ema99, klines_15m))) {
 			return;
 		}
 		//开仓点
@@ -251,6 +255,10 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void openShort(FibInfo fibInfo, List<Klines> klines_1h, List<Klines> klines_15m) {
+		
+		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
+		Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+		
 		Klines last_15m = PriceUtil.getLastKlines(klines_15m);
 		Klines last_1h = PriceUtil.getLastKlines(klines_1h);
 		
@@ -260,7 +268,8 @@ public class KlinesServiceImpl implements KlinesService {
 		double ema99 = last_1h.getEma99();
 		double currentPrice = last_15m.getClosePriceDoubleValue();
 		
-		if(!(PriceUtil.isShort_v2(ema25, klines_15m) || PriceUtil.isShort_v2(ema99, klines_15m))) {
+		if(!( (PriceUtil.isShort_v2(ema25, klines_15m) && !PriceUtil.isHighHit(afterHighKlines, ema99)) 
+				|| PriceUtil.isShort_v2(ema99, klines_15m))) {
 			return;
 		}
 		//开仓点
