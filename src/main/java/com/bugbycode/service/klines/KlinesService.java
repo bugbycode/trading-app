@@ -59,7 +59,7 @@ public interface KlinesService {
 	/**
 	 * 合约做多
 	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param klines_1h 最后一根k线
+	 * @param klines_1h 1小时级别k线信息
 	 * @param klines_15m 最近时间段内部分k线信息
 	 */
 	public void openLong(FibInfo fibInfo, List<Klines> klines_1h, List<Klines> klines_15m);
@@ -67,7 +67,7 @@ public interface KlinesService {
 	/**
 	 * 合约做多
 	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param klines_1h 最后一根k线
+	 * @param klines_1h 1小时级别k线信息
 	 * @param klines_15m 最近时间段内部分k线信息
 	 */
 	public void openShort(FibInfo fibInfo, List<Klines> klines_1h, List<Klines> klines_15m);
