@@ -195,11 +195,12 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String pair = last_1h.getPair();
 		
+		double ema7 = last_1h.getEma7();
 		double ema25 = last_1h.getEma25();
 		double ema99 = last_1h.getEma99();
 		double currentPrice = last_15m.getClosePriceDoubleValue();
 		
-		if(!( (PriceUtil.isLong_v2(ema25, klines_15m) && !PriceUtil.isLowHit(afterLowKlines, ema99)) 
+		if(!( (PriceUtil.isLong_v2(ema25, klines_15m) && !PriceUtil.isLowHit(afterLowKlines, ema99) && ema7 > ema25) 
 				|| PriceUtil.isLong_v2(ema99, klines_15m))) {
 			return;
 		}
@@ -264,11 +265,12 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String pair = last_1h.getPair();
 		
+		double ema7 = last_1h.getEma7();
 		double ema25 = last_1h.getEma25();
 		double ema99 = last_1h.getEma99();
 		double currentPrice = last_15m.getClosePriceDoubleValue();
 		
-		if(!( (PriceUtil.isShort_v2(ema25, klines_15m) && !PriceUtil.isHighHit(afterHighKlines, ema99)) 
+		if(!( (PriceUtil.isShort_v2(ema25, klines_15m) && !PriceUtil.isHighHit(afterHighKlines, ema99) && ema7 < ema25) 
 				|| PriceUtil.isShort_v2(ema99, klines_15m))) {
 			return;
 		}
