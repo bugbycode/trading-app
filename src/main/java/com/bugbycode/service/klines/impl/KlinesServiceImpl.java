@@ -30,6 +30,7 @@ import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
@@ -185,142 +186,169 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openLong(FibInfo fibInfo, List<Klines> klines_1h, List<Klines> klines_15m) {
+	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
 		
-		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
-		Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
+		String pair = hitKline.getPair();
 		
-		Klines last_15m = PriceUtil.getLastKlines(klines_15m);
-		Klines last_1h = PriceUtil.getLastKlines(klines_1h);
+		FibCode[] codes = FibCode.values();
 		
-		String pair = last_1h.getPair();
+		//开盘、收盘、最低、最高价格
+		double closePrice = hitKline.getClosePriceDoubleValue();
+		//double openPrice = hitKline.getOpenPrice();
+		//double lowPrice = hitKline.getLowPriceDoubleValue();
+		//double hightPrice = hitKline.getHighPrice();
+		double currentPrice = closePrice;
 		
-		double ema7 = last_1h.getEma7();
-		double ema25 = last_1h.getEma25();
-		double ema99 = last_1h.getEma99();
-		double currentPrice = last_15m.getClosePriceDoubleValue();
-		
-		if(!( (PriceUtil.isLong_v2(ema25, klines_15m) && !PriceUtil.isLowHit(afterLowKlines, ema99) && ema7 > ema25) 
-				|| PriceUtil.isLong_v2(ema99, klines_15m))) {
-			return;
-		}
-		//开仓点
-		FibCode code = fibInfo.getFibCode(currentPrice);
-		if(code.lt(fibInfo.getLevel().getStartFibCode())) {
-			return;
-		}
-		
-		//市价做多
-		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, fibInfo.getFibCodeOffset(code), fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
-		
-		//
-		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
-		
-		for(User u : userList) {
+		//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
+		for(int offset = 0;offset < codes.length;offset++) {
 			
-			//根据交易风格设置盈利限制
-			TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+			FibCode code = codes[offset];//当前斐波那契点位
 			
-			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
-			
-			//保守的交易风格
-			if(tradeStyle == TradeStyle.CONSERVATIVE) {
-				closePpositionCode = fibInfo.getTakeProfit(code, currentPrice, u.getMonitorProfit(), u.getProfitLimit());
-			}
-			
-			//计算预计盈利百分比
-			double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
-			
-			if(profitPercent < u.getMonitorProfit()) {
-				continue;
-			}
-			
-			//止盈价
-			double profitPrice = fibInfo.getFibValue(closePpositionCode);
+			if(PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
+					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
+					&& !PriceUtil.isTraded(code, fibInfo)) {
+				
+				//市价做多
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
+				
+				//
+				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
+				
+				for(User u : userList) {
+					
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+						continue;
+					}
+					
+					//根据交易风格设置盈利限制
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					
+					FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
+					
+					//保守的交易风格
+					if(tradeStyle == TradeStyle.CONSERVATIVE) {
+						closePpositionCode = fibInfo.getTakeProfit_v3(code, currentPrice, u.getMonitorProfit(), u.getProfitLimit());
+					}
+					
+					//计算预计盈利百分比
+					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+					
+					if(profitPercent < u.getMonitorProfit()) {
+						continue;
+					}
+					
+					//止盈价
+					double profitPrice = fibInfo.getFibValue(closePpositionCode);
 
-			//开仓订阅提醒
-			String subject = String.format("%s永续合约%s(%s)[%s]做多机会(PNL:%s%%) %s", pair, code.getDescription(),
-					PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-					fibInfo.getLevel().getLabel(),
-					PriceUtil.formatDoubleDecimal(profitPercent, 2),
-					DateFormatUtil.format(new Date()));
+					//开仓订阅提醒
+					String subject = String.format("%s永续合约%s(%s)[%s]做多机会(PNL:%s%%) %s", pair, code.getDescription(),
+							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+							fibInfo.getLevel().getLabel(),
+							PriceUtil.formatDoubleDecimal(profitPercent, 2),
+							DateFormatUtil.format(new Date()));
+					
+					String text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
+							profitPrice, fibInfo.getDecimalPoint());
+					
+					text += "\r\n\r\n" + fibInfo.toString();
+					
+					sendEmail(u, subject, text, u.getUsername());
+				}
+				break;
+			}
 			
-			String text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
-					profitPrice, fibInfo.getDecimalPoint());
-			
-			text += "\r\n\r\n" + fibInfo.toString();
-			
-			sendEmail(u, subject, text, u.getUsername());
+			if(code == fibInfo.getLevel().getStartFibCode()) {
+				break;
+			}
 		}
+		
 	}
 	
-	@Override
-	public void openShort(FibInfo fibInfo, List<Klines> klines_1h, List<Klines> klines_15m) {
+	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
-		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
-		Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
-		Klines last_15m = PriceUtil.getLastKlines(klines_15m);
-		Klines last_1h = PriceUtil.getLastKlines(klines_1h);
+		//开盘、收盘、最低、最高价格
+		double closePrice = hitKline.getClosePriceDoubleValue();
+		//double openPrice = hitKline.getOpenPrice();
+		//double lowPrice = hitKline.getLowPrice();
+		//double hightPrice = hitKline.getHighPriceDoubleValue();
+		double currentPrice = closePrice;
+		String pair = hitKline.getPair();
 		
-		String pair = last_1h.getPair();
+		FibCode[] codes = FibCode.values();
 		
-		double ema7 = last_1h.getEma7();
-		double ema25 = last_1h.getEma25();
-		double ema99 = last_1h.getEma99();
-		double currentPrice = last_15m.getClosePriceDoubleValue();
-		
-		if(!( (PriceUtil.isShort_v2(ema25, klines_15m) && !PriceUtil.isHighHit(afterHighKlines, ema99) && ema7 < ema25) 
-				|| PriceUtil.isShort_v2(ema99, klines_15m))) {
-			return;
-		}
-		//开仓点
-		FibCode code = fibInfo.getFibCode(currentPrice);
-		if(code.lt(fibInfo.getLevel().getStartFibCode())) {
-			return;
-		}
-		
-		//市价做空
-		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, fibInfo.getFibCodeOffset(code), fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
-		//
-		List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
-		
-		for(User u : userList) {
+		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
+		for(int offset = 0;offset < codes.length;offset++) {
 			
-			//根据交易风格设置盈利限制
-			TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+			FibCode code = codes[offset];//当前斐波那契点位
 			
-			FibCode closePpositionCode = fibInfo.getTakeProfit(code);//止盈点位
-			
-			//保守的交易风格
-			if(tradeStyle == TradeStyle.CONSERVATIVE) {
-				closePpositionCode = fibInfo.getTakeProfit(code, currentPrice, u.getMonitorProfit(), u.getProfitLimit());
+			if(PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
+					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
+					&& !PriceUtil.isTraded(code, fibInfo)) {
+				
+				//市价做空
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
+
+				//
+				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
+				
+				for(User u : userList) {
+
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+						continue;
+					}
+					
+					//根据交易风格设置盈利限制
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					
+					FibCode closePpositionCode = fibInfo.getTakeProfit_v2(code);//止盈点位
+					
+					//保守的交易风格
+					if(tradeStyle == TradeStyle.CONSERVATIVE) {
+						closePpositionCode = fibInfo.getTakeProfit_v3(code, currentPrice, u.getMonitorProfit(), u.getProfitLimit());
+					}
+					
+					//计算预计盈利百分比
+					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+					
+					if(profitPercent < u.getMonitorProfit()) {
+						continue;
+					}
+					
+					//止盈价
+					double profitPrice = fibInfo.getFibValue(closePpositionCode);
+					
+					String subject = String.format("%s永续合约%s(%s)[%s]做空机会(PNL:%s%%) %s", pair, code.getDescription(),
+							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+							fibInfo.getLevel().getLabel(),
+							PriceUtil.formatDoubleDecimal(profitPercent, 2),
+							DateFormatUtil.format(new Date()));
+					
+					String text = StringUtil.formatShortMessage(pair, currentPrice, profitPrice, 
+							PriceUtil.rectificationCutLossShortPrice_v3(currentPrice, u.getCutLoss()), fibInfo.getDecimalPoint());
+					
+					text += "\r\n\r\n" + fibInfo.toString();
+					
+					
+					sendEmail(u, subject,text, u.getUsername());
+				}
+				break;
 			}
+
 			
-			//计算预计盈利百分比
-			double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
-			
-			if(profitPercent < u.getMonitorProfit()) {
-				continue;
+			if(code == fibInfo.getLevel().getStartFibCode()) {
+				break;
 			}
-			
-			//止盈价
-			double profitPrice = fibInfo.getFibValue(closePpositionCode);
-			
-			String subject = String.format("%s永续合约%s(%s)[%s]做空机会(PNL:%s%%) %s", pair, code.getDescription(),
-					PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-					fibInfo.getLevel().getLabel(),
-					PriceUtil.formatDoubleDecimal(profitPercent, 2),
-					DateFormatUtil.format(new Date()));
-			
-			String text = StringUtil.formatShortMessage(pair, currentPrice, profitPrice, 
-					PriceUtil.rectificationCutLossShortPrice_v3(currentPrice, u.getCutLoss()), fibInfo.getDecimalPoint());
-			
-			text += "\r\n\r\n" + fibInfo.toString();
-			
-			
-			sendEmail(u, subject,text, u.getUsername());
 		}
+		
 	}
 	
 	@Override
@@ -381,11 +409,19 @@ public class KlinesServiceImpl implements KlinesService {
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
 								
-								takeProfitCode = fibInfo.getTakeProfit(code);
+								takeProfitCode = fibInfo.getTakeProfit_v2(code);
 								
 								//根据交易风格设置盈利限制
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfitCode = fibInfo.getTakeProfit(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+									takeProfitCode = fibInfo.getTakeProfit_v3(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+								}
+								
+								logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
+								
+								//回踩单判断
+								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+									continue;
 								}
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
@@ -602,11 +638,19 @@ public class KlinesServiceImpl implements KlinesService {
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								FibCode code = codes[offset];
 
-								takeProfitCode = fibInfo.getTakeProfit(code);
+								takeProfitCode = fibInfo.getTakeProfit_v2(code);
 								
 								//根据交易风格设置盈利限制
 								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfitCode = fibInfo.getTakeProfit(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+									takeProfitCode = fibInfo.getTakeProfit_v3(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+								}
+								
+								logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
+								
+								//回踩单判断
+								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+									continue;
 								}
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
@@ -880,20 +924,16 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1h, List<Klines> list_15m) {
+		
 		if(CollectionUtils.isEmpty(list_1h) || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
-		KlinesComparator kc = new KlinesComparator(SortType.ASC);
-
-		list_15m.sort(kc);
-		list_1h.sort(kc);
+		FibInfoFactory factory = new FibInfoFactory(list_1h);
 		
-		PriceUtil.calculateEMA_7_25_99(list_1h);
+		FibInfo fibInfo = factory.getFibInfo();
 		
-		FibInfoFactory factory_v3 = new FibInfoFactory(list_1h);
-		
-		FibInfo fibInfo = factory_v3.getFibInfo();
+		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
 		if(fibInfo == null) {
 			return;
@@ -901,9 +941,11 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		QuotationMode mode = fibInfo.getQuotationMode();
 		if(mode == QuotationMode.LONG) {
-			openLong(fibInfo, list_1h, list_15m);
+			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+			openLong(fibInfo, afterLowKlines, list_15m);
 		} else if(mode == QuotationMode.SHORT) {
-			openShort(fibInfo, list_1h, list_15m);
+			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+			openShort(fibInfo, afterHighKlines, list_15m);
 		}
 	}
 	

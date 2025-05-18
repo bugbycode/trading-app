@@ -123,7 +123,7 @@ public class FibInfo {
 	}
 	
 	/**
-	 * 斐波那契回撤止盈点位(保守的交易风格) </br>
+	 * 止盈点位 V3 (保守的交易风格) </br>
 	 * 
 	 * 1、当【盈利百分比】大于【用户止盈百分比限制】则止盈点位为下一个回撤点位 </br>
 	 * 2、当下一个回撤点位止盈时【盈利百分比】小于【用户盈利预期】时则止盈点位保持不变 </br>
@@ -134,9 +134,9 @@ public class FibInfo {
 	 * @param profitLimit 用户止盈百分比限制
 	 * @return 止盈的斐波那契回撤点位
 	 */
-	public FibCode getTakeProfit(FibCode code, double price, double profit, double profitLimit) {
+	public FibCode getTakeProfit_v3(FibCode code, double price, double profit, double profitLimit) {
 		
-		FibCode takeProfit = getTakeProfit(code);
+		FibCode takeProfit = getTakeProfit_v2(code);
 		FibCode next = getNextFibCode(code);
 		
 		double pricePercent = PriceUtil.getPercent(price, takeProfit, this); //价格波动幅度
@@ -150,20 +150,59 @@ public class FibInfo {
 	}
 	
 	/**
-	 * 斐波那契回撤止盈点位
+	 * 止盈点位 V2
 	 * @param code 开仓时所处的斐波那契回撤点位
 	 * @return 止盈的斐波那契回撤点位
 	 */
-	public FibCode getTakeProfit(FibCode code) {
+	public FibCode getTakeProfit_v2(FibCode code) {
 		FibCode takeProfit = FibCode.FIB0;
-		if(code == FibCode.FIB1) {
+		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+			takeProfit = FibCode.FIB2_618;
+		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
+			takeProfit = FibCode.FIB1_618;
+		} else if(code == FibCode.FIB2) { // 2 - 1.272
+			takeProfit = FibCode.FIB1_272;
+		} else if(code == FibCode.FIB1_618) { // 1.618 - 1
+			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1_272) {//1.272 - 0.786
+			takeProfit = FibCode.FIB786;
+		} else if(code == FibCode.FIB1) { // 1 -> 0.5
 			takeProfit = FibCode.FIB5;
-		} else if(code == FibCode.FIB786) {
+		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
 			takeProfit = FibCode.FIB382;
-		} else if(code == FibCode.FIB66 || code == FibCode.FIB618) {
+		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.236
 			takeProfit = FibCode.FIB236;
-		} else if(code == FibCode.FIB5 || code == FibCode.FIB382 || code == FibCode.FIB236) {
+		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
+			takeProfit = FibCode.FIB236;
+		} else if(code == FibCode.FIB382) { // 0.382 -> 0
 			takeProfit = FibCode.FIB0;
+		}
+		return takeProfit;
+	}
+	
+	/**
+	 * 止盈点位 V1
+	 * @param code 开仓时所处的斐波那契回撤点位
+	 * @return 止盈的斐波那契回撤点位
+	 */
+	public FibCode getTakeProfit_v1(FibCode code) {
+		FibCode takeProfit = FibCode.FIB0;
+		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+			takeProfit = FibCode.FIB2_618;
+		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
+			takeProfit = FibCode.FIB1_618;
+		} else if(code == FibCode.FIB2 || code == FibCode.FIB1_618 || code == FibCode.FIB1_272) { // 2/1.618/1.272 - 1
+			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1) { // 1 -> 0.618
+			takeProfit = FibCode.FIB618;
+		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
+			takeProfit = FibCode.FIB5;
+		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
+			takeProfit = FibCode.FIB382;
+		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
+			takeProfit = FibCode.FIB236;
+		} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
+			takeProfit = FibCode.FIB236;
 		}
 		return takeProfit;
 	}
@@ -263,18 +302,26 @@ public class FibInfo {
 	 * @return
 	 */
 	public FibCode getNextFibCode(FibCode current) {
+		
 		FibCode result = FibCode.FIB0;
+		
 		if(current == FibCode.FIB1) {
 			result = FibCode.FIB618;
 		} else if(current == FibCode.FIB786) {
 			result = FibCode.FIB5;
-		} else if(current == FibCode.FIB66 || current == FibCode.FIB618) {
+		} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
 			result = FibCode.FIB382;
-		} else if(current == FibCode.FIB5) {
-			result = FibCode.FIB236;
-		} else if(current == FibCode.FIB382) {
-			result = FibCode.FIB236;
+		} else {
+			FibCode codes[] = FibCode.values();
+			for(int index = 0; index < codes.length; index++) {
+				FibCode code = codes[index];
+				if(code == current && code != FibCode.FIB0) {
+					result = codes[index + 1];
+					break;
+				}
+			}
 		}
+		
 		return result;
 	}
 
@@ -290,61 +337,6 @@ public class FibInfo {
 		
 		return info != null && this.getFibValue(FibCode.FIB0) == info.getFibValue(FibCode.FIB0)
 				 && this.getFibValue(FibCode.FIB1) == info.getFibValue(FibCode.FIB1);
-	}
-	
-	/**
-	 * 根据价格寻找所处的回撤点位
-	 * @param price
-	 * @return
-	 */
-	public FibCode getFibCode(double price) {
-		FibCode code = FibCode.FIB0;
-		QuotationMode mode = this.getQuotationMode();
-		if(mode == QuotationMode.LONG) {
-			if(price < this.getFibValue(FibCode.FIB786)) { //1~0.786
-				code = FibCode.FIB1;
-			} else if(price >= this.getFibValue(FibCode.FIB786) && price < this.getFibValue(FibCode.FIB66)) {//0.786~0.66
-				code = FibCode.FIB786;
-			} else if((price >= this.getFibValue(FibCode.FIB66) || price >= this.getFibValue(FibCode.FIB618)) 
-					&& price < this.getFibValue(FibCode.FIB5)) {// 0.618~0.5
-				code = FibCode.FIB618;
-			} else if(price >= this.getFibValue(FibCode.FIB5) && price < this.getFibValue(FibCode.FIB382)) {//0.5~0.382
-				code = FibCode.FIB5;
-			} else if(price >= this.getFibValue(FibCode.FIB382) && price < this.getFibValue(FibCode.FIB236)) { //0.382~0.236
-				code = FibCode.FIB382;
-			} else if(price >= this.getFibValue(FibCode.FIB236) && price < this.getFibValue(FibCode.FIB0)) { //0.382~0.236
-				code = FibCode.FIB236;
-			}
-		} else {
-			if(price > this.getFibValue(FibCode.FIB786)) { //1~0.786
-				code = FibCode.FIB1;
-			} else if(price <= this.getFibValue(FibCode.FIB786) && price > this.getFibValue(FibCode.FIB66)) {//0.786~0.66
-				code = FibCode.FIB786;
-			} else if((price <= this.getFibValue(FibCode.FIB66) || price <= this.getFibValue(FibCode.FIB618)) 
-					&& price > this.getFibValue(FibCode.FIB5)) {// 0.618~0.5
-				code = FibCode.FIB618;
-			} else if(price <= this.getFibValue(FibCode.FIB5) && price > this.getFibValue(FibCode.FIB382)) {//0.5~0.382
-				code = FibCode.FIB5;
-			} else if(price <= this.getFibValue(FibCode.FIB382) && price > this.getFibValue(FibCode.FIB236)) { //0.382~0.236
-				code = FibCode.FIB382;
-			} else if(price <= this.getFibValue(FibCode.FIB236) && price > this.getFibValue(FibCode.FIB0)) { //0.382~0.236
-				code = FibCode.FIB236;
-			}
-		}
-		
-		return code;
-	}
-	
-	public int getFibCodeOffset(FibCode code) {
-		int offset = 0;
-		FibCode[] codes = FibCode.values();
-		for(int index = 0; index < codes.length; index++) {
-			if(code == codes[index]) {
-				offset = index;
-				break;
-			}
-		}
-		return offset;
 	}
 
 	@Override

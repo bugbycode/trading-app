@@ -2633,6 +2633,46 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断开仓点是否交易过
+	 * @param code 开仓点
+	 * @param fibInfo 回撤信息
+	 * @return
+	 */
+	public static boolean isTraded(FibCode code,FibInfo fibInfo) {
+		
+		boolean result = false;
+		
+		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
+		
+		//止盈点
+		FibCode takeProfitCode = fibInfo.getTakeProfit_v1(code);
+		
+		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			fibAfterKlines.sort(new KlinesComparator(SortType.ASC));
+			Klines hitCodeKlines = null;
+			Klines hitTakeProfitCodeKlines = null;
+			for(int index = 0; index < fibAfterKlines.size(); index++) {
+				Klines k = fibAfterKlines.get(index);
+				//判断是否命中开仓价
+				if(hitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(code))) {
+					hitCodeKlines = k;
+				}
+				//判断是否命中止盈价
+				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(takeProfitCode))) {
+					hitTakeProfitCodeKlines = k;
+				}
+				
+				if(!(hitCodeKlines == null || hitTakeProfitCodeKlines == null)) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * 判断是否为低点
 	 * @param current 当前k线
 	 * @param next 前一根k线
@@ -2708,25 +2748,5 @@ public class PriceUtil {
 		Klines k1 = list.get(index - 2);
 		Klines k2 = list.get(index - 3);
 		return isGreedyBuy(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isFall());
-	}
-	
-	/**
-	 * 判断k线最低价是否低于预期价格
-	 * @param low k线
-	 * @param price 预期价格
-	 * @return
-	 */
-	public static boolean isLowHit(Klines low, double price) {
-		return low != null && low.getLowPriceDoubleValue() <= price;
-	}
-	
-	/**
-	 * 判断k线最高价是否高于预期价格
-	 * @param high k线
-	 * @param price 预期价格
-	 * @return
-	 */
-	public static boolean isHighHit(Klines high, double price) {
-		return high != null && high.getHighPriceDoubleValue() >= price;
 	}
 }
