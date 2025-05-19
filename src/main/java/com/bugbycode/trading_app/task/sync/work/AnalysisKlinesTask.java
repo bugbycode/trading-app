@@ -11,6 +11,7 @@ import com.bugbycode.service.klines.KlinesService;
 import com.util.DateFormatUtil;
 import com.util.PriceUtil;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,24 +36,8 @@ public class AnalysisKlinesTask implements Runnable{
     @Override
     public void run() {
         try {
-            //查询日线级别K线信息
-            List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
-            if(CollectionUtils.isEmpty(klines_list_1d)){
-                logger.info("无法获取" + pair + "交易对日线级别K线信息");
-                return;
-            }
             
-            //检查更新
-            if(klinesService.verifyUpdateDayKlines(klines_list_1d)) {
-            	logger.info(pair + "交易对日线级别K线信息已更新");
-            	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
-            }
-            
-            if(!klinesService.checkData(klines_list_1d)) {
-            	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
-            }
-            
-            //查询15分钟级别k线信息
+            //查询15分钟级别k线信息 START ============================================================================
             List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
             if(CollectionUtils.isEmpty(klines_list_15m)){
                 logger.info("无法获取" + pair + "交易对15分钟级别K线信息");
@@ -63,7 +48,9 @@ public class AnalysisKlinesTask implements Runnable{
             	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
             }
             
-            //查询1小时级别k线信息
+            //查询15分钟级别k线信息 END ============================================================================
+            
+            //查询1小时级别k线信息 START ===============================================================================
             List<Klines> klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
             List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(klines_list_15m);
         	Klines last_1h = PriceUtil.getLastKlines(klines_list_1h);
@@ -86,6 +73,37 @@ public class AnalysisKlinesTask implements Runnable{
                 klinesService.checkData(klines_list_1h_db);
                 klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
             }
+            //查询1小时级别k线信息 END ===============================================================================
+            
+            //日线级别信息START====================================================================================
+            //合并成昨日的日线级别
+            int hours = DateFormatUtil.getHours(new Date().getTime());
+            Date lastDayStartTimeDate = DateFormatUtil.getStartTime(hours);//前一天K线起始时间 yyyy-MM-dd 08:00:00
+            Date lastDayEndTimeDate = DateFormatUtil.getEndTime(hours);//前一天K线结束时间 yyyy-MM-dd 07:59:59
+            List<Klines> lastDay_15m = PriceUtil.subListForBetweenStartTimeAndEndTime(klines_list_15m, lastDayStartTimeDate.getTime(), lastDayEndTimeDate.getTime() + 1000);
+            if(!CollectionUtils.isEmpty(lastDay_15m)) {
+            	
+            	//查询日线级别K线信息
+                List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
+                if(CollectionUtils.isEmpty(klines_list_1d)){
+                    logger.info("无法获取" + pair + "交易对日线级别K线信息");
+                    return;
+                }
+                
+                Klines lastDay = PriceUtil.getLastKlines(klines_list_1d);
+            	Klines parseKlines_1d = PriceUtil.parse(lastDay_15m, Inerval.INERVAL_1D);
+            	//与最后一天不是同一根k线则直接入库
+            	if(!lastDay.isEquals(parseKlines_1d)) {
+            		klinesRepository.insert(parseKlines_1d);
+                	
+                	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
+                	//检查数据完整性
+                	klinesService.checkData(klines_list_1d);
+            	}
+                
+            }
+            
+            //日线级别信息END====================================================================================
             
             //斐波那契回撤分析
             klinesService.futuresFibMonitor(klines_list_1h_db, klines_list_15m);

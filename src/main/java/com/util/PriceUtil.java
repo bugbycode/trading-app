@@ -1261,6 +1261,43 @@ public class PriceUtil {
 		return new Klines(pair, startTime, openPrice, highPrice, lowPrice, closePrice, endTime, inerval, decimalNum, v, n, q, iv, iq);
 	}
 	
+	/**
+	 * 将多根k线合并成一根k线
+	 * @param list k线信息
+	 * @param inerval 合并后的时间级别
+	 * @return 
+	 */
+	public static Klines parse(List<Klines> list, Inerval inerval) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(list)) {
+			KlinesComparator kc = new KlinesComparator(SortType.ASC);
+			list.sort(kc);
+			KlinesUtil ku = new KlinesUtil(list);
+			Klines highKlines = ku.getMax();
+			Klines lowKlines = ku.getMin();
+			Klines firstKlines = ku.getFirst();
+			Klines lastKlines = ku.getLast();
+			String openPrice = firstKlines.getOpenPrice();
+			String closePrice = lastKlines.getClosePrice();
+			String highPrice = highKlines.getHighPrice();
+			String lowPrice = lowKlines.getLowPrice();
+			long startTime = firstKlines.getStartTime();
+			long endTime = lastKlines.getEndTime();
+			String pair = firstKlines.getPair();
+			int decimalNum = firstKlines.getDecimalNum();
+			
+			String v = String.valueOf(sum_volume(list));
+			String iv = String.valueOf(sum_i_volume(list));
+			long n = sum_n(list);
+			String q = String.valueOf(sum_q(list));
+			String iq = String.valueOf(sum_iq(list));
+			
+			result = new Klines(pair, startTime, openPrice, highPrice, lowPrice, closePrice, endTime, inerval.getDescption(), decimalNum, v, n, q, iv, iq);
+		}
+		
+		return result;
+	}
+	
 	public static double sum_volume(List<Klines> list) {
 		double v = 0;
 		for(Klines k : list) {
@@ -2748,5 +2785,25 @@ public class PriceUtil {
 		Klines k1 = list.get(index - 2);
 		Klines k2 = list.get(index - 3);
 		return isGreedyBuy(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isFall());
+	}
+	
+	/**
+	 * 根据开盘时间和收盘时间截取k线信息
+	 * @param list k线集合
+	 * @param startTime 开盘时间
+	 * @param endTime 收盘时间
+	 * @return
+	 */
+	public static List<Klines> subListForBetweenStartTimeAndEndTime(List<Klines> list,long startTime, long endTime) {
+		List<Klines> result = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list)) {
+			for(Klines k : list) {
+				if(k.getStartTime() >= startTime && k.getEndTime() <= endTime) {
+					result.add(k);
+				}
+			}
+			result.sort(new KlinesComparator(SortType.ASC));
+		}
+		return result;
 	}
 }
