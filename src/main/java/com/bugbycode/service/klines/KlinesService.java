@@ -94,9 +94,10 @@ public interface KlinesService {
 	
 	/**
 	 * 价格行为监控
+	 * @param list_1h
 	 * @param list_15m
 	 */
-	public void futuresPriceAction(List<Klines> list_15m);
+	public void futuresPriceAction(List<Klines> list_1h, List<Klines> list_15m);
 	
 	/**
 	 * 发送邮件
