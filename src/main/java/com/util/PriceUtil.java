@@ -2806,4 +2806,32 @@ public class PriceUtil {
 		}
 		return result;
 	}
+	
+	/**
+	 * 判断k线最低价是否小于等于预期价格
+	 * @param k k线信息
+	 * @param price 预期价格
+	 * @return
+	 */
+	public static boolean lte(Klines k, double price) {
+		boolean result = false;
+		if(k != null && k.getLowPriceDoubleValue() <= price) {
+			result = true;
+		}
+		return result;
+	}
+	
+	/**
+	 * 判断k线最高价是否大于等于预期价格
+	 * @param k k线信息
+	 * @param price 预期价格
+	 * @return
+	 */
+	public static boolean gte(Klines k, double price) {
+		boolean result = false;
+		if(k != null && k.getHighPriceDoubleValue() >= price) {
+			result = true;
+		}
+		return result;
+	}
 }
