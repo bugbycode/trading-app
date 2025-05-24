@@ -66,8 +66,8 @@ public class ConsolidationAreaUtil {
 		low = PriceUtil.getMinReversalPoint(points);
 		high = PriceUtil.getMaxReversalPoint(points);
 		
-		logger.info(low.getCurrent());
-		logger.info(low.getParent());
+		logger.debug(low.getCurrent());
+		logger.debug(low.getParent());
 	}
 	
 	public boolean isEmpty() {
