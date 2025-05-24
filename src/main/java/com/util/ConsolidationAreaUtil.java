@@ -74,12 +74,20 @@ public class ConsolidationAreaUtil {
 		return low == null || high == null;
 	}
 	
+	private boolean verifyHigh(Klines k) {
+		return k.getBbPercentB() >= 0.95;
+	}
+	
+	private boolean verifyLow(Klines k) {
+		return k.getBbPercentB() <= 0.05;
+	}
+	
 	private boolean verifyHigh(Klines current, Klines parent) {
-		return parent.isRise() && current.isFall() && parent.getBbPercentB() >= 0.95;
+		return parent.isRise() && current.isFall() && (verifyHigh(parent) || verifyHigh(current));
 	}
 	
 	private boolean verifyLow(Klines current, Klines parent) {
-		return parent.isFall() && current.isRise() && parent.getBbPercentB() <= 0.05;
+		return parent.isFall() && current.isRise() && (verifyLow(parent) || verifyLow(current));
 	}
 	
 	private boolean verifyHigh(ReversalPoint point) {
