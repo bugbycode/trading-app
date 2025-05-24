@@ -21,6 +21,7 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.ReversalPoint;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.PriceInfo;
 
@@ -2831,6 +2832,30 @@ public class PriceUtil {
 		boolean result = false;
 		if(k != null && k.getHighPriceDoubleValue() >= price) {
 			result = true;
+		}
+		return result;
+	}
+	
+	public static ReversalPoint getMaxReversalPoint(List<ReversalPoint> list) {
+		ReversalPoint result = null;
+		if(!CollectionUtils.isEmpty(list)) {
+			for(ReversalPoint rp : list) {
+				if(result == null || rp.getMaxPrice() > result.getMaxPrice()) {
+					result = rp;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static ReversalPoint getMinReversalPoint(List<ReversalPoint> list) {
+		ReversalPoint result = null;
+		if(!CollectionUtils.isEmpty(list)) {
+			for(ReversalPoint rp : list) {
+				if(result == null || rp.getMinPrice() < result.getMinPrice()) {
+					result = rp;
+				}
+			}
 		}
 		return result;
 	}

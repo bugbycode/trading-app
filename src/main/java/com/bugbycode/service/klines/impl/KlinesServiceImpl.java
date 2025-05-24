@@ -950,13 +950,16 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void consolidationAreaMonitor(List<Klines> list_1h, List<Klines> list_15m) {
-		if(CollectionUtils.isEmpty(list_1h)) {
+	public void consolidationAreaMonitor(List<Klines> list_1d, List<Klines> list_15m) {
+		if(CollectionUtils.isEmpty(list_1d)) {
 			return;
 		}
 		
-		ConsolidationAreaFibUtil ca = new ConsolidationAreaFibUtil(list_1h);
-		if(!ca.verifyOpen(list_15m)) {
+		ConsolidationAreaFibUtil ca = new ConsolidationAreaFibUtil(list_1d);
+
+		FibInfo fibInfo = ca.getFibInfo(list_15m);
+		
+		if(fibInfo == null) {
 			return;
 		}
 		
@@ -967,7 +970,6 @@ public class KlinesServiceImpl implements KlinesService {
 		String pair = last.getPair();
 		double currentPrice = last.getClosePriceDoubleValue();
 		
-		FibInfo fibInfo = ca.getFibInfo();
 		QuotationMode qm = fibInfo.getQuotationMode();
 		if(qm == QuotationMode.LONG) {
 			//市价做多
@@ -990,7 +992,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent, 2);
 				
-				String subject = String.format("%s永续合约[%s]做多交易机会(PNL:%s%%) %s", pair, currentPrice, pnlStr, dateStr);
+				String subject = String.format("%s永续合约盘整区做多交易机会(PNL:%s%%) %s", pair, pnlStr, dateStr);
 				String text = StringUtil.formatLongMessage_v2(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
 						takeProfitPrice, last.getDecimalNum(), pnlStr);
 				
@@ -1016,7 +1018,7 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent, 2);
 				
-				String subject = String.format("%s永续合约[%s]做空交易机会(PNL:%s%%) %s", pair, currentPrice, pnlStr, dateStr);
+				String subject = String.format("%s永续合约盘整区做空交易机会(PNL:%s%%) %s", pair, pnlStr, dateStr);
 				String text = StringUtil.formatShortMessage_v2(pair, currentPrice, takeProfitPrice, PriceUtil.rectificationCutLossShortPrice_v3(currentPrice, u.getCutLoss()), last.getDecimalNum(), pnlStr);
 				
 				sendEmail(u, subject, text, u.getUsername());
