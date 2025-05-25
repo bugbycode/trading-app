@@ -120,15 +120,19 @@ public class FibInfoFactory {
 			return;
 		}
 		
+		List<Klines> endSubList = null;
+		
 		Klines start = null;
 		Klines end = null;
 		if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
-			end = PriceUtil.getMaxPriceKLine(firstSubList);
+			endSubList = PriceUtil.subList(start, list);
+			end = PriceUtil.getMaxPriceKLine(endSubList);
 			fibInfo = new FibInfo(start, end, start.getDecimalNum(), FibLevel.LEVEL_3);
 		} else if(ps == PositionSide.SHORT) {
 			start = PriceUtil.getMaxPriceKLine(firstSubList);
-			end = PriceUtil.getMinPriceKLine(firstSubList);
+			endSubList = PriceUtil.subList(start, list);
+			end = PriceUtil.getMinPriceKLine(endSubList);
 			fibInfo = new FibInfo(end, start, start.getDecimalNum(), FibLevel.LEVEL_3);
 		}
 		
