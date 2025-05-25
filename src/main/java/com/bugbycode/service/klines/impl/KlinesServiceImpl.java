@@ -1066,7 +1066,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent, 2);
 				
-				String subject = String.format("%s永续合约[%s]做多交易机会(PNL:%s%%) %s", pair, currentPrice, pnlStr, dateStr);
+				String subject = String.format("%s永续合约强势价格行为(PNL:%s%%) %s", pair, pnlStr, dateStr);
 				String text = StringUtil.formatLongMessage_v2(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
 						takeProfitPrice, last.getDecimalNum(), pnlStr);
 				
@@ -1094,7 +1094,7 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent, 2);
 				
-				String subject = String.format("%s永续合约[%s]做空交易机会(PNL:%s%%) %s", pair, currentPrice, pnlStr, dateStr);
+				String subject = String.format("%s永续合约颓势价格行为(PNL:%s%%) %s", pair, pnlStr, dateStr);
 				String text = StringUtil.formatShortMessage_v2(pair, currentPrice, takeProfitPrice, PriceUtil.rectificationCutLossShortPrice_v3(currentPrice, u.getCutLoss()), last.getDecimalNum(), pnlStr);
 				
 				sendEmail(u, subject, text, u.getUsername());
