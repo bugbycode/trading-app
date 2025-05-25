@@ -87,10 +87,10 @@ public interface KlinesService {
 	
 	/**
 	 * 盘整区监控
-	 * @param list_1d
+	 * @param list_1h
 	 * @param list_15m
 	 */
-	public void consolidationAreaMonitor(List<Klines> list_1d, List<Klines> list_15m);
+	public void consolidationAreaMonitor(List<Klines> list_1h, List<Klines> list_15m);
 	
 	/**
 	 * 价格行为监控

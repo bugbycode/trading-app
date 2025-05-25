@@ -950,18 +950,18 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void consolidationAreaMonitor(List<Klines> list_1d, List<Klines> list_15m) {
-		if(CollectionUtils.isEmpty(list_1d)) {
+	public void consolidationAreaMonitor(List<Klines> list_1h, List<Klines> list_15m) {
+		if(CollectionUtils.isEmpty(list_1h)) {
 			return;
 		}
 		
-		ConsolidationAreaFibUtil ca = new ConsolidationAreaFibUtil(list_1d);
+		ConsolidationAreaFibUtil ca = new ConsolidationAreaFibUtil(list_1h);
+		
+		if(!ca.verifyOpen(list_15m)) {
+			return;
+		}
 
-		FibInfo fibInfo = ca.getFibInfo(list_15m);
-		
-		if(fibInfo == null) {
-			return;
-		}
+		FibInfo fibInfo = ca.getFibInfo();
 		
 		List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
 		

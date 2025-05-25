@@ -119,7 +119,7 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.futuresPriceAction(klines_list_1h_db, klines_list_15m);
             
             //盘整区分析
-            klinesService.consolidationAreaMonitor(klines_list_1d, klines_list_15m);
+            klinesService.consolidationAreaMonitor(klines_list_1h_db, klines_list_15m);
             
             //量价分析
             klinesService.volumeMonitor(klines_list_15m);
