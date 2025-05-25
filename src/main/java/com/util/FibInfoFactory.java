@@ -3,6 +3,8 @@ package com.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.FibInfo;
@@ -15,6 +17,8 @@ import com.bugbycode.module.trading.PositionSide;
  * 斐波那契回撤工厂类 <br/>
  */
 public class FibInfoFactory {
+	
+	private final Logger logger = LogManager.getLogger(FibInfoFactory.class);
 
 	private List<Klines> list;
 	
@@ -46,15 +50,21 @@ public class FibInfoFactory {
 		Klines first = null;
 		
 		Klines afterFlag = null;
+		Klines last = PriceUtil.getLastKlines(list);
 		
 		for(int index = this.list.size() - 1; index > 1; index--) {
 			Klines current = this.list.get(index);
 			Klines parent = this.list.get(index - 1);
 			if(ps == PositionSide.DEFAULT) {
 				if(verifyHigh(current, parent)) {
-					ps = PositionSide.SHORT;
-				} else if(verifyLow(current, parent)) {
 					ps = PositionSide.LONG;
+				} else if(verifyLow(current, parent)) {
+					ps = PositionSide.SHORT;
+				}
+				if(last.isEquals(current)) {
+					ps = PositionSide.DEFAULT;
+				} else if(ps != PositionSide.DEFAULT) {
+					second = current;
 				}
 			} else if(ps == PositionSide.LONG) {
 				if(second == null) {
@@ -90,10 +100,10 @@ public class FibInfoFactory {
 			for(int index = 1; index < secondSubList.size(); index++) {
 				Klines current = secondSubList.get(index);
 				Klines parent = secondSubList.get(index - 1);
-				if(ps == PositionSide.SHORT && verifyHigh(current, parent)) {
+				if(ps == PositionSide.LONG && verifyHigh(current, parent)) {
 					afterFlag = parent;
 					break;
-				} else if(ps == PositionSide.LONG && verifyLow(current, parent)) {
+				} else if(ps == PositionSide.SHORT && verifyLow(current, parent)) {
 					afterFlag = parent;
 					break;
 				}
@@ -126,6 +136,8 @@ public class FibInfoFactory {
 			return;
 		}
 		
+		logger.debug(fibInfo);
+		
 		List<Klines> start_end = new ArrayList<Klines>();
 		start_end.add(start);
 		start_end.add(end);
@@ -141,12 +153,20 @@ public class FibInfoFactory {
 		fibInfo.setFibAfterKlines(fibAfterKlines);
 	}
 	
+	private boolean verifyLow(Klines k) {
+		return k.getBbPercentB() <= 0;
+	}
+	
 	private boolean verifyLow(Klines current, Klines parent) {
-		return parent.isFall() && current.isRise() && parent.getBbPercentB() <= 0;
+		return parent.isFall() && current.isRise() && (verifyLow(parent) || verifyLow(current));
+	}
+	
+	private boolean verifyHigh(Klines k) {
+		return k.getBbPercentB() >= 1;
 	}
 	
 	private boolean verifyHigh(Klines current, Klines parent) {
-		return parent.isRise() && current.isFall() && parent.getBbPercentB() >= 1;
+		return parent.isRise() && current.isFall() && (verifyHigh(parent) || verifyHigh(current));
 	}
 
 	public List<Klines> getFibAfterKlines() {
