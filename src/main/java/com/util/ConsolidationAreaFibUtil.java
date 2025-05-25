@@ -3,6 +3,8 @@ package com.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.FibCode;
@@ -17,6 +19,8 @@ import com.bugbycode.module.trading.PositionSide;
  * 盘整区斐波那契回撤工具类
  */
 public class ConsolidationAreaFibUtil {
+
+	private final Logger logger = LogManager.getLogger(ConsolidationAreaFibUtil.class);
 	
 	private List<Klines> list;
 	
@@ -132,7 +136,7 @@ public class ConsolidationAreaFibUtil {
 		if(fibInfo == null) {
 			return;
 		}
-		
+		logger.debug(fibInfo);
 		QuotationMode mode = fibInfo.getQuotationMode();
 		addOpenPrice(fibInfo.getFibValue(FibCode.FIB1));
 		if(mode == QuotationMode.SHORT) {
@@ -166,6 +170,7 @@ public class ConsolidationAreaFibUtil {
 			Klines last = PriceUtil.getLastKlines(list);
 			double closePrice = last.getClosePriceDoubleValue();
 			double fib618Price = fibInfo.getFibValue(FibCode.FIB618);
+			double fib1_618Price = fibInfo.getFibValue(FibCode.FIB1_618);
 			QuotationMode mode = fibInfo.getQuotationMode();
 			Klines afterHitFlag = null;
 			if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -177,11 +182,11 @@ public class ConsolidationAreaFibUtil {
 			}
 			for(int index = 0;index < openPrices.size();index++) {
 				double price = openPrices.get(index);
-				if(mode == QuotationMode.LONG && closePrice < fib618Price 
+				if(mode == QuotationMode.LONG && closePrice < fib618Price && !PriceUtil.lte(afterHitFlag, fib1_618Price)
 						&& PriceUtil.isLong_v2(price, list) && !PriceUtil.isObsoleteLong(afterHitFlag, openPrices, index)) {
 					result = true;
 					break;
-				} else if(mode == QuotationMode.SHORT && closePrice > fib618Price
+				} else if(mode == QuotationMode.SHORT && closePrice > fib618Price && !PriceUtil.gte(afterHitFlag, fib1_618Price)
 						&& PriceUtil.isShort_v2(price, list) && !PriceUtil.isObsoleteShort(afterHitFlag, openPrices, index)) {
 					result = true;
 					break;
