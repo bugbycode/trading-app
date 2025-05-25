@@ -31,126 +31,108 @@ public class FibInfoFactory {
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 20) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 99) {
 			return;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		
-		PriceUtil.calculateAllBBPercentB(list);
+		PriceUtil.calculateEMA_7_25_99(list);
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
+		Klines third = null;
 		Klines second = null;
 		Klines first = null;
 		
-		Klines afterFlag = null;
-		
-		for(int index = this.list.size() - 1; index > 1; index--) {
-			Klines current = this.list.get(index);
-			Klines parent = this.list.get(index - 1);
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = list.get(index);
 			if(ps == PositionSide.DEFAULT) {
-				if(verifyHigh(current, parent)) {
-					ps = PositionSide.SHORT;
-				} else if(verifyLow(current, parent)) {
+				if(verifyLong(current)) {
 					ps = PositionSide.LONG;
+				} else if(verifyShort(current)) {
+					ps = PositionSide.SHORT;
 				}
-			} else if(ps == PositionSide.LONG) {
-				if(second == null) {
-					if(verifyHigh(current, parent)) {
+			} else if(ps == PositionSide.LONG) {// high - low - high
+				if(third == null) { //high
+					if(verifyHigh(current)) {
+						third = current;
+					}
+				} else if(second == null) {// low
+					if(verifyLow(current)) {
 						second = current;
 					}
-				} else if(first == null) {
-					if(verifyLow(current, parent)) {
-						first = parent;
+				} else if(first == null) {// high
+					if(verifyHigh(current)) {
+						first = current;
 						break;
 					}
 				}
-			} else if(ps == PositionSide.SHORT) {
-				if(second == null) {
-					if(verifyLow(current, parent)) {
+			} else if(ps == PositionSide.SHORT) { // low - high - low
+				if(third == null) { //low
+					if(verifyLow(current)) {
+						third = current;
+					}
+				} else if(second == null) {// high
+					if(verifyHigh(current)) {
 						second = current;
 					}
-				} else if(first == null) {
-					if(verifyHigh(current, parent)) {
-						first = parent;
+				} else if(first == null) {// low
+					if(verifyLow(current)) {
+						first = current;
 						break;
 					}
 				}
 			}
 		}
 		
-		if(first == null || second == null) {
+		if(first == null || second == null || third == null) {
 			return;
 		}
 		
-		List<Klines> secondSubList = PriceUtil.subList(second, list);
-		if(!CollectionUtils.isEmpty(secondSubList) || secondSubList.size() > 2) {
-			for(int index = 1; index < secondSubList.size(); index++) {
-				Klines current = secondSubList.get(index);
-				Klines parent = secondSubList.get(index - 1);
-				if(ps == PositionSide.SHORT && verifyHigh(current, parent)) {
-					afterFlag = parent;
-					break;
-				} else if(ps == PositionSide.LONG && verifyLow(current, parent)) {
-					afterFlag = parent;
-					break;
-				}
-			}
-			if(afterFlag != null) {
-				second = afterFlag;
-			}
-		}
-		
-		
-		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
-		
-		if(CollectionUtils.isEmpty(firstSubList)) {
-			return;
-		}
-		
-		List<Klines> endSubList = null;
+		List<Klines> firstSubList = PriceUtil.subList(first, third, list);
+		List<Klines> secondSubList = null;
 		
 		Klines start = null;
 		Klines end = null;
+		
 		if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
-			endSubList = PriceUtil.subList(start, list);
-			end = PriceUtil.getMaxPriceKLine(endSubList);
-			fibInfo = new FibInfo(start, end, start.getDecimalNum(), FibLevel.LEVEL_3);
+			secondSubList = PriceUtil.subList(start, third, list);
+			end = PriceUtil.getMaxPriceKLine(secondSubList);
+			fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_3);
 		} else if(ps == PositionSide.SHORT) {
 			start = PriceUtil.getMaxPriceKLine(firstSubList);
-			endSubList = PriceUtil.subList(start, list);
-			end = PriceUtil.getMinPriceKLine(endSubList);
-			fibInfo = new FibInfo(end, start, start.getDecimalNum(), FibLevel.LEVEL_3);
+			secondSubList = PriceUtil.subList(start, third, list);
+			end = PriceUtil.getMinPriceKLine(secondSubList);
+			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_3);
 		}
 		
 		if(fibInfo == null) {
 			return;
 		}
 		
-		List<Klines> start_end = new ArrayList<Klines>();
-		start_end.add(start);
-		start_end.add(end);
-		start_end.sort(kc);
-		
-		Klines fibAfter = PriceUtil.getAfterKlines(start_end.get(start_end.size() - 1), list);
-		if(fibAfter == null) {
-			return;
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, list);
+		if(fibAfterFlag != null) {
+			fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
-		
-		fibAfterKlines = PriceUtil.subList(fibAfter, list); 
-		
-		fibInfo.setFibAfterKlines(fibAfterKlines);
 	}
 	
-	private boolean verifyLow(Klines current, Klines parent) {
-		return parent.isFall() && current.isRise() && parent.getBbPercentB() <= 0;
+	private boolean verifyLong(Klines k) {
+		return k.getEma25() < k.getEma99();
 	}
 	
-	private boolean verifyHigh(Klines current, Klines parent) {
-		return parent.isRise() && current.isFall() && parent.getBbPercentB() >= 1;
+	private boolean verifyShort(Klines k) {
+		return k.getEma25() > k.getEma99();
+	}
+	
+	private boolean verifyHigh(Klines k) {
+		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99();
+	}
+	
+	private boolean verifyLow(Klines k) {
+		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99();
 	}
 
 	public List<Klines> getFibAfterKlines() {
