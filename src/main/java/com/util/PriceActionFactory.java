@@ -30,6 +30,8 @@ public class PriceActionFactory {
 	
 	private List<Double> openPrices;
 	
+	private ConsolidationAreaFibUtil cu;
+	
 	public PriceActionFactory(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<Double>();
@@ -44,123 +46,113 @@ public class PriceActionFactory {
 			return;
 		}
 		
+		cu = new ConsolidationAreaFibUtil(list);
+		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		
-		PriceUtil.calculateAllBBPercentB(list);
+		PriceUtil.calculateEMA_7_25_99(list);
 		
-		PositionSide ps = PositionSide.DEFAULT;
+		PositionSide ps = getPositionSide();
 		
-		Klines fourth = null;
-		Klines third = null;
 		Klines second = null;
 		Klines first = null;
 		
 		for(int index = list.size() - 1; index > 0; index--) {
-			Klines k = list.get(index);
-			if(ps == PositionSide.DEFAULT) {
-				if(verifyHigh(k)) {
-					ps = PositionSide.SHORT;
-				} else if(verifyLow(k)) {
-					ps = PositionSide.LONG;
-				}
-			} else if(ps == PositionSide.LONG){
-				if(fourth == null) {
-					if(verifyHigh(k)) {
-						fourth = k;
-					}
-				} else if(third == null) {
-					if(k.getBbPercentB() < 0.5) {
-						third = k;
-					}
-				} else if(second == null) {
-					if(k.getBbPercentB() >= 0.5) {
-						second = k;
+			Klines current = list.get(index);
+			if(ps == PositionSide.LONG) {//high - low
+				if(second == null) {
+					if(verifyHigh(current)) {
+						second = current;
 					}
 				} else if(first == null) {
-					if(k.getBbPercentB() < 0.5) {
-						first = list.get(index + 1);
+					if(verifyLow(current)) {
+						first = current;
 						break;
 					}
 				}
-			} else if(ps == PositionSide.SHORT) {
-				if(fourth == null) {
-					if(verifyLow(k)) {
-						fourth = k;
-					}
-				} else if(third == null) {
-					if(k.getBbPercentB() > 0.5) {
-						third = k;
-					}
-				} else if(second == null) {
-					if(k.getBbPercentB() <= 0.5) {
-						second = k;
+			} else if(ps == PositionSide.SHORT) { // low - high
+				if(second == null) {
+					if(verifyLow(current)) {
+						second = current;
 					}
 				} else if(first == null) {
-					if(k.getBbPercentB() > 0.5) {
-						first = list.get(index + 1);
+					if(verifyHigh(current)) {
+						first = current;
 						break;
 					}
 				}
 			}
 		}
 		
-		if(first == null) {
+		if(first == null || second == null) {
 			return;
 		}
 		
-		List<Klines> areaList = PriceUtil.subList(first, third, list);
-		List<Klines> fibList = PriceUtil.subList(third, list);
-		if(CollectionUtils.isEmpty(fibList)) {
-			return;
-		}
-		
+		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
+		List<Klines> secondSubList = null;
 		Klines start = null;
 		Klines end = null;
-		List<Klines> fibSub = null;
 		if(ps == PositionSide.LONG) {
-			start = PriceUtil.getMaxPriceKLine(fibList);
-			fibSub = PriceUtil.subList(start, list);
-			end = PriceUtil.getMinPriceKLine(fibSub);
+			start = PriceUtil.getMaxPriceKLine(firstSubList);
+			secondSubList = PriceUtil.subList(start, list);
+			end = PriceUtil.getMinPriceKLine(secondSubList);
 			fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
 		} else if(ps == PositionSide.SHORT) {
-			start = PriceUtil.getMinPriceKLine(fibList);
-			fibSub = PriceUtil.subList(start, list);
-			end = PriceUtil.getMaxPriceKLine(fibSub);
+			start = PriceUtil.getMinPriceKLine(firstSubList);
+			secondSubList = PriceUtil.subList(start, list);
+			end = PriceUtil.getMaxPriceKLine(secondSubList);
 			fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
 		}
 		
 		if(fibInfo == null) {
 			return;
 		}
-
-		logger.debug(areaList);
-		logger.debug(start);
-		logger.debug(end);
 		
-		Klines areaLow = PriceUtil.getMinPriceKLine(areaList);
-		Klines areaHigh = PriceUtil.getMaxPriceKLine(areaList);
-		addPrices(areaLow.getLowPriceDoubleValue());
-		addPrices(areaHigh.getHighPriceDoubleValue());
-		
-		if(ps == PositionSide.LONG) {
-			openPrices.sort(new PriceComparator(SortType.DESC));
-		} else {
-			openPrices.sort(new PriceComparator(SortType.ASC));
-		}
-		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, list);
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, secondSubList);
 		if(fibAfterFlag != null) {
-			fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
+			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
+		
+		QuotationMode current_mode = fibInfo.getQuotationMode() == QuotationMode.LONG ? QuotationMode.SHORT : QuotationMode.LONG;
+		FibInfo child_fib = cu.getFibInfo();
+		if(child_fib == null) {
+			return;
+		}
+		QuotationMode child_mode = child_fib.getQuotationMode();
+		
+		if(child_mode == current_mode) {
+			this.openPrices.addAll(cu.getOpenPrices());
+		}
+		
+		logger.debug(this.openPrices);
 	}
 	
-	public boolean verifyHigh(Klines k) {
-		return k.getBbPercentB() >= 1;
+	private PositionSide getPositionSide() {
+		PositionSide ps = PositionSide.DEFAULT;
+		Klines last = PriceUtil.getLastKlines(list);
+		if(verifyLong(last)) {
+			ps = PositionSide.LONG;
+		} else if(verifyShort(last)) {
+			ps = PositionSide.SHORT;
+		}
+		return ps;
 	}
 	
-	public boolean verifyLow(Klines k) {
-		return k.getBbPercentB() <= 0;
+	private boolean verifyShort(Klines k) {
+		return k.getEma25() > k.getEma99();
+	}
+	
+	private boolean verifyLong(Klines k) {
+		return k.getEma25() < k.getEma99();
+	}
+	
+	private boolean verifyHigh(Klines k) {
+		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99();
+	}
+	
+	private boolean verifyLow(Klines k) {
+		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99();
 	}
 	
 	public boolean verifyOpen(List<Klines> list) {
@@ -168,7 +160,7 @@ public class PriceActionFactory {
 		if(!(CollectionUtils.isEmpty(list) || fibInfo == null)) {
 			Klines last = PriceUtil.getLastKlines(list);
 			double closePrice = last.getClosePriceDoubleValue();
-			double fibPrice = fibInfo.getFibValue(FibCode.FIB5);
+			double fibPrice = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode mode = fibInfo.getQuotationMode();
 			for(int index = 0; index < openPrices.size(); index++) {
 				double price = openPrices.get(index);
