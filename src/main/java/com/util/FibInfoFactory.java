@@ -53,8 +53,10 @@ public class FibInfoFactory {
 			if(ps == PositionSide.DEFAULT) {
 				if(verifyHigh(current, parent)) {
 					ps = PositionSide.SHORT;
+					afterFlag = current;
 				} else if(verifyLow(current, parent)) {
 					ps = PositionSide.LONG;
+					afterFlag = current;
 				}
 			} else if(ps == PositionSide.LONG) {
 				if(second == null) {
@@ -84,7 +86,7 @@ public class FibInfoFactory {
 		if(first == null || second == null) {
 			return;
 		}
-		
+		/*
 		List<Klines> secondSubList = PriceUtil.subList(second, list);
 		if(!CollectionUtils.isEmpty(secondSubList) || secondSubList.size() > 2) {
 			for(int index = 1; index < secondSubList.size(); index++) {
@@ -101,7 +103,7 @@ public class FibInfoFactory {
 			if(afterFlag != null) {
 				second = afterFlag;
 			}
-		}
+		}*/
 		
 		
 		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
@@ -116,12 +118,12 @@ public class FibInfoFactory {
 		Klines end = null;
 		if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
-			endSubList = PriceUtil.subList(start, list);
+			endSubList = PriceUtil.subList(start, afterFlag, list);
 			end = PriceUtil.getMaxPriceKLine(endSubList);
 			fibInfo = new FibInfo(start, end, start.getDecimalNum(), FibLevel.LEVEL_3);
 		} else if(ps == PositionSide.SHORT) {
 			start = PriceUtil.getMaxPriceKLine(firstSubList);
-			endSubList = PriceUtil.subList(start, list);
+			endSubList = PriceUtil.subList(start, afterFlag, list);
 			end = PriceUtil.getMinPriceKLine(endSubList);
 			fibInfo = new FibInfo(end, start, start.getDecimalNum(), FibLevel.LEVEL_3);
 		}
