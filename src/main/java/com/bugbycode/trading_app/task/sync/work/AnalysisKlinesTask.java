@@ -110,7 +110,7 @@ public class AnalysisKlinesTask implements Runnable{
             //日线级别信息END====================================================================================
             
             //斐波那契回撤分析
-            klinesService.futuresFibMonitor(klines_list_1h_db, klines_list_15m);
+            klinesService.futuresFibMonitor_v2(klines_list_1h_db, klines_list_15m);
             
             //指数均线
             klinesService.futuresEmaRiseAndFallMonitor(klines_list_15m);

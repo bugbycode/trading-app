@@ -338,6 +338,50 @@ public class FibInfo {
 		return info != null && this.getFibValue(FibCode.FIB0) == info.getFibValue(FibCode.FIB0)
 				 && this.getFibValue(FibCode.FIB1) == info.getFibValue(FibCode.FIB1);
 	}
+	
+	
+	/**
+	 * 根据价格寻找所处的回撤点位
+	 * @param price
+	 * @return
+	 */
+	public FibCode getFibCode(double price) {
+		FibCode code = FibCode.FIB0;
+		QuotationMode mode = this.getQuotationMode();
+		if(mode == QuotationMode.LONG) {
+			if(price < this.getFibValue(FibCode.FIB786)) { //1~0.786
+				code = FibCode.FIB1;
+			} else if(price >= this.getFibValue(FibCode.FIB786) && price < this.getFibValue(FibCode.FIB66)) {//0.786~0.66
+				code = FibCode.FIB786;
+			} else if((price >= this.getFibValue(FibCode.FIB66) || price >= this.getFibValue(FibCode.FIB618)) 
+					&& price < this.getFibValue(FibCode.FIB5)) {// 0.618~0.5
+				code = FibCode.FIB618;
+			} else if(price >= this.getFibValue(FibCode.FIB5) && price < this.getFibValue(FibCode.FIB382)) {//0.5~0.382
+				code = FibCode.FIB5;
+			} else if(price >= this.getFibValue(FibCode.FIB382) && price < this.getFibValue(FibCode.FIB236)) { //0.382~0.236
+				code = FibCode.FIB382;
+			} else if(price >= this.getFibValue(FibCode.FIB236) && price < this.getFibValue(FibCode.FIB0)) { //0.382~0.236
+				code = FibCode.FIB236;
+			}
+		} else {
+			if(price > this.getFibValue(FibCode.FIB786)) { //1~0.786
+				code = FibCode.FIB1;
+			} else if(price <= this.getFibValue(FibCode.FIB786) && price > this.getFibValue(FibCode.FIB66)) {//0.786~0.66
+				code = FibCode.FIB786;
+			} else if((price <= this.getFibValue(FibCode.FIB66) || price <= this.getFibValue(FibCode.FIB618)) 
+					&& price > this.getFibValue(FibCode.FIB5)) {// 0.618~0.5
+				code = FibCode.FIB618;
+			} else if(price <= this.getFibValue(FibCode.FIB5) && price > this.getFibValue(FibCode.FIB382)) {//0.5~0.382
+				code = FibCode.FIB5;
+			} else if(price <= this.getFibValue(FibCode.FIB382) && price > this.getFibValue(FibCode.FIB236)) { //0.382~0.236
+				code = FibCode.FIB382;
+			} else if(price <= this.getFibValue(FibCode.FIB236) && price > this.getFibValue(FibCode.FIB0)) { //0.382~0.236
+				code = FibCode.FIB236;
+			}
+		}
+		
+		return code;
+	}
 
 	@Override
 	public String toString() {
