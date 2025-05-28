@@ -2050,7 +2050,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void volumeMonitor(List<Klines> list) {
 		
-		if(CollectionUtils.isEmpty(list) || list.size() < 3) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 12) {
 			return;
 		}
 		
