@@ -374,18 +374,21 @@ public class KlinesServiceImpl implements KlinesService {
 		for(int offset = 0;offset < openPrices.size();offset++) {
 			
 			//FibCode code = codes[offset];//当前斐波那契点位
-			FibCode code = fibInfo.getFibCode(openPrices.get(offset));
+			double price = openPrices.get(offset);
+			FibCode code = fibInfo.getFibCode(price);
 			if(code.lt(fibInfo.getLevel().getStartFibCode())) {
 				continue;
 			}
 			
-			if(PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
+			if(//PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					//&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
+					PriceUtil.isLong_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, offset)
-					&& !PriceUtil.isTraded(code, fibInfo)) {
+					//&& !PriceUtil.isTraded(code, fibInfo)
+					) {
 				
 				//市价做多
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, fibInfo.getFibCodeIndex(code), fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
 				
 				//
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
@@ -463,19 +466,24 @@ public class KlinesServiceImpl implements KlinesService {
 		//for(int offset = 0;offset < codes.length;offset++) {
 		for(int offset = 0; offset < openPrices.size(); offset++) {	
 			//FibCode code = codes[offset];//当前斐波那契点位
-			FibCode code = fibInfo.getFibCode(openPrices.get(offset));
+			
+			double price = openPrices.get(offset);
+			
+			FibCode code = fibInfo.getFibCode(price);
 			
 			if(code.lt(fibInfo.getLevel().getStartFibCode())) {
 				continue;
 			}
 			
-			if(PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
+			if(//PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
 					//&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
+					PriceUtil.isShort_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, offset)
-					&& !PriceUtil.isTraded(code, fibInfo)) {
+					//&& !PriceUtil.isTraded(code, fibInfo)
+					) {
 				
 				//市价做空
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, fibInfo.getFibCodeIndex(code),  fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
 
 				//
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);

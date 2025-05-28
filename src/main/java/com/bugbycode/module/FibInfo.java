@@ -339,6 +339,17 @@ public class FibInfo {
 				 && this.getFibValue(FibCode.FIB1) == info.getFibValue(FibCode.FIB1);
 	}
 	
+	public int getFibCodeIndex(FibCode code) {
+		int index = 0;
+		FibCode[] codes = FibCode.values();
+		for(int offset = 0;offset < codes.length; offset++) {
+			if(codes[offset] == code) {
+				index = offset;
+				break;
+			}
+		}
+		return index;
+	}
 	
 	/**
 	 * 根据价格寻找所处的回撤点位
