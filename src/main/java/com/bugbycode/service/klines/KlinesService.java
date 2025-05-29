@@ -11,7 +11,6 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
-import com.util.FibInfoFactory_v2;
 
 public interface KlinesService {
 	
@@ -74,22 +73,6 @@ public interface KlinesService {
 	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
-	 * 合约做多
-	 * @param factory 
-	 * @param afterLowKlines 回撤之后的最低k线
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openLong_v2(FibInfoFactory_v2 factory,Klines afterLowKlines,List<Klines> klinesList_hit);
-	
-	/**
-	 * 合约做空
-	 * @param factory 
-	 * @param afterHighKlines 回撤之后的最高k线
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openShort_v2(FibInfoFactory_v2 factory,Klines afterHighKlines,List<Klines> klinesList_hit);
-	
-	/**
 	 * 指数均线监控
 	 * @param klinesList
 	 */
@@ -101,13 +84,6 @@ public interface KlinesService {
 	 * @param list_15m
 	 */
 	public void futuresFibMonitor(List<Klines> list_1h, List<Klines> list_15m);
-	
-	/**
-	 * 斐波那契回撤点位监控 V2
-	 * 
-	 * @param list_15m
-	 */
-	public void futuresFibMonitor_v2(List<Klines> list_1h, List<Klines> list_15m);
 	
 	/**
 	 * 盘整区监控
