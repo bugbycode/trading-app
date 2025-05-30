@@ -142,24 +142,24 @@ public class ConsolidationAreaFibUtil {
 		if(mode == QuotationMode.SHORT) {
 			//顶部压力区
 			Klines bodyHighPriceKLine = PriceUtil.getMaxBodyHighPriceKLine(firstSubList);
-			Klines fallMaxBodyLowPriceKLine = PriceUtil.getFallMaxBodyLowPriceKLine(firstSubList);
+			//Klines fallMaxBodyLowPriceKLine = PriceUtil.getFallMaxBodyLowPriceKLine(firstSubList);
 			if(bodyHighPriceKLine != null) {
 				addOpenPrice(bodyHighPriceKLine.getBodyHighPriceDoubleValue());
 			}
-			if(fallMaxBodyLowPriceKLine != null) {
+			/*if(fallMaxBodyLowPriceKLine != null) {
 				addOpenPrice(fallMaxBodyLowPriceKLine.getBodyLowPriceDoubleValue());
-			}
+			}*/
 			openPrices.sort(new PriceComparator(SortType.ASC));
 		} else {
 			//底部压力区
 			Klines bodyLowPriceKline = PriceUtil.getMinBodyLowPriceKLine(firstSubList);
-			Klines riseMinBodyHighPriceKline = PriceUtil.getRiseMinBodyHighPriceKLine(firstSubList);
+			//Klines riseMinBodyHighPriceKline = PriceUtil.getRiseMinBodyHighPriceKLine(firstSubList);
 			if(bodyLowPriceKline != null) {
 				addOpenPrice(bodyLowPriceKline.getBodyLowPriceDoubleValue());
 			}
-			if(riseMinBodyHighPriceKline != null) {
+			/*if(riseMinBodyHighPriceKline != null) {
 				addOpenPrice(riseMinBodyHighPriceKline.getBodyHighPriceDoubleValue());
-			}
+			}*/
 			openPrices.sort(new PriceComparator(SortType.DESC));
 		}
 	}
