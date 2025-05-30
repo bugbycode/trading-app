@@ -120,24 +120,16 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		if(!CollectionUtils.isEmpty(list) && fibInfo != null) {
-			Klines last = PriceUtil.getLastKlines(list);
-			QuotationMode mode = fibInfo.getQuotationMode();
-			if(mode == QuotationMode.LONG && last.getEma25() >= last.getEma99()) {
-				result = true;
-			}
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
+			result = true;
 		}
 		return result;
 	}
 	
 	public boolean isShort() {
 		boolean result = false;
-		if(!CollectionUtils.isEmpty(list) && fibInfo != null) {
-			Klines last = PriceUtil.getLastKlines(list);
-			QuotationMode mode = fibInfo.getQuotationMode();
-			if(mode == QuotationMode.SHORT && last.getEma25() <= last.getEma99()) {
-				result = true;
-			}
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
+			result = true;
 		}
 		return result;
 	}

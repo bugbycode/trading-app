@@ -935,10 +935,6 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
-		if(fibInfo == null) {
-			return;
-		}
-		
 		if(factory.isLong()) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
 			openLong(fibInfo, afterLowKlines, list_15m);
