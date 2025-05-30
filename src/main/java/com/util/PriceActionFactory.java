@@ -11,6 +11,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.trading.PositionSide;
@@ -30,8 +31,6 @@ public class PriceActionFactory {
 	
 	private List<Double> openPrices;
 	
-	private ConsolidationAreaFibUtil cu;
-	
 	public PriceActionFactory(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<Double>();
@@ -45,8 +44,6 @@ public class PriceActionFactory {
 		if(CollectionUtils.isEmpty(list) || list.size() < 99) {
 			return;
 		}
-		
-		cu = new ConsolidationAreaFibUtil(list);
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
@@ -114,15 +111,61 @@ public class PriceActionFactory {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
 		
-		QuotationMode current_mode = fibInfo.getQuotationMode() == QuotationMode.LONG ? QuotationMode.SHORT : QuotationMode.LONG;
-		FibInfo child_fib = cu.getFibInfo();
-		if(child_fib == null) {
-			return;
+		//处理市场情绪价格信息 START========================================
+		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
+		QuotationMode mode = fibInfo.getQuotationMode();
+		List<Klines> fibSubList = PriceUtil.subList(start, list);
+		for(int index = fibSubList.size() - 1; index > 3; index--) {
+			Klines last = fibSubList.get(index);
+			Klines k0 = fibSubList.get(index - 1);
+			Klines k1 = fibSubList.get(index - 2);
+			Klines k2 = fibSubList.get(index - 3);
+			if((mode == QuotationMode.LONG && PriceUtil.isGreedyBuy(last, k0, k1, k2)) //寻找疯狂购买的市场情绪
+				|| (mode == QuotationMode.SHORT && PriceUtil.isPanicSell(last, k0, k1, k2)) //寻找恐慌抛售的市场情绪
+					) {
+				msList.add(getMarketSentiment(last, k0, k1, k2));
+			}
 		}
-		QuotationMode child_mode = child_fib.getQuotationMode();
 		
-		if(child_mode == current_mode) {
-			this.openPrices.addAll(cu.getOpenPrices());
+		//处理市场情绪价格信息 END ========================================
+		
+		Klines release = null;
+		//处理放量上涨或放量下跌价格信息 START ==============================
+		for(int index = list.size() - 1;index > 1; index--) {
+			Klines k0 = list.get(index);
+			Klines k1 = list.get(index - 1);
+			if(k0.lt(start)) {
+				break;
+			}
+			if(mode == QuotationMode.LONG) {//寻找放量上涨
+				if(PriceUtil.isRise_v3(k0, k1) && PriceUtil.isRelease(k0, k1)) { //上涨
+					if(release == null || release.getHighPriceDoubleValue() < k0.getHighPriceDoubleValue()) {
+						release = k0;
+					}
+				}
+			} else if(mode == QuotationMode.SHORT) {//寻找放量下跌
+				if(PriceUtil.isFall_v3(k0, k1) && PriceUtil.isRelease(k0, k1)) {//下跌
+					if(release == null || release.getLowPriceDoubleValue() > k0.getLowPriceDoubleValue()) {
+						release = k0;
+					}
+				}
+			}
+		}
+		//logger.info(release);
+		if(release != null) {
+			MarketSentiment releaseMs = new MarketSentiment(release);
+			msList.add(releaseMs);
+		}
+		//处理放量上涨或放量下跌价格信息 END ==============================
+
+		//开始处理开仓点位
+		MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
+		MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
+		
+		if(mode == QuotationMode.LONG && high != null) {//高点做空
+			addPrices(high.getHighPrice());
+		} else if(mode == QuotationMode.SHORT && low != null){//低点做多
+			addPrices(low.getLowPrice());
 		}
 		
 		logger.debug(this.openPrices);
@@ -160,7 +203,7 @@ public class PriceActionFactory {
 		if(!(CollectionUtils.isEmpty(list) || fibInfo == null)) {
 			Klines last = PriceUtil.getLastKlines(list);
 			double closePrice = last.getClosePriceDoubleValue();
-			double fibPrice = fibInfo.getFibValue(FibCode.FIB382);
+			double fibPrice = fibInfo.getFibValue(FibCode.FIB236);
 			QuotationMode mode = fibInfo.getQuotationMode();
 			for(int index = 0; index < openPrices.size(); index++) {
 				double price = openPrices.get(index);
@@ -196,5 +239,14 @@ public class PriceActionFactory {
 
 	public List<Klines> getFibAfterKlines() {
 		return fibAfterKlines;
+	}
+	
+	private MarketSentiment getMarketSentiment(Klines last, Klines k0, Klines k1, Klines k2) {
+		List<Klines> data = new ArrayList<>();
+		data.add(last);
+		data.add(k0);
+		data.add(k1);
+		data.add(k2);
+		return new MarketSentiment(data);
 	}
 }

@@ -20,6 +20,7 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ReversalPoint;
 import com.bugbycode.module.SortType;
@@ -2250,7 +2251,25 @@ public class PriceUtil {
 		
 		Klines k0 = list.get(index);
 		Klines k1 = list.get(index - 1);
+		/*
+		double v_0 = k0.getVDoubleValue();
+		double v_1 = k1.getVDoubleValue();
 		
+		if(v_0 == 0 || v_1 == 0) {
+			return false;
+		}
+		
+		return v_0 > (v_1 * 5) && k0.getPriceFluctuationPercentage() > 3;*/
+		return isRelease(k0, k1);
+	}
+	
+	/**
+	 * 是否出现放量
+	 * @param k0 最新k线
+	 * @param k1 前一根k
+	 * @return
+	 */
+	public static boolean isRelease(Klines k0, Klines k1) {
 		double v_0 = k0.getVDoubleValue();
 		double v_1 = k1.getVDoubleValue();
 		
@@ -2767,6 +2786,19 @@ public class PriceUtil {
 		Klines k0 = list.get(index - 1);
 		Klines k1 = list.get(index - 2);
 		Klines k2 = list.get(index - 3);
+		//return isPanicSell(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isRise());
+		return isPanicSell(last, k0, k1, k2);
+	}
+	
+	/**
+	 * 是否出现恐慌抛售
+	 * @param last 最新k线
+	 * @param k0 前一根k
+	 * @param k1 ......
+	 * @param k2 ......
+	 * @return
+	 */
+	public static boolean isPanicSell(Klines last, Klines k0, Klines k1, Klines k2) {
 		return isPanicSell(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isRise());
 	}
 	
@@ -2785,6 +2817,19 @@ public class PriceUtil {
 		Klines k0 = list.get(index - 1);
 		Klines k1 = list.get(index - 2);
 		Klines k2 = list.get(index - 3);
+		//return isGreedyBuy(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isFall());
+		return isGreedyBuy(last, k0, k1, k2);
+	}
+	
+	/**
+	 * 是否出现贪婪买入
+	 * @param last 最新k线
+	 * @param k0 前一根k
+	 * @param k1 ......
+	 * @param k2 ......
+	 * @return
+	 */
+	public static boolean isGreedyBuy(Klines last, Klines k0, Klines k1, Klines k2) {
 		return isGreedyBuy(k0, k1, k2) && (last.getVDoubleValue() < k0.getVDoubleValue() || last.isFall());
 	}
 	
@@ -2854,6 +2899,30 @@ public class PriceUtil {
 			for(ReversalPoint rp : list) {
 				if(result == null || rp.getMinPrice() < result.getMinPrice()) {
 					result = rp;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static MarketSentiment getMaxMarketSentiment(List<MarketSentiment> list) {
+		MarketSentiment result = null;
+		if(!CollectionUtils.isEmpty(list)) {
+			for(MarketSentiment ms : list) {
+				if(result == null || result.getHighPrice() < ms.getHighPrice()) {
+					result = ms;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static MarketSentiment getMinMarketSentiment(List<MarketSentiment> list) {
+		MarketSentiment result = null;
+		if(!CollectionUtils.isEmpty(list)) {
+			for(MarketSentiment ms : list) {
+				if(result == null || result.getLowPrice() > ms.getLowPrice()) {
+					result = ms;
 				}
 			}
 		}
