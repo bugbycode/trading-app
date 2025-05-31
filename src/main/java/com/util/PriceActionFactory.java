@@ -50,6 +50,8 @@ public class PriceActionFactory {
 		
 		PriceUtil.calculateEMA_7_25_99(list);
 		
+		Klines last_1h = PriceUtil.getLastKlines(list);
+		
 		PositionSide ps = getPositionSide();
 		
 		Klines second = null;
@@ -162,9 +164,9 @@ public class PriceActionFactory {
 		MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
 		MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
 		
-		if(mode == QuotationMode.LONG && high != null) {//高点做空
+		if(mode == QuotationMode.LONG && high != null && !last_1h.isEquals(high.getHigh())) {//高点做空
 			addPrices(high.getHighPrice());
-		} else if(mode == QuotationMode.SHORT && low != null){//低点做多
+		} else if(mode == QuotationMode.SHORT && low != null && !last_1h.isEquals(low.getLow())){//低点做多
 			addPrices(low.getLowPrice());
 		}
 		
