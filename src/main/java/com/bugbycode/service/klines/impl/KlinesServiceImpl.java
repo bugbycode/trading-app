@@ -388,7 +388,7 @@ public class KlinesServiceImpl implements KlinesService {
 					) {
 				
 				//市价做多
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, fibInfo.getFibCodeIndex(code), fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
 				
 				//
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
@@ -484,7 +484,7 @@ public class KlinesServiceImpl implements KlinesService {
 					) {
 				
 				//市价做空
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, fibInfo.getFibCodeIndex(code),  fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
 
 				//
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
