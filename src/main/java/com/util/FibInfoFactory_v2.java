@@ -167,13 +167,18 @@ public class FibInfoFactory_v2 {
 			areaEnd = areaThird;
 		}
 		
+		addOpenPrice(fibInfo.getFibValue(FibCode.FIB1));
+		
+		if(areaEnd == null) {
+			return;
+		}
+		
 		List<Klines> areaList = PriceUtil.subList(areaStart, areaEnd, fibSubList);
 		
 		Klines high = PriceUtil.getMaxPriceKLine(areaList);
 		Klines low = PriceUtil.getMinPriceKLine(areaList);
 		addOpenPrice(high.getHighPriceDoubleValue());
 		addOpenPrice(low.getLowPriceDoubleValue());
-		addOpenPrice(fibInfo.getFibValue(FibCode.FIB1));
 		
 		if(mode == QuotationMode.LONG) {
 			openPrices.sort(new PriceComparator(SortType.DESC));
