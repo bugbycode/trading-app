@@ -115,6 +115,7 @@ public class FibInfoFactory {
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, list);
 		if(fibAfterFlag != null) {
 			fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
+			fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 	}
 	
