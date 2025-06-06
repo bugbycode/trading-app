@@ -47,6 +47,8 @@ public class FibInfoFactory_v2 {
 		//PriceUtil.calculateEMA_7_25_99(list);
 		PositionSide ps = PositionSide.DEFAULT;
 		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		Klines first = null;
 		Klines second = null;
 		Klines third = null;
@@ -54,6 +56,9 @@ public class FibInfoFactory_v2 {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
 			if(ps == PositionSide.DEFAULT) {
+				if(current.isEquals(last)) {
+					continue;
+				}
 				if(verifyHigh(current, parent)) {// high - low - high
 					ps = PositionSide.LONG;
 					third = current;
@@ -117,11 +122,11 @@ public class FibInfoFactory_v2 {
 				if(areaFirst == null) {
 					if(current.getBbPercentB() > 0.5) {
 						areaFirst = current;
-						if(index == 0) {
+						/*if(index == 0) {
 							areaEnd = current;
 						} else {
 							areaEnd = fibSubList.get(index - 1);
-						}
+						}*/
 					}
 				} else if(areaSecond == null) {
 					if(current.getBbPercentB() < 0.5) {
@@ -136,11 +141,11 @@ public class FibInfoFactory_v2 {
 				if(areaFirst == null) {
 					if(current.getBbPercentB() < 0.5) {
 						areaFirst = current;
-						if(index == 0) {
+						/*if(index == 0) {
 							areaEnd = current;
 						} else {
 							areaEnd = fibSubList.get(index - 1);
-						}
+						}*/
 					}
 				} else if(areaSecond == null) {
 					if(current.getBbPercentB() > 0.5) {
@@ -155,9 +160,10 @@ public class FibInfoFactory_v2 {
 		}
 		
 		Klines areaStart = null;
-		if(areaThird == null) {
+		/*if(areaThird == null) {
 			areaStart = fibSubList.get(0);
-		} else {
+		} else {*/
+		if(areaThird != null) {
 			List<Klines> areaFirstSub = PriceUtil.subList(areaFirst, areaSecond, fibSubList);
 			if(mode == QuotationMode.LONG) {
 				areaStart = PriceUtil.getMaxPriceKLine(areaFirstSub);
@@ -170,15 +176,16 @@ public class FibInfoFactory_v2 {
 		addOpenPrice(fibInfo.getFibValue(FibCode.FIB1));
 		
 		if(areaEnd == null) {
-			return;
+			//return;
+			addOpenPrice(fibInfo.getFibValue(FibCode.FIB618));
+		} else {
+			List<Klines> areaList = PriceUtil.subList(areaStart, areaEnd, fibSubList);
+			
+			Klines high = PriceUtil.getMaxPriceKLine(areaList);
+			Klines low = PriceUtil.getMinPriceKLine(areaList);
+			addOpenPrice(high.getHighPriceDoubleValue());
+			addOpenPrice(low.getLowPriceDoubleValue());
 		}
-		
-		List<Klines> areaList = PriceUtil.subList(areaStart, areaEnd, fibSubList);
-		
-		Klines high = PriceUtil.getMaxPriceKLine(areaList);
-		Klines low = PriceUtil.getMinPriceKLine(areaList);
-		addOpenPrice(high.getHighPriceDoubleValue());
-		addOpenPrice(low.getLowPriceDoubleValue());
 		
 		if(mode == QuotationMode.LONG) {
 			openPrices.sort(new PriceComparator(SortType.DESC));
