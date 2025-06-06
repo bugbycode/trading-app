@@ -190,11 +190,17 @@ public class PriceActionFactory {
 			endFlag = high.getHigh();
 			addPrices(high.getHighPrice());
 			addPrices(high.getHigh().getBodyHighPriceDoubleValue());
+			if(verifyDeclining(last_1h)) {
+				addPrices(high.getHigh().getBodyLowPriceDoubleValue());
+			}
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		} else if(mode == QuotationMode.SHORT && low != null && !last_1h.isEquals(low.getLow())){//低点做多
 			endFlag = low.getLow();
 			addPrices(low.getLowPrice());
 			addPrices(low.getLow().getBodyLowPriceDoubleValue());
+			if(verifyPowerful(last_1h)) {
+				addPrices(low.getLow().getBodyHighPriceDoubleValue());
+			}
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
 		
@@ -284,4 +290,22 @@ public class PriceActionFactory {
 		data.add(k2);
 		return new MarketSentiment(data);
 	}*/
+	
+	/**
+	 * ema7 < ema25 return true;
+	 * @param k
+	 * @return
+	 */
+	private boolean verifyDeclining(Klines k) {
+		return k.getEma7() < k.getEma25();
+	}
+	
+	/**
+	 * ema7 > ema25 return true;
+	 * @param k
+	 * @return
+	 */
+	private boolean verifyPowerful(Klines k) {
+		return k.getEma7() > k.getEma25();
+	}
 }
