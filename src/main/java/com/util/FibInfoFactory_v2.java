@@ -178,6 +178,7 @@ public class FibInfoFactory_v2 {
 		if(areaEnd == null) {
 			//return;
 			addOpenPrice(fibInfo.getFibValue(FibCode.FIB618));
+			addOpenPrice(fibInfo.getFibValue(FibCode.FIB66));
 		} else {
 			List<Klines> areaList = PriceUtil.subList(areaStart, areaEnd, fibSubList);
 			
