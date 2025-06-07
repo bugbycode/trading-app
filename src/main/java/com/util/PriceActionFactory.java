@@ -113,11 +113,9 @@ public class PriceActionFactory {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
 		
+		//处理市场情绪价格信息 START========================================
 		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 		QuotationMode mode = fibInfo.getQuotationMode();
-		
-		/*
-		//处理市场情绪价格信息 START========================================
 		List<Klines> fibSubList = PriceUtil.subList(start, list);
 		for(int index = fibSubList.size() - 1; index > 3; index--) {
 			Klines last = fibSubList.get(index);
@@ -161,52 +159,15 @@ public class PriceActionFactory {
 			msList.add(releaseMs);
 		}
 		//处理放量上涨或放量下跌价格信息 END ==============================
-		
-		*/
-		
-		//处理强势或颓势价格行为 START ==================================
-		
-		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
-			for(int index = 0; index < fibAfterKlines.size(); index++) {
-				Klines k = fibAfterKlines.get(index);
-				if(mode == QuotationMode.LONG && PriceUtil.isBreachShort(k, k.getEma25())) { //寻找颓势
-					MarketSentiment releaseMs = new MarketSentiment(k);
-					msList.add(releaseMs);
-				} else if(mode == QuotationMode.SHORT && PriceUtil.isBreachLong(k, k.getEma25())){ //寻找强势
-					MarketSentiment releaseMs = new MarketSentiment(k);
-					msList.add(releaseMs);
-				}
-			}
-		}
-		
-		//处理强势或颓势价格行为 END ==================================
-		
+
 		//开始处理开仓点位
 		MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
 		MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
 		
-		Klines endFlag = null;
 		if(mode == QuotationMode.LONG && high != null && !last_1h.isEquals(high.getHigh())) {//高点做空
-			endFlag = high.getHigh();
 			addPrices(high.getHighPrice());
-			addPrices(high.getHigh().getBodyHighPriceDoubleValue());
-			if(verifyDeclining(last_1h)) {
-				addPrices(high.getHigh().getBodyLowPriceDoubleValue());
-			}
-			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		} else if(mode == QuotationMode.SHORT && low != null && !last_1h.isEquals(low.getLow())){//低点做多
-			endFlag = low.getLow();
 			addPrices(low.getLowPrice());
-			addPrices(low.getLow().getBodyLowPriceDoubleValue());
-			if(verifyPowerful(last_1h)) {
-				addPrices(low.getLow().getBodyHighPriceDoubleValue());
-			}
-			this.openPrices.sort(new PriceComparator(SortType.DESC));
-		}
-		
-		fibAfterFlag = PriceUtil.getAfterKlines(endFlag, secondSubList);
-		if(fibAfterFlag != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
 		
 		logger.debug(this.openPrices);
@@ -244,7 +205,7 @@ public class PriceActionFactory {
 		if(!(CollectionUtils.isEmpty(list) || fibInfo == null)) {
 			Klines last = PriceUtil.getLastKlines(list);
 			double closePrice = last.getClosePriceDoubleValue();
-			double fibPrice = fibInfo.getFibValue(FibCode.FIB382);
+			double fibPrice = fibInfo.getFibValue(FibCode.FIB236);
 			QuotationMode mode = fibInfo.getQuotationMode();
 			for(int index = 0; index < openPrices.size(); index++) {
 				double price = openPrices.get(index);
@@ -281,7 +242,7 @@ public class PriceActionFactory {
 	public List<Klines> getFibAfterKlines() {
 		return fibAfterKlines;
 	}
-	/*
+	
 	private MarketSentiment getMarketSentiment(Klines last, Klines k0, Klines k1, Klines k2) {
 		List<Klines> data = new ArrayList<>();
 		data.add(last);
@@ -289,23 +250,5 @@ public class PriceActionFactory {
 		data.add(k1);
 		data.add(k2);
 		return new MarketSentiment(data);
-	}*/
-	
-	/**
-	 * ema7 < ema25 return true;
-	 * @param k
-	 * @return
-	 */
-	private boolean verifyDeclining(Klines k) {
-		return k.getEma7() < k.getEma25();
-	}
-	
-	/**
-	 * ema7 > ema25 return true;
-	 * @param k
-	 * @return
-	 */
-	private boolean verifyPowerful(Klines k) {
-		return k.getEma7() > k.getEma25();
 	}
 }
