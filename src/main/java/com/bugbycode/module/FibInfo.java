@@ -207,6 +207,8 @@ public class FibInfo {
 			takeProfit = FibCode.FIB236;
 		} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
 			takeProfit = FibCode.FIB236;
+		} else if(code == FibCode.FIB236) {// 0.236 -> 0
+			takeProfit = FibCode.FIB0;
 		}
 		return takeProfit;
 	}
