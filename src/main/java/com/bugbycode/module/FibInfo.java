@@ -376,7 +376,7 @@ public class FibInfo {
 				code = FibCode.FIB5;
 			} else if(price > this.getFibValue(FibCode.FIB5) && price <= this.getFibValue(FibCode.FIB382)) { //0.5~0.382
 				code = FibCode.FIB382;
-			} else if(price > this.getFibValue(FibCode.FIB382) && price <= this.getFibValue(FibCode.FIB236)) { //0.382~0.236
+			} else if(price > this.getFibValue(FibCode.FIB382) /*&& price <= this.getFibValue(FibCode.FIB236)*/) { //0.382~0.236
 				code = FibCode.FIB236;
 			}
 		} else {
@@ -390,7 +390,7 @@ public class FibInfo {
 				code = FibCode.FIB5;
 			} else if(price < this.getFibValue(FibCode.FIB5) && price >= this.getFibValue(FibCode.FIB382)) { //0.5~0.382
 				code = FibCode.FIB382;
-			} else if(price < this.getFibValue(FibCode.FIB382) && price >= this.getFibValue(FibCode.FIB236)) { //0.382~0.236
+			} else if(price < this.getFibValue(FibCode.FIB382) /*&& price >= this.getFibValue(FibCode.FIB236)*/) { //0.382~0.236
 				code = FibCode.FIB236;
 			}
 		}

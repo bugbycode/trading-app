@@ -55,8 +55,8 @@ import com.util.CommandUtil;
 import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.EmaFibUtil;
-import com.util.FibInfoFactory_v2;
 import com.util.FibInfoFactory_v4;
+import com.util.FibInfoFactory_v5;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.PriceActionFactory;
@@ -352,7 +352,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 	}
 	
-	public void openLong_v2(FibInfoFactory_v2 factory, Klines afterLowKlines, List<Klines> klinesList_hit) {
+	public void openLong_v2(FibInfoFactory_v5 factory, Klines afterLowKlines, List<Klines> klinesList_hit) {
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		List<Double> openPrices = factory.getOpenPrices();
@@ -446,7 +446,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openShort_v2(FibInfoFactory_v2 factory, Klines afterHighKlines, List<Klines> klinesList_hit) {
+	public void openShort_v2(FibInfoFactory_v5 factory, Klines afterHighKlines, List<Klines> klinesList_hit) {
 
 		FibInfo fibInfo = factory.getFibInfo();
 		List<Double> openPrices = factory.getOpenPrices();
@@ -1141,7 +1141,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		FibInfoFactory_v2 factory = new FibInfoFactory_v2(list_1h);
+		FibInfoFactory_v5 factory = new FibInfoFactory_v5(list_1h);
 		
 		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
