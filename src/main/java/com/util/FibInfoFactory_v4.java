@@ -91,12 +91,12 @@ public class FibInfoFactory_v4 {
 			start = PriceUtil.getMaxPriceKLine(firstSubList);
 			secondSubList = PriceUtil.subList(start, list);
 			end = PriceUtil.getMinPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_2);
 		} else if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
 			secondSubList = PriceUtil.subList(start, list);
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_2);
 		}
 		
 		if(this.fibInfo == null) {
