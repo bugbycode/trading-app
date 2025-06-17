@@ -55,7 +55,7 @@ import com.util.CommandUtil;
 import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.EmaFibUtil;
-import com.util.FibInfoFactory_v6;
+import com.util.FibInfoFactory_v4;
 import com.util.FibInfoFactory_v5;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
@@ -206,10 +206,6 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(code.gt(FibCode.FIB1_272)) {
-				continue;
-			}
-			
 			if(PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
 					&& !PriceUtil.isTraded(code, fibInfo)) {
@@ -291,10 +287,6 @@ public class KlinesServiceImpl implements KlinesService {
 		for(int offset = 0;offset < codes.length;offset++) {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
-			
-			if(code.gt(FibCode.FIB1_272)) {
-				continue;
-			}
 			
 			if(PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
@@ -1128,7 +1120,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		FibInfoFactory_v6 factory = new FibInfoFactory_v6(list_1h);
+		FibInfoFactory_v4 factory = new FibInfoFactory_v4(list_1h);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
