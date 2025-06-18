@@ -1689,6 +1689,16 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v5(Klines current,Klines parent) {
+		return parent.getEma7() >= parent.getEma99() && current.getEma7() < parent.getEma99();
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -1721,6 +1731,16 @@ public class PriceUtil {
 			flag = true;
 		}
 		return flag;
+	}
+	
+	/**
+	 * 判断是否出现强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v5(Klines current,Klines parent) {
+		return parent.getEma7() <= current.getEma99() && current.getEma7() > current.getEma99();
 	}
 	
 	/**
@@ -2927,5 +2947,14 @@ public class PriceUtil {
 			}
 		}
 		return result;
+	}
+	
+	public static MarketSentiment getMarketSentiment(Klines last, Klines k0, Klines k1, Klines k2) {
+		List<Klines> data = new ArrayList<>();
+		data.add(last);
+		data.add(k0);
+		data.add(k1);
+		data.add(k2);
+		return new MarketSentiment(data);
 	}
 }

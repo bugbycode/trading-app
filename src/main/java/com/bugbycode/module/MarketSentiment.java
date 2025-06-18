@@ -57,4 +57,12 @@ public class MarketSentiment {
 	public double getLowPrice() {
 		return low == null ? 0 : low.getLowPriceDoubleValue();
 	}
+	
+	public double getBodyHighPrice() {
+		return high == null ? 0 : high.getBodyHighPriceDoubleValue();
+	}
+	
+	public double getBodyLowPrice() {
+		return low == null ? 0 : low.getBodyLowPriceDoubleValue();
+	}
 }
