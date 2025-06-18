@@ -177,10 +177,10 @@ public class FibInfo {
 			takeProfit = FibCode.FIB236;
 		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.236
 			takeProfit = FibCode.FIB236;
-		} else if(code == FibCode.FIB5) { // 0.5 -> 0
-			takeProfit = FibCode.FIB0;
-		} else if(code == FibCode.FIB382) { // 0.382 -> 0
-			takeProfit = FibCode.FIB0;
+		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
+			takeProfit = FibCode.FIB236;
+		} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
+			takeProfit = FibCode.FIB236;
 		} else if(code == FibCode.FIB236) { // 0.236 -> 0
 			takeProfit = FibCode.FIB0;
 		}
@@ -322,8 +322,6 @@ public class FibInfo {
 			result = FibCode.FIB382;
 		} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
 			result = FibCode.FIB382;
-		} else if(current == FibCode.FIB5) {
-			result = FibCode.FIB236;
 		} else {
 			FibCode codes[] = FibCode.values();
 			for(int index = 0; index < codes.length; index++) {
