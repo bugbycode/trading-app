@@ -41,4 +41,15 @@ public enum FibLevel {
 		return startFibCode;
 	}
 	
+	public static FibLevel valueOf(FibCode startFibCode) {
+		FibLevel result = LEVEL_1;
+		FibLevel[] levels = FibLevel.values();
+		for(FibLevel level : levels) {
+			if(level.getStartFibCode() == startFibCode) {
+				result = level;
+				break;
+			}
+		}
+		return result;
+	}
 }

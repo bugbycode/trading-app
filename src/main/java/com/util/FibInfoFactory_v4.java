@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
@@ -110,6 +111,8 @@ public class FibInfoFactory_v4 {
 			return;
 		}
 		
+		this.resetFibLevel();
+		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, secondSubList);
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
@@ -166,5 +169,36 @@ public class FibInfoFactory_v4 {
 			result = true;
 		}
 		return result;
+	}
+	
+	private FibCode getFibCode() {
+		FibCode result = FibCode.FIB1;
+		if(this.fibInfo != null) {
+			QuotationMode mode = this.fibInfo.getQuotationMode();
+			Klines last = PriceUtil.getLastKlines(list);
+			double ema99 = last.getEma99();
+			FibCode[] codes = FibCode.values();
+			for(int index = 0; index < codes.length; index++) {
+				FibCode code = codes[index];
+				double fibPrice = this.fibInfo.getFibValue(code);
+				if((mode == QuotationMode.LONG && fibPrice >= ema99) 
+						|| (mode == QuotationMode.SHORT && fibPrice <= ema99)) {
+					result = code;
+					break;
+				}
+			}
+		}
+		if(result == FibCode.FIB66) {
+			result = FibCode.FIB618;
+		}
+		return result;
+	}
+	
+	private void resetFibLevel() {
+		if(this.fibInfo != null) {
+			FibCode startFibCode = getFibCode();
+			FibLevel level = FibLevel.valueOf(startFibCode);
+			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
+		}
 	}
 }
