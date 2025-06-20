@@ -52,4 +52,52 @@ public enum FibLevel {
 		}
 		return result;
 	}
+	
+	public static FibLevel valueOf(int value) {
+		FibLevel result = LEVEL_3;
+		FibLevel[] levels = FibLevel.values();
+		for(FibLevel level : levels) {
+			if(level.getValue() == value) {
+				result = level;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * 大于
+	 * @param level
+	 * @return
+	 */
+	public boolean gt(FibLevel level) {
+		return this.getValue() > level.getValue();
+	}
+	
+	/**
+	 * 大于等于
+	 * @param level
+	 * @return
+	 */
+	public boolean gte(FibLevel level) {
+		return this.getValue() >= level.getValue();
+	}
+	
+	/**
+	 * 小于
+	 * @param level
+	 * @return
+	 */
+	public boolean lt(FibLevel level) {
+		return this.getValue() < level.getValue();
+	}
+	
+	/**
+	 * 小于等于
+	 * @param level
+	 * @return
+	 */
+	public boolean lte(FibLevel level) {
+		return this.getValue() <= level.getValue();
+	}
 }

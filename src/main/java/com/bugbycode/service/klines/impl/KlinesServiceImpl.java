@@ -218,6 +218,10 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
+					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+						continue;
+					}
+					
 					//回踩单判断
 					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 					
@@ -299,6 +303,10 @@ public class KlinesServiceImpl implements KlinesService {
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
+					
+					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+						continue;
+					}
 
 					//回踩单判断
 					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
@@ -598,6 +606,11 @@ public class KlinesServiceImpl implements KlinesService {
 							FibCode takeProfitCode = FibCode.FIB618;
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
+								
+								if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+									continue;
+								}
+								
 								FibCode code = codes[offset];
 								
 								takeProfitCode = fibInfo.getTakeProfit_v2(code);
@@ -827,6 +840,11 @@ public class KlinesServiceImpl implements KlinesService {
 							FibCode takeProfitCode = FibCode.FIB618;
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
+								
+								if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+									continue;
+								}
+								
 								FibCode code = codes[offset];
 
 								takeProfitCode = fibInfo.getTakeProfit_v2(code);

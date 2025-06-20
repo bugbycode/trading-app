@@ -9,6 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.bugbycode.module.FibLevel;
+
 /**
  * 用户信息
  */
@@ -95,6 +97,8 @@ public class User implements UserDetails {
 	private double monitorProfit = 1;//行情监控振幅过滤
 	
 	private int smtpIndex = 0;//smtp账号索引 发送邮件时轮换认证使用
+	
+	private int fibLevel = 0;//价格回撤级别
 	
 	public String getId() {
 		return id;
@@ -410,5 +414,17 @@ public class User implements UserDetails {
 
 	public void setMonitorProfit(double monitorProfit) {
 		this.monitorProfit = monitorProfit;
+	}
+
+	public int getFibLevel() {
+		return fibLevel;
+	}
+
+	public void setFibLevel(int fibLevel) {
+		this.fibLevel = fibLevel;
+	}
+	
+	public FibLevel getFibLevelType() {
+		return FibLevel.valueOf(this.fibLevel);
 	}
 }

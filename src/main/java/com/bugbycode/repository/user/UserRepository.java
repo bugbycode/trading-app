@@ -2,6 +2,7 @@ package com.bugbycode.repository.user;
 
 import java.util.List;
 
+import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.VolumeMonitorStatus;
@@ -132,11 +133,12 @@ public interface UserRepository {
 	 * @param tradeStyle 交易风格 0：保守 1：激进
 	 * @param profitLimit 止盈百分比限制 交易风格为保守时使用
 	 * @param countertrendTrading 是否交易逆势单 0：否 1：是
+	 * @param fibLevel 价格回撤级别
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
 			int baseStepSize,int leverage,double positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade,
 			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle,double profitLimit,
-			int countertrendTrading);
+			int countertrendTrading, FibLevel fibLevel);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

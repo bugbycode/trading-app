@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
+import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.VolumeMonitorStatus;
@@ -137,7 +138,7 @@ public class UserRepositoryImpl implements UserRepository {
 	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade,
 			int baseStepSize,int leverage,double positionValue, double cutLoss,double profit,int autoTradeType,int drawTrade,
 			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle,double profitLimit,
-			int countertrendTrading) {
+			int countertrendTrading, FibLevel fibLevel) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
@@ -156,6 +157,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("tradeStyle", tradeStyle);
 		update.set("profitLimit", profitLimit);
 		update.set("countertrendTrading", countertrendTrading);
+		update.set("fibLevel", fibLevel.getValue());
 		
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
