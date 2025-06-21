@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.bugbycode.module.Inerval;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.util.DateFormatUtil;
 
 /**
  * 删除k线信息任务
@@ -39,7 +40,9 @@ public class RemoveKlinesTask implements Runnable {
 	@Override
 	public void run() {
 		try {
+			logger.info("开始删除{}{}之前{}级别所有k线信息", pair, DateFormatUtil.format(time), interval.getMemo());
 			klinesRepository.removeBeforeKlinesByTime(pair, time, interval);
+			logger.info("{}{}之前{}级别所有k线信息已删除完成", pair, DateFormatUtil.format(time), interval.getMemo());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
