@@ -83,6 +83,11 @@ public class InitConfig implements ApplicationRunner {
 	}
 	
 	@Bean
+	public WorkTaskPool removeKlinesTaskPool() {
+		return new WorkTaskPool("RemoveKlinesTaskPool", 1);
+	}
+	
+	@Bean
 	public TradingWebSocketClientEndpoint websocketApi() {
 		return new TradingWebSocketClientEndpoint(websocketApiBaseUrl);
 	}

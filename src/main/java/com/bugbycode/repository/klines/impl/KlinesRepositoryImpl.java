@@ -126,4 +126,10 @@ public class KlinesRepositoryImpl implements KlinesRepository{
 		return template.find(q, Klines.class, StringUtil.formatCollectionName(pair, interval));
 	}
 
+	@Override
+	public void removeBeforeKlinesByTime(String pair, long time, Inerval interval) {
+		Criteria c = Criteria.where("pair").is(pair).and("interval").is(interval.getDescption()).and("startTime").lte(time);
+		Query q = Query.query(c);
+		template.remove(q, Klines.class, StringUtil.formatCollectionName(pair, interval));
+	}
 }

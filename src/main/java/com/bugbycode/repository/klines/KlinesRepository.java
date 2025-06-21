@@ -113,4 +113,12 @@ public interface KlinesRepository {
      * @return
      */
     public List<Klines> findByTimeLimit(String pair,Inerval interval,long startTime, long endTime);
+    
+    /**
+     * 删除某个时间点之前的所有k线信息
+     * @param pair 交易对
+     * @param time 时间点
+     * @param interval 时间级别
+     */
+    public void removeBeforeKlinesByTime(String pair, long time, Inerval interval);
 }
