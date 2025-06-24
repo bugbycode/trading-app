@@ -1715,7 +1715,7 @@ public class PriceUtil {
 	 */
 	public static boolean verifyDecliningPrice_v7(Klines current) {
 		return  current.isFall() && isBreachShort(current, current.getEma7()) && isBreachShort(current, current.getEma25()) 
-				&& current.getEma7() > current.getEma25() && current.getEma25() > 0;
+				&& current.getEma7() > current.getEma25() && current.getEma25() > current.getEma99() && current.getEma99() > 0;
 	}
 	
 	/**
@@ -1780,7 +1780,7 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v7(Klines current) {
 		return current.isRise() && isBreachLong(current, current.getEma7()) && isBreachLong(current, current.getEma25()) 
-				&& current.getEma7() < current.getEma25() && current.getEma25() > 0;
+				&& current.getEma7() < current.getEma25() && current.getEma25() < current.getEma99() && current.getEma99() > 0;
 	}
 	
 	/**
