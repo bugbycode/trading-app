@@ -42,7 +42,7 @@ public enum FibLevel {
 	}
 	
 	public static FibLevel valueOf(FibCode startFibCode) {
-		FibLevel result = LEVEL_1;
+		FibLevel result = LEVEL_5;
 		FibLevel[] levels = FibLevel.values();
 		for(FibLevel level : levels) {
 			if(level.getStartFibCode() == startFibCode) {
