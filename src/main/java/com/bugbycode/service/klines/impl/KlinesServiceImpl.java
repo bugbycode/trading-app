@@ -55,7 +55,7 @@ import com.util.CommandUtil;
 import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.EmaFibUtil;
-import com.util.FibInfoFactory_v2;
+import com.util.FibInfoFactory;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.PriceActionFactory;
@@ -217,7 +217,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(code.lt(u.getFibLevelType().getStartFibCode())) {
+					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 						continue;
 					}
 					
@@ -303,7 +303,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(code.lt(u.getFibLevelType().getStartFibCode())) {
+					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 						continue;
 					}
 
@@ -416,11 +416,11 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								
-								FibCode code = codes[offset];
-								
-								if(code.lt(u.getFibLevelType().getStartFibCode())) {
+								if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 									continue;
 								}
+								
+								FibCode code = codes[offset];
 								
 								takeProfitCode = fibInfo.getTakeProfit_v2(code);
 								
@@ -650,11 +650,11 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							if(autoTradeType == AutoTradeType.FIB_RET) {
 								
-								FibCode code = codes[offset];
-								
-								if(code.lt(u.getFibLevelType().getStartFibCode())) {
+								if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 									continue;
 								}
+								
+								FibCode code = codes[offset];
 
 								takeProfitCode = fibInfo.getTakeProfit_v2(code);
 								
@@ -947,7 +947,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		FibInfoFactory_v2 factory = new FibInfoFactory_v2(list_1h);
+		FibInfoFactory factory = new FibInfoFactory(list_1h);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
