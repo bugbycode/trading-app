@@ -113,6 +113,21 @@ public class PriceActionFactory {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
 		
+		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
+		QuotationMode mode = fibInfo.getQuotationMode();
+		//List<Klines> fibSubList = PriceUtil.subList(start, list);
+		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			for(int index = this.fibAfterKlines.size() - 1; index > 0; index--) {
+				Klines current = this.fibAfterKlines.get(index);
+				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v7(current))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v7(current))
+							) {
+					msList.add(new MarketSentiment(current));
+				}
+			}
+		}
+		
+		/*
 		//处理市场情绪价格信息 START========================================
 		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 		QuotationMode mode = fibInfo.getQuotationMode();
@@ -159,7 +174,7 @@ public class PriceActionFactory {
 			msList.add(releaseMs);
 		}
 		//处理放量上涨或放量下跌价格信息 END ==============================
-
+		*/
 		//开始处理开仓点位
 		MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
 		MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
@@ -167,10 +182,12 @@ public class PriceActionFactory {
 		if(mode == QuotationMode.LONG && high != null && !last_1h.isEquals(high.getHigh())) {//高点做空
 			addPrices(high.getHighPrice());
 			addPrices(high.getBodyHighPrice());
+			addPrices(high.getBodyLowPrice());
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		} else if(mode == QuotationMode.SHORT && low != null && !last_1h.isEquals(low.getLow())){//低点做多
 			addPrices(low.getLowPrice());
 			addPrices(low.getBodyLowPrice());
+			addPrices(low.getBodyHighPrice());
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
 		
@@ -209,7 +226,7 @@ public class PriceActionFactory {
 		if(!(CollectionUtils.isEmpty(list) || fibInfo == null)) {
 			Klines last = PriceUtil.getLastKlines(list);
 			double closePrice = last.getClosePriceDoubleValue();
-			double fibPrice = fibInfo.getFibValue(FibCode.FIB236);
+			double fibPrice = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode mode = fibInfo.getQuotationMode();
 			for(int index = 0; index < openPrices.size(); index++) {
 				double price = openPrices.get(index);
@@ -247,7 +264,7 @@ public class PriceActionFactory {
 		return fibAfterKlines;
 	}
 	
-	private MarketSentiment getMarketSentiment(Klines last, Klines k0, Klines k1, Klines k2) {
+	public MarketSentiment getMarketSentiment(Klines last, Klines k0, Klines k1, Klines k2) {
 		List<Klines> data = new ArrayList<>();
 		data.add(last);
 		data.add(k0);
