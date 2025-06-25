@@ -193,6 +193,8 @@ public class FibInfoFactory_v2 {
 		}
 		if(result == FibCode.FIB66) {
 			result = FibCode.FIB618;
+		} else if(result == FibCode.FIB0) {
+			result = FibCode.FIB236;
 		}
 		return result;
 	}
