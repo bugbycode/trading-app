@@ -119,8 +119,10 @@ public class AnalysisKlinesTask implements Runnable{
             	if(!PriceUtil.verifyKlines(klines_last_4h)) {
             		klines_list_4h.remove(klines_last_4h);
             	}
-            	klinesRepository.insert(klines_list_4h);
-            	logger.info("已初始化{}交易对{}条4小时级别k线信息", pair, klines_list_4h.size());
+            	if(!CollectionUtils.isEmpty(klines_list_4h)) {
+                	klinesRepository.insert(klines_list_4h);
+                	logger.info("已初始化{}交易对{}条4小时级别k线信息", pair, klines_list_4h.size());
+            	}
             } else if(PriceUtil.verifyKlines(klines_4h)) {
             	klinesRepository.insert(klines_4h);
             }
