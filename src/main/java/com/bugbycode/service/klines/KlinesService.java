@@ -57,6 +57,16 @@ public interface KlinesService {
 	public List<Klines> continuousKlines15M(String pair,Date now,int limit,QUERY_SPLIT split);
 	
 	/**
+	 * 查询4小时级别K线信息
+	 * @param pair 交易对
+	 * @param now 时间
+	 * @param limit k线数量
+	 * @param split 用来判断是否读取所有K线 ALL 所有 NOT_ENDTIME 没有返回最后一根K线
+	 * @return
+	 */
+	public List<Klines> continuousKlines4H(String pair,Date now,int limit,QUERY_SPLIT split);
+	
+	/**
 	 * 合约做多
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterLowKlines 回撤之后的最低k线
@@ -81,9 +91,10 @@ public interface KlinesService {
 	/**
 	 * 斐波那契回撤点位监控
 	 * 
+	 * @param list
 	 * @param list_15m
 	 */
-	public void futuresFibMonitor(List<Klines> list_1h, List<Klines> list_15m);
+	public void futuresFibMonitor(List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 盘整区监控

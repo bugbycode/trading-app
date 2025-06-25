@@ -1300,6 +1300,57 @@ public class PriceUtil {
 		return result;
 	}
 	
+	/**
+	 * 将list内最后4根1小时级别k线转换成4小时级别k线 </br>
+	 * 若k线不完整则返回null
+	 * 
+	 * @param list
+	 * @return 
+	 */
+	public static Klines parse1Hto4H(List<Klines> list) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(list) && list.size() >= 4) {
+			KlinesComparator kc = new KlinesComparator(SortType.ASC);
+			list.sort(kc);
+			int index = list.size() - 1;
+			Klines k3 = list.get(index);
+			Klines k2 = list.get(index - 1);
+			Klines k1 = list.get(index - 2);
+			Klines k0 = list.get(index - 3);
+			List<Klines> data = new ArrayList<Klines>();
+			data.add(k0);
+			data.add(k1);
+			data.add(k2);
+			data.add(k3);
+			result = parse(data, Inerval.INERVAL_4H);
+			if(!verifyKlines(result)) {
+				result = null;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * 校验k线是否完整 支持4H级别
+	 * @param k
+	 * @return
+	 */
+	public static boolean verifyKlines(Klines k) {
+		boolean result = false;
+		if(k != null) {
+			Inerval inerval = k.getInervalType();
+			Date now = new Date();
+			if(inerval == Inerval.INERVAL_4H) {
+				int start_hours = DateFormatUtil.getHours(k.getStartTime());//开始时间时间点（小时）
+				int end_hours = DateFormatUtil.getHours(k.getEndTime());//结束时间时间点（小时）
+				int end_munite = DateFormatUtil.getMinute(k.getEndTime());//结束时间是简单（分钟）
+				result = (start_hours % 4 == 0) && ((end_hours + 1) % 4 == 0) 
+						&& end_munite == 59 && k.getEndTime() <= now.getTime();
+			}
+		}
+		return result;
+	}
+	
 	public static double sum_volume(List<Klines> list) {
 		double v = 0;
 		for(Klines k : list) {

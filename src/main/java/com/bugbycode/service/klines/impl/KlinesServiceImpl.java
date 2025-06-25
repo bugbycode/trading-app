@@ -186,6 +186,25 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
+	public List<Klines> continuousKlines4H(String pair,Date now,int limit,QUERY_SPLIT split) {
+		List<Klines> result = null;
+		try {
+			
+			Date endTime = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_00_00(now));
+			Date startTime = DateFormatUtil.getStartTimeBySetHour(endTime, -Inerval.INERVAL_4H.getNumber() * 4 * limit);//limit根k线
+			endTime = DateFormatUtil.getStartTimeBySetMillisecond(endTime, -1);//收盘时间
+			
+			result = continuousKlines(pair, startTime.getTime(),
+					endTime.getTime(), Inerval.INERVAL_4H,split);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Override
 	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
@@ -941,13 +960,13 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresFibMonitor(List<Klines> list_1h, List<Klines> list_15m) {
+	public void futuresFibMonitor(List<Klines> list, List<Klines> list_15m) {
 		
-		if(CollectionUtils.isEmpty(list_1h) || CollectionUtils.isEmpty(list_15m)) {
+		if(CollectionUtils.isEmpty(list) || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
-		FibInfoFactory_v2 factory = new FibInfoFactory_v2(list_1h);
+		FibInfoFactory_v2 factory = new FibInfoFactory_v2(list);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		

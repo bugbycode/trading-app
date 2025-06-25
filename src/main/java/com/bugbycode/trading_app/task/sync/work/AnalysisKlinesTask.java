@@ -6,6 +6,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.util.DateFormatUtil;
@@ -109,8 +110,31 @@ public class AnalysisKlinesTask implements Runnable{
             
             //日线级别信息END====================================================================================
             
+            //查询4小时级别k线信息 START==========================================================================
+            Klines klines_4h = PriceUtil.parse1Hto4H(klines_list_1h_db);
+            List<Klines> klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
+            if(CollectionUtils.isEmpty(klines_list_4h_db)) {
+            	List<Klines> klines_list_4h = klinesService.continuousKlines4H(pair, new Date(), 1500, QUERY_SPLIT.ALL);
+            	Klines klines_last_4h = PriceUtil.getLastKlines(klines_list_4h);
+            	if(!PriceUtil.verifyKlines(klines_last_4h)) {
+            		klines_list_4h.remove(klines_last_4h);
+            	}
+            	klinesRepository.insert(klines_list_4h);
+            	logger.info("已初始化{}交易对{}条4小时级别k线信息", pair, klines_list_4h.size());
+            } else if(PriceUtil.verifyKlines(klines_4h)) {
+            	klinesRepository.insert(klines_4h);
+            }
+            
+            klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
+            
+            if(!klinesService.checkData(klines_list_4h_db)) {
+            	klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
+            }
+            
+            //查询4小时级别k线信息 END==========================================================================
+            
             //斐波那契回撤分析
-            klinesService.futuresFibMonitor(klines_list_1h_db, klines_list_15m);
+            klinesService.futuresFibMonitor(klines_list_4h_db, klines_list_15m);
             
             //指数均线
             klinesService.futuresEmaRiseAndFallMonitor(klines_list_15m);
