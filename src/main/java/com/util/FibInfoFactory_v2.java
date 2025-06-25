@@ -179,7 +179,7 @@ public class FibInfoFactory_v2 {
 		if(this.fibInfo != null) {
 			QuotationMode mode = this.fibInfo.getQuotationMode();
 			Klines last = PriceUtil.getLastKlines(list);
-			double emaValue = last.getEma25();
+			double emaValue = last.getEma99();
 			FibCode[] codes = FibCode.values();
 			for(int index = 0; index < codes.length; index++) {
 				FibCode code = codes[index];
