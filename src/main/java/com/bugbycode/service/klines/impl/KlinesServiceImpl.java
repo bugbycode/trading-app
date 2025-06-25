@@ -55,7 +55,7 @@ import com.util.CommandUtil;
 import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.EmaFibUtil;
-import com.util.FibInfoFactory;
+import com.util.FibInfoFactory_v2;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.PriceActionFactory;
@@ -966,7 +966,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		FibInfoFactory factory = new FibInfoFactory(list);
+		FibInfoFactory_v2 factory = new FibInfoFactory_v2(list);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
