@@ -966,7 +966,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		FibInfoFactory_v2 factory = new FibInfoFactory_v2(list);
+		FibInfoFactory_v2 factory = new FibInfoFactory_v2(list, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		

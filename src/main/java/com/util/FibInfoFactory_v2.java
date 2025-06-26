@@ -14,7 +14,7 @@ import com.bugbycode.module.SortType;
 import com.bugbycode.module.trading.PositionSide;
 
 /**
- * 斐波那契回撤指标 V2 1小时级别交易
+ * 斐波那契回撤指标 V2 4小时级别交易
  */
 public class FibInfoFactory_v2 {
 
@@ -24,8 +24,14 @@ public class FibInfoFactory_v2 {
 	
 	private FibInfo fibInfo;
 	
-	public FibInfoFactory_v2(List<Klines> list) {
+	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
+	
+	public FibInfoFactory_v2(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
 			this.init();
@@ -116,9 +122,9 @@ public class FibInfoFactory_v2 {
 		
 		this.resetFibLevel();
 		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, secondSubList);
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterFlag != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
+			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, this.list_15m);
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 	}

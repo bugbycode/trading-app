@@ -2186,8 +2186,12 @@ public class PriceUtil {
 		if(!(current == null || CollectionUtils.isEmpty(list))) {
 			for(int index = 0; index < list.size(); index++) {
 				Klines tmp = list.get(index);
-				if(tmp.getStartTime() == current.getStartTime() && index != list.size() - 1) {
+				/*if(tmp.getStartTime() == current.getStartTime() && index != list.size() - 1) {
 					result = list.get(index + 1);
+					break;
+				}*/
+				if(tmp.getStartTime() >= current.getEndTime()) {
+					result = list.get(index);
 					break;
 				}
 			}
