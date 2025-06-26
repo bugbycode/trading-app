@@ -143,11 +143,11 @@ public class FibInfoFactory_v2 {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99() && k.getEma99() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99() && k.getEma99() > 0;
 	}
 	
 	public FibInfo getFibInfo() {
@@ -160,8 +160,7 @@ public class FibInfoFactory_v2 {
 	
 	public boolean isLong() {
 		boolean result = false;
-		Klines last = PriceUtil.getLastKlines(list);
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && last.getEma7() > last.getEma99()) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
 			result = true;
 		}
 		return result;
@@ -169,8 +168,7 @@ public class FibInfoFactory_v2 {
 	
 	public boolean isShort() {
 		boolean result = false;
-		Klines last = PriceUtil.getLastKlines(list);
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && last.getEma7() < last.getEma99()) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
 			result = true;
 		}
 		return result;
