@@ -187,7 +187,8 @@ public class FibInfoFactory_v2 {
 			Klines last = PriceUtil.getLastKlines(list);
 			double emaValue = last.getEma99();
 			FibCode[] codes = FibCode.values();
-			for(int index = 0; index < codes.length; index++) {
+			int index = 0;
+			for(index = 0; index < codes.length; index++) {
 				FibCode code = codes[index];
 				double fibPrice = this.fibInfo.getFibValue(code);
 				if((mode == QuotationMode.LONG && fibPrice >= emaValue) 
@@ -196,11 +197,12 @@ public class FibInfoFactory_v2 {
 					break;
 				}
 			}
-		}
-		if(result == FibCode.FIB66) {
-			result = FibCode.FIB618;
-		} else if(result == FibCode.FIB0) {
-			result = FibCode.FIB236;
+			
+			if(result == FibCode.FIB66) {
+				result = FibCode.FIB618;
+			} else if(result == FibCode.FIB0) {
+				result = FibCode.FIB236;
+			}
 		}
 		return result;
 	}
@@ -210,6 +212,22 @@ public class FibInfoFactory_v2 {
 			FibCode startFibCode = getFibCode();
 			FibLevel level = FibLevel.valueOf(startFibCode);
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
+			this.fibInfo.setEndFibCode(getParentCode(level.getStartFibCode()));
 		}
+	}
+	
+	public FibCode getParentCode(FibCode code) {
+		FibCode[] codes = FibCode.values();
+		FibCode result = FibCode.FIB4_618;
+		for(int index = 0; index < codes.length; index++) {
+			if(code == FibCode.FIB5) {
+				result = FibCode.FIB66;
+			} else if(code == FibCode.FIB618) {
+				result = FibCode.FIB786;
+			} else if(code == codes[index] && index > 0) {
+				result = codes[index - 1];
+			}
+		}
+		return result;
 	}
 }

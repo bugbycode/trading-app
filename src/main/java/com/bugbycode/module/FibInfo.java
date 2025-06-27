@@ -16,6 +16,8 @@ public class FibInfo {
 	
 	private List<Klines> fibAfterKlines;
 	
+	private FibCode endFibCode = FibCode.FIB4_618;
+	
 	public FibCode getAreaTakeProfit(double price, double profit, double profitLimit) {
 		FibCode result = null;
 		QuotationMode qm = this.getQuotationMode();
@@ -444,6 +446,14 @@ public class FibInfo {
 		}
 		
 		return formatBufBefor.toString() + formatBuf.toString() + "\n\nExtension: " + extensionBuffer.toString();
+	}
+
+	public FibCode getEndFibCode() {
+		return endFibCode;
+	}
+
+	public void setEndFibCode(FibCode endFibCode) {
+		this.endFibCode = endFibCode;
 	}
     
 }
