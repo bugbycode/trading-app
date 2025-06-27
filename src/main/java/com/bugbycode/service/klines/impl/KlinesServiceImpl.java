@@ -239,10 +239,10 @@ public class KlinesServiceImpl implements KlinesService {
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
-					
+					/*
 					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 						continue;
-					}
+					}*/
 					
 					//回踩单判断
 					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
@@ -329,10 +329,10 @@ public class KlinesServiceImpl implements KlinesService {
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
-					
+					/*
 					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 						continue;
-					}
+					}*/
 
 					//回踩单判断
 					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
