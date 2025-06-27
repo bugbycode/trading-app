@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
@@ -24,8 +23,14 @@ public class FibInfoFactory {
 	
 	private FibInfo fibInfo;
 	
-	public FibInfoFactory(List<Klines> list) {
+	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
+	
+	public FibInfoFactory(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
 			this.init();
@@ -98,7 +103,7 @@ public class FibInfoFactory {
 			if(startAfterFlag != null) {
 				secondSubList = PriceUtil.subList(startAfterFlag, list);
 				end = PriceUtil.getMinPriceKLine(secondSubList);
-				this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+				this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_5);
 			}
 		} else if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
@@ -106,7 +111,7 @@ public class FibInfoFactory {
 			if(startAfterFlag != null) {
 				secondSubList = PriceUtil.subList(startAfterFlag, list);
 				end = PriceUtil.getMaxPriceKLine(secondSubList);
-				this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+				this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_5);
 			}
 		}
 		
@@ -114,11 +119,9 @@ public class FibInfoFactory {
 			return;
 		}
 		
-		this.resetFibLevel();
-		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, secondSubList);
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterFlag != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
+			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, this.list_15m);
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 	}
@@ -135,11 +138,11 @@ public class FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
@@ -172,38 +175,5 @@ public class FibInfoFactory {
 			result = true;
 		}
 		return result;
-	}
-	
-	private FibCode getFibCode() {
-		FibCode result = FibCode.FIB1;
-		if(this.fibInfo != null) {
-			QuotationMode mode = this.fibInfo.getQuotationMode();
-			Klines last = PriceUtil.getLastKlines(list);
-			double emaValue = last.getEma25();
-			FibCode[] codes = FibCode.values();
-			for(int index = 0; index < codes.length; index++) {
-				FibCode code = codes[index];
-				double fibPrice = this.fibInfo.getFibValue(code);
-				if((mode == QuotationMode.LONG && fibPrice >= emaValue) 
-						|| (mode == QuotationMode.SHORT && fibPrice <= emaValue)) {
-					result = code;
-					break;
-				}
-			}
-		}
-		if(result == FibCode.FIB66) {
-			result = FibCode.FIB618;
-		} else if(result == FibCode.FIB0) {
-			result = FibCode.FIB236;
-		}
-		return result;
-	}
-	
-	private void resetFibLevel() {
-		if(this.fibInfo != null) {
-			FibCode startFibCode = getFibCode();
-			FibLevel level = FibLevel.valueOf(startFibCode);
-			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
-		}
 	}
 }
