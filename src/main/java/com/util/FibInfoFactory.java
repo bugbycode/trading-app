@@ -16,7 +16,7 @@ import com.bugbycode.module.trading.PositionSide;
 /**
  * 斐波那契回撤指标 V2 4小时级别交易
  */
-public class FibInfoFactory_v2 {
+public class FibInfoFactory {
 
 	private List<Klines> list;
 	
@@ -26,7 +26,7 @@ public class FibInfoFactory_v2 {
 	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
 	
-	public FibInfoFactory_v2(List<Klines> list, List<Klines> list_15m) {
+	public FibInfoFactory(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list_15m)) {
