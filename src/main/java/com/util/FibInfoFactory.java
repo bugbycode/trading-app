@@ -212,7 +212,11 @@ public class FibInfoFactory {
 			FibCode startFibCode = getFibCode();
 			FibLevel level = FibLevel.valueOf(startFibCode);
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
-			this.fibInfo.setEndFibCode(getParentCode(level.getStartFibCode()));
+			Klines last = PriceUtil.getLastKlines(list);
+			if((isLong() && last.getEma7() < last.getEma99())
+					|| (isShort() && last.getEma7() > last.getEma99())) {
+				this.fibInfo.setEndFibCode(getParentCode(level.getStartFibCode()));
+			}
 		}
 	}
 	
