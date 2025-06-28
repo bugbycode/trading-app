@@ -14,6 +14,6 @@ binance:
     rest: https://fapi.binance.com
     websocketApi: wss://ws-fapi.binance.com/ws-fapi/v1
 server:
-  version: 202506282254
+  version: 202506290300
 loggin: 
   config: classpath:log4j2.xml
