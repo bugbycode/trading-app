@@ -26,6 +26,8 @@ import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 @Configuration
 public class InitConfig implements ApplicationRunner {
 	
+	private final Logger logger = LogManager.getLogger(InitConfig.class);
+	
 	@Value("${binance.baseUrl.websocket}")
 	private String websocketBaseUrl;
 	
@@ -37,6 +39,9 @@ public class InitConfig implements ApplicationRunner {
 	
 	@Value("${google.recaptcha.secret}")
 	private String recapt_secret;
+	
+	@Value("${server.version}")
+	private String version;
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
@@ -53,6 +58,8 @@ public class InitConfig implements ApplicationRunner {
         );
         
         AppConfig.DEBUG = isDebugMode;
+        
+        logger.info("trading app version : {}", version);
 	}
 
 	@Bean("restTemplate")
