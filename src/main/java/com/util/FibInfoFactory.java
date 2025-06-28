@@ -141,11 +141,11 @@ public class FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getEma25() > k.getEma99() && k.getEma99() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getEma25() < k.getEma99() && k.getEma99() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
@@ -185,7 +185,7 @@ public class FibInfoFactory {
 		if(this.fibInfo != null) {
 			QuotationMode mode = this.fibInfo.getQuotationMode();
 			Klines last = PriceUtil.getLastKlines(list);
-			double emaValue = last.getEma25();
+			double emaValue = last.getEma99();
 			FibCode[] codes = FibCode.values();
 			int index = 0;
 			for(index = 0; index < codes.length; index++) {
