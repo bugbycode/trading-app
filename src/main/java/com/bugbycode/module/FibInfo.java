@@ -160,12 +160,16 @@ public class FibInfo {
 		FibCode takeProfit = FibCode.FIB0;
 		if(code == FibCode.FIB4_618) { // 4.618 - 2.618
 			takeProfit = FibCode.FIB2_618;
+		} else if(code == FibCode.FIB3_618) {// 3.618 - 2
+			takeProfit = FibCode.FIB2;
 		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
 			takeProfit = FibCode.FIB1_618;
 		} else if(code == FibCode.FIB2) { // 2 - 1
 			takeProfit = FibCode.FIB1;
 		} else if(code == FibCode.FIB1_618) { // 1.618 - 1
 			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1_272) { // 1.272 - 0.786
+			takeProfit = FibCode.FIB786;
 		} else if(code == FibCode.FIB1) { // 1 -> 0.5
 			takeProfit = FibCode.FIB5;
 		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
@@ -190,12 +194,16 @@ public class FibInfo {
 	public FibCode getTakeProfit_v1(FibCode code) {
 		FibCode takeProfit = FibCode.FIB0;
 		if(code == FibCode.FIB4_618) { // 4.618 - 3.618
-			takeProfit = FibCode.FIB2_618;
+			takeProfit = FibCode.FIB3_618;
+		} else if(code == FibCode.FIB3_618) {// 3.618 - 2
+			takeProfit = FibCode.FIB2;
 		} else if(code == FibCode.FIB2_618) { // 2.618 - 1.618
 			takeProfit = FibCode.FIB1_618;
-		} else if(code == FibCode.FIB2) {// 2 - 1.618
-			takeProfit = FibCode.FIB1_618;
+		} else if(code == FibCode.FIB2) {// 2 - 1.272
+			takeProfit = FibCode.FIB1_272;
 		} else if(code == FibCode.FIB1_618) { // 1.618 - 1
+			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1_272) { // 1.272 - 1
 			takeProfit = FibCode.FIB1;
 		} else if(code == FibCode.FIB1) { // 1 -> 0.618
 			takeProfit = FibCode.FIB618;
@@ -311,7 +319,17 @@ public class FibInfo {
 		
 		FibCode result = FibCode.FIB0;
 		
-		if(current == FibCode.FIB1) {
+		if(current == FibCode.FIB4_618) { //4.618 - 3.618
+			result = FibCode.FIB3_618;
+		} else if(current == FibCode.FIB2_618) { // 2.618 - 2
+			result = FibCode.FIB2;
+		} else if(current == FibCode.FIB2) { // 2 - 1.272
+			result = FibCode.FIB1_272;
+		} else if(current == FibCode.FIB1_618) { // 1.618 - 1.272
+			result = FibCode.FIB1_272;
+		} else if(current == FibCode.FIB1_272) { // 1.272 - 1
+			result = FibCode.FIB1;
+		} else if(current == FibCode.FIB1) {// 1 - 0.618
 			result = FibCode.FIB618;
 		} else if(current == FibCode.FIB786) {
 			result = FibCode.FIB5;
