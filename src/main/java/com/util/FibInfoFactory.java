@@ -13,7 +13,7 @@ import com.bugbycode.module.SortType;
 import com.bugbycode.module.trading.PositionSide;
 
 /**
- * 斐波那契回撤指标 15分钟级别短线交易
+ * 斐波那契回撤指标
  */
 public class FibInfoFactory {
 
