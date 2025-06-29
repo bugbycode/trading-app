@@ -14,9 +14,9 @@ import com.bugbycode.module.SortType;
 import com.bugbycode.module.trading.PositionSide;
 
 /**
- * 斐波那契回撤指标 V1 按指数均线做交易
+ * 斐波那契回撤指标 V2 按价格回撤做交易
  */
-public class FibInfoFactory {
+public class FibInfoFactory_v2 {
 
 	private List<Klines> list;
 	
@@ -26,7 +26,13 @@ public class FibInfoFactory {
 	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
 	
-	public FibInfoFactory(List<Klines> list, List<Klines> list_15m) {
+	private Klines start;
+	
+	private Klines end;
+	
+	private double emaValue;
+	
+	public FibInfoFactory_v2(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list_15m)) {
@@ -96,8 +102,6 @@ public class FibInfoFactory {
 		
 		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
 		List<Klines> secondSubList = null;
-		Klines start = null;
-		Klines end = null;
 		Klines startAfterFlag = null;
 		if(ps == PositionSide.SHORT) {
 			start = PriceUtil.getMaxPriceKLine(firstSubList);
@@ -121,6 +125,18 @@ public class FibInfoFactory {
 			return;
 		}
 		
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		
+		QuotationMode mode = this.fibInfo.getQuotationMode();
+		
+		for(Klines k : fibSubList) {
+			if((mode == QuotationMode.LONG && k.getEma7() >= k.getEma25())
+					|| (mode == QuotationMode.SHORT && k.getEma7() <= k.getEma25())) {
+				emaValue = k.getEma25();
+				break;
+			}
+		}
+		
 		this.resetFibLevel();
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
@@ -142,11 +158,11 @@ public class FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma25() > k.getEma99() && k.getEma99() > 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma25() < k.getEma99() && k.getEma99() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
@@ -167,12 +183,7 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		Klines last = PriceUtil.getLastKlines(list);
-		double closePrice = last.getClosePriceDoubleValue();
-		double ema99 = last.getEma99();
-		double deaValue = last.getDea();
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG 
-				&& ( closePrice > ema99 || ( closePrice <= ema99 && deaValue > 0))) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && start.getEma99() < end.getEma99()) {
 			result = true;
 		}
 		return result;
@@ -180,12 +191,7 @@ public class FibInfoFactory {
 	
 	public boolean isShort() {
 		boolean result = false;
-		Klines last = PriceUtil.getLastKlines(list);
-		double closePrice = last.getClosePriceDoubleValue();
-		double ema99 = last.getEma99();
-		double deaValue = last.getDea();
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT 
-				&& ( closePrice < ema99 || ( closePrice >= ema99 && deaValue < 0) )) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && start.getEma99() > end.getEma99()) {
 			result = true;
 		}
 		return result;
@@ -195,8 +201,6 @@ public class FibInfoFactory {
 		FibCode result = FibCode.FIB1;
 		if(this.fibInfo != null) {
 			QuotationMode mode = this.fibInfo.getQuotationMode();
-			Klines last = PriceUtil.getLastKlines(list);
-			double emaValue = last.getEma99();
 			FibCode[] codes = FibCode.values();
 			int index = 0;
 			for(index = 0; index < codes.length; index++) {
@@ -208,7 +212,6 @@ public class FibInfoFactory {
 					break;
 				}
 			}
-			
 			if(result == FibCode.FIB66) {
 				result = FibCode.FIB618;
 			} else if(result == FibCode.FIB0) {
@@ -224,20 +227,5 @@ public class FibInfoFactory {
 			FibLevel level = FibLevel.valueOf(startFibCode);
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
 		}
-	}
-	
-	public FibCode getParentCode(FibCode code) {
-		FibCode[] codes = FibCode.values();
-		FibCode result = FibCode.FIB4_618;
-		for(int index = 0; index < codes.length; index++) {
-			if(code == FibCode.FIB5) {
-				result = FibCode.FIB66;
-			} else if(code == FibCode.FIB618) {
-				result = FibCode.FIB786;
-			} else if(code == codes[index] && index > 0) {
-				result = codes[index - 1];
-			}
-		}
-		return result;
 	}
 }
