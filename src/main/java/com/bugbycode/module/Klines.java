@@ -21,6 +21,8 @@ public class Klines {
 	private String lowPrice;//最低价
 	
 	private String closePrice;//收盘价
+	
+	private long endTime;//收盘时间
 
 	private String interval;//时间级别
 	
@@ -30,7 +32,11 @@ public class Klines {
 	
 	private double ema99;
 	
-	private long endTime;
+	private double dif;
+	
+    private double dea;
+    
+    private double macd;
 	
 	private int decimalNum = 2;
 	
@@ -157,6 +163,30 @@ public class Klines {
 
 	public void setEma99(double ema99) {
 		this.ema99 = ema99;
+	}
+
+	public double getDif() {
+		return dif;
+	}
+
+	public void setDif(double dif) {
+		this.dif = dif;
+	}
+
+	public double getDea() {
+		return dea;
+	}
+
+	public void setDea(double dea) {
+		this.dea = dea;
+	}
+
+	public double getMacd() {
+		return macd;
+	}
+
+	public void setMacd(double macd) {
+		this.macd = macd;
 	}
 
 	public String getInterval(){

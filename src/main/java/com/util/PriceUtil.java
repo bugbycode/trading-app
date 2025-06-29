@@ -3052,4 +3052,36 @@ public class PriceUtil {
 		data.add(k2);
 		return new MarketSentiment(data);
 	}
+	
+	public static void calculateMACD(List<Klines> list) {
+        if (CollectionUtils.isEmpty(list)) { 
+        	return;
+        }
+
+        final double shortAlpha = 2.0 / (12 + 1);
+        final double longAlpha = 2.0 / (26 + 1);
+        final double signalAlpha = 2.0 / (9 + 1);
+
+        double ema12 = list.get(0).getClosePriceDoubleValue();  // 初始化为第一根K线收盘价
+        double ema26 = list.get(0).getClosePriceDoubleValue();
+        double dea = 0.0;
+
+        for (int i = 0; i < list.size(); i++) {
+            Klines k = list.get(i);
+            double close = k.getClosePriceDoubleValue();
+
+            // 计算EMA
+            ema12 = ema12 * (1 - shortAlpha) + close * shortAlpha;
+            ema26 = ema26 * (1 - longAlpha) + close * longAlpha;
+
+            double dif = ema12 - ema26;
+            dea = dea * (1 - signalAlpha) + dif * signalAlpha;
+            double macd = 2 * (dif - dea);
+
+            // 存入K线对象中（可选）
+            k.setDif(dif);
+            k.setDea(dea);
+            k.setMacd(macd);
+        }
+    }
 }

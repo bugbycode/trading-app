@@ -227,10 +227,6 @@ public class KlinesServiceImpl implements KlinesService {
 				continue;
 			}
 			
-			if(code.gt(fibInfo.getEndFibCode())) {
-				continue;
-			}
-			
 			if(PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
 					&& !PriceUtil.isTraded(code, fibInfo)) {
@@ -317,10 +313,6 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			if(!code.isTrade()) {
-				continue;
-			}
-			
-			if(code.gt(fibInfo.getEndFibCode())) {
 				continue;
 			}
 			

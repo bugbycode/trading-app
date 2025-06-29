@@ -47,6 +47,7 @@ public class FibInfoFactory {
 		this.list.sort(kc);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateMACD(list);
 		
 		PositionSide ps = getPositionSide();
 		
@@ -166,7 +167,8 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
+		Klines last = PriceUtil.getLastKlines(list);
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && last.getDif() > 0) {
 			result = true;
 		}
 		return result;
@@ -174,7 +176,8 @@ public class FibInfoFactory {
 	
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
+		Klines last = PriceUtil.getLastKlines(list);
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && last.getDif() < 0) {
 			result = true;
 		}
 		return result;
@@ -212,11 +215,6 @@ public class FibInfoFactory {
 			FibCode startFibCode = getFibCode();
 			FibLevel level = FibLevel.valueOf(startFibCode);
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
-			/*Klines last = PriceUtil.getLastKlines(list);
-			if((isLong() && last.getEma7() < last.getEma99())
-					|| (isShort() && last.getEma7() > last.getEma99())) {
-				this.fibInfo.setEndFibCode(getParentCode(level.getStartFibCode()));
-			}*/
 		}
 	}
 	
