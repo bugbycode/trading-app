@@ -168,7 +168,7 @@ public class FibInfoFactory {
 	public boolean isLong() {
 		boolean result = false;
 		Klines last = PriceUtil.getLastKlines(list);
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && last.getDif() > 0) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && last.getDea() > 0) {
 			result = true;
 		}
 		return result;
@@ -177,7 +177,7 @@ public class FibInfoFactory {
 	public boolean isShort() {
 		boolean result = false;
 		Klines last = PriceUtil.getLastKlines(list);
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && last.getDif() < 0) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && last.getDea() < 0) {
 			result = true;
 		}
 		return result;
