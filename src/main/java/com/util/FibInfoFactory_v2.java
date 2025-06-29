@@ -183,8 +183,11 @@ public class FibInfoFactory_v2 {
 	
 	public boolean isLong() {
 		boolean result = false;
+		double startEma99 = start.getEma99();
+		double endEma99 = end.getEma99();
+		double endEma25 = end.getEma25();
 		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG 
-				&& start.getEma99() < end.getEma99() && start.getEma99() > 0) {
+				&& ((startEma99 < endEma99 && startEma99 > 0) || endEma25 > endEma99)) {
 			result = true;
 		}
 		return result;
@@ -192,8 +195,11 @@ public class FibInfoFactory_v2 {
 	
 	public boolean isShort() {
 		boolean result = false;
+		double startEma99 = start.getEma99();
+		double endEma99 = end.getEma99();
+		double endEma25 = end.getEma25();
 		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT 
-				&& start.getEma99() > end.getEma99() && end.getEma99() > 0) {
+				&& ((startEma99 > endEma99 && endEma99 > 0) || endEma25 < endEma99)) {
 			result = true;
 		}
 		return result;
