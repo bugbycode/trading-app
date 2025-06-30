@@ -68,11 +68,12 @@ public interface KlinesService {
 	
 	/**
 	 * 合约做多
+	 * @param tradeType 指标类型
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterLowKlines 回撤之后的最低k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openLong(FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	public void openLong(AutoTradeType tradeType, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
@@ -80,7 +81,7 @@ public interface KlinesService {
 	 * @param afterHighKlines 回撤之后的最高k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openShort(FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public void openShort(AutoTradeType tradeType, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 指数均线监控
@@ -98,10 +99,10 @@ public interface KlinesService {
 	
 	/**
 	 * 盘整区监控
-	 * @param list_1h
+	 * @param list
 	 * @param list_15m
 	 */
-	public void consolidationAreaMonitor(List<Klines> list_1h, List<Klines> list_15m);
+	public void consolidationAreaMonitor(List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 价格行为监控
