@@ -167,12 +167,12 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		/*Klines last = PriceUtil.getLastKlines(list);
+		Klines last = PriceUtil.getLastKlines(list);
 		double closePrice = last.getClosePriceDoubleValue();
 		double ema99 = last.getEma99();
-		double deaValue = last.getDea();*/
+		double deaValue = last.getDea();
 		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG 
-				//&& ( closePrice > ema99 || ( closePrice <= ema99 && deaValue > 0))
+				&& ( closePrice > ema99 || ( closePrice <= ema99 && deaValue > 0))
 				) {
 			result = true;
 		}
@@ -181,12 +181,12 @@ public class FibInfoFactory {
 	
 	public boolean isShort() {
 		boolean result = false;
-		/*Klines last = PriceUtil.getLastKlines(list);
+		Klines last = PriceUtil.getLastKlines(list);
 		double closePrice = last.getClosePriceDoubleValue();
 		double ema99 = last.getEma99();
-		double deaValue = last.getDea();*/
+		double deaValue = last.getDea();
 		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT 
-				//&& ( closePrice < ema99 || ( closePrice >= ema99 && deaValue < 0) )
+				&& ( closePrice < ema99 || ( closePrice >= ema99 && deaValue < 0) )
 				) {
 			result = true;
 		}
