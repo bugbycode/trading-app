@@ -210,8 +210,8 @@ public class FibInfoFactory {
 	
 	private void resetFibLevel() {
 		if(this.fibInfo != null) {
-			FibCode startFibCode = getFibCode();
-			FibLevel level = FibLevel.valueOf(startFibCode);
+			FibCode levelFibCode = getFibCode();
+			FibLevel level = FibLevel.valueOf(levelFibCode);
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
 			this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
 		}

@@ -5,28 +5,31 @@ package com.bugbycode.module;
  */
 public enum FibLevel {
 
-	LEVEL_0(0,"Lv0",FibCode.FIB236),
+	LEVEL_0(0,"Lv0", FibCode.FIB382, FibCode.FIB236),
 	
-	LEVEL_1(1,"Lv1",FibCode.FIB382),
+	LEVEL_1(1,"Lv1", FibCode.FIB5, FibCode.FIB382),
 	
-	LEVEL_2(2,"Lv2",FibCode.FIB5),
+	LEVEL_2(2,"Lv2", FibCode.FIB5, FibCode.FIB5),
 	
-	LEVEL_3(3,"Lv3",FibCode.FIB618),
+	LEVEL_3(3,"Lv3", FibCode.FIB618, FibCode.FIB618),
 	
-	LEVEL_4(4,"Lv4",FibCode.FIB786),
+	LEVEL_4(4,"Lv4", FibCode.FIB786, FibCode.FIB786),
 	
-	LEVEL_5(5,"Lv5",FibCode.FIB1);
+	LEVEL_5(5,"Lv5", FibCode.FIB1, FibCode.FIB1);
 	
 	private int value;
 	
 	private String label;
 	
+	private FibCode levelCode;
+	
 	private FibCode startFibCode;
 	
-	FibLevel(int value, String label,FibCode startFibCode) {
+	FibLevel(int value, String label, FibCode startFibCode, FibCode levelCode) {
 		this.value = value;
 		this.label = label;
 		this.startFibCode = startFibCode;
+		this.levelCode = levelCode;
 	}
 
 	public int getValue() {
@@ -37,15 +40,19 @@ public enum FibLevel {
 		return label;
 	}
 
+	public FibCode getLevelCode() {
+		return levelCode;
+	}
+
 	public FibCode getStartFibCode() {
 		return startFibCode;
 	}
 	
-	public static FibLevel valueOf(FibCode startFibCode) {
+	public static FibLevel valueOf(FibCode levelFibCode) {
 		FibLevel result = LEVEL_5;
 		FibLevel[] levels = FibLevel.values();
 		for(FibLevel level : levels) {
-			if(level.getStartFibCode() == startFibCode) {
+			if(level.getLevelCode() == levelFibCode) {
 				result = level;
 				break;
 			}
