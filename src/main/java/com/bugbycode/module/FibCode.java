@@ -6,7 +6,7 @@ package com.bugbycode.module;
 public enum FibCode {
 
 	//FIB4_764(4.764,"4.764", false),
-	FIB4_618(4.618,"4.618", false),
+	FIB4_618(4.618,"4.618", true),
 	/*FIB4_414(4.414,"4.414", false),
 	FIB4_272(4.272,"4.272", false),
 	FIB4_236(4.236,"4.236", false),
@@ -17,10 +17,10 @@ public enum FibCode {
 	FIB3_272(3.272,"3.272", false),
 	FIB3(3,"3", false),
 	*/
-	FIB2_618(2.618,"2.618", false),
+	FIB2_618(2.618,"2.618", true),
 	//FIB2_414(2.414,"2.414", false),
 	//FIB2_272(2.272,"2.272", false),
-	FIB2(2,"2", false),
+	FIB2(2,"2", true),
 
 	FIB1_618(1.618,"1.618", true),
 	//FIB1_414(1.414,"1.414", false),
