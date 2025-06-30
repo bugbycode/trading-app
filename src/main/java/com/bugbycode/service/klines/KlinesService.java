@@ -77,6 +77,7 @@ public interface KlinesService {
 	
 	/**
 	 * 合约做空
+	 * @param tradeType 指标类型
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterHighKlines 回撤之后的最高k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
