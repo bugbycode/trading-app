@@ -167,13 +167,7 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		Klines last = PriceUtil.getLastKlines(list);
-		double closePrice = last.getClosePriceDoubleValue();
-		double ema99 = last.getEma99();
-		double deaValue = last.getDea();
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG 
-				&& ( closePrice > ema99 || ( closePrice <= ema99 && deaValue > 0))
-				) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
 			result = true;
 		}
 		return result;
@@ -181,13 +175,7 @@ public class FibInfoFactory {
 	
 	public boolean isShort() {
 		boolean result = false;
-		Klines last = PriceUtil.getLastKlines(list);
-		double closePrice = last.getClosePriceDoubleValue();
-		double ema99 = last.getEma99();
-		double deaValue = last.getDea();
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT 
-				&& ( closePrice < ema99 || ( closePrice >= ema99 && deaValue < 0) )
-				) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
 			result = true;
 		}
 		return result;
@@ -225,6 +213,7 @@ public class FibInfoFactory {
 			FibCode startFibCode = getFibCode();
 			FibLevel level = FibLevel.valueOf(startFibCode);
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
+			this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
 		}
 	}
 	
