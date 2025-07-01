@@ -2171,12 +2171,13 @@ public class PriceUtil {
 	public static boolean isLong_v2(double price, List<Klines> list) {
 		int index = list.size() - 1;
 		Klines k0 = list.get(index);
-		Klines k1 = list.get(index -1);
+		//Klines k1 = list.get(index -1);
 		Klines k2 = list.get(index -2);
+		Klines k3 = list.get(index -3);
 		
 		double closePrice = k0.getClosePriceDoubleValue();
 		
-		return closePrice >= price && (isHitPrice(k0, price) || isHitPrice(k1, price) || isHitPrice(k2, price)) && isRise_v3(k0, k1);
+		return closePrice >= price && (isBreachLong(k2, price) || isBreachLong(k3, price));
 	}
 	
 	/**
@@ -2188,12 +2189,13 @@ public class PriceUtil {
 	public static boolean isShort_v2(double price, List<Klines> list) {
 		int index = list.size() - 1;
 		Klines k0 = list.get(index);
-		Klines k1 = list.get(index -1);
+		//Klines k1 = list.get(index -1);
 		Klines k2 = list.get(index -2);
+		Klines k3 = list.get(index -3);
 		
 		double closePrice = k0.getClosePriceDoubleValue();
 		
-		return closePrice <= price && (isHitPrice(k0, price) || isHitPrice(k1, price) || isHitPrice(k2, price)) && isFall_v3(k0, k1);
+		return closePrice <= price && (isBreachShort(k2, price) || isBreachShort(k3, price));
 	}
 	
 	/**
