@@ -213,7 +213,7 @@ public class FibInfoFactory {
 			FibCode levelFibCode = getFibCode();
 			FibLevel level = FibLevel.valueOf(levelFibCode);
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
-			//this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
+			this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
 		}
 	}
 	
