@@ -1770,6 +1770,17 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v8(Klines current, Klines parent) {
+		return  current.getDif() < current.getDea() && parent.getDif() >= parent.getDea();
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -1832,6 +1843,16 @@ public class PriceUtil {
 	public static boolean verifyPowerful_v7(Klines current) {
 		return current.isRise() && isBreachLong(current, current.getEma7()) && isBreachLong(current, current.getEma25()) 
 				&& current.getEma7() < current.getEma25() && current.getEma25() < current.getEma99() && current.getEma99() > 0;
+	}
+	
+	/**
+	 * 判断是否出现强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v8(Klines current,Klines parent) {
+		return current.getDif() > current.getDea() && parent.getDif() <= parent.getDea();
 	}
 	
 	/**

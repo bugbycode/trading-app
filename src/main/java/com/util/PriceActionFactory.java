@@ -49,6 +49,7 @@ public class PriceActionFactory {
 		this.list.sort(kc);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateMACD(list);
 		
 		Klines last_1h = PriceUtil.getLastKlines(list);
 		
@@ -113,14 +114,16 @@ public class PriceActionFactory {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
 		
+		List<Klines> sub_for_start_list = PriceUtil.subList(start, list);
+		
 		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 		QuotationMode mode = fibInfo.getQuotationMode();
-		//List<Klines> fibSubList = PriceUtil.subList(start, list);
-		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
-			for(int index = this.fibAfterKlines.size() - 1; index > 0; index--) {
-				Klines current = this.fibAfterKlines.get(index);
-				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v7(current))
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v7(current))
+		if(!CollectionUtils.isEmpty(sub_for_start_list)) {
+			for(int index = sub_for_start_list.size() - 1; index > 1; index--) {
+				Klines current = sub_for_start_list.get(index);
+				Klines parent = sub_for_start_list.get(index - 1);
+				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))
 							) {
 					msList.add(new MarketSentiment(current));
 				}
