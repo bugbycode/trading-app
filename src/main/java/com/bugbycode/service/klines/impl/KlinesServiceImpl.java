@@ -234,7 +234,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(code.isTrade() && code.lte(fibInfo.getEndCode()) 
 					&& PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
-					//&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
+					&& (!PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset) || fibInfo.getEndCode() != FibCode.FIB4_618)
 					&& !PriceUtil.isTraded(code, fibInfo)) {
 				
 				//市价做多
@@ -334,7 +334,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(code.isTrade() && code.lte(fibInfo.getEndCode())  
 					&& PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
-					//&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
+					&& (!PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset) || fibInfo.getEndCode() != FibCode.FIB4_618)
 					&& !PriceUtil.isTraded(code, fibInfo)) {
 				
 				//市价做空
