@@ -47,7 +47,7 @@ public class FibInfoFactory {
 		this.list.sort(kc);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
-		//PriceUtil.calculateMACD(list_15m);
+		PriceUtil.calculateMACD(list);
 		
 		PositionSide ps = getPositionSide();
 		
@@ -167,7 +167,8 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
+		Klines last = PriceUtil.getLastKlines(list);
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && last.getDea() > 0) {
 			result = true;
 		}
 		return result;
@@ -175,7 +176,8 @@ public class FibInfoFactory {
 	
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
+		Klines last = PriceUtil.getLastKlines(list);
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && last.getDea() < 0) {
 			result = true;
 		}
 		return result;

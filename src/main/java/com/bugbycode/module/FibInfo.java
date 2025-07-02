@@ -53,22 +53,22 @@ public class FibInfo {
 		
 		QuotationMode qm = this.getQuotationMode() == QuotationMode.LONG ? QuotationMode.SHORT : QuotationMode.LONG;
 		
-		//double percent_382 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB382), qm);
+		double percent_382 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB382), qm);
 		double percent_5 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB5), qm);
 		double percent_618 = PriceUtil.getPercent(price, this.getFibValue(FibCode.FIB618), qm);
 		
-		/*if(percent_382 >= profit && percent_382 <= profitLimit) {
+		if(percent_382 >= profit && percent_382 <= profitLimit) {
 			result = FibCode.FIB382;
-		} else */if(percent_5 >= profit && percent_5 <= profitLimit) {
+		} else if(percent_5 >= profit && percent_5 <= profitLimit) {
 			result = FibCode.FIB5;
 		} else if(percent_618 >= profit && percent_618 <= profitLimit) {
 			result = FibCode.FIB618;
 		}
 		
 		if(result == null) {
-			/*if(percent_382 >= profit) {
+			if(percent_382 >= profit) {
 				result = FibCode.FIB382;
-			} else */if(percent_5 >= profit) {
+			} else if(percent_5 >= profit) {
 				result = FibCode.FIB5;
 			} else if(percent_618 >= profit) {
 				result = FibCode.FIB618;
@@ -166,12 +166,12 @@ public class FibInfo {
 			takeProfit = FibCode.FIB1;
 		} else if(code == FibCode.FIB1_618) { // 1.618 - 1
 			takeProfit = FibCode.FIB1;
-		} else if(code == FibCode.FIB1) { // 1 -> 0.5
+		} else if(code == FibCode.FIB1) { // 1 -> 0.618
+			takeProfit = FibCode.FIB618;
+		} else if(code == FibCode.FIB786) { // 0.786 -> 0.5
 			takeProfit = FibCode.FIB5;
-		} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
+		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.382
 			takeProfit = FibCode.FIB382;
-		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.236
-			takeProfit = FibCode.FIB236;
 		} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
 			takeProfit = FibCode.FIB236;
 		} else if(code == FibCode.FIB382) { // 0.382 -> 0
@@ -312,11 +312,11 @@ public class FibInfo {
 		FibCode result = FibCode.FIB0;
 		
 		if(current == FibCode.FIB1) {
-			result = FibCode.FIB618;
+			result = FibCode.FIB786;
 		} else if(current == FibCode.FIB786) {
-			result = FibCode.FIB5;
+			result = FibCode.FIB618;
 		} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
-			result = FibCode.FIB382;
+			result = FibCode.FIB5;
 		} else if(current == FibCode.FIB5) {
 			result = FibCode.FIB382;
 		} else {
