@@ -1777,7 +1777,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static boolean verifyDecliningPrice_v8(Klines current, Klines parent) {
-		return  current.getDea() < 0 && parent.getDea() >= 0;
+		return  current.getDif() < 0 && parent.getDif() >= 0;
 	}
 	
 	/**
@@ -1852,7 +1852,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static boolean verifyPowerful_v8(Klines current,Klines parent) {
-		return current.getDea() > 0 && parent.getDea() <= 0;
+		return current.getDif() > 0 && parent.getDif() <= 0;
 	}
 	
 	/**
