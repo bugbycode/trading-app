@@ -220,7 +220,8 @@ public class FibInfoFactory {
 				this.fibInfo.setEndCode(level.getStartFibCode());
 			}*/
 			Klines last = PriceUtil.getLastKlines(list);
-			if((isLong() && last.getEma7() < last.getEma99()) || (isShort() && last.getEma7() > last.getEma99())) {
+			if((isLong() && last.getOpenPriceDoubleValue() <= last.getEma99() && last.getClosePriceDoubleValue() <= last.getEma99()) 
+					|| (isShort() && last.getOpenPriceDoubleValue() >= last.getEma99() && last.getClosePriceDoubleValue() >= last.getEma99())) {
 				this.fibInfo.setEndCode(level.getStartFibCode());
 			}
 		}
