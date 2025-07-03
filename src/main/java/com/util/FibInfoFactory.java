@@ -47,7 +47,7 @@ public class FibInfoFactory {
 		this.list.sort(kc);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
-		//PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list);
 		
 		PositionSide ps = getPositionSide();
 		
@@ -215,15 +215,15 @@ public class FibInfoFactory {
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
 			//this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
 			//this.fibInfo.setEndCode(level.getStartFibCode());
-			/*Klines last = PriceUtil.getLastKlines(list);
-			if((isLong() && last.getDea() < 0) || (isShort() && last.getDea() > 0)) {
-				this.fibInfo.setEndCode(level.getStartFibCode());
-			}*/
 			Klines last = PriceUtil.getLastKlines(list);
+			if((isLong() && last.getDif() < 0) || (isShort() && last.getDif() > 0)) {
+				this.fibInfo.setEndCode(level.getStartFibCode());
+			}
+			/*Klines last = PriceUtil.getLastKlines(list);
 			if((isLong() && last.getOpenPriceDoubleValue() <= last.getEma99() && last.getClosePriceDoubleValue() <= last.getEma99()) 
 					|| (isShort() && last.getOpenPriceDoubleValue() >= last.getEma99() && last.getClosePriceDoubleValue() >= last.getEma99())) {
 				this.fibInfo.setEndCode(level.getStartFibCode());
-			}
+			}*/
 		}
 	}
 	
