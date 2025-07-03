@@ -9,7 +9,7 @@ public enum FibLevel {
 	
 	LEVEL_1(1,"Lv1", FibCode.FIB382, FibCode.FIB382),
 	
-	LEVEL_2(2,"Lv2", FibCode.FIB618, FibCode.FIB5),
+	LEVEL_2(2,"Lv2", FibCode.FIB5, FibCode.FIB5),
 	
 	LEVEL_3(3,"Lv3", FibCode.FIB618, FibCode.FIB618),
 	
