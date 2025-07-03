@@ -215,10 +215,10 @@ public class FibInfoFactory {
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
 			//this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
 			//this.fibInfo.setEndCode(level.getStartFibCode());
-			Klines last = PriceUtil.getLastKlines(list);
+			/*Klines last = PriceUtil.getLastKlines(list);
 			if((isLong() && last.getDea() < 0) || (isShort() && last.getDea() > 0)) {
 				this.fibInfo.setEndCode(level.getStartFibCode());
-			}
+			}*/
 		}
 	}
 	
