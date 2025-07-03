@@ -114,14 +114,13 @@ public class PriceActionFactory {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
 		
-		List<Klines> sub_for_start_list = PriceUtil.subList(start, list);
-		
+		//List<Klines> sub_for_start_list = PriceUtil.subList(start, list);
 		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 		QuotationMode mode = fibInfo.getQuotationMode();
-		if(!CollectionUtils.isEmpty(sub_for_start_list)) {
-			for(int index = sub_for_start_list.size() - 1; index > 1; index--) {
-				Klines current = sub_for_start_list.get(index);
-				Klines parent = sub_for_start_list.get(index - 1);
+		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
+				Klines current = fibAfterKlines.get(index);
+				Klines parent = fibAfterKlines.get(index - 1);
 				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent))
 						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))
 							) {
