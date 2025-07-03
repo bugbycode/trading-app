@@ -3,6 +3,8 @@ package com.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.module.FibInfo;
@@ -16,6 +18,8 @@ import com.bugbycode.module.trading.PositionSide;
  * 盘整区斐波那契回撤工具类
  */
 public class ConsolidationAreaFibUtil {
+	
+	private final Logger logger = LogManager.getLogger(ConsolidationAreaFibUtil.class);
 	
 	private List<Klines> list;
 	
@@ -44,11 +48,13 @@ public class ConsolidationAreaFibUtil {
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
-		
+		/*
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
+		*/
+		PriceUtil.calculateAllBBPercentB(list);
 		
-		PositionSide ps = getPositionSide();
+		PositionSide ps = PositionSide.DEFAULT;
 		
 		Klines third = null;
 		Klines second = null;
@@ -56,7 +62,9 @@ public class ConsolidationAreaFibUtil {
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
-			if(ps == PositionSide.SHORT) {//low - high - low
+			if(ps == PositionSide.DEFAULT) {
+				ps = getPositionSide(current);
+			} else if(ps == PositionSide.SHORT) {//low - high - low
 				if(third == null) {
 					if(verifyLow(current)) {
 						third = current;
@@ -89,11 +97,16 @@ public class ConsolidationAreaFibUtil {
 			}
 		}
 		
+		logger.debug(first);
+		logger.debug(second);
+		logger.debug(third);
+		
 		if(first == null || second == null || third == null) {
 			return;
 		}
 		
-		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
+		//List<Klines> firstSubList = PriceUtil.subList(first, second, list);
+		List<Klines> firstSubList = PriceUtil.subList(first, third, list);
 		List<Klines> secondSubList = null;
 		Klines start = null;
 		Klines end = null;
@@ -143,9 +156,9 @@ public class ConsolidationAreaFibUtil {
 		return result;
 	}
 	
-	private PositionSide getPositionSide() {
+	private PositionSide getPositionSide(Klines last) {
 		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list);
+		//Klines last = PriceUtil.getLastKlines(list);
 		if(verifyLong(last)) {
 			ps = PositionSide.LONG;
 		} else if(verifyShort(last)) {
@@ -155,19 +168,23 @@ public class ConsolidationAreaFibUtil {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		//return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getBbPercentB() <= 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		//return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getBbPercentB() >= 1;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		//return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getBbPercentB() >= 1;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		//return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getBbPercentB() <= 0;
 	}
 
 	public FibInfo getFibInfo() {

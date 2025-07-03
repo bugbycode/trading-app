@@ -11,9 +11,9 @@ public enum FibCode {
 	FIB4_272(4.272,"4.272", false),
 	FIB4_236(4.236,"4.236", false),
 	FIB4(4,"4", false),
-	
-	FIB3_618(3.618,"3.618", false),
-	FIB3_414(3.414,"3.414", false),
+	*/
+	FIB3_618(3.618,"3.618", true),
+	/*FIB3_414(3.414,"3.414", false),
 	FIB3_272(3.272,"3.272", false),
 	FIB3(3,"3", false),
 	*/
