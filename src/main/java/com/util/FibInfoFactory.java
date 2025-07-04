@@ -38,11 +38,11 @@ public class FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(false);
 		}
 	}
 
-	private void init() {
+	private void init(boolean loadParent) {
 		if(CollectionUtils.isEmpty(list) || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -53,7 +53,7 @@ public class FibInfoFactory {
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
 		
-		PositionSide ps = getPositionSide();
+		PositionSide ps = getPositionSide(loadParent);
 		
 		Klines third = null;
 		Klines second = null;
@@ -124,6 +124,14 @@ public class FibInfoFactory {
 			return;
 		}
 		
+		if(!loadParent) {
+			double start_ema99 = start.getEma99();
+			double end_ema99 = end.getEma99();
+			if((isLong() && start_ema99 > end_ema99) || (isShort() && start_ema99 < end_ema99)) {
+				this.init(true);
+			}
+		}
+		
 		this.resetFibLevel();
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
@@ -133,23 +141,31 @@ public class FibInfoFactory {
 		}
 	}
 	
-	private PositionSide getPositionSide() {
+	private PositionSide getPositionSide(boolean loadParent) {
 		PositionSide ps = PositionSide.DEFAULT;
 		Klines last = PriceUtil.getLastKlines(list);
-		if(verifyLong(last)) {
+		if(verifyLong(last, loadParent)) {
 			ps = PositionSide.LONG;
-		} else if(verifyShort(last)) {
+		} else if(verifyShort(last, loadParent)) {
 			ps = PositionSide.SHORT;
 		}
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines k) {
-		return k.getEma25() > k.getEma99() && k.getEma99() > 0;
+	private boolean verifyLong(Klines k, boolean loadParent) {
+		if(loadParent) {
+			return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		} else {
+			return k.getEma25() > k.getEma99() && k.getEma99() > 0;
+		}
 	}
 	
-	private boolean verifyShort(Klines k) {
-		return k.getEma25() < k.getEma99() && k.getEma99() > 0;
+	private boolean verifyShort(Klines k, boolean loadParent) {
+		if(loadParent) {
+			return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		} else {
+			return k.getEma25() < k.getEma99() && k.getEma99() > 0;
+		}
 	}
 	
 	private boolean verifyHigh(Klines k) {
