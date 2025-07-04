@@ -193,13 +193,14 @@ public class FibInfoFactory {
 			List<Klines> fibSubList = PriceUtil.subList(start, end, list);
 			for(int index = 0; index < fibSubList.size(); index++) {
 				Klines current = fibSubList.get(index);
+				double c_ema7 = current.getEma7();
 				double c_ema25 = current.getEma25();
-				if(mode == QuotationMode.LONG && current.getEma7() > current.getEma25()) {
+				if(mode == QuotationMode.LONG && c_ema7 > c_ema25) {
 					if(c_ema25 < emaValue) {
 						emaValue = c_ema25;
 					}
 					break;
-				} else if(mode == QuotationMode.SHORT && current.getEma7() < current.getEma25()) {
+				} else if(mode == QuotationMode.SHORT && c_ema7 < c_ema25) {
 					if(c_ema25 > emaValue) {
 						emaValue = c_ema25;
 					}
