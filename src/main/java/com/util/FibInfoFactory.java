@@ -26,6 +26,10 @@ public class FibInfoFactory {
 	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
 	
+	private Klines start = null;
+	
+	private Klines end = null;
+	
 	public FibInfoFactory(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
@@ -96,8 +100,7 @@ public class FibInfoFactory {
 		
 		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
 		List<Klines> secondSubList = null;
-		Klines start = null;
-		Klines end = null;
+		
 		Klines startAfterFlag = null;
 		if(ps == PositionSide.SHORT) {
 			start = PriceUtil.getMaxPriceKLine(firstSubList);
@@ -187,6 +190,16 @@ public class FibInfoFactory {
 			QuotationMode mode = this.fibInfo.getQuotationMode();
 			Klines last = PriceUtil.getLastKlines(list);
 			double emaValue = last.getEma99();
+			List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+			for(int index = 0; index < fibSubList.size(); index++) {
+				Klines current = fibSubList.get(index);
+				if( (mode == QuotationMode.LONG && current.getEma7() > current.getEma25()) 
+						|| (mode == QuotationMode.SHORT && current.getEma7() < current.getEma25()) ) {
+					emaValue = current.getEma25();
+					break;
+				}
+			}
+			
 			FibCode[] codes = FibCode.values();
 			int index = 0;
 			for(index = 0; index < codes.length; index++) {
