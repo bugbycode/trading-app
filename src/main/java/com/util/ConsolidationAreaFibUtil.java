@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
@@ -132,6 +133,8 @@ public class ConsolidationAreaFibUtil {
 		if(this.fibInfo == null) {
 			return;
 		}
+		
+		this.fibInfo.setEndCode(FibCode.FIB1_272);
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterFlag != null) {
