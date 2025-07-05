@@ -26,6 +26,10 @@ public class FibInfoFactory {
 	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
 	
+	private Klines start = null;
+	
+	private Klines end = null;
+	
 	public FibInfoFactory(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
@@ -34,11 +38,11 @@ public class FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(false);
 		}
 	}
 
-	private void init() {
+	private void init(boolean loadParent) {
 		if(CollectionUtils.isEmpty(list) || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -49,7 +53,7 @@ public class FibInfoFactory {
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
 		
-		PositionSide ps = getPositionSide();
+		PositionSide ps = getPositionSide(loadParent);
 		
 		Klines third = null;
 		Klines second = null;
@@ -96,8 +100,7 @@ public class FibInfoFactory {
 		
 		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
 		List<Klines> secondSubList = null;
-		Klines start = null;
-		Klines end = null;
+		
 		Klines startAfterFlag = null;
 		if(ps == PositionSide.SHORT) {
 			start = PriceUtil.getMaxPriceKLine(firstSubList);
@@ -121,6 +124,13 @@ public class FibInfoFactory {
 			return;
 		}
 		
+		if(!loadParent) {
+			QuotationMode mode = this.fibInfo.getQuotationMode();
+			if((mode == QuotationMode.LONG && !isLong()) || (mode == QuotationMode.SHORT && !isShort())) {
+				this.init(true);
+			}
+		}
+		
 		this.resetFibLevel();
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
@@ -130,23 +140,31 @@ public class FibInfoFactory {
 		}
 	}
 	
-	private PositionSide getPositionSide() {
+	private PositionSide getPositionSide(boolean loadParent) {
 		PositionSide ps = PositionSide.DEFAULT;
 		Klines last = PriceUtil.getLastKlines(list);
-		if(verifyLong(last)) {
+		if(verifyLong(last, loadParent)) {
 			ps = PositionSide.LONG;
-		} else if(verifyShort(last)) {
+		} else if(verifyShort(last, loadParent)) {
 			ps = PositionSide.SHORT;
 		}
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines k) {
-		return k.getEma25() > k.getEma99() && k.getEma99() > 0;
+	private boolean verifyLong(Klines k, boolean loadParent) {
+		if(loadParent) {
+			return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		} else {
+			return k.getEma25() > k.getEma99() && k.getEma99() > 0;
+		}
 	}
 	
-	private boolean verifyShort(Klines k) {
-		return k.getEma25() < k.getEma99() && k.getEma99() > 0;
+	private boolean verifyShort(Klines k, boolean loadParent) {
+		if(loadParent) {
+			return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		} else {
+			return k.getEma25() < k.getEma99() && k.getEma99() > 0;
+		}
 	}
 	
 	private boolean verifyHigh(Klines k) {
@@ -167,16 +185,24 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
-			result = true;
+		if(fibInfo != null) {
+			double start_ema99 = start.getEma99();
+			double end_ema99 = end.getEma99();
+			if(fibInfo.getQuotationMode() == QuotationMode.LONG && start_ema99 <= end_ema99) {
+				result = true;
+			}
 		}
 		return result;
 	}
 	
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
-			result = true;
+		if(fibInfo != null) {
+			double start_ema99 = start.getEma99();
+			double end_ema99 = end.getEma99();
+			if(fibInfo.getQuotationMode() == QuotationMode.SHORT && start_ema99 >= end_ema99) {
+				result = true;
+			}
 		}
 		return result;
 	}
@@ -187,6 +213,24 @@ public class FibInfoFactory {
 			QuotationMode mode = this.fibInfo.getQuotationMode();
 			Klines last = PriceUtil.getLastKlines(list);
 			double emaValue = last.getEma99();
+			List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+			for(int index = 0; index < fibSubList.size(); index++) {
+				Klines current = fibSubList.get(index);
+				double c_ema7 = current.getEma7();
+				double c_ema25 = current.getEma25();
+				if(mode == QuotationMode.LONG && c_ema7 > c_ema25) {
+					if(c_ema25 < emaValue) {
+						emaValue = c_ema25;
+					}
+					break;
+				} else if(mode == QuotationMode.SHORT && c_ema7 < c_ema25) {
+					if(c_ema25 > emaValue) {
+						emaValue = c_ema25;
+					}
+					break;
+				}
+			}
+			
 			FibCode[] codes = FibCode.values();
 			int index = 0;
 			for(index = 0; index < codes.length; index++) {
@@ -220,7 +264,8 @@ public class FibInfoFactory {
 					
 					|| (isShort() && ( last.getDif() > 0 || ( last.getOpenPriceDoubleValue() >= last.getEma99() && last.getClosePriceDoubleValue() >= last.getEma99() ) ) )) {
 				
-				this.fibInfo.setEndCode(level.getStartFibCode());
+				//this.fibInfo.setEndCode(level.getStartFibCode());
+				this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
 			
 			}
 			/*Klines last = PriceUtil.getLastKlines(list);
