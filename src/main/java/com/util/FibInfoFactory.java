@@ -264,7 +264,8 @@ public class FibInfoFactory {
 					
 					|| (isShort() && ( last.getDif() > 0 || ( last.getOpenPriceDoubleValue() >= last.getEma99() && last.getClosePriceDoubleValue() >= last.getEma99() ) ) )) {
 				
-				this.fibInfo.setEndCode(level.getStartFibCode());
+				//this.fibInfo.setEndCode(level.getStartFibCode());
+				this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
 			
 			}
 			/*Klines last = PriceUtil.getLastKlines(list);
