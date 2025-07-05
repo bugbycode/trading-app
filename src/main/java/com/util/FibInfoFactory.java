@@ -185,20 +185,24 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		double start_ema99 = start.getEma99();
-		double end_ema99 = end.getEma99();
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && start_ema99 <= end_ema99) {
-			result = true;
+		if(fibInfo != null) {
+			double start_ema99 = start.getEma99();
+			double end_ema99 = end.getEma99();
+			if(fibInfo.getQuotationMode() == QuotationMode.LONG && start_ema99 <= end_ema99) {
+				result = true;
+			}
 		}
 		return result;
 	}
 	
 	public boolean isShort() {
 		boolean result = false;
-		double start_ema99 = start.getEma99();
-		double end_ema99 = end.getEma99();
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && start_ema99 >= end_ema99) {
-			result = true;
+		if(fibInfo != null) {
+			double start_ema99 = start.getEma99();
+			double end_ema99 = end.getEma99();
+			if(fibInfo.getQuotationMode() == QuotationMode.SHORT && start_ema99 >= end_ema99) {
+				result = true;
+			}
 		}
 		return result;
 	}
