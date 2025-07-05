@@ -1789,10 +1789,9 @@ public class PriceUtil {
 	 */
 	public static boolean verifyDecliningPrice_v9(Klines current, Klines parent) {
 		double ema99 = current.getEma99();
-		double o = current.getOpenPriceDoubleValue();
-		double c = current.getClosePriceDoubleValue();
+		double h = current.getHighPriceDoubleValue();
 		double p_ema99 = parent.getEma99();
-		return isBreachShort(parent, p_ema99) &&  (o < ema99 && c < ema99);
+		return isBreachShort(parent, p_ema99) && (h < ema99);
 	}
 	
 	/**
@@ -1878,10 +1877,9 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v9(Klines current,Klines parent) {
 		double ema99 = current.getEma99();
-		double o = current.getOpenPriceDoubleValue();
-		double c = current.getClosePriceDoubleValue();
+		double l = current.getLowPriceDoubleValue();
 		double p_ema99 = parent.getEma99();
-		return isBreachLong(parent, p_ema99) && (o > ema99 && c > ema99);
+		return isBreachLong(parent, p_ema99) && (l > ema99);
 	}
 	
 	/**
