@@ -38,7 +38,7 @@ public class FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init(true);
+			this.init(false);
 		}
 	}
 
@@ -124,10 +124,10 @@ public class FibInfoFactory {
 			return;
 		}
 		
-		if(loadParent) {
+		if(!loadParent) {
 			QuotationMode mode = this.fibInfo.getQuotationMode();
 			if((mode == QuotationMode.LONG && !isLong()) || (mode == QuotationMode.SHORT && !isShort())) {
-				this.init(false);
+				this.init(true);
 			}
 		}
 		
