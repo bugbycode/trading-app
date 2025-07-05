@@ -38,7 +38,7 @@ public class FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init(false);
+			this.init(true);
 		}
 	}
 
@@ -124,11 +124,11 @@ public class FibInfoFactory {
 			return;
 		}
 		
-		if(!loadParent) {
+		if(loadParent) {
 			double start_ema99 = start.getEma99();
 			double end_ema99 = end.getEma99();
 			if((isLong() && start_ema99 > end_ema99) || (isShort() && start_ema99 < end_ema99)) {
-				this.init(true);
+				this.init(false);
 			}
 		}
 		
