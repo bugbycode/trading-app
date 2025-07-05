@@ -121,8 +121,8 @@ public class PriceActionFactory {
 			for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
 				Klines current = fibAfterKlines.get(index);
 				Klines parent = fibAfterKlines.get(index - 1);
-				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent))
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))
+				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v9(current, parent))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v9(current, parent))
 							) {
 					msList.add(new MarketSentiment(current));
 				}
@@ -228,7 +228,7 @@ public class PriceActionFactory {
 		if(!(CollectionUtils.isEmpty(list) || fibInfo == null)) {
 			Klines last = PriceUtil.getLastKlines(list);
 			double closePrice = last.getClosePriceDoubleValue();
-			double fibPrice = fibInfo.getFibValue(FibCode.FIB382);
+			double fibPrice = fibInfo.getFibValue(FibCode.FIB5);
 			QuotationMode mode = fibInfo.getQuotationMode();
 			for(int index = 0; index < openPrices.size(); index++) {
 				double price = openPrices.get(index);

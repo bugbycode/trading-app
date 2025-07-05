@@ -1781,6 +1781,21 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v9(Klines current, Klines parent) {
+		double ema99 = current.getEma99();
+		double o = current.getOpenPriceDoubleValue();
+		double c = current.getClosePriceDoubleValue();
+		double p_ema99 = parent.getEma99();
+		return isBreachShort(parent, p_ema99) &&  (o < ema99 && c < ema99);
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -1853,6 +1868,20 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v8(Klines current,Klines parent) {
 		return current.getDif() > 0 && parent.getDif() <= 0;
+	}
+	
+	/**
+	 * 判断是否出现强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v9(Klines current,Klines parent) {
+		double ema99 = current.getEma99();
+		double o = current.getOpenPriceDoubleValue();
+		double c = current.getClosePriceDoubleValue();
+		double p_ema99 = parent.getEma99();
+		return isBreachLong(parent, p_ema99) && (o > ema99 && c > ema99);
 	}
 	
 	/**
