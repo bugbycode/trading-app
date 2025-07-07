@@ -24,8 +24,6 @@ public class FibInfoFactory {
 	
 	private FibInfo fibInfo;
 	
-	private FibInfo fibInfo_parent;
-	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
 	
 	private Klines start = null;
@@ -126,72 +124,6 @@ public class FibInfoFactory {
 			return;
 		}
 		
-		List<Klines> list_parent = PriceUtil.subList(list.get(0), start, list);
-		Klines third_parent = null;
-		Klines second_parent = null;
-		Klines first_parent = null;
-		
-		for(int index = list_parent.size() - 1; index > 0; index--) {
-			Klines current = list_parent.get(index);
-			if(ps == PositionSide.SHORT) {//low - high - low
-				if(third_parent == null) {
-					if(verifyLow(current)) {
-						third_parent = current;
-					}
-				} else if(second_parent == null) {
-					if(verifyHigh(current)) {
-						second_parent = current;
-					}
-				} else if(first_parent == null) {
-					if(verifyLow(current)) {
-						first_parent = current;
-						break;
-					}
-				}
-			} else if(ps == PositionSide.LONG) { // high - low - high
-				if(third_parent == null) {
-					if(verifyHigh(current)) {
-						third_parent = current;
-					}
-				} else if(second_parent == null) {
-					if(verifyLow(current)) {
-						second_parent = current;
-					}
-				} else if(first_parent == null) {
-					if(verifyHigh(current)) {
-						first_parent = current;
-						break;
-					}
-				}
-			}
-		}
-		
-		if(!(first_parent == null || second_parent == null || third_parent == null)) {
-			List<Klines> firstSubList_parent = PriceUtil.subList(first_parent, second_parent, list_parent);
-			List<Klines> secondSubList_parent = null;
-			Klines start_parent = null;
-			Klines end_parent = null;
-			Klines startAfterFlag_parent = null;
-			if(ps == PositionSide.SHORT) {
-				start_parent = PriceUtil.getMaxPriceKLine(firstSubList_parent);
-				startAfterFlag_parent = PriceUtil.getAfterKlines(start_parent, firstSubList_parent);
-				if(startAfterFlag_parent != null) {
-					secondSubList_parent = PriceUtil.subList(startAfterFlag_parent, list_parent);
-					end_parent = PriceUtil.getMinPriceKLine(secondSubList_parent);
-					this.fibInfo_parent = new FibInfo(start_parent.getHighPriceDoubleValue(), end_parent.getLowPriceDoubleValue(), start_parent.getDecimalNum(), FibLevel.LEVEL_1);
-				}
-			} else if(ps == PositionSide.LONG) {
-				start_parent = PriceUtil.getMinPriceKLine(firstSubList_parent);
-				startAfterFlag_parent = PriceUtil.getAfterKlines(start_parent, firstSubList_parent);
-				if(startAfterFlag_parent != null) {
-					secondSubList_parent = PriceUtil.subList(startAfterFlag_parent, list_parent);
-					end_parent = PriceUtil.getMaxPriceKLine(secondSubList_parent);
-					this.fibInfo_parent = new FibInfo(start_parent.getLowPriceDoubleValue(), end_parent.getHighPriceDoubleValue(), start_parent.getDecimalNum(), FibLevel.LEVEL_1);
-				}
-			}
-			
-		}
-		
 		if(!loadParent) {
 			QuotationMode mode = this.fibInfo.getQuotationMode();
 			if((mode == QuotationMode.LONG && !isLong()) || (mode == QuotationMode.SHORT && !isShort())) {
@@ -223,7 +155,7 @@ public class FibInfoFactory {
 		if(loadParent) {
 			return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 		} else {
-			return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+			return k.getEma25() > k.getEma99() && k.getEma99() > 0;
 		}
 	}
 	
@@ -231,7 +163,7 @@ public class FibInfoFactory {
 		if(loadParent) {
 			return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 		} else {
-			return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+			return k.getEma25() < k.getEma99() && k.getEma99() > 0;
 		}
 	}
 	
@@ -253,18 +185,24 @@ public class FibInfoFactory {
 	
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo_parent != null && fibInfo.getQuotationMode() == QuotationMode.LONG
-				&& fibInfo.getFibValue(FibCode.FIB0) > fibInfo_parent.getFibValue(FibCode.FIB0)) {
-			result = true;
+		if(fibInfo != null) {
+			double start_ema99 = start.getEma99();
+			double end_ema99 = end.getEma99();
+			if(fibInfo.getQuotationMode() == QuotationMode.LONG && start_ema99 <= end_ema99) {
+				result = true;
+			}
 		}
 		return result;
 	}
 	
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo_parent != null && fibInfo.getQuotationMode() == QuotationMode.SHORT
-				&& fibInfo.getFibValue(FibCode.FIB0) < fibInfo_parent.getFibValue(FibCode.FIB0)) {
-			result = true;
+		if(fibInfo != null) {
+			double start_ema99 = start.getEma99();
+			double end_ema99 = end.getEma99();
+			if(fibInfo.getQuotationMode() == QuotationMode.SHORT && start_ema99 >= end_ema99) {
+				result = true;
+			}
 		}
 		return result;
 	}
@@ -274,17 +212,21 @@ public class FibInfoFactory {
 		if(this.fibInfo != null) {
 			QuotationMode mode = this.fibInfo.getQuotationMode();
 			Klines last = PriceUtil.getLastKlines(list);
-			double emaValue = last.getEma25();
+			double emaValue = last.getEma99();
 			List<Klines> fibSubList = PriceUtil.subList(start, end, list);
 			for(int index = 0; index < fibSubList.size(); index++) {
 				Klines current = fibSubList.get(index);
 				double c_ema7 = current.getEma7();
 				double c_ema25 = current.getEma25();
 				if(mode == QuotationMode.LONG && c_ema7 > c_ema25) {
-					emaValue = c_ema25;
+					if(c_ema25 < emaValue) {
+						emaValue = c_ema25;
+					}
 					break;
 				} else if(mode == QuotationMode.SHORT && c_ema7 < c_ema25) {
-					emaValue = c_ema25;
+					if(c_ema25 > emaValue) {
+						emaValue = c_ema25;
+					}
 					break;
 				}
 			}
@@ -315,10 +257,37 @@ public class FibInfoFactory {
 			FibCode levelFibCode = getFibCode();
 			FibLevel level = FibLevel.valueOf(levelFibCode);
 			this.fibInfo = new FibInfo(this.fibInfo.getFibValue(FibCode.FIB1), this.fibInfo.getFibValue(FibCode.FIB0), this.fibInfo.getDecimalPoint(), level);
+			//this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
+			//this.fibInfo.setEndCode(level.getStartFibCode());
+			Klines last = PriceUtil.getLastKlines(list);
+			if((isLong() && ( last.getDif() < 0 || ( last.getOpenPriceDoubleValue() <= last.getEma99() && last.getClosePriceDoubleValue() <= last.getEma99() ) )) 
+					
+					|| (isShort() && ( last.getDif() > 0 || ( last.getOpenPriceDoubleValue() >= last.getEma99() && last.getClosePriceDoubleValue() >= last.getEma99() ) ) )) {
+				
+				//this.fibInfo.setEndCode(level.getStartFibCode());
+				this.fibInfo.setEndCode(getParentCode(level.getStartFibCode()));
+			
+			}
+			/*Klines last = PriceUtil.getLastKlines(list);
+			if((isLong() && last.getOpenPriceDoubleValue() <= last.getEma99() && last.getClosePriceDoubleValue() <= last.getEma99()) 
+					|| (isShort() && last.getOpenPriceDoubleValue() >= last.getEma99() && last.getClosePriceDoubleValue() >= last.getEma99())) {
+				this.fibInfo.setEndCode(level.getStartFibCode());
+			}*/
 		}
 	}
-
-	public FibInfo getFibInfo_parent() {
-		return fibInfo_parent;
+	
+	public FibCode getParentCode(FibCode code) {
+		FibCode[] codes = FibCode.values();
+		FibCode result = FibCode.FIB4_618;
+		for(int index = 0; index < codes.length; index++) {
+			if(code == FibCode.FIB5) {
+				result = FibCode.FIB66;
+			} else if(code == FibCode.FIB618) {
+				result = FibCode.FIB786;
+			} else if(code == codes[index] && index > 0) {
+				result = codes[index - 1];
+			}
+		}
+		return result;
 	}
 }
