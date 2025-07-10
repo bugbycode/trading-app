@@ -288,6 +288,16 @@ public class FibInfoFactory {
 				result = codes[index - 1];
 			}
 		}
+		
+		Klines last = PriceUtil.getLastKlines(list);
+		if(last != null) {
+			double ema25 = last.getEma25();
+			double ema99 = last.getEma99();
+			if( ( (isLong() && ema25 > ema99) || (isShort() && ema25 < ema99) ) 
+					&& result.lt(FibCode.FIB1) ) {
+				result = FibCode.FIB1;
+			}
+		}
 		return result;
 	}
 }
