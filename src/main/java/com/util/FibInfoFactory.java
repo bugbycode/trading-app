@@ -288,7 +288,7 @@ public class FibInfoFactory {
 				result = codes[index - 1];
 			}
 		}
-		
+		/*
 		Klines last = PriceUtil.getLastKlines(list);
 		if(last != null) {
 			double ema25 = last.getEma25();
@@ -297,7 +297,7 @@ public class FibInfoFactory {
 					&& result.lt(FibCode.FIB1) ) {
 				result = FibCode.FIB1;
 			}
-		}
+		}*/
 		return result;
 	}
 }
