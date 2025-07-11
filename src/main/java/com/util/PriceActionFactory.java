@@ -114,13 +114,13 @@ public class PriceActionFactory {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, list);
 		}
 		
-		//List<Klines> sub_for_start_list = PriceUtil.subList(start, list);
+		List<Klines> sub_for_start_list = PriceUtil.subList(start, list);
 		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 		QuotationMode mode = fibInfo.getQuotationMode();
-		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
-			for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
-				Klines current = fibAfterKlines.get(index);
-				Klines parent = fibAfterKlines.get(index - 1);
+		if(!CollectionUtils.isEmpty(sub_for_start_list)) {
+			for(int index = sub_for_start_list.size() - 1; index > 1; index--) {
+				Klines current = sub_for_start_list.get(index);
+				Klines parent = sub_for_start_list.get(index - 1);
 				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent))
 						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))
 							) {
@@ -208,19 +208,19 @@ public class PriceActionFactory {
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma25() > k.getEma99();
+		return k.getEma7() > k.getEma25();
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma25() < k.getEma99();
+		return k.getEma7() < k.getEma25();
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99() && k.getEma99() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99() && k.getEma99() > 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	public boolean verifyOpen(List<Klines> list) {
@@ -228,7 +228,7 @@ public class PriceActionFactory {
 		if(!(CollectionUtils.isEmpty(list) || fibInfo == null)) {
 			Klines last = PriceUtil.getLastKlines(list);
 			double closePrice = last.getClosePriceDoubleValue();
-			double fibPrice = fibInfo.getFibValue(FibCode.FIB5);
+			double fibPrice = fibInfo.getFibValue(FibCode.FIB382);
 			QuotationMode mode = fibInfo.getQuotationMode();
 			for(int index = 0; index < openPrices.size(); index++) {
 				double price = openPrices.get(index);
