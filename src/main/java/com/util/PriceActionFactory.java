@@ -181,15 +181,37 @@ public class PriceActionFactory {
 		MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
 		MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
 		
+		List<Klines> pointsKlines = null;
+		
 		if(mode == QuotationMode.LONG && high != null /*&& !last_1h.isEquals(high.getHigh())*/) {//高点做空
+			/*
 			addPrices(high.getHighPrice());
 			addPrices(high.getBodyHighPrice());
 			addPrices(high.getBodyLowPrice());
+			*/
+			pointsKlines = PriceUtil.subList(start, high.getHigh(), list);
+			
+			Klines h_k = PriceUtil.getMaxPriceKLine(pointsKlines);//最高k线
+			Klines h_body_k = PriceUtil.getMaxBodyHighPriceKLine(pointsKlines);//最高实体k线
+			
+			addPrices(h_k.getHighPriceDoubleValue());
+			addPrices(h_body_k.getBodyHighPriceDoubleValue());
+			
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
+			
 		} else if(mode == QuotationMode.SHORT && low != null /*&& !last_1h.isEquals(low.getLow())*/){//低点做多
-			addPrices(low.getLowPrice());
+			/*addPrices(low.getLowPrice());
 			addPrices(low.getBodyLowPrice());
-			addPrices(low.getBodyHighPrice());
+			addPrices(low.getBodyHighPrice());*/
+			
+			pointsKlines = PriceUtil.subList(start, low.getLow(), list);
+			
+			Klines l_k = PriceUtil.getMinPriceKLine(pointsKlines);//最低k线
+			Klines l_body_k = PriceUtil.getMinBodyLowPriceKLine(pointsKlines);//最低实体k线
+			
+			addPrices(l_k.getLowPriceDoubleValue());
+			addPrices(l_body_k.getBodyLowPriceDoubleValue());
+			
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
 		
@@ -208,19 +230,19 @@ public class PriceActionFactory {
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma7() > k.getEma25();
+		return k.getEma25() > k.getEma99() && k.getEma99() > 0;
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma7() < k.getEma25();
+		return k.getEma25() < k.getEma99() && k.getEma99() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99() && k.getEma99() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99() && k.getEma99() > 0;
 	}
 	
 	public boolean verifyOpen(List<Klines> list) {
