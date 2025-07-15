@@ -295,7 +295,7 @@ public class FibInfoFactory {
 			double ema99 = last.getEma99();
 			if( ( (isLong() && ema25 > ema99) || (isShort() && ema25 < ema99) ) 
 					&& result.lt(FibCode.FIB1) ) {
-				result = FibCode.FIB1;
+				result = FibCode.FIB1_272;
 			}
 		}
 		return result;
