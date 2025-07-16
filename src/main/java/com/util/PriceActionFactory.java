@@ -36,6 +36,7 @@ public class PriceActionFactory {
 	public PriceActionFactory(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<Double>();
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
 		}
@@ -137,6 +138,9 @@ public class PriceActionFactory {
 		this.resetFibLevel();
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
+		if(fibAfterFlag == null) {
+			return;
+		}
 		/*if(fibAfterFlag != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, this.list_15m);
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
