@@ -123,13 +123,8 @@ public class FibInfoFactory {
 		if(this.fibInfo == null) {
 			return;
 		}
-		
-		if(!loadParent) {
-			QuotationMode mode = this.fibInfo.getQuotationMode();
-			if((mode == QuotationMode.LONG && !isLong()) || (mode == QuotationMode.SHORT && !isShort())) {
-				this.init(true);
-			}
-		}
+
+		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		this.resetFibLevel();
 		
@@ -137,6 +132,12 @@ public class FibInfoFactory {
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, this.list_15m);
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+		}
+		
+		if(!loadParent) {
+			if((mode == QuotationMode.LONG && !isLong()) || (mode == QuotationMode.SHORT && !isShort())) {
+				this.init(true);
+			}
 		}
 	}
 	

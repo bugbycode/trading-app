@@ -263,11 +263,11 @@ public class FibInfo {
 	}
 	
 	public double getFibValue(FibCode code) {
-		return calculateFibonacciRetracement(endPrice,startPrice,code.getValue());
+		return Double.valueOf(PriceUtil.formatDoubleDecimal(calculateFibonacciRetracement(endPrice,startPrice,code.getValue()), this.decimalPoint));
 	}
 	
 	public double getFibValue(double fibValue) {
-		return calculateFibonacciRetracement(endPrice,startPrice,fibValue);
+		return Double.valueOf(PriceUtil.formatDoubleDecimal(calculateFibonacciRetracement(endPrice,startPrice,fibValue), this.decimalPoint));
 	}
 	
 	public int getDecimalPoint() {

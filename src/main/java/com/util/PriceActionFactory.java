@@ -9,7 +9,6 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.trading.PositionSide;
@@ -128,67 +127,76 @@ public class PriceActionFactory {
 			return;
 		}
 		
-		if(!loadParent) {
-			QuotationMode mode = this.fibInfo.getQuotationMode();
-			if((mode == QuotationMode.LONG && !isLong()) || (mode == QuotationMode.SHORT && !isShort())) {
-				this.init(true);
-			}
-		}
+		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		this.resetFibLevel();
 		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
-		if(fibAfterFlag == null) {
-			return;
-		}
-		/*if(fibAfterFlag != null) {
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
+		if(fibAfterFlag != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, this.list_15m);
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
-		}*/
+		}
 		
 		this.openPrices = new ArrayList<Double>();
-		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
-		List<Klines> fibAfterSubList = PriceUtil.subList(fibAfterFlag, list);
-		//寻找开仓点位
-		if(!CollectionUtils.isEmpty(fibAfterSubList)) {
-			for(int index = fibAfterSubList.size() - 1; index > 1; index--) {
-				Klines current = fibAfterSubList.get(index);
-				Klines parent = fibAfterSubList.get(index - 1);
-				if((this.isLong() && PriceUtil.verifyPowerful_v8(current, parent)) 
-						|| (this.isShort() && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
-					msList.add(new MarketSentiment(current));
+		
+		Klines openFlag = null;
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		for(int index = 0; index < fibSubList.size(); index++) {
+			Klines current = fibSubList.get(index);
+			if((mode == QuotationMode.LONG && current.getEma7() > current.getEma25())
+					|| (mode == QuotationMode.SHORT && current.getEma7() < current.getEma25())) {
+				if(index == 0) {
+					openFlag = current;
+				} else {
+					openFlag = fibSubList.get(index - 1);
+				}
+				break;
+			}
+		}
+		
+		double startPrice = -1;
+		if(openFlag != null) {
+			List<Klines> openFlagSubList = PriceUtil.subList(openFlag, fibSubList);
+			Klines openStart = null;
+			if(mode == QuotationMode.LONG) {
+				openStart = PriceUtil.getMinPriceKLine(openFlagSubList);
+				startPrice = openStart.getLowPriceDoubleValue();
+			} else {
+				openStart = PriceUtil.getMaxPriceKLine(openFlagSubList);
+				startPrice = openStart.getHighPriceDoubleValue();
+			}
+		}
+		
+		if(startPrice != -1) {
+			addPrices(startPrice);
+		}
+		
+		FibCode[] codes = FibCode.values();
+		for(FibCode code : codes) {
+			if(code.lt(this.fibInfo.getLevel().getStartFibCode())) {
+				continue;
+			}
+			double fibPrice = this.fibInfo.getFibValue(code);
+			if(mode == QuotationMode.LONG) {
+				if(fibPrice < startPrice || startPrice == -1) {
+					addPrices(fibPrice);
+				}
+			} else {
+				if(fibPrice > startPrice || startPrice == -1) {
+					addPrices(fibPrice);
 				}
 			}
 		}
 		
-		//开始处理开仓点位
-		MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
-		MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
-		
-		Klines openFlag = null;
-		
-		if(this.isShort() && high != null /*&& !last_1h.isEquals(high.getHigh())*/) {//高点做空
-			openFlag = high.getHigh();
-			addPrices(high.getHighPrice());
-			addPrices(high.getBodyHighPrice());
-			addPrices(high.getBodyLowPrice());
-			
-			this.openPrices.sort(new PriceComparator(SortType.ASC));
-			
-		} else if(this.isLong() && low != null /*&& !last_1h.isEquals(low.getLow())*/){//低点做多
-			openFlag = low.getLow();
-			addPrices(low.getLowPrice());
-			addPrices(low.getBodyLowPrice());
-			addPrices(low.getBodyHighPrice());
-			
+		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
+		} else {
+			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
 		
-		if(openFlag != null) {
-			Klines openFlagAfter = PriceUtil.getAfterKlines(openFlag, this.list_15m);
-			if(openFlagAfter != null) {
-				this.fibAfterKlines = PriceUtil.subList(openFlagAfter, this.list_15m);
-				this.fibInfo.setFibAfterKlines(fibAfterKlines);
+		if(!loadParent) {
+			if((mode == QuotationMode.LONG && !isLong()) || (mode == QuotationMode.SHORT && !isShort())) {
+				this.init(true);
 			}
 		}
 	}

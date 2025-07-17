@@ -1052,7 +1052,8 @@ public class KlinesServiceImpl implements KlinesService {
 			double price = openPrices.get(index);
 			FibCode code = fibInfo.getFibCode(price);
 			
-			if(PriceUtil.isLong_v2(price, klinesList_hit)
+			if(code.isTrade() && code.lte(fibInfo.getEndCode()) 
+					&& PriceUtil.isLong_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					) {
 				
@@ -1111,10 +1112,10 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				break;
 			}
-			
+			/*
 			if(code == fibInfo.getLevel().getStartFibCode()) {
 				break;
-			}
+			}*/
 		}
 	}
 
@@ -1140,7 +1141,8 @@ public class KlinesServiceImpl implements KlinesService {
 			double price = openPrices.get(index);
 			FibCode code = fibInfo.getFibCode(price);
 			
-			if(PriceUtil.isShort_v2(price, klinesList_hit)
+			if(code.isTrade() && code.lte(fibInfo.getEndCode()) 
+					&& PriceUtil.isShort_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)) {
 				
 				//市价做空
@@ -1199,10 +1201,10 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			}
 
-			
+			/*
 			if(code == fibInfo.getLevel().getStartFibCode()) {
 				break;
-			}
+			}*/
 		}
 	}
 
