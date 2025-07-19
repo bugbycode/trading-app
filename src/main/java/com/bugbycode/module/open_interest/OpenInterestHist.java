@@ -20,17 +20,20 @@ public class OpenInterestHist {
 	
 	private long timestamp;
 	
+	private long tradeNumber;//每分钟成交笔数
+	
 	public OpenInterestHist() {
 		
 	}
 
 	public OpenInterestHist(String id, String symbol, String sumOpenInterest, String sumOpenInterestValue,
-			long timestamp) {
+			long timestamp, long tradeNumber) {
 		this.id = id;
 		this.symbol = symbol;
 		this.sumOpenInterest = sumOpenInterest;
 		this.sumOpenInterestValue = sumOpenInterestValue;
 		this.timestamp = timestamp;
+		this.tradeNumber = tradeNumber;
 	}
 
 	public String getId() {
@@ -71,6 +74,14 @@ public class OpenInterestHist {
 
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public long getTradeNumber() {
+		return tradeNumber;
+	}
+
+	public void setTradeNumber(long tradeNumber) {
+		this.tradeNumber = tradeNumber;
 	}
 
 	@Override

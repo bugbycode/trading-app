@@ -1,5 +1,6 @@
 package com.bugbycode.trading_app.task.openInterest;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -15,9 +16,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
+import com.bugbycode.module.Klines;
 import com.bugbycode.module.open_interest.OpenInterestHist;
+import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
+import com.util.PriceUtil;
 
 /**
  * 历史合约持仓量信息同步任务
@@ -36,6 +40,9 @@ public class OpenInterestHistTaskSync {
 	
 	@Autowired
 	private BinanceExchangeService binanceExchangeService;
+	
+	@Autowired
+	private KlinesRepository klinesRepository;
 	
 	/**
 	 * 同步任务 每4分钟执行一次
@@ -75,6 +82,12 @@ public class OpenInterestHistTaskSync {
 					oih.setSumOpenInterest(json.getString("sumOpenInterest"));
 					oih.setSumOpenInterestValue(json.getString("sumOpenInterestValue"));
 					oih.setTimestamp(json.getLong("timestamp"));
+					
+					List<Klines> list_15m = klinesRepository.findLastKlinesByPair(symbol, Inerval.INERVAL_15M, 1);
+					Klines last = PriceUtil.getLastKlines(list_15m);
+					if(last != null) {
+						oih.setTradeNumber(last.getN() / 15);
+					}
 					
 					openInterestHistRepository.save(oih);
 					
