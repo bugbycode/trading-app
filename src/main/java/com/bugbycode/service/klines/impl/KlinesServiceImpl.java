@@ -223,6 +223,8 @@ public class KlinesServiceImpl implements KlinesService {
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
 		
+		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
+		
 		FibCode[] codes = FibCode.values();
 		
 		//开盘、收盘、最低、最高价格
@@ -255,6 +257,10 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				
 				for(User u : userList) {
+					
+					if(oih.getTradeNumber() < u.getTradeNumber()) {
+						continue;
+					}
 					
 					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 						continue;
@@ -331,6 +337,8 @@ public class KlinesServiceImpl implements KlinesService {
 		double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
+		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
+		
 		FibCode[] codes = FibCode.values();
 		
 		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
@@ -356,6 +364,10 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				
 				for(User u : userList) {
+					
+					if(oih.getTradeNumber() < u.getTradeNumber()) {
+						continue;
+					}
 					
 					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 						continue;
@@ -904,6 +916,8 @@ public class KlinesServiceImpl implements KlinesService {
 		String pair = last.getPair();
 		String dateStr = DateFormatUtil.format(new Date());
 		
+		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
+		
 		EmaFibUtil fu = new EmaFibUtil(list_15m);
 		FibInfo fibInfo = fu.getFibInfo();
 		
@@ -931,6 +945,10 @@ public class KlinesServiceImpl implements KlinesService {
 				double profit = u.getMonitorProfit();
 				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
+				
+				if(oih.getTradeNumber() < u.getTradeNumber()) {
+					continue;
+				}
 				
 				if(tradeStyle == TradeStyle.CONSERVATIVE) {
 					takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(closePrice, profit, profitLimit);
@@ -960,6 +978,10 @@ public class KlinesServiceImpl implements KlinesService {
 				double profit = u.getMonitorProfit();
 				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
+				
+				if(oih.getTradeNumber() < u.getTradeNumber()) {
+					continue;
+				}
 				
 				if(tradeStyle == TradeStyle.CONSERVATIVE) {
 					takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(closePrice, profit, profitLimit);
@@ -1054,6 +1076,8 @@ public class KlinesServiceImpl implements KlinesService {
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
 		
+		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
+		
 		//FibCode[] codes = FibCode.values();
 		
 		//开盘、收盘、最低、最高价格
@@ -1080,6 +1104,10 @@ public class KlinesServiceImpl implements KlinesService {
 				List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
+					
+					if(oih.getTradeNumber() < u.getTradeNumber()) {
+						continue;
+					}
 					
 					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 						continue;
@@ -1152,6 +1180,8 @@ public class KlinesServiceImpl implements KlinesService {
 		double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
+		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
+		
 		for(int index = 0;index < openPrices.size();index++) {	
 			
 			double price = openPrices.get(index);
@@ -1168,6 +1198,10 @@ public class KlinesServiceImpl implements KlinesService {
 				List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
+					
+					if(oih.getTradeNumber() < u.getTradeNumber()) {
+						continue;
+					}
 					
 					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
 						continue;
@@ -1963,6 +1997,8 @@ public class KlinesServiceImpl implements KlinesService {
 		Klines last = PriceUtil.getLastKlines(list_1h);
 		String pair = last.getPair();
 		
+		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
+		
 		/*
 		int minute = DateFormatUtil.getMinute(last.getEndTime());
 		if(minute != 59) {
@@ -1987,6 +2023,11 @@ public class KlinesServiceImpl implements KlinesService {
 		if(StringUtil.isNotEmpty(subject)) {
 			List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
 			for(User u : userList) {
+				
+				if(oih.getTradeNumber() < u.getTradeNumber()) {
+					continue;
+				}
+				
 				sendEmail(u, subject, text, u.getUsername());
 			}
 		}
@@ -2007,6 +2048,11 @@ public class KlinesServiceImpl implements KlinesService {
 		if(StringUtil.isNotEmpty(subject)) {
 			List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
 			for(User u : userList) {
+				
+				if(oih.getTradeNumber() < u.getTradeNumber()) {
+					continue;
+				}
+				
 				sendEmail(u, subject, text, u.getUsername());
 			}
 		}
