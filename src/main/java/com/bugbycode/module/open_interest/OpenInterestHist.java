@@ -87,7 +87,7 @@ public class OpenInterestHist {
 	@Override
 	public String toString() {
 		return "交易对：" + this.getSymbol() + ", 持仓总数量：" + sumOpenInterest
-				+ ", 持仓总价值：" + sumOpenInterestValue + ", 更新时间：" + DateFormatUtil.format(timestamp);
+				+ ", 持仓总价值：" + sumOpenInterestValue + ", 更新时间：" + DateFormatUtil.format(timestamp) + ", 每分钟成交笔数：" + tradeNumber;
 	}
 	
 	
