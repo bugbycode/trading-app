@@ -100,6 +100,8 @@ public class User implements UserDetails {
 	
 	private int fibLevel = 0;//价格回撤级别
 	
+	private long tradeNumber = 60;//每分钟成交笔数限制（用来过滤不活跃的交易对）
+	
 	public String getId() {
 		return id;
 	}
@@ -426,5 +428,13 @@ public class User implements UserDetails {
 	
 	public FibLevel getFibLevelType() {
 		return FibLevel.valueOf(this.fibLevel);
+	}
+
+	public long getTradeNumber() {
+		return tradeNumber;
+	}
+
+	public void setTradeNumber(long tradeNumber) {
+		this.tradeNumber = tradeNumber;
 	}
 }

@@ -41,9 +41,11 @@ import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
+import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -96,6 +98,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private ShapeRepository shapeRepository;
+	
+	@Autowired
+	private OpenInterestHistRepository openInterestHistRepository;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -412,6 +417,9 @@ public class KlinesServiceImpl implements KlinesService {
 	public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, 
 			FibInfo fibInfo, AutoTradeType autoTradeType, int decimalNum) {
 		FibCode[] codes = FibCode.values();
+		
+		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
+		
 		if(ps == PositionSide.LONG) {//做多
 			//只做U本位(USDT)合约
 			if(pair.endsWith("USDT")) {
@@ -428,6 +436,10 @@ public class KlinesServiceImpl implements KlinesService {
 					String dateStr = DateFormatUtil.format(new Date());
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					//活跃度限制
+					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+						continue;
+					}
 					
 					//计算预计盈利百分比
 					double profitPercent = 0;
@@ -654,6 +666,10 @@ public class KlinesServiceImpl implements KlinesService {
 					String dateStr = DateFormatUtil.format(new Date());
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					//活跃度限制
+					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+						continue;
+					}
 					
 					//计算预计盈利百分比
 					double profitPercent = 0;
