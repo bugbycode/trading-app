@@ -225,9 +225,9 @@ public class PriceActionFactory {
 		logger.debug(this.openPrices);
 		
 		if(loadPs == PositionSide.DEFAULT) {
-			if(ps == PositionSide.LONG && !isLong()) {
+			if(mode == QuotationMode.SHORT && !isLong()) {
 				init(PositionSide.SHORT);
-			} else if(ps == PositionSide.SHORT && !isShort()) {
+			} else if(mode == QuotationMode.LONG && !isShort()) {
 				init(PositionSide.LONG);
 			}
 		}
