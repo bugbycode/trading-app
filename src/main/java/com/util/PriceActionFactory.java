@@ -46,11 +46,13 @@ public class PriceActionFactory {
 	}
 	
 	private void init(PositionSide loadPs) {
+		
 		if(CollectionUtils.isEmpty(list) || list.size() < 99) {
 			return;
 		}
 		
 		this.fibAfterKlines.clear();
+		this.openPrices.clear();
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
@@ -61,6 +63,8 @@ public class PriceActionFactory {
 		PositionSide ps = PositionSide.DEFAULT;
 		if(loadPs == PositionSide.DEFAULT) {
 			ps = getPositionSide();
+		} else {
+			ps = loadPs;
 		}
 		
 		Klines first = null;
