@@ -1785,6 +1785,18 @@ public class PriceUtil {
 	 * 
 	 * @param current 当前k线
 	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v10(Klines current, Klines parent, Klines next) {
+		return  parent.getMacd() >= next.getMacd() && current.getMacd() < parent.getMacd();
+	}
+	
+	/**
+	 * 判断是否出现颓势
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
 	 * @return
 	 */
 	public static boolean verifyDecliningPrice_v9(Klines current, Klines parent) {
@@ -1867,6 +1879,17 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v8(Klines current,Klines parent) {
 		return current.getMacd() > 0 && parent.getMacd() <= 0;
+	}
+	
+	/**
+	 * 判断是否出现强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyPowerful_v10(Klines current,Klines parent, Klines next) {
+		return parent.getMacd() <= next.getMacd() && current.getMacd() > parent.getMacd();
 	}
 	
 	/**
