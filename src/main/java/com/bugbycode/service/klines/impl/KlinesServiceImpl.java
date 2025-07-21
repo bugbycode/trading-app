@@ -1061,9 +1061,9 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1h, List<Klines> list_15m) {
 		
 		PriceActionFactory factory = new PriceActionFactory(list_1h);
-		if(!factory.verifyOpen(list_15m)) {
+		/*if(!factory.verifyOpen(list_15m)) {
 			return;
-		}
+		}*/
 		
 		String dateStr = DateFormatUtil.format(new Date());
 		Klines last = PriceUtil.getLastKlines(list_15m);
@@ -1073,9 +1073,9 @@ public class KlinesServiceImpl implements KlinesService {
 		List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 
 		FibInfo fibInfo = factory.getFibInfo();
-		QuotationMode qm = fibInfo.getQuotationMode();
+		//QuotationMode qm = fibInfo.getQuotationMode();
 		
-		if(qm == QuotationMode.SHORT) {
+		if(factory.isLong() && factory.verifyOpen(list_15m)) {
 			//市价做多
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.PRICE_ACTION, fibInfo.getDecimalPoint()));
 			
@@ -1103,7 +1103,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				sendEmail(u, subject, text, u.getUsername());
 			}
-		} else {
+		} else if(factory.isShort() && factory.verifyOpen(list_15m)) {
 			
 			//市价做空
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.PRICE_ACTION, fibInfo.getDecimalPoint()));
