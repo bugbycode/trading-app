@@ -41,6 +41,7 @@ public enum FibLevel {
 		this.label = label;
 		this.startFibCode = startFibCode;
 		this.levelCode = levelCode;
+		this.value = value;
 	}
 
 	public int getValue() {
