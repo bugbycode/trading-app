@@ -239,7 +239,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(code.isTrade() && code.lte(fibInfo.getEndCode()) 
+			if(code.isTrade() && code.gte(fibInfo.getLevel().getStartFibCode()) && code.lte(fibInfo.getEndCode()) 
 					&& PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
 					//&& (!PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset) || fibInfo.getEndCode() != FibCode.FIB4_618)
 					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
@@ -309,10 +309,6 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				break;
 			}
-			
-			if(code == fibInfo.getLevel().getStartFibCode()) {
-				break;
-			}
 		}
 		
 	}
@@ -346,7 +342,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = codes[offset];//当前斐波那契点位
 			
-			if(code.isTrade() && code.lte(fibInfo.getEndCode())  
+			if(code.isTrade() && code.gte(fibInfo.getLevel().getStartFibCode()) && code.lte(fibInfo.getEndCode())  
 					&& PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
 					//&& (!PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset) || fibInfo.getEndCode() != FibCode.FIB4_618)
 					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
@@ -414,11 +410,6 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					sendEmail(u, subject,text, u.getUsername());
 				}
-				break;
-			}
-
-			
-			if(code == fibInfo.getLevel().getStartFibCode()) {
 				break;
 			}
 		}

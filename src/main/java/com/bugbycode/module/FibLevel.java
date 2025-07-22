@@ -5,17 +5,29 @@ package com.bugbycode.module;
  */
 public enum FibLevel {
 
-	LEVEL_0(0,"Lv0", FibCode.FIB382, FibCode.FIB236),
+	DEFAULT(-1, "DEFAULT", FibCode.FIB0, FibCode.FIB0),
 	
-	LEVEL_1(1,"Lv1", FibCode.FIB5, FibCode.FIB382),
+	LEVEL_0(0, "Lv0", FibCode.FIB236, FibCode.FIB236),
 	
-	LEVEL_2(2,"Lv2", FibCode.FIB618, FibCode.FIB5),
+	LEVEL_1(1, "Lv1", FibCode.FIB382, FibCode.FIB382),
 	
-	LEVEL_3(3,"Lv3", FibCode.FIB786, FibCode.FIB618),
+	LEVEL_2(2, "Lv2", FibCode.FIB5, FibCode.FIB5),
 	
-	LEVEL_4(4,"Lv4", FibCode.FIB786, FibCode.FIB786),
+	LEVEL_3(3, "Lv3", FibCode.FIB618, FibCode.FIB618),
 	
-	LEVEL_5(5,"Lv5", FibCode.FIB1, FibCode.FIB1);
+	LEVEL_4(4, "Lv4", FibCode.FIB786, FibCode.FIB786),
+	
+	LEVEL_5(5, "Lv5", FibCode.FIB1_272, FibCode.FIB1_272),
+	
+	LEVEL_6(6, "Lv6", FibCode.FIB1_618, FibCode.FIB1_618),
+	
+	LEVEL_7(7, "Lv7", FibCode.FIB2, FibCode.FIB2),
+	
+	LEVEL_8(8, "Lv8", FibCode.FIB2_618, FibCode.FIB2_618),
+	
+	LEVEL_9(9, "Lv9", FibCode.FIB3_618, FibCode.FIB3_618),
+	
+	LEVEL_10(10, "Lv10", FibCode.FIB4_618, FibCode.FIB4_618);
 	
 	private int value;
 	
@@ -26,7 +38,6 @@ public enum FibLevel {
 	private FibCode startFibCode;
 	
 	FibLevel(int value, String label, FibCode startFibCode, FibCode levelCode) {
-		this.value = value;
 		this.label = label;
 		this.startFibCode = startFibCode;
 		this.levelCode = levelCode;
