@@ -226,12 +226,12 @@ public class FibInfoFactory {
 			List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 			if(fibAfterFlag != null) {
 				List<Klines> fibAfterSubList = PriceUtil.subList(fibAfterFlag, list);
-				for(int index = fibAfterSubList.size() - 1; index > 2;index--) {
+				for(int index = fibAfterSubList.size() - 1; index > 1;index--) {
 					Klines current = fibAfterSubList.get(index);
 					Klines parent = fibAfterSubList.get(index - 1);
-					Klines next = fibAfterSubList.get(index - 2);
-					if((mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v10(current, parent, next))
-							|| (mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v10(current, parent, next))
+					//Klines next = fibAfterSubList.get(index - 2);
+					if((mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))
+							|| (mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent))
 								) {
 						msList.add(new MarketSentiment(current));
 					}

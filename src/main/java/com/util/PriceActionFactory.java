@@ -144,12 +144,12 @@ public class PriceActionFactory {
 		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 		QuotationMode mode = fibInfo.getQuotationMode();
 		if(!CollectionUtils.isEmpty(sub_for_start_list)) {
-			for(int index = sub_for_start_list.size() - 1; index > 2; index--) {
+			for(int index = sub_for_start_list.size() - 1; index > 1; index--) {
 				Klines current = sub_for_start_list.get(index);
 				Klines parent = sub_for_start_list.get(index - 1);
-				Klines next = sub_for_start_list.get(index - 2);
-				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v10(current, parent, next))
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v10(current, parent, next))
+				//Klines next = sub_for_start_list.get(index - 2);
+				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))
 							) {
 					msList.add(new MarketSentiment(current));
 				}
