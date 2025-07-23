@@ -174,7 +174,7 @@ public class FibInfoFactory {
 					
 					code = this.fibInfo.getFibCode(grap_area_value);
 					
-					if(code.gte(FibCode.FIB5)) {
+					if(code.gte(FibCode.FIB382)) {
 						addPrices(grap_area_value);
 					}
 					
@@ -187,7 +187,7 @@ public class FibInfoFactory {
 					
 					code = this.fibInfo.getFibCode(grap_area_value);
 					
-					if(code.gte(FibCode.FIB5)) {
+					if(code.gte(FibCode.FIB382)) {
 						addPrices(grap_area_value);
 					}
 					
