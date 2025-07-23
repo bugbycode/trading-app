@@ -166,10 +166,13 @@ public class FibInfoFactory {
 				if(mode == QuotationMode.LONG) {
 					openFlag = PriceUtil.getMinPriceKLine(gapSubList);
 					addPrices(openFlag.getLowPriceDoubleValue());
+					addPrices(gap_start.getHighPriceDoubleValue());
 				} else {
 					openFlag = PriceUtil.getMaxPriceKLine(gapSubList);
 					addPrices(openFlag.getHighPriceDoubleValue());
+					addPrices(gap_start.getLowPriceDoubleValue());
 				}
+				
 			}
 		}
 		

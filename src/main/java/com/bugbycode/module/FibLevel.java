@@ -5,13 +5,13 @@ package com.bugbycode.module;
  */
 public enum FibLevel {
 
-	LEVEL_0(0,"Lv0", FibCode.FIB382, FibCode.FIB236),
+	LEVEL_0(0,"Lv0", FibCode.FIB236, FibCode.FIB236),
 	
-	LEVEL_1(1,"Lv1", FibCode.FIB5, FibCode.FIB382),
+	LEVEL_1(1,"Lv1", FibCode.FIB382, FibCode.FIB382),
 	
-	LEVEL_2(2,"Lv2", FibCode.FIB618, FibCode.FIB5),
+	LEVEL_2(2,"Lv2", FibCode.FIB5, FibCode.FIB5),
 	
-	LEVEL_3(3,"Lv3", FibCode.FIB786, FibCode.FIB618),
+	LEVEL_3(3,"Lv3", FibCode.FIB618, FibCode.FIB618),
 	
 	LEVEL_4(4,"Lv4", FibCode.FIB786, FibCode.FIB786),
 	
