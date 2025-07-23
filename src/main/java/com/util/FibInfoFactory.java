@@ -162,15 +162,36 @@ public class FibInfoFactory {
 		if(gap_start != null) {
 			List<Klines> gapSubList = PriceUtil.subList(gap_start, fibSubList);
 			if(!CollectionUtils.isEmpty(gapSubList)) {
+				
 				Klines openFlag = null;
+				FibCode code = null;
+				double grap_area_value = 0;
+				
 				if(mode == QuotationMode.LONG) {
+					
 					openFlag = PriceUtil.getMinPriceKLine(gapSubList);
+					grap_area_value = gap_start.getHighPriceDoubleValue();
+					
+					code = this.fibInfo.getFibCode(grap_area_value);
+					
+					if(code.gte(FibCode.FIB5)) {
+						addPrices(grap_area_value);
+					}
+					
 					addPrices(openFlag.getLowPriceDoubleValue());
-					addPrices(gap_start.getHighPriceDoubleValue());
+					
 				} else {
+					
 					openFlag = PriceUtil.getMaxPriceKLine(gapSubList);
+					grap_area_value = gap_start.getLowPriceDoubleValue();
+					
+					code = this.fibInfo.getFibCode(grap_area_value);
+					
+					if(code.gte(FibCode.FIB5)) {
+						addPrices(grap_area_value);
+					}
+					
 					addPrices(openFlag.getHighPriceDoubleValue());
-					addPrices(gap_start.getLowPriceDoubleValue());
 				}
 				
 			}
