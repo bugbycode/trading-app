@@ -30,9 +30,12 @@ public class FibInfoFactory {
 	
 	private Klines end = null;
 	
+	private List<Double> openPrices;
+	
 	public FibInfoFactory(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<Double>();
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
 		}
@@ -52,6 +55,8 @@ public class FibInfoFactory {
 		
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
+		
+		this.openPrices.clear();
 		
 		PositionSide ps = getPositionSide(loadParent);
 		
@@ -132,6 +137,48 @@ public class FibInfoFactory {
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, this.list_15m);
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+		}
+		
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		Klines gap_start = null;
+		//Klines gap_end = null;
+		//寻找缺口
+		if(!CollectionUtils.isEmpty(fibSubList)) {
+			for(int index = 0; index < fibSubList.size() - 1; index++) {
+				Klines parent = fibSubList.get(index);
+				Klines current = fibSubList.get(index + 1);
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent)) 
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
+					if((mode == QuotationMode.LONG && current.isFall()) || (mode == QuotationMode.SHORT && current.isRise())) {
+						gap_start = parent;
+					} else {
+						gap_start = current;
+					}
+					break;
+				}
+			}
+		}
+		
+		if(gap_start != null) {
+			List<Klines> gapSubList = PriceUtil.subList(gap_start, fibSubList);
+			if(!CollectionUtils.isEmpty(gapSubList)) {
+				Klines openFlag = null;
+				if(mode == QuotationMode.LONG) {
+					openFlag = PriceUtil.getMinPriceKLine(gapSubList);
+					addPrices(openFlag.getLowPriceDoubleValue());
+				} else {
+					openFlag = PriceUtil.getMaxPriceKLine(gapSubList);
+					addPrices(openFlag.getHighPriceDoubleValue());
+				}
+			}
+		}
+		
+		addPrices(this.fibInfo.getFibValue(FibCode.FIB1));
+		
+		if(mode == QuotationMode.LONG) {
+			this.openPrices.sort(new PriceComparator(SortType.DESC));
+		} else {
+			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
 		
 		if(!loadParent) {
@@ -300,5 +347,15 @@ public class FibInfoFactory {
 			}
 		}
 		return result;
+	}
+	
+	public void addPrices(double price) {
+		if(!PriceUtil.contains(openPrices, price)) {
+			openPrices.add(price);
+		}
+	}
+
+	public List<Double> getOpenPrices() {
+		return openPrices;
 	}
 }
