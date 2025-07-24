@@ -136,7 +136,7 @@ public class AnalysisKlinesTask implements Runnable{
             //查询4小时级别k线信息 END==========================================================================
             
             //斐波那契回撤分析
-            klinesService.futuresFibMonitor(klines_list_1d, klines_list_15m);
+            klinesService.futuresFibMonitor(klines_list_1h_db, klines_list_15m);
             
             //盘整区分析
             klinesService.consolidationAreaMonitor(klines_list_1h_db, klines_list_15m);
