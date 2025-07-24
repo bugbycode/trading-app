@@ -147,9 +147,9 @@ public class PriceActionFactory {
 			for(int index = sub_for_start_list.size() - 1; index > 1; index--) {
 				Klines current = sub_for_start_list.get(index);
 				Klines parent = sub_for_start_list.get(index - 1);
-				//Klines next = sub_for_start_list.get(index - 2);
-				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent))
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))
+				Klines next = sub_for_start_list.get(index - 2);
+				if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v10(current, parent, next))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v10(current, parent, next))
 							) {
 					msList.add(new MarketSentiment(current));
 				}
@@ -208,23 +208,43 @@ public class PriceActionFactory {
 		MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
 		MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
 		
+		Klines afterSplit = null;
+		List<Klines> fibSubList = null;
+		
 		if(mode == QuotationMode.LONG && high != null /*&& !last_1h.isEquals(high.getHigh())*/) {//高点做空
+			
+			afterSplit = high.getHigh();
+			fibSubList = PriceUtil.subList(start, afterSplit, list);
+			
+			Klines hk = PriceUtil.getMaxPriceKLine(fibSubList);
+			Klines bhk = PriceUtil.getMaxBodyHighPriceKLine(fibSubList);
+			addPrices(hk.getHighPriceDoubleValue());
+			addPrices(bhk.getBodyHighPriceDoubleValue());
 			/*
 			addPrices(high.getHighPrice());
 			addPrices(high.getBodyHighPrice());
 			addPrices(high.getBodyLowPrice());
 			*/
-			addPrices(high.getBodyLowPrice());
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 			
 		} else if(mode == QuotationMode.SHORT && low != null /*&& !last_1h.isEquals(low.getLow())*/){//低点做多
-			/*addPrices(low.getLowPrice());
-			addPrices(low.getBodyLowPrice());
-			addPrices(low.getBodyHighPrice());*/
 			
+			afterSplit = low.getLow();
+			
+			fibSubList = PriceUtil.subList(start, afterSplit, list);
+			Klines lk = PriceUtil.getMinPriceKLine(fibSubList);
+			Klines blk = PriceUtil.getMinBodyLowPriceKLine(fibSubList);
+			addPrices(lk.getLowPriceDoubleValue());
+			addPrices(blk.getBodyLowPriceDoubleValue());
+			
+			/*
+			addPrices(low.getLowPrice());
+			addPrices(low.getBodyLowPrice());
 			addPrices(low.getBodyHighPrice());
+			*/
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
+		
 		
 		logger.debug(this.openPrices);
 		
