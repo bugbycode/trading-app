@@ -164,32 +164,32 @@ public class FibInfoFactory {
 			if(!CollectionUtils.isEmpty(gapSubList)) {
 				
 				Klines openFlag = null;
-				FibCode code = null;
-				double grap_area_value = 0;
+				//FibCode code = null;
+				//double grap_area_value = 0;
 				
 				if(mode == QuotationMode.LONG) {
 					
 					openFlag = PriceUtil.getMinPriceKLine(gapSubList);
-					grap_area_value = gap_start.getHighPriceDoubleValue();
+					/*grap_area_value = gap_start.getHighPriceDoubleValue();
 					
 					code = this.fibInfo.getFibCode(grap_area_value);
 					
 					if(code.gte(FibCode.FIB382)) {
 						addPrices(grap_area_value);
-					}
+					}*/
 					
 					addPrices(openFlag.getLowPriceDoubleValue());
 					
 				} else {
 					
 					openFlag = PriceUtil.getMaxPriceKLine(gapSubList);
-					grap_area_value = gap_start.getLowPriceDoubleValue();
+					/*grap_area_value = gap_start.getLowPriceDoubleValue();
 					
 					code = this.fibInfo.getFibCode(grap_area_value);
 					
 					if(code.gte(FibCode.FIB382)) {
 						addPrices(grap_area_value);
-					}
+					}*/
 					
 					addPrices(openFlag.getHighPriceDoubleValue());
 				}
