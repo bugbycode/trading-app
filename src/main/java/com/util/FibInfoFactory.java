@@ -240,11 +240,11 @@ public class FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
 	}
 	
 	public FibInfo getFibInfo() {
