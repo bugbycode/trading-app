@@ -170,7 +170,7 @@ public class FibInfoFactory {
 				if(mode == QuotationMode.LONG) {
 					
 					openFlag = PriceUtil.getMinPriceKLine(gapSubList);
-					grap_area_value = gap_start.getBodyHighPriceDoubleValue();
+					grap_area_value = gap_start.getHighPriceDoubleValue();
 					
 					code = this.fibInfo.getFibCode(grap_area_value);
 					
@@ -183,7 +183,7 @@ public class FibInfoFactory {
 				} else {
 					
 					openFlag = PriceUtil.getMaxPriceKLine(gapSubList);
-					grap_area_value = gap_start.getBodyLowPriceDoubleValue();
+					grap_area_value = gap_start.getLowPriceDoubleValue();
 					
 					code = this.fibInfo.getFibCode(grap_area_value);
 					
