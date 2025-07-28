@@ -26,6 +26,8 @@ public class FibInfoFactory_v3 {
 	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
 	
+	private Klines parent_point = null;
+	
 	private Klines start = null;
 	
 	private Klines end = null;
@@ -57,43 +59,53 @@ public class FibInfoFactory_v3 {
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
 		
+		this.parent_point = null;
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
 		
 		PositionSide ps = getPositionSide(loadParent);
 		
+		Klines fourth = null;
 		Klines third = null;
 		Klines second = null;
 		Klines first = null;
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
-			if(ps == PositionSide.SHORT) {//low - high - low
-				if(third == null) {
+			if(ps == PositionSide.SHORT) {//low - high - low - high
+				if(fourth == null) {
 					if(verifyLow(current)) {
+						fourth = current;
+					}
+				} else if(third == null) {
+					if(verifyHigh(current)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyHigh(current)) {
+					if(verifyLow(current)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow(current)) {
+					if(verifyHigh(current)) {
 						first = current;
 						break;
 					}
 				}
-			} else if(ps == PositionSide.LONG) { // high - low - high
-				if(third == null) {
+			} else if(ps == PositionSide.LONG) { // high - low - high - low
+				if(fourth == null) {
 					if(verifyHigh(current)) {
+						fourth = current;
+					}
+				} else if(third == null) {
+					if(verifyLow(current)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyLow(current)) {
+					if(verifyHigh(current)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh(current)) {
+					if(verifyLow(current)) {
 						first = current;
 						break;
 					}
@@ -101,11 +113,11 @@ public class FibInfoFactory_v3 {
 			}
 		}
 		
-		if(first == null || second == null || third == null) {
+		if(first == null || second == null || third == null || fourth == null) {
 			return;
 		}
 		
-		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
+		List<Klines> firstSubList = PriceUtil.subList(second, fourth, list);
 		List<Klines> secondSubList = null;
 		
 		Klines startAfterFlag = null;
@@ -135,12 +147,13 @@ public class FibInfoFactory_v3 {
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		/*
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
-		if(fibAfterFlag != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterFlag, this.list_15m);
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
-		}*/
+		//寻找前高或前低
+		List<Klines> parentSubList = PriceUtil.subList(first, third, list);
+		if(mode == QuotationMode.LONG) {
+			this.parent_point = PriceUtil.getMaxPriceKLine(parentSubList);
+		} else {
+			this.parent_point = PriceUtil.getMinPriceKLine(parentSubList);
+		}
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
 		if(fibAfterFlag != null) {
@@ -254,7 +267,8 @@ public class FibInfoFactory_v3 {
 		if(fibInfo != null) {
 			double start_ema99 = start.getEma99();
 			double end_ema99 = end.getEma99();
-			if(fibInfo.getQuotationMode() == QuotationMode.LONG && start_ema99 <= end_ema99 && start_ema99 > 0 && end_ema99 > 0) {
+			if(fibInfo.getQuotationMode() == QuotationMode.LONG && start_ema99 <= end_ema99 && start_ema99 > 0 && end_ema99 > 0
+					&& fibInfo.getFibValue(FibCode.FIB0) > parent_point.getHighPriceDoubleValue()) {
 				result = true;
 			}
 		}
@@ -266,7 +280,8 @@ public class FibInfoFactory_v3 {
 		if(fibInfo != null) {
 			double start_ema99 = start.getEma99();
 			double end_ema99 = end.getEma99();
-			if(fibInfo.getQuotationMode() == QuotationMode.SHORT && start_ema99 >= end_ema99 && start_ema99 > 0 && end_ema99 > 0) {
+			if(fibInfo.getQuotationMode() == QuotationMode.SHORT && start_ema99 >= end_ema99 && start_ema99 > 0 && end_ema99 > 0
+					&& fibInfo.getFibValue(FibCode.FIB0) < parent_point.getHighPriceDoubleValue()) {
 				result = true;
 			}
 		}
