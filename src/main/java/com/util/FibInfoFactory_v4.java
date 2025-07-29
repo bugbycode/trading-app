@@ -142,7 +142,7 @@ public class FibInfoFactory_v4 {
 		
 		double levelPrice = 0;
 		FibCode code = FibCode.FIB0;
-		FibCode boundary = FibCode.FIB236;
+		FibCode boundary = FibCode.FIB382;
 		Klines parent = null;
 		Klines current = null;
 		
