@@ -170,7 +170,7 @@ public class FibInfoFactory_v4 {
 			}
 		}
 		
-		if(current != null) {
+		if(openFlag != null) {
 			List<Klines> openSubList = PriceUtil.subList(openFlag, fibSubList);
 			if(mode == QuotationMode.LONG) {
 				openFlag = PriceUtil.getMinPriceKLine(openSubList);
