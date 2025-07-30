@@ -141,29 +141,43 @@ public class FibInfoFactory_v4 {
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		double levelPrice = 0;
-		FibCode code = FibCode.FIB0;
-		FibCode boundary = FibCode.FIB382;
+		//FibCode code = FibCode.FIB0;
+		//FibCode boundary = FibCode.FIB382;
 		Klines parent = null;
 		Klines current = null;
+		Klines openFlag = null;
 		
 		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
 		for(int index = 0; index < fibSubList.size() - 1; index++) {
 			parent = fibSubList.get(index);
 			current = fibSubList.get(index + 1);
 			if(mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v11(current, parent)) {
-				levelPrice = current.getBodyHighPriceDoubleValue();
+				/*levelPrice = current.getBodyHighPriceDoubleValue();
 				code = this.fibInfo.getFibCode(levelPrice);
 				if(code.lte(boundary)) {
 					levelPrice = current.getBodyLowPriceDoubleValue();
-				}
+				}*/
+				openFlag = current;
 				break;
 			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v11(current, parent)) {
-				levelPrice = current.getBodyLowPriceDoubleValue();
+				/*levelPrice = current.getBodyLowPriceDoubleValue();
 				code = this.fibInfo.getFibCode(levelPrice);
 				if(code.lte(boundary)) {
 					levelPrice = current.getBodyHighPriceDoubleValue();
-				}
+				}*/
+				openFlag = current;
 				break;
+			}
+		}
+		
+		if(current != null) {
+			List<Klines> openSubList = PriceUtil.subList(openFlag, fibSubList);
+			if(mode == QuotationMode.LONG) {
+				openFlag = PriceUtil.getMinPriceKLine(openSubList);
+				levelPrice = openFlag.getLowPriceDoubleValue();
+			} else {
+				openFlag = PriceUtil.getMaxPriceKLine(openSubList);
+				levelPrice = openFlag.getHighPriceDoubleValue();
 			}
 		}
 		
