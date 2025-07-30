@@ -9,6 +9,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.trading.PositionSide;
@@ -148,16 +149,30 @@ public class FibInfoFactory {
 		Klines fibEnd = null;
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 			for(int index = 0; index < fibAfterKlines.size() - 1; index++) {
 				Klines parent = fibAfterKlines.get(index);
 				Klines current = fibAfterKlines.get(index + 1);
 				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v11(current, parent))
 						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v11(current, parent))) {
-					addPrices(current.getBodyHighPriceDoubleValue());
+					/*addPrices(current.getBodyHighPriceDoubleValue());
 					addPrices(current.getBodyLowPriceDoubleValue());
 					fibEnd = current;
-					break;
+					break;*/
+					msList.add(new MarketSentiment(current));
 				}
+			}
+			//开始处理开仓点位
+			if(!CollectionUtils.isEmpty(msList)) {
+				MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
+				MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
+				if(mode == QuotationMode.LONG) {
+					fibEnd = low.getLow();
+				} else {
+					fibEnd = high.getHigh();
+				}
+				addPrices(fibEnd.getBodyHighPriceDoubleValue());
+				addPrices(fibEnd.getBodyLowPriceDoubleValue());
 			}
 		}
 		
