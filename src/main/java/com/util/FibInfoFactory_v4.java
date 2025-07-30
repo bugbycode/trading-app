@@ -157,7 +157,11 @@ public class FibInfoFactory_v4 {
 				if(code.lte(boundary)) {
 					levelPrice = current.getBodyLowPriceDoubleValue();
 				}*/
-				openFlag = current;
+				if(current.getLowPriceDoubleValue() >= current.getEma25()) {
+					openFlag = parent;
+				} else {
+					openFlag = current;
+				}
 				break;
 			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v11(current, parent)) {
 				/*levelPrice = current.getBodyLowPriceDoubleValue();
@@ -165,7 +169,11 @@ public class FibInfoFactory_v4 {
 				if(code.lte(boundary)) {
 					levelPrice = current.getBodyHighPriceDoubleValue();
 				}*/
-				openFlag = current;
+				if(current.getHighPriceDoubleValue() <= current.getEma25()) {
+					openFlag = parent;
+				} else {
+					openFlag = current;
+				}
 				break;
 			}
 		}
