@@ -143,15 +143,18 @@ public class FibInfoFactory_v5 {
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		double ema99 = Double.valueOf(PriceUtil.formatDoubleDecimal(end.getEma99(), last.getDecimalNum()));
-		/*double ema25 = Double.valueOf(PriceUtil.formatDoubleDecimal(end.getEma25(), last.getDecimalNum()));
+		double ema25 = Double.valueOf(PriceUtil.formatDoubleDecimal(end.getEma25(), last.getDecimalNum()));
 		
 		//double last_ema7 = last.getEma7();
 		//double last_ema25 = last.getEma25();
 		
 		if((mode == QuotationMode.LONG && ema25 > ema99)
 				|| (mode == QuotationMode.SHORT && ema25 < ema99)) {
-			addPrices(ema25);
-		}*/
+			FibCode code = this.fibInfo.getFibCode(ema25);
+			if(code.gte(FibCode.FIB5)) {
+				addPrices(ema25);
+			}
+		}
 		
 		addPrices(ema99);
 		
