@@ -1818,6 +1818,18 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势 ema25下降
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v12(Klines current, Klines parent, Klines next) {
+		return parent.getEma25() >= next.getEma25() && current.getEma25() < parent.getEma25();
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -1911,6 +1923,17 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v11(Klines current,Klines parent) {
 		return current.getEma7() >= current.getEma25() && parent.getEma7() < parent.getEma25();
+	}
+	
+	/**
+	 * 判断是否出现强势 ema25上升
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyPowerful_v12(Klines current,Klines parent, Klines next) {
+		return parent.getEma25() <= next.getEma25() && current.getEma25() > parent.getEma25();
 	}
 	
 	/**

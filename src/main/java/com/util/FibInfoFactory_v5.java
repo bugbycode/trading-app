@@ -14,7 +14,7 @@ import com.bugbycode.module.SortType;
 import com.bugbycode.module.trading.PositionSide;
 
 /**
- * 斐波那契回撤指标 V4 按指数均线做交易
+ * 斐波那契回撤指标 V5 按指数均线做交易
  */
 public class FibInfoFactory_v5 {
 
