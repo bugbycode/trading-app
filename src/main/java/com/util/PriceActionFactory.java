@@ -139,10 +139,20 @@ public class PriceActionFactory {
 		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
 		
 		if(!CollectionUtils.isEmpty(this.fibAfterKlines)) {
-			for(int index = 0; index < this.fibAfterKlines.size(); index++) {
+			/*for(int index = 0; index < this.fibAfterKlines.size(); index++) {
 				Klines current = this.fibAfterKlines.get(index);
 				if((mode == QuotationMode.LONG && current.getEma7() <= current.getEma25())
 						|| (mode == QuotationMode.SHORT && current.getEma7() >= current.getEma25())) {
+					msList.add(new MarketSentiment(current));
+				}
+			}*/
+			
+			for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
+				Klines current = fibAfterKlines.get(index);
+				Klines parent = fibAfterKlines.get(index - 1);
+				Klines next = fibAfterKlines.get(index - 2);
+				if((mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v12(current, parent, next))
+						|| (mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v12(current, parent, next))) {
 					msList.add(new MarketSentiment(current));
 				}
 			}
@@ -192,21 +202,25 @@ public class PriceActionFactory {
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list);
-		if(verifyLong(last)) {
-			ps = PositionSide.LONG;
-		} else if(verifyShort(last)) {
-			ps = PositionSide.SHORT;
+		int size = list.size();
+		if(size > 1) {
+			Klines current = list.get(size - 1);
+			Klines parent = list.get(size - 2);
+			if(verifyShort(current, parent)) {
+				ps = PositionSide.SHORT;
+			} else if(verifyLong(current, parent)) {
+				ps = PositionSide.LONG;
+			}
 		}
 		return ps;
 	}
 	
-	private boolean verifyShort(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+	private boolean verifyLong(Klines current, Klines parent) {
+		return current.getEma25() > parent.getEma25();
 	}
 	
-	private boolean verifyLong(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+	private boolean verifyShort(Klines current, Klines parent) {
+		return current.getEma25() < parent.getEma25();
 	}
 	
 	private boolean verifyHigh(Klines k) {
@@ -222,7 +236,7 @@ public class PriceActionFactory {
 		if(!(CollectionUtils.isEmpty(list) || fibInfo == null)) {
 			Klines last = PriceUtil.getLastKlines(list);
 			double closePrice = last.getClosePriceDoubleValue();
-			double fibPrice = fibInfo.getFibValue(FibCode.FIB618);
+			double fibPrice = fibInfo.getFibValue(FibCode.FIB5);
 			QuotationMode mode = fibInfo.getQuotationMode();
 			for(int index = 0; index < openPrices.size(); index++) {
 				double price = openPrices.get(index);
@@ -270,10 +284,10 @@ public class PriceActionFactory {
 	}
 	
 	public boolean isLong() {
-		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && start.getEma99() < end.getEma99();
+		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT;
 	}
 	
 	public boolean isShort() {
-		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && start.getEma99() > end.getEma99();
+		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG;
 	}
 }
