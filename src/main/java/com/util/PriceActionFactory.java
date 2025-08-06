@@ -25,6 +25,8 @@ public class PriceActionFactory {
 
 	private List<Klines> list;
 	
+	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
+	
 	private FibInfo fibInfo;
 	
 	private List<Klines> fibAfterKlines;
@@ -35,10 +37,14 @@ public class PriceActionFactory {
 	
 	private Klines end = null;
 	
-	public PriceActionFactory(List<Klines> list) {
+	public PriceActionFactory(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<Double>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
 			this.init();
@@ -178,8 +184,10 @@ public class PriceActionFactory {
 		MarketSentiment high = PriceUtil.getMaxMarketSentiment(msList);
 		MarketSentiment low = PriceUtil.getMinMarketSentiment(msList);
 		
+		Klines fibEnd = null;
+		
 		if(mode == QuotationMode.LONG && high != null /*&& !last_1h.isEquals(high.getHigh())*/) {//高点做空
-			
+			fibEnd = high.getHigh();
 			//addPrices(high.getHighPrice());
 			addPrices(high.getBodyHighPrice());
 			addPrices(high.getBodyLowPrice());
@@ -187,7 +195,7 @@ public class PriceActionFactory {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 			
 		} else if(mode == QuotationMode.SHORT && low != null /*&& !last_1h.isEquals(low.getLow())*/){//低点做多
-			
+			fibEnd = low.getLow();
 			//addPrices(low.getLowPrice());
 			addPrices(low.getBodyLowPrice());
 			addPrices(low.getBodyHighPrice());
@@ -195,6 +203,15 @@ public class PriceActionFactory {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
 		
+		this.fibAfterKlines.clear();
+		
+		if(fibEnd != null) {
+			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+			if(fibAfterFlag != null) {
+				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+				this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			}
+		}
 		
 		logger.debug(this.openPrices);
 		

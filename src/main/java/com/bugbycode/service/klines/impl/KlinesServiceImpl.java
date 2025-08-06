@@ -1242,7 +1242,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresPriceAction(List<Klines> list_1h, List<Klines> list_15m) {
 		
-		PriceActionFactory factory = new PriceActionFactory(list_1h);
+		PriceActionFactory factory = new PriceActionFactory(list_1h, list_15m);
 		/*if(!factory.verifyOpen(list_15m)) {
 			return;
 		}*/
