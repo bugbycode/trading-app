@@ -33,6 +33,8 @@ public class FibInfoFactory_v6 {
 	
 	private List<Double> openPrices;
 	
+	private FibInfoFactory_v4 factory_v4;
+	
 	public FibInfoFactory_v6(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
@@ -51,6 +53,8 @@ public class FibInfoFactory_v6 {
 		if(CollectionUtils.isEmpty(list) || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
+		
+		this.factory_v4 = new FibInfoFactory_v4(list, list_15m);
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
@@ -230,7 +234,9 @@ public class FibInfoFactory_v6 {
 	public boolean isLong() {
 		boolean result = false;
 		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG
-				&& start.getEma99() <= end.getEma99() && start.getEma99() > 0 && end.getEma99() > 0) {
+				//&& start.getEma99() <= end.getEma99() && start.getEma99() > 0 && end.getEma99() > 0
+				&& this.factory_v4.isLong()
+				) {
 			result = true;
 		}
 		return result;
@@ -239,7 +245,9 @@ public class FibInfoFactory_v6 {
 	public boolean isShort() {
 		boolean result = false;
 		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT
-				&& start.getEma99() >= end.getEma99() && start.getEma99() > 0 && end.getEma99() > 0) {
+				//&& start.getEma99() >= end.getEma99() && start.getEma99() > 0 && end.getEma99() > 0
+				&& factory_v4.isShort()
+				) {
 			result = true;
 		}
 		return result;
