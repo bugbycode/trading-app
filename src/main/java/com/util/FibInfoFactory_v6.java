@@ -229,7 +229,8 @@ public class FibInfoFactory_v6 {
 	
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG
+				&& start.getEma99() <= end.getEma99() && start.getEma99() > 0 && end.getEma99() > 0) {
 			result = true;
 		}
 		return result;
@@ -237,7 +238,8 @@ public class FibInfoFactory_v6 {
 	
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT
+				&& start.getEma99() >= end.getEma99() && start.getEma99() > 0 && end.getEma99() > 0) {
 			result = true;
 		}
 		return result;

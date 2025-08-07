@@ -301,10 +301,12 @@ public class PriceActionFactory {
 	}
 	
 	public boolean isLong() {
-		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT;
+		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT 
+				&& start.getEma99() <= end.getEma99() && start.getEma99() > 0 && end.getEma99() > 0;
 	}
 	
 	public boolean isShort() {
-		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG;
+		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG 
+				&& start.getEma99() >= end.getEma99() && start.getEma99() > 0 && end.getEma99() > 0;
 	}
 }
