@@ -1781,7 +1781,7 @@ public class PriceUtil {
 	}
 	
 	/**
-	 * 判断是否出现颓势
+	 * 判断是否出现颓势  以MACD强弱判断
 	 * 
 	 * @param current 当前k线
 	 * @param parent 前一根k线
@@ -1905,7 +1905,7 @@ public class PriceUtil {
 	}
 	
 	/**
-	 * 判断是否出现强势
+	 * 判断是否出现强势 以MACD强弱判断
 	 * @param current 当前k线
 	 * @param parent 前一根k线
 	 * @param next ......
