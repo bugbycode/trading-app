@@ -200,11 +200,11 @@ public class FibInfoFactory_v8 {
 	}
 	
 	private boolean verifyLong(Klines current, Klines parent) {
-		return current.getEma99() > parent.getEma99();
+		return current.getEma99() > parent.getEma99() && parent.getEma99() > 0;
 	}
 	
 	private boolean verifyShort(Klines current, Klines parent) {
-		return current.getEma99() < parent.getEma99();
+		return current.getEma99() < parent.getEma99() && parent.getEma99() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
