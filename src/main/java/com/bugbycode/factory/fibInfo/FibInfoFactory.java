@@ -28,7 +28,15 @@ public interface FibInfoFactory {
 	 */
 	public List<Double> getOpenPrices();
 	
+	/**
+	 * 判断是否为多头行情
+	 * @return
+	 */
 	public boolean isLong();
 	
+	/**
+	 * 判断是否为空头行情
+	 * @return
+	 */
 	public boolean isShort();
 }
