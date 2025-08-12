@@ -179,9 +179,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			Klines current = fibSubList.get(index);
 			Klines parent = fibSubList.get(index - 1);
 			Klines next = fibSubList.get(index - 2);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v10(current, parent, next))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v10(current, parent, next))) {
-				msList.add(new MarketSentiment(current));
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v10(current, parent, next))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v10(current, parent, next))) {
+				List<Klines> sub_list = PriceUtil.subList(current, fibSubList);
+				msList.add(new MarketSentiment(sub_list));
 			}
 		}
 		
@@ -192,23 +193,23 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			for(MarketSentiment ms : msList) {
 				if(mode == QuotationMode.LONG) {
 					fibEnd = ms.getLow();
-					price = fibEnd.getBodyLowPriceDoubleValue();
+					price = fibEnd.getLowPriceDoubleValue();
 					if(openPrices.isEmpty() || getLastPrice() > price) {
 						addPrices(price);
 					}
 					this.openPrices.sort(new PriceComparator(SortType.DESC));
 				} else {
 					fibEnd = ms.getHigh();
-					price = fibEnd.getBodyHighPriceDoubleValue();
+					price = fibEnd.getHighPriceDoubleValue();
 					if(openPrices.isEmpty() || getLastPrice() < price) {
 						addPrices(price);
 					}
 					this.openPrices.sort(new PriceComparator(SortType.ASC));
 				}
 			}
-			
-			addPrices(fibInfo.getFibValue(FibCode.FIB1));
 		}
+		
+		addPrices(fibInfo.getFibValue(FibCode.FIB1));
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
 		

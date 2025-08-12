@@ -462,7 +462,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+					if(code.lt(u.getFibLevelType().getLevelCode())) {
 						continue;
 					}
 					
@@ -556,7 +556,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+					if(code.lt(u.getFibLevelType().getLevelCode())) {
 						continue;
 					}
 
@@ -670,11 +670,11 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.AREA_INDEX) {
 								
-								if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+								FibCode code = codes[offset];
+								
+								if(code.lt(u.getFibLevelType().getLevelCode())) {
 									continue;
 								}
-								
-								FibCode code = codes[offset];
 								
 								takeProfitCode = fibInfo.getTakeProfit_v2(code);
 								
@@ -903,11 +903,11 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.AREA_INDEX) {
 								
-								if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+								FibCode code = codes[offset];
+								
+								if(code.lt(u.getFibLevelType().getLevelCode())) {
 									continue;
 								}
-								
-								FibCode code = codes[offset];
 
 								takeProfitCode = fibInfo.getTakeProfit_v2(code);
 								
