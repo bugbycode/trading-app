@@ -22,6 +22,8 @@ import com.util.PriceUtil;
  */
 public class FibInfoFactoryImplForMacd implements FibInfoFactory {
 
+	private List<Klines> list_1d;
+	
 	private List<Klines> list;
 	
 	private List<Klines> fibAfterKlines;
@@ -36,11 +38,15 @@ public class FibInfoFactoryImplForMacd implements FibInfoFactory {
 	
 	private List<Double> openPrices;
 	
-	public FibInfoFactoryImplForMacd(List<Klines> list, List<Klines> list_15m) {
+	public FibInfoFactoryImplForMacd(List<Klines> list_1d, List<Klines> list, List<Klines> list_15m) {
+		this.list_1d = new ArrayList<Klines>();
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<Double>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_1d)) {
+			this.list_1d.addAll(list_1d);
+		}
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
 		}
@@ -84,15 +90,18 @@ public class FibInfoFactoryImplForMacd implements FibInfoFactory {
 	}
 
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 99 || CollectionUtils.isEmpty(list_15m) || CollectionUtils.isEmpty(list_1d) || list_1d.size() < 35) {
 			return;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
+		this.list_15m.sort(kc);
 		this.list.sort(kc);
+		this.list_1d.sort(kc);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list_1d);
 		
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
@@ -227,22 +236,42 @@ public class FibInfoFactoryImplForMacd implements FibInfoFactory {
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list);
+		/*Klines last = PriceUtil.getLastKlines(list);
 		if(verifyShort(last)) {
 			ps = PositionSide.SHORT;
 		} else if(verifyLong(last)) {
 			ps = PositionSide.LONG;
+		}*/
+		int size = list_1d.size();
+		if(size > 1) {
+			int index = size - 1;
+			Klines current = list_1d.get(index);
+			Klines parent = list_1d.get(index - 1);
+			if(verifyShort(current, parent)) {
+				ps = PositionSide.SHORT;
+			} else if(verifyLong(current, parent)) {
+				ps = PositionSide.LONG;
+			}
 		}
 		return ps;
 	}
 	
+	private boolean verifyLong(Klines current, Klines parent) {
+		return current.getMacd() > parent.getMacd();
+	}
+	
+	private boolean verifyShort(Klines current, Klines parent) {
+		return current.getMacd() < parent.getMacd();
+	}
+	
+	/*
 	private boolean verifyLong(Klines current) {
 		return current.getEma7() < current.getEma25();
 	}
 	
 	private boolean verifyShort(Klines current) {
 		return current.getEma7() > current.getEma25();
-	}
+	}*/
 	
 	private boolean verifyHigh(Klines k) {
 		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;

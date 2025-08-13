@@ -111,10 +111,11 @@ public interface KlinesService {
 	/**
 	 * 斐波那契回撤点位监控
 	 * 
-	 * @param list
-	 * @param list_15m
+	 * @param list_1d 日线级别（趋势判断）
+	 * @param list 回撤参考
+	 * @param list_15m 开仓价格匹配参考
 	 */
-	public void futuresFibMonitor(List<Klines> list, List<Klines> list_15m);
+	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 盘整区监控
