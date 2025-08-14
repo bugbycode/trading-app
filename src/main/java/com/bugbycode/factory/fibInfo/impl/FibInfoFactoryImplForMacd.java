@@ -191,9 +191,9 @@ public class FibInfoFactoryImplForMacd implements FibInfoFactory {
 		Klines current = null;
 		Klines parent = null;
 		Klines next = null;
+		List<Klines> sub_list = null;
 		Klines fibEnd = null;
 		FibCode openCode = null;
-		/*List<Klines> sub_list = null;
 		for(int index = this.fibAfterKlines.size() - 1; index > 1; index--) {
 			current = fibAfterKlines.get(index);
 			parent = fibAfterKlines.get(index - 1);
@@ -210,29 +210,6 @@ public class FibInfoFactoryImplForMacd implements FibInfoFactory {
 				fibEnd = ms.getHigh();
 				openCode = this.fibInfo.getFibCode(fibEnd.getHighPriceDoubleValue());
 				break;
-			}
-		}*/
-		List<Klines> points = new ArrayList<Klines>();
-		for(int index = this.fibAfterKlines.size() - 1; index > 1; index--) {
-			current = fibAfterKlines.get(index);
-			parent = fibAfterKlines.get(index - 1);
-			next = fibAfterKlines.get(index - 2);
-			if(mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v10(current, parent, next)) {
-				points.add(current);
-			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
-				points.add(current);
-				break;
-			}
-		}
-		
-		if(!CollectionUtils.isEmpty(points)) {
-			ms = new MarketSentiment(points);
-			if(mode == QuotationMode.LONG) {
-				fibEnd = ms.getLow();
-				openCode = this.fibInfo.getFibCode(fibEnd.getBodyLowPriceDoubleValue());
-			} else {
-				fibEnd = ms.getHigh();
-				openCode = this.fibInfo.getFibCode(fibEnd.getBodyHighPriceDoubleValue());
 			}
 		}
 		
