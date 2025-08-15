@@ -1830,6 +1830,17 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势 BB值变弱
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v13(Klines current, Klines parent) {
+		return current.getBbPercentB() < 0.5 && parent.getBbPercentB() >= 0.5;
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -1934,6 +1945,16 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v12(Klines current,Klines parent, Klines next) {
 		return parent.getEma25() <= next.getEma25() && current.getEma25() > parent.getEma25();
+	}
+	
+	/**
+	 * 判断是否出现强势 BB数值变强
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v13(Klines current,Klines parent) {
+		return current.getBbPercentB() > 0.5 && parent.getBbPercentB() <= 0.5;
 	}
 	
 	/**

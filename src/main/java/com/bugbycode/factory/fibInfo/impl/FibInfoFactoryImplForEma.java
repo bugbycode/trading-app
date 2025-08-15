@@ -186,8 +186,8 @@ public class FibInfoFactoryImplForEma implements FibInfoFactory {
 			for(int index = 0; index < fibAfterKlines.size() - 1; index++) {
 				Klines parent = fibAfterKlines.get(index);
 				Klines current = fibAfterKlines.get(index + 1);
-				if((mode == QuotationMode.LONG && verifyLong(current, parent))
-						|| (mode == QuotationMode.SHORT && verifyShort(current, parent))) {
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v11(current, parent))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v11(current, parent))) {
 					/*addPrices(current.getBodyHighPriceDoubleValue());
 					addPrices(current.getBodyLowPriceDoubleValue());
 					fibEnd = current;
@@ -235,25 +235,21 @@ public class FibInfoFactoryImplForEma implements FibInfoFactory {
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		int size = list.size();
-		if(size > 1) {
-			Klines current = list.get(size - 1);
-			Klines parrent = list.get(size - 2);
-			if(verifyLong(current, parrent)) {
-				ps = PositionSide.LONG;
-			} else if(verifyShort(current, parrent)) {
-				ps = PositionSide.SHORT;
-			}
+		Klines last = PriceUtil.getLastKlines(list);
+		if(verifyLong(last)) {
+			ps = PositionSide.LONG;
+		} else if(verifyShort(last)) {
+			ps = PositionSide.SHORT;
 		}
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current, Klines parent) {
-		return current.getEma25() > parent.getEma25() && current.getEma99() > parent.getEma99() && parent.getEma25() > 0 && parent.getEma99() > 0;
+	private boolean verifyLong(Klines current) {
+		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
 	}
 	
-	private boolean verifyShort(Klines current, Klines parent) {
-		return current.getEma25() < parent.getEma25() && current.getEma99() < parent.getEma99() && parent.getEma25() > 0 && parent.getEma99() > 0;
+	private boolean verifyShort(Klines current) {
+		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
