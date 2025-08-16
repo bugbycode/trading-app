@@ -223,6 +223,87 @@ public class FibInfo {
 	}
 	
 	/**
+	 * 获取价格行为止盈点位
+	 * @param code 当前开仓点
+	 * @return
+	 */
+	public FibCode getPriceActionTakeProfit_v1(FibCode code) {
+		FibCode takeProfit = FibCode.FIB4_618;
+		if(code.lt(FibCode.FIB5)) { // 0 ~ 0.382 - 0.618
+			takeProfit = FibCode.FIB618;
+		} else if(code == FibCode.FIB5) { // 0.5 - 0.786
+			takeProfit = FibCode.FIB786;
+		} else if(code == FibCode.FIB618 || code == FibCode.FIB66 || code == FibCode.FIB786) { // 0.618 || 0.786 - 1
+			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1 || code == FibCode.FIB1_272) {// 1 || 1.272 - 2
+			takeProfit = FibCode.FIB2;
+		} else if(code == FibCode.FIB1_618) { // 1.618 - 2.618
+			takeProfit = FibCode.FIB2_618;
+		} else if(code == FibCode.FIB2) { // 2 - 3.618
+			takeProfit = FibCode.FIB3_618;
+		} else if(code == FibCode.FIB2_618 || code == FibCode.FIB3_618) {// 2.618 || 3.618 - 4.618
+			takeProfit = FibCode.FIB4_618;
+		}
+		return takeProfit;
+	}
+	
+	/**
+	 * 获取价格行为止盈点位前一个回撤点
+	 * @param code 当前开仓点
+	 * @return
+	 */
+	public FibCode getPriceActionTakeProfit_nextCode(FibCode code) {
+		FibCode takeProfit = FibCode.FIB4_618;
+		if(code.lt(FibCode.FIB5)) { // 0 ~ 0.382 - 0.5
+			takeProfit = FibCode.FIB5;
+		} else if(code == FibCode.FIB5) { // 0.5 - 0.618
+			takeProfit = FibCode.FIB618;
+		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 - 0.786
+			takeProfit = FibCode.FIB786;
+		} else if(code == FibCode.FIB786) {// 0.786 - 1
+			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1 || code == FibCode.FIB1_272) {// 1 || 1.272 - 1.618
+			takeProfit = FibCode.FIB1_618;
+		} else if(code == FibCode.FIB1_618) { // 1.618 - 2
+			takeProfit = FibCode.FIB2;
+		} else if(code == FibCode.FIB2) { // 2 - 2.618
+			takeProfit = FibCode.FIB2_618;
+		} else if(code == FibCode.FIB2_618) {// 2.618 - 3.618
+			takeProfit = FibCode.FIB3_618;
+		} else if(code == FibCode.FIB3_618) { // 3.618 - 4.618
+			takeProfit = FibCode.FIB4_618;
+		}
+		return takeProfit;
+	}
+	
+	/**
+	 * 价格行为止盈点位 (保守的交易风格) </br>
+	 * 
+	 * 1、当【盈利百分比】大于【用户止盈百分比限制】则止盈点位为下一个回撤点位 </br>
+	 * 2、当下一个回撤点位止盈时【盈利百分比】小于【用户盈利预期】时则止盈点位保持不变 </br>
+	 * 
+	 * @param code 开仓时所处的斐波那契回撤点位
+	 * @param price 当前价格
+	 * @param profit 用户盈利预期
+	 * @param profitLimit 用户止盈百分比限制
+	 * @return 止盈的斐波那契回撤点位
+	 */
+	public FibCode getPriceActionTakeProfit(FibCode code, double price, double profit, double profitLimit) {
+		
+		FibCode takeProfit = getPriceActionTakeProfit_v1(code);
+		FibCode next = getPriceActionTakeProfit_nextCode(code);
+		
+		double pricePercent = PriceUtil.getPercent(price, takeProfit, this); //价格波动幅度
+		double nextPricePercent = PriceUtil.getPercent(price, next, this);;//下一个点位价格波动幅度
+		
+		if(PriceUtil.checkPercent(pricePercent, nextPricePercent, profit, profitLimit)) {
+			takeProfit = next;
+		}
+		
+		return takeProfit;
+	}
+	
+	/**
 	 * 
 	 * @param fib1 斐波那契回撤起始价
 	 * @param fib0 斐波那契回撤结束价

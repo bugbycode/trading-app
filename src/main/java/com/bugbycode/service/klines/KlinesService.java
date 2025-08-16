@@ -103,6 +103,24 @@ public interface KlinesService {
 	public void openShort_v2(List<Double> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
+	 * 价格行为做多
+	 * @param openPrices 开仓价格
+	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param afterLowKlines 回撤之后的最低k线
+	 * @param klinesList_hit 最近时间段内部分k线信息
+	 */
+	public void openLong_priceAction(List<Double> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	
+	/**
+	 * 价格行为做空
+	 * @param openPrices 开仓价格
+	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param afterHighKlines 回撤之后的最高k线
+	 * @param klinesList_hit 最近时间段内部分k线信息
+	 */
+	public void openShort_priceAction(List<Double> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	
+	/**
 	 * 指数均线监控
 	 * @param klinesList
 	 */
