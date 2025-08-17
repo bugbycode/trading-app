@@ -260,7 +260,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(oih.getTradeNumber() < u.getTradeNumber()) {
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
 					
@@ -363,7 +363,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(oih.getTradeNumber() < u.getTradeNumber()) {
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
 					
@@ -459,7 +459,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(oih.getTradeNumber() < u.getTradeNumber()) {
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
 					
@@ -553,7 +553,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(oih.getTradeNumber() < u.getTradeNumber()) {
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
 					
@@ -1146,7 +1146,7 @@ public class KlinesServiceImpl implements KlinesService {
 				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
 				
-				if(oih.getTradeNumber() < u.getTradeNumber()) {
+				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 					continue;
 				}
 				
@@ -1179,7 +1179,7 @@ public class KlinesServiceImpl implements KlinesService {
 				double profitLimit = u.getProfitLimit();
 				double cutLoss = u.getCutLoss();
 				
-				if(oih.getTradeNumber() < u.getTradeNumber()) {
+				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 					continue;
 				}
 				
@@ -1308,7 +1308,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(oih.getTradeNumber() < u.getTradeNumber()) {
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
 					
@@ -1391,7 +1391,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(oih.getTradeNumber() < u.getTradeNumber()) {
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
 					
@@ -2200,7 +2200,7 @@ public class KlinesServiceImpl implements KlinesService {
 			List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
 			for(User u : userList) {
 				
-				if(oih.getTradeNumber() < u.getTradeNumber()) {
+				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 					continue;
 				}
 				
@@ -2225,7 +2225,7 @@ public class KlinesServiceImpl implements KlinesService {
 			List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
 			for(User u : userList) {
 				
-				if(oih.getTradeNumber() < u.getTradeNumber()) {
+				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 					continue;
 				}
 				

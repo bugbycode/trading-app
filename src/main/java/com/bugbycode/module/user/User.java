@@ -100,7 +100,9 @@ public class User implements UserDetails {
 	
 	private int fibLevel = 0;//价格回撤级别
 	
-	private long tradeNumber = 60;//每分钟成交笔数限制（用来过滤不活跃的交易对）
+	private long tradeNumber = 60;//每分钟成交笔数限制（用来过滤不活跃的交易对）自动交易
+	
+	private long tradeNumberMonitor = 60; //每分钟成交笔数限制（用来过滤不活跃的交易对）行情监控
 	
 	public String getId() {
 		return id;
@@ -368,6 +370,7 @@ public class User implements UserDetails {
 		this.setAreaMonitor(user.getAreaMonitor());
 		this.setVolumeMonitor(user.getVolumeMonitor());
 		this.setMonitorProfit(user.getMonitorProfit());
+		this.setTradeNumberMonitor(user.getTradeNumberMonitor());
 	}
 
 	public String getSmtpUser2() {
@@ -436,5 +439,13 @@ public class User implements UserDetails {
 
 	public void setTradeNumber(long tradeNumber) {
 		this.tradeNumber = tradeNumber;
+	}
+
+	public long getTradeNumberMonitor() {
+		return tradeNumberMonitor;
+	}
+
+	public void setTradeNumberMonitor(long tradeNumberMonitor) {
+		this.tradeNumberMonitor = tradeNumberMonitor;
 	}
 }

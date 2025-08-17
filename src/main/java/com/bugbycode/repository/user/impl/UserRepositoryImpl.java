@@ -96,6 +96,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("areaMonitor", user.getAreaMonitor());
 		update.set("volumeMonitor", user.getVolumeMonitor());
 		update.set("monitorProfit", user.getMonitorProfit());
+		update.set("tradeNumberMonitor", user.getTradeNumberMonitor());
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
