@@ -245,13 +245,13 @@ public class FibInfoFactoryImplForMacd implements FibInfoFactory {
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		/*Klines last = PriceUtil.getLastKlines(list);
+		Klines last = PriceUtil.getLastKlines(list);
 		if(verifyShort(last)) {
 			ps = PositionSide.SHORT;
 		} else if(verifyLong(last)) {
 			ps = PositionSide.LONG;
-		}*/
-		int size = list_1d.size();
+		}
+		/*int size = list_1d.size();
 		if(size > 1) {
 			int index = size - 1;
 			Klines current = list_1d.get(index);
@@ -261,25 +261,25 @@ public class FibInfoFactoryImplForMacd implements FibInfoFactory {
 			} else if(verifyLong(current, parent)) {
 				ps = PositionSide.LONG;
 			}
-		}
+		}*/
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current, Klines parent) {
+	/*private boolean verifyLong(Klines current, Klines parent) {
 		return current.getMacd() > parent.getMacd();
 	}
 	
 	private boolean verifyShort(Klines current, Klines parent) {
 		return current.getMacd() < parent.getMacd();
-	}
+	}*/
 	
-	/*private boolean verifyLong(Klines current) {
+	private boolean verifyLong(Klines current) {
 		return current.getEma7() < current.getEma25();
 	}
 	
 	private boolean verifyShort(Klines current) {
 		return current.getEma7() > current.getEma25();
-	}*/
+	}
 	
 	private boolean verifyHigh(Klines k) {
 		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
