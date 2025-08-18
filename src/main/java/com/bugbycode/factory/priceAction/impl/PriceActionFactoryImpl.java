@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.priceAction.PriceActionFactory;
-//import com.bugbycode.module.FibCode;
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
@@ -238,10 +238,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private void addPrices(double price) {
-		//if(fibInfo != null && FibCode.FIB382.gte(fibInfo.getFibCode(price))) {
+		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price))) {
 			if(!PriceUtil.contains(openPrices, price)) {
 				openPrices.add(price);
 			}
-		//}
+		}
 	}
 }
