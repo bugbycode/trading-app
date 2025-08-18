@@ -229,8 +229,8 @@ public class FibInfo {
 	 */
 	public FibCode getPriceActionTakeProfit_v1(FibCode code) {
 		FibCode takeProfit = FibCode.FIB4_618;
-		if(code.lte(FibCode.FIB236)) { // 0 ~ 0.236 - 0.5
-			takeProfit = FibCode.FIB5;
+		if(code.lte(FibCode.FIB236)) { // 0 ~ 0.236 - 0.618
+			takeProfit = FibCode.FIB618;
 		} else if(code == FibCode.FIB382) { // 0.382 - 0.618
 			takeProfit = FibCode.FIB618;
 		} else if(code == FibCode.FIB5) { // 0.5 - 0.786
@@ -256,8 +256,8 @@ public class FibInfo {
 	 */
 	public FibCode getPriceActionTakeProfit_nextCode(FibCode code) {
 		FibCode takeProfit = FibCode.FIB4_618;
-		if(code.lte(FibCode.FIB236)) { // 0 ~ 0.236 - 0.382
-			takeProfit = FibCode.FIB382;
+		if(code.lte(FibCode.FIB236)) { // 0 ~ 0.236 - 0.5
+			takeProfit = FibCode.FIB5;
 		} else if(code == FibCode.FIB382) { // 0.382 - 0.5
 			takeProfit = FibCode.FIB5;
 		} else if(code == FibCode.FIB5) { // 0.5 - 0.618
