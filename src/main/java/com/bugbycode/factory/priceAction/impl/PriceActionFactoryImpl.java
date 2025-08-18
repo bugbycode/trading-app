@@ -172,12 +172,12 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		
 		Klines current = null;
 		Klines parent = null;
-		//Klines next = null;
+		Klines next = null;
 		Klines fibEnd = null;
 		for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
 			current = fibAfterKlines.get(index);
 			parent = fibAfterKlines.get(index - 1);
-			/*next = fibAfterKlines.get(index - 2);
+			next = fibAfterKlines.get(index - 2);
 			if((ps == PositionSide.LONG && (PriceUtil.verifyPowerful_v10(current, parent, next) || PriceUtil.verifyPowerful_v11(current, parent)) )
 					|| (ps == PositionSide.SHORT && (PriceUtil.verifyDecliningPrice_v10(current, parent, next) || PriceUtil.verifyDecliningPrice_v11(current, parent)) )) {
 				fibEnd = current;
@@ -187,14 +187,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				} else {
 					addPrices(fibEnd.getClosePriceDoubleValue());
 				}
-				break;
-			}*/
-			
-			if((ps == PositionSide.LONG && PriceUtil.verifyPowerful_v11(current, parent) )
-					|| (ps == PositionSide.SHORT && PriceUtil.verifyDecliningPrice_v11(current, parent)) ) {
-				fibEnd = current;
-				addPrices(fibEnd.getBodyHighPriceDoubleValue());
-				addPrices(fibEnd.getBodyLowPriceDoubleValue());
 				break;
 			}
 		}
@@ -246,7 +238,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private void addPrices(double price) {
-		if(fibInfo != null && FibCode.FIB382.gte(fibInfo.getFibCode(price))) {
+		if(fibInfo != null && FibCode.FIB236.gte(fibInfo.getFibCode(price))) {
 			if(!PriceUtil.contains(openPrices, price)) {
 				openPrices.add(price);
 			}
