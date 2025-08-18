@@ -196,7 +196,7 @@ public class FibInfoFactoryImplForBB implements FibInfoFactory {
 		//Klines next = null;
 		List<Klines> sub_list = null;
 		Klines fibEnd = null;
-		FibCode openCode = null;
+		//FibCode openCode = null;
 		for(int index = this.fibAfterKlines.size() - 1; index > 0; index--) {
 			current = this.fibAfterKlines.get(index);
 			if( ( (mode == QuotationMode.LONG && current.getBbPercentB() <= 0) 
@@ -206,18 +206,20 @@ public class FibInfoFactoryImplForBB implements FibInfoFactory {
 				ms = new MarketSentiment(sub_list);
 				if(mode == QuotationMode.LONG) {
 					fibEnd = ms.getLow();
-					openCode = this.fibInfo.getFibCode(fibEnd.getLowPriceDoubleValue());
+					//openCode = this.fibInfo.getFibCode(fibEnd.getLowPriceDoubleValue());
+					addPrices(fibEnd.getLowPriceDoubleValue());
 				} else {
 					fibEnd = ms.getHigh();
-					openCode = this.fibInfo.getFibCode(fibEnd.getHighPriceDoubleValue());
+					//openCode = this.fibInfo.getFibCode(fibEnd.getHighPriceDoubleValue());
+					addPrices(fibEnd.getHighPriceDoubleValue());
 				}
 				break;
 			}
 		}
-		
+		/*
 		if(openCode != null) {
 			addPrices(this.fibInfo.getFibValue(openCode));
-		}
+		}*/
 		
 		this.fibAfterKlines.clear();
 		
