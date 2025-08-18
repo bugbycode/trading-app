@@ -107,6 +107,8 @@ public class FibInfoFactoryImplForBB implements FibInfoFactory {
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
 		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		PositionSide ps = getPositionSide();
 		
 		Klines third = null;
@@ -197,8 +199,9 @@ public class FibInfoFactoryImplForBB implements FibInfoFactory {
 		FibCode openCode = null;
 		for(int index = this.fibAfterKlines.size() - 1; index > 0; index--) {
 			current = this.fibAfterKlines.get(index);
-			if((mode == QuotationMode.LONG && current.getBbPercentB() <= 0) 
-					|| (mode == QuotationMode.SHORT && current.getBbPercentB() >= 1)) {
+			if( ( (mode == QuotationMode.LONG && current.getBbPercentB() <= 0) 
+					|| (mode == QuotationMode.SHORT && current.getBbPercentB() >= 1) ) 
+					&& !last.isEquals(current)) {
 				sub_list = PriceUtil.subList(fibAfterFlag, current, fibAfterKlines);
 				ms = new MarketSentiment(sub_list);
 				if(mode == QuotationMode.LONG) {
