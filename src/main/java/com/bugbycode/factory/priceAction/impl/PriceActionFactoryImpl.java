@@ -238,7 +238,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private void addPrices(double price) {
-		if(fibInfo != null && FibCode.FIB382.gte(fibInfo.getFibCode(price))) {
+		if(fibInfo != null && FibCode.FIB236.gte(fibInfo.getFibCode(price))) {
 			if(!PriceUtil.contains(openPrices, price)) {
 				openPrices.add(price);
 			}
