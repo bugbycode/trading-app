@@ -57,7 +57,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	public boolean isLong() {
 		boolean result = false;
 		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG
-				&& end.getHighPriceDoubleValue() >= firstPoint.getHighPriceDoubleValue()) {
+				&& isAth()) {
 			result = true;
 		}
 		return result;
@@ -67,7 +67,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	public boolean isShort() {
 		boolean result = false;
 		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT
-				&& end.getLowPriceDoubleValue() <= firstPoint.getLowPriceDoubleValue()) {
+				&& isAtl()) {
 			result = true;
 		}
 		return result;
@@ -86,6 +86,22 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	@Override
 	public List<Double> getOpenPrices() {
 		return openPrices;
+	}
+	
+	/**
+	 * 是否出现新高
+	 * @return
+	 */
+	private boolean isAth() {
+		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && end.getHighPriceDoubleValue() >= firstPoint.getHighPriceDoubleValue();
+	}
+	
+	/**
+	 * 是否出现新低
+	 * @return
+	 */
+	private boolean isAtl() {
+		return fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && end.getLowPriceDoubleValue() <= firstPoint.getLowPriceDoubleValue();
 	}
 	
 	private void init() {
@@ -217,6 +233,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 		
 		addPrices(fibInfo.getFibValue(FibCode.FIB1));
+		
+		if(isAth() || isAtl()) {
+			FibCode[] codes = FibCode.values();
+			for(FibCode code : codes) {
+				if(code.gt(FibCode.FIB1)) {
+					addPrices(fibInfo.getFibValue(code));
+				}
+			}
+		}
 		
 		//开始处理开仓点位
 		if(ms != null) {
