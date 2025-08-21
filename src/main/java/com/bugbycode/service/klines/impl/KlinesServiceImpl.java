@@ -1333,7 +1333,7 @@ public class KlinesServiceImpl implements KlinesService {
 					double profitPrice = fibInfo.getFibValue(closePpositionCode);
 
 					//开仓订阅提醒
-					String subject = String.format("%s永续合约%s(%s)[%s]做多机会(PNL:%s%%) %s", pair, code.getDescription(),
+					String subject = String.format("%s永续合约%s(%s)[%s]强势价格行为(PNL:%s%%) %s", pair, code.getDescription(),
 							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 							fibInfo.getLevel().getLabel(),
 							PriceUtil.formatDoubleDecimal(profitPercent, 2),
@@ -1415,7 +1415,7 @@ public class KlinesServiceImpl implements KlinesService {
 					//止盈价
 					double profitPrice = fibInfo.getFibValue(closePpositionCode);
 					
-					String subject = String.format("%s永续合约%s(%s)[%s]做空机会(PNL:%s%%) %s", pair, code.getDescription(),
+					String subject = String.format("%s永续合约%s(%s)[%s]颓势价格行为(PNL:%s%%) %s", pair, code.getDescription(),
 							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
 							fibInfo.getLevel().getLabel(),
 							PriceUtil.formatDoubleDecimal(profitPercent, 2),
