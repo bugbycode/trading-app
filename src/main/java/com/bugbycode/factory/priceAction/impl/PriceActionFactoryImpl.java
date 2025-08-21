@@ -178,8 +178,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			current = fibAfterKlines.get(index);
 			parent = fibAfterKlines.get(index - 1);
 			next = fibAfterKlines.get(index - 2);
-			if((ps == PositionSide.LONG && (PriceUtil.verifyPowerful_v10(current, parent, next) || PriceUtil.verifyPowerful_v11(current, parent)) )
-					|| (ps == PositionSide.SHORT && (PriceUtil.verifyDecliningPrice_v10(current, parent, next) || PriceUtil.verifyDecliningPrice_v11(current, parent)) )) {
+			if((ps == PositionSide.LONG && 
+					( (PriceUtil.verifyPowerful_v10(current, parent, next) && (current.getMacd() < 0 || parent.getMacd() < 0)) || PriceUtil.verifyPowerful_v11(current, parent)) )
+					|| (ps == PositionSide.SHORT && 
+					( (PriceUtil.verifyDecliningPrice_v10(current, parent, next) && (current.getMacd() > 0 || parent.getMacd() > 0) ) || PriceUtil.verifyDecliningPrice_v11(current, parent)) )) {
 				fibEnd = current;
 				if(PriceUtil.verifyPowerful_v11(current, parent) || PriceUtil.verifyDecliningPrice_v11(current, parent)) {
 					addPrices(fibEnd.getBodyHighPriceDoubleValue());
