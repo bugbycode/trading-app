@@ -251,13 +251,17 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				openFlag = ms.getLow();
 				price = openFlag.getLowPriceDoubleValue();
 				addPrices(price);
-				this.openPrices.sort(new PriceComparator(SortType.DESC));
 			} else {
 				openFlag = ms.getHigh();
 				price = openFlag.getHighPriceDoubleValue();
 				addPrices(price);
-				this.openPrices.sort(new PriceComparator(SortType.ASC));
 			}
+		}
+		
+		if(mode == QuotationMode.LONG) {
+			this.openPrices.sort(new PriceComparator(SortType.DESC));
+		} else {
+			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
