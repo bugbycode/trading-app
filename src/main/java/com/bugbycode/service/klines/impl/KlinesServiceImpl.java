@@ -20,7 +20,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImplPlus;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
-import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
+import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImplPlus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -1252,7 +1252,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresPriceAction(List<Klines> list_1h, List<Klines> list_15m) {
 		
-		PriceActionFactory factory = new PriceActionFactoryImpl(list_1h, list_15m);
+		PriceActionFactory factory = new PriceActionFactoryImplPlus(list_1h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		

@@ -65,4 +65,8 @@ public class MarketSentiment {
 	public double getBodyLowPrice() {
 		return low == null ? 0 : low.getBodyLowPriceDoubleValue();
 	}
+	
+	public boolean isEmpty() {
+		return this.list == null || this.list.isEmpty();
+	}
 }
