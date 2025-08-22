@@ -1,5 +1,7 @@
 package com.bugbycode.trading_app;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
@@ -13,6 +15,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
+import com.bugbycode.module.open_interest.OpenInterestHist;
+import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -22,6 +26,9 @@ public class OpenInterestHistTest {
 	
 	@Autowired
 	private RestTemplate restTemplate;
+
+	@Autowired
+	private OpenInterestHistRepository openInterestHistRepository;
 
 	@Before
 	public void befor() {
@@ -42,6 +49,22 @@ public class OpenInterestHistTest {
 		//
 		String result = restTemplate.getForObject(url, String.class);
 		logger.info(result);
+	}
+
+	@Test
+	public void testQuery() {
+		List<OpenInterestHist> list = openInterestHistRepository.query();
+		logger.info(list.size());
+		for(OpenInterestHist o : list) {
+			logger.info(o);
+		}
+	}
+
+	@Test
+	public void testQueryOne() {
+		String symbol = "SKLUSDT";
+		OpenInterestHist o = openInterestHistRepository.findOneBySymbol(symbol);
+		logger.info(o);
 	}
 
 }
