@@ -25,6 +25,7 @@ import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ReversalPoint;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.PriceInfo;
+import com.bugbycode.module.price.OpenPrice;
 
 public class PriceUtil {
 	
@@ -591,10 +592,10 @@ public class PriceUtil {
 	 * @param offset
 	 * @return
 	 */
-	public static boolean isObsoleteLong(Klines afterLowKlines,List<Double> openPriceList,int offset) {
+	public static boolean isObsoleteLong(Klines afterLowKlines,List<OpenPrice> openPriceList,int offset) {
 		boolean result = false;
 		if(!ObjectUtils.isEmpty(afterLowKlines) && offset < openPriceList.size() - 1) {
-			double nexPrice = openPriceList.get(offset + 1);
+			double nexPrice = openPriceList.get(offset + 1).getPrice();
 			if(afterLowKlines.getLowPriceDoubleValue() <= nexPrice) {
 				result = true;
 			}
@@ -609,10 +610,10 @@ public class PriceUtil {
 	 * @param offset
 	 * @return
 	 */
-	public static boolean isObsoleteShort(Klines afterHighKlines,List<Double> openPriceList,int offset) {
+	public static boolean isObsoleteShort(Klines afterHighKlines,List<OpenPrice> openPriceList,int offset) {
 		boolean result = false;
 		if(!ObjectUtils.isEmpty(afterHighKlines) && offset < openPriceList.size() - 1) {
-			double nexPrice = openPriceList.get(offset + 1);
+			double nexPrice = openPriceList.get(offset + 1).getPrice();
 			if(afterHighKlines.getHighPriceDoubleValue() >= nexPrice) {
 				result = true;
 			}
@@ -1579,6 +1580,17 @@ public class PriceUtil {
 		if(!CollectionUtils.isEmpty(list)) {
 			for(double p : list) {
 				if(p == price) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static boolean contains(List<OpenPrice> list, OpenPrice price) {
+		if(!CollectionUtils.isEmpty(list)) {
+			for(OpenPrice p : list) {
+				if(p.getPrice() == price.getPrice()) {
 					return true;
 				}
 			}

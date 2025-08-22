@@ -9,6 +9,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
+import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
 
@@ -91,7 +92,7 @@ public interface KlinesService {
 	 * @param afterLowKlines 回撤之后的最低k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openLong_v2(List<Double> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	public void openLong_v2(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做空
@@ -100,7 +101,7 @@ public interface KlinesService {
 	 * @param afterHighKlines 回撤之后的最高k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openShort_v2(List<Double> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public void openShort_v2(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 价格行为做多
@@ -109,7 +110,7 @@ public interface KlinesService {
 	 * @param afterLowKlines 回撤之后的最低k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openLong_priceAction(List<Double> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	public void openLong_priceAction(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 价格行为做空
@@ -118,7 +119,7 @@ public interface KlinesService {
 	 * @param afterHighKlines 回撤之后的最高k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openShort_priceAction(List<Double> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public void openShort_priceAction(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 指数均线监控

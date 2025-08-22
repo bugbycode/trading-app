@@ -13,6 +13,8 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.price.OpenPrice;
+import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceComparator;
@@ -35,12 +37,12 @@ public class PriceActionFactoryImplPlus implements PriceActionFactory{
 	
 	private Klines end = null;
 	
-	private List<Double> openPrices;
+	private List<OpenPrice> openPrices;
 	
 	public PriceActionFactoryImplPlus(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
-		this.openPrices = new ArrayList<Double>();
+		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -62,7 +64,7 @@ public class PriceActionFactoryImplPlus implements PriceActionFactory{
 	}
 
 	@Override
-	public List<Double> getOpenPrices() {
+	public List<OpenPrice> getOpenPrices() {
 		return openPrices;
 	}
 
@@ -199,7 +201,7 @@ public class PriceActionFactoryImplPlus implements PriceActionFactory{
 		
 		if(fibEnd != null) {
 			
-			addPrices(fibEnd.getClosePriceDoubleValue());
+			addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(fibEnd.getClosePriceDoubleValue()), fibEnd.getClosePriceDoubleValue()));
 			
 			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
 			
@@ -244,8 +246,8 @@ public class PriceActionFactoryImplPlus implements PriceActionFactory{
 		return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
 	}
 	
-	private void addPrices(double price) {
-		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price))) {
+	private void addPrices(OpenPrice price) {
+		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price.getPrice()))) {
 			if(!PriceUtil.contains(openPrices, price)) {
 				openPrices.add(price);
 			}

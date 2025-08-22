@@ -13,6 +13,8 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.price.OpenPrice;
+import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceComparator;
@@ -37,12 +39,12 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private Klines firstPoint = null;//前高或前低
 	
-	private List<Double> openPrices;
+	private List<OpenPrice> openPrices;
 	
 	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
-		this.openPrices = new ArrayList<Double>();
+		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -84,7 +86,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 
 	@Override
-	public List<Double> getOpenPrices() {
+	public List<OpenPrice> getOpenPrices() {
 		return openPrices;
 	}
 	
@@ -232,13 +234,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 		}
 		
-		addPrices(fibInfo.getFibValue(FibCode.FIB1));
+		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
 		
 		if(isAth() || isAtl()) {
 			FibCode[] codes = FibCode.values();
 			for(FibCode code : codes) {
 				if(code.gt(FibCode.FIB1)) {
-					addPrices(fibInfo.getFibValue(code));
+					addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code)));
 				}
 			}
 		}
@@ -250,11 +252,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(mode == QuotationMode.LONG) {
 				openFlag = ms.getLow();
 				price = openFlag.getLowPriceDoubleValue();
-				addPrices(price);
+				addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(price), price));
 			} else {
 				openFlag = ms.getHigh();
 				price = openFlag.getHighPriceDoubleValue();
-				addPrices(price);
+				addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(price), price));
 			}
 		}
 		
@@ -308,7 +310,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		if(this.fibInfo != null) {
 			
 			if(!CollectionUtils.isEmpty(openPrices)) {
-				double price = openPrices.get(0);
+				double price = openPrices.get(0).getPrice();
 				result = this.fibInfo.getFibCode(price);
 			}
 			
@@ -330,7 +332,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 	}
 	
-	private void addPrices(double price) {
+	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price)) {
 			openPrices.add(price);
 		}

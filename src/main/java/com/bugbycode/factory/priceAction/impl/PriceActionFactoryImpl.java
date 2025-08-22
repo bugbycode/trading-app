@@ -12,6 +12,8 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.price.OpenPrice;
+import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceComparator;
@@ -34,12 +36,12 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private Klines end = null;
 	
-	private List<Double> openPrices;
+	private List<OpenPrice> openPrices;
 	
 	public PriceActionFactoryImpl(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
-		this.openPrices = new ArrayList<Double>();
+		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -61,7 +63,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 
 	@Override
-	public List<Double> getOpenPrices() {
+	public List<OpenPrice> getOpenPrices() {
 		return openPrices;
 	}
 
@@ -184,10 +186,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					( (PriceUtil.verifyDecliningPrice_v10(current, parent, next) && (current.getMacd() > 0 || parent.getMacd() > 0) ) || PriceUtil.verifyDecliningPrice_v11(current, parent)) )) {
 				fibEnd = current;
 				if(PriceUtil.verifyPowerful_v11(current, parent) || PriceUtil.verifyDecliningPrice_v11(current, parent)) {
-					addPrices(fibEnd.getBodyHighPriceDoubleValue());
-					addPrices(fibEnd.getBodyLowPriceDoubleValue());
+					addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(fibEnd.getBodyHighPriceDoubleValue()), fibEnd.getBodyHighPriceDoubleValue()));
+					addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(fibEnd.getBodyLowPriceDoubleValue()), fibEnd.getBodyLowPriceDoubleValue()));
 				} else {
-					addPrices(fibEnd.getClosePriceDoubleValue());
+					addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(fibEnd.getClosePriceDoubleValue()), fibEnd.getClosePriceDoubleValue()));
 				}
 				break;
 			}
@@ -239,8 +241,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
 	}
 	
-	private void addPrices(double price) {
-		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price))) {
+	private void addPrices(OpenPrice price) {
+		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price.getPrice()))) {
 			if(!PriceUtil.contains(openPrices, price)) {
 				openPrices.add(price);
 			}

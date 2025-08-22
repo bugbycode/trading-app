@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.price.OpenPrice;
 
 /**
  * 斐波那契回指标撤接口信息
@@ -26,7 +27,7 @@ public interface FibInfoFactory {
 	 * 获取开仓点位
 	 * @return
 	 */
-	public List<Double> getOpenPrices();
+	public List<OpenPrice> getOpenPrices();
 	
 	/**
 	 * 判断是否为多头行情

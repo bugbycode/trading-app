@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.price.OpenPrice;
 
 /**
  * 价格行为指标接口
@@ -26,7 +27,7 @@ public interface PriceActionFactory {
 	 * 获取开仓点位
 	 * @return
 	 */
-	public List<Double> getOpenPrices();
+	public List<OpenPrice> getOpenPrices();
 	
 
 	/**

@@ -48,6 +48,7 @@ import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
+import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
@@ -419,7 +420,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openLong_v2(List<Double> openPrices, FibInfo fibInfo, Klines afterLowKlines,
+	public void openLong_v2(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterLowKlines,
 			List<Klines> klinesList_hit) {
 		if(fibInfo == null) {
 			return;
@@ -441,9 +442,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		for(int index = 0;index < openPrices.size(); index++) {
 		
-			double price = openPrices.get(index);
+			OpenPrice openPrice = openPrices.get(index);
+			double price = openPrice.getPrice();
 			
-			FibCode code = fibInfo.getFibCode(price);//当前斐波那契点位
+			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			
@@ -514,7 +516,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openShort_v2(List<Double> openPrices, FibInfo fibInfo, Klines afterHighKlines,
+	public void openShort_v2(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterHighKlines,
 			List<Klines> klinesList_hit) {
 		if(fibInfo == null) {
 			return;
@@ -536,9 +538,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		for(int index = 0;index < openPrices.size(); index++) {
 			
-			double price = openPrices.get(index);
+			OpenPrice openPrice = openPrices.get(index);
+			double price = openPrice.getPrice();
 			
-			FibCode code = fibInfo.getFibCode(price);//当前斐波那契点位
+			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			if(PriceUtil.isShort_v2(price, klinesList_hit)
@@ -1268,7 +1271,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openLong_priceAction(List<Double> openPrices, FibInfo fibInfo, Klines afterLowKlines,
+	public void openLong_priceAction(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterLowKlines,
 			List<Klines> klinesList_hit) {
 		if(fibInfo == null) {
 			return;
@@ -1290,9 +1293,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		for(int index = 0;index < openPrices.size(); index++) {
 		
-			double price = openPrices.get(index);
+			OpenPrice openPrice = openPrices.get(index);
+			double price = openPrice.getPrice();
 			
-			FibCode code = fibInfo.getFibCode(price);//当前斐波那契点位
+			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			
@@ -1352,7 +1356,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void openShort_priceAction(List<Double> openPrices, FibInfo fibInfo, Klines afterHighKlines,
+	public void openShort_priceAction(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterHighKlines,
 			List<Klines> klinesList_hit) {
 		if(fibInfo == null) {
 			return;
@@ -1374,9 +1378,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		for(int index = 0;index < openPrices.size(); index++) {
 			
-			double price = openPrices.get(index);
+			OpenPrice openPrice = openPrices.get(index);
+			double price = openPrice.getPrice();
 			
-			FibCode code = fibInfo.getFibCode(price);//当前斐波那契点位
+			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			if(PriceUtil.isShort_v2(price, klinesList_hit)
