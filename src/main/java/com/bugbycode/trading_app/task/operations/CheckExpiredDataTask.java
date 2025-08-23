@@ -63,6 +63,7 @@ public class CheckExpiredDataTask {
 					collectionsRepository.dropCollections(pair, Inerval.INERVAL_1H);
 					collectionsRepository.dropCollections(pair, Inerval.INERVAL_15M);
 					collectionsRepository.dropCollections(pair, Inerval.INERVAL_5M);
+					openInterestHistRepository.remove(oih.getId());
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
