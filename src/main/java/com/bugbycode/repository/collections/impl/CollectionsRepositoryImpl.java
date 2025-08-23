@@ -26,7 +26,7 @@ public class CollectionsRepositoryImpl implements CollectionsRepository {
 		String collectionName = StringUtil.formatCollectionName(pair, interval);
 		MongoCollection<Document> collections = template.getCollection(collectionName);
 		if(collections != null) {
-			logger.info("开始删除集合{}");
+			logger.info("开始删除集合{}", collectionName);
 			collections.drop();
 			logger.info("集合{}已被删除", collectionName);
 			logger.info("已清理{}交易对{}级别的所有K线数据", pair, interval.getMemo());
