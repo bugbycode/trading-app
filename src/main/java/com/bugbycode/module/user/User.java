@@ -104,6 +104,10 @@ public class User implements UserDetails {
 	
 	private long tradeNumberMonitor = 60; //每分钟成交笔数限制（用来过滤不活跃的交易对）行情监控
 	
+	private int breakthroughTrade = 0; //是否交易突破单 价格行为交易使用 0：否 1：是
+	
+	private int breakthroughMonitor = 0; //是否监控突破行为 价格行为监控使用 0：否 1：是
+	
 	public String getId() {
 		return id;
 	}
@@ -371,6 +375,7 @@ public class User implements UserDetails {
 		this.setVolumeMonitor(user.getVolumeMonitor());
 		this.setMonitorProfit(user.getMonitorProfit());
 		this.setTradeNumberMonitor(user.getTradeNumberMonitor());
+		this.setBreakthroughMonitor(user.getBreakthroughMonitor());
 	}
 
 	public String getSmtpUser2() {
@@ -447,5 +452,21 @@ public class User implements UserDetails {
 
 	public void setTradeNumberMonitor(long tradeNumberMonitor) {
 		this.tradeNumberMonitor = tradeNumberMonitor;
+	}
+
+	public int getBreakthroughTrade() {
+		return breakthroughTrade;
+	}
+
+	public void setBreakthroughTrade(int breakthroughTrade) {
+		this.breakthroughTrade = breakthroughTrade;
+	}
+
+	public int getBreakthroughMonitor() {
+		return breakthroughMonitor;
+	}
+
+	public void setBreakthroughMonitor(int breakthroughMonitor) {
+		this.breakthroughMonitor = breakthroughMonitor;
 	}
 }

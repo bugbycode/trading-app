@@ -97,6 +97,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("volumeMonitor", user.getVolumeMonitor());
 		update.set("monitorProfit", user.getMonitorProfit());
 		update.set("tradeNumberMonitor", user.getTradeNumberMonitor());
+		update.set("breakthroughMonitor", user.getBreakthroughMonitor());
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
@@ -139,7 +140,7 @@ public class UserRepositoryImpl implements UserRepository {
 	public void updateBinanceApiSecurity(String username,String binanceApiKey, String binanceSecretKey,int autoTrade,
 			int baseStepSize,int leverage,double positionValue, double cutLoss,double profit,int autoTradeType,int drawTrade,
 			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle,double profitLimit,
-			int countertrendTrading, FibLevel fibLevel, long tradeNumber) {
+			int countertrendTrading, FibLevel fibLevel, long tradeNumber, int breakthroughTrade) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
@@ -160,6 +161,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("countertrendTrading", countertrendTrading);
 		update.set("fibLevel", fibLevel.getValue());
 		update.set("tradeNumber", tradeNumber);
+		update.set("breakthroughTrade", breakthroughTrade);
 		
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}

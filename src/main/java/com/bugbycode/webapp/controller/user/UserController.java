@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
+import com.bugbycode.module.BreakthroughTradeStatus;
 import com.bugbycode.module.CountertrendTradingStatus;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.RecvTradeStatus;
@@ -118,6 +119,8 @@ public class UserController extends BaseController{
 		TradeStyle tradeStyle = TradeStyle.valueOf(data.getTradeStyle());
 		CountertrendTradingStatus countertrendTradingStatus = CountertrendTradingStatus.valueOf(data.getCountertrendTrading());
 		
+		BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(data.getBreakthroughTrade());
+		
 		if(data.getCutLoss() == 0) {
 			data.setCutLoss(3);
 		}
@@ -146,7 +149,8 @@ public class UserController extends BaseController{
 			userRepository.updateBinanceApiSecurity(user.getUsername(), data.getBinanceApiKey(), data.getBinanceSecretKey(), autoTrade.value(),
 					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
 					drawTrade.getValue(), recvTradeStatus.getValue(), recvCrossUnPnlStatus.getValue(), data.getRecvCrossUnPnlPercent(), 
-					tradeStepBackStatus.getValue(), tradeStyle.getValue(), data.getProfitLimit(), countertrendTradingStatus.getValue(), data.getFibLevelType(), data.getTradeNumber());
+					tradeStepBackStatus.getValue(), tradeStyle.getValue(), data.getProfitLimit(), countertrendTradingStatus.getValue(), 
+					data.getFibLevelType(), data.getTradeNumber(), breakthroughTradeStatus.getValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -167,6 +171,7 @@ public class UserController extends BaseController{
 			user.setCountertrendTrading(countertrendTradingStatus.getValue());
 			user.setFibLevel(data.getFibLevelType().getValue());
 			user.setTradeNumber(data.getTradeNumber());
+			user.setBreakthroughTrade(data.getBreakthroughTrade());
 			
 			json.put("message", "修改成功");
 		} else {
