@@ -18,7 +18,7 @@ import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImplPlus;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImplPlus;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -452,7 +452,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(PriceUtil.isLong_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					&& !PriceUtil.isTraded(price, fibInfo)) {
+					//&& !PriceUtil.isTraded(price, fibInfo)
+					) {
 			
 				//市价做多
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
@@ -547,7 +548,8 @@ public class KlinesServiceImpl implements KlinesService {
 			int offset = fibInfo.getFibCodeIndex(code);
 			if(PriceUtil.isShort_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					&& !PriceUtil.isTraded(price, fibInfo)) {
+					//&& !PriceUtil.isTraded(price, fibInfo)
+					) {
 			
 				//市价做空
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.FIB_RET, fibInfo.getDecimalPoint()));
@@ -1230,7 +1232,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		FibInfoFactory factory = new FibInfoFactoryImplPlus(list, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		

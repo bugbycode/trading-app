@@ -15,6 +15,10 @@ public class MarketSentiment {
 	
 	private Klines low;
 	
+	private Klines highBody;
+	
+	private Klines lowBody;
+	
 	public MarketSentiment(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list)) {
@@ -40,6 +44,8 @@ public class MarketSentiment {
 		
 		high = PriceUtil.getMaxPriceKLine(list);
 		low = PriceUtil.getMinPriceKLine(list);
+		highBody = PriceUtil.getMaxBodyHighPriceKLine(list);
+		lowBody = PriceUtil.getMinBodyLowPriceKLine(list);
 	}
 
 	public Klines getHigh() {
@@ -50,6 +56,22 @@ public class MarketSentiment {
 		return low;
 	}
 	
+	public Klines getHighBody() {
+		return highBody;
+	}
+
+	public Klines getLowBody() {
+		return lowBody;
+	}
+	
+	public double getHighBodyPrice() {
+		return highBody == null ? 0 : highBody.getBodyHighPriceDoubleValue();
+	}
+
+	public double getLowBodyPrice() {
+		return lowBody == null ? 0 : lowBody.getBodyLowPriceDoubleValue();
+	}
+
 	public double getHighPrice() {
 		return high == null ? 0 : high.getHighPriceDoubleValue();
 	}
