@@ -168,18 +168,21 @@ public class PriceActionFactoryImplPlus implements PriceActionFactory{
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
 		
+		if(fibAfterFlag != null) {
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, list));
+		}
+		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		Klines current = null;
 		Klines parent = null;
 		Klines fibEnd = null;
 		
-		List<Klines> sub_list = PriceUtil.subList(start, list);
 		List<Klines> points = new ArrayList<Klines>();
 		
-		for(int index = sub_list.size() - 1; index > 1; index--) {
-			current = sub_list.get(index);
-			parent = sub_list.get(index - 1);
+		for(int index = fibAfterKlines.size() - 1; index > 0; index--) {
+			current = fibAfterKlines.get(index);
+			parent = fibAfterKlines.get(index - 1);
 			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v11(current, parent))
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v11(current, parent))) {
 				points.add(current);

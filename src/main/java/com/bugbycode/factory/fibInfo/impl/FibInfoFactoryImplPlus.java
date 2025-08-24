@@ -215,7 +215,7 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 		
 		List<Klines> points = new ArrayList<Klines>();
 		
-		for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
+		for(int index = fibAfterKlines.size() - 1; index > 0; index--) {
 			current = fibAfterKlines.get(index);
 			parent = fibAfterKlines.get(index - 1);
 			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v11(current, parent))
