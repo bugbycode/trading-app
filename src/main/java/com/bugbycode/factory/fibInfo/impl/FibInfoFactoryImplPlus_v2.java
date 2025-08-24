@@ -212,7 +212,7 @@ public class FibInfoFactoryImplPlus_v2 implements FibInfoFactory {
 			FibCode code = codes[offset];
 			double price = this.fibInfo.getFibValue(code);
 			if((mode == QuotationMode.LONG && PriceUtil.isLong_v2(price, list) && !PriceUtil.isObsoleteLong(fibInfo, afterLowKlines, codes, offset)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.isShort_v2(price, list) && PriceUtil.isObsoleteShort(fibInfo, afterHighKlines, codes, offset))) {
+					|| (mode == QuotationMode.SHORT && PriceUtil.isShort_v2(price, list) && !PriceUtil.isObsoleteShort(fibInfo, afterHighKlines, codes, offset))) {
 				openCode = code;
 				break;
 			}
