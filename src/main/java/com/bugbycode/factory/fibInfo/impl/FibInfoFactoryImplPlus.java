@@ -218,8 +218,8 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 		for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
 			current = fibAfterKlines.get(index);
 			parent = fibAfterKlines.get(index - 1);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v11(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v11(current, parent))) {
 				points.add(current);
 			}
 		}
@@ -275,11 +275,11 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() > 0;
+		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() < 0;
+		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {

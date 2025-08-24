@@ -18,7 +18,7 @@ import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImplPlus_v2;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImplPlus;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImplPlus;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -1230,7 +1230,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		FibInfoFactory factory = new FibInfoFactoryImplPlus_v2(list, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImplPlus(list, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		

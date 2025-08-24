@@ -180,8 +180,8 @@ public class PriceActionFactoryImplPlus implements PriceActionFactory{
 		for(int index = sub_list.size() - 1; index > 1; index--) {
 			current = sub_list.get(index);
 			parent = sub_list.get(index - 1);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))) {
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v11(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v11(current, parent))) {
 				points.add(current);
 			}
 		}
@@ -231,11 +231,11 @@ public class PriceActionFactoryImplPlus implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() > 0;
+		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() < 0;
+		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {

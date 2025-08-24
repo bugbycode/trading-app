@@ -1826,7 +1826,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static boolean verifyDecliningPrice_v11(Klines current, Klines parent) {
-		return current.getEma7() <= current.getEma25() && parent.getEma7() > parent.getEma25();
+		return current.getEma7() < current.getEma25() && parent.getEma7() >= parent.getEma25();
 	}
 	
 	/**
@@ -1956,7 +1956,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static boolean verifyPowerful_v11(Klines current,Klines parent) {
-		return current.getEma7() >= current.getEma25() && parent.getEma7() < parent.getEma25();
+		return current.getEma7() > current.getEma25() && parent.getEma7() <= parent.getEma25();
 	}
 	
 	/**
