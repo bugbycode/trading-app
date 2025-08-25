@@ -743,33 +743,38 @@ public class KlinesServiceImpl implements KlinesService {
 										);
 							}
 							
-							//计算预计盈利百分比
-							profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-							
-							//盈利太少则不做交易
-							if((profitPercent * 100) < u.getProfit()) {
-								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
-								continue;
-							}
-							
-							//根据交易风格设置盈利限制
-							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
-								double dbProfitLimit = u.getProfitLimit() / 100;
-								if(profitPercent > dbProfitLimit) {
-									profitPercent = dbProfitLimit;
+							if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+
+								//计算预计盈利百分比
+								profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+								
+								//盈利太少则不做交易
+								if((profitPercent * 100) < u.getProfit()) {
+									logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+									continue;
 								}
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
-												);
-								logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
-										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
+								
+								//根据交易风格设置盈利限制
+								if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
+									double dbProfitLimit = u.getProfitLimit() / 100;
+									if(profitPercent > dbProfitLimit) {
+										profitPercent = dbProfitLimit;
+									}
+									takeProfit = new BigDecimal(
+											PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
+													);
+									logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
+											PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
+								}
 							}
 							
 						}
 						
-						//多头的止盈价格必须大于当前价格
-						if(!(priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
-							continue;
+						if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+							//多头的止盈价格必须大于当前价格
+							if(!(priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
+								continue;
+							}
 						}
 						
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
@@ -1008,33 +1013,38 @@ public class KlinesServiceImpl implements KlinesService {
 										);
 							}
 							
-							//计算预计盈利百分比
-							profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-							
-							//盈利太少则不做交易
-							if((profitPercent * 100) < u.getProfit()) {
-								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
-								continue;
-							}
-							
-							//根据交易风格设置盈利限制
-							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
-								double dbProfitLimit = u.getProfitLimit() / 100;
-								if(profitPercent > dbProfitLimit) {
-									profitPercent = dbProfitLimit;
+							if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+								//计算预计盈利百分比
+								profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+								
+								//盈利太少则不做交易
+								if((profitPercent * 100) < u.getProfit()) {
+									logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+									continue;
 								}
 								
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
-												);
-								logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
-										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
+								//根据交易风格设置盈利限制
+								if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
+									double dbProfitLimit = u.getProfitLimit() / 100;
+									if(profitPercent > dbProfitLimit) {
+										profitPercent = dbProfitLimit;
+									}
+									
+									takeProfit = new BigDecimal(
+											PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
+													);
+									logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
+											PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
+								}
 							}
+							
 						}
 						
-						//空头止盈价格必须小于当前价格
-						if(!(priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
-							continue;
+						if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+							//空头止盈价格必须小于当前价格
+							if(!(priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
+								continue;
+							}
 						}
 
 						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);

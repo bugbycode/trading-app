@@ -117,7 +117,9 @@ public class AnalysisKlinesTask implements Runnable{
             	List<Klines> klines_list_4h = klinesService.continuousKlines4H(pair, new Date(), 1500, QUERY_SPLIT.ALL);
             	Klines klines_last_4h = PriceUtil.getLastKlines(klines_list_4h);
             	if(!PriceUtil.verifyKlines(klines_last_4h)) {
-            		klines_list_4h.remove(klines_last_4h);
+            		if(!CollectionUtils.isEmpty(klines_list_4h)) {
+                		klines_list_4h.remove(klines_last_4h);
+            		}
             	}
             	if(!CollectionUtils.isEmpty(klines_list_4h)) {
                 	klinesRepository.insert(klines_list_4h);
