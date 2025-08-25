@@ -672,7 +672,7 @@ public class KlinesServiceImpl implements KlinesService {
 						BigDecimal stopLoss = new BigDecimal(0);
 						BigDecimal takeProfit = new BigDecimal(0);
 
-						if(fibInfo == null) {//自定义止盈止损
+						if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
 							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossDoubleValue, decimalNum));
 							takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(takeProfitDoubleValue , decimalNum));
 							
@@ -942,7 +942,7 @@ public class KlinesServiceImpl implements KlinesService {
 						BigDecimal stopLoss = new BigDecimal(0);
 						BigDecimal takeProfit = new BigDecimal(0); 
 
-						if(fibInfo == null) {//自定义止盈止损
+						if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
 							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossDoubleValue, decimalNum));
 							takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(takeProfitDoubleValue , decimalNum));
 							
