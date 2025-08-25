@@ -778,6 +778,25 @@ public class PriceUtil {
 		return price + (price * (cutLoss * 0.01));
 	}
 	
+	/**
+	 * 计算多头追踪止损触发价
+	 * @param price 参考价
+	 * @param activationPriceRatio 上涨幅度
+	 * @return
+	 */
+	public static double calculateLongActivationPrice(double price, double activationPriceRatio) {
+		return price + (price * (activationPriceRatio * 0.01));
+	}
+	
+	/**
+	 * 计算空头追踪止损触发价
+	 * @param price 参考价
+	 * @param activationPriceRatio 上涨幅度
+	 * @return
+	 */
+	public static double calculateShortActivationPrice(double price, double activationPriceRatio) {
+		return price - (price * (activationPriceRatio * 0.01));
+	}
 	
 	/**
 	 * 获取起始k线之后的最低价k线信息

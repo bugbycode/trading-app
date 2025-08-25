@@ -41,6 +41,7 @@ import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.BinanceOrderInfo;
+import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.PriceInfo;
@@ -637,6 +638,9 @@ public class KlinesServiceImpl implements KlinesService {
 					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughTrade());
+					double callbackRate = u.getCallbackRate();
+					double activationPriceRatio = u.getActivationPriceRatio();
+					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
 					
 					//活跃度限制
 					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
@@ -653,7 +657,13 @@ public class KlinesServiceImpl implements KlinesService {
 						if(priceInfo == null) {
 							continue;
 						}
-
+						
+						//计算追踪止损触发价
+						BigDecimal activationPriceValue = new BigDecimal(
+								PriceUtil.formatDoubleDecimal(PriceUtil.calculateLongActivationPrice(priceInfo.getPriceDoubleValue(), activationPriceRatio), decimalNum)
+								);
+						BigDecimal callbackRateValue = new BigDecimal(callbackRate);
+						
 						//int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
 						
 						BigDecimal stopLoss = new BigDecimal(0);
@@ -825,7 +835,8 @@ public class KlinesServiceImpl implements KlinesService {
 							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, u.getLeverage());
 						}
 						
-						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit);
+						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit, 
+								callbackRateEnabled, activationPriceValue, callbackRateValue);
 
 						//开仓邮件通知
 						String subject_ = "";
@@ -883,6 +894,10 @@ public class KlinesServiceImpl implements KlinesService {
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughTrade());
 					
+					double callbackRate = u.getCallbackRate();
+					double activationPriceRatio = u.getActivationPriceRatio();
+					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
+					
 					//活跃度限制
 					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
 						continue;
@@ -898,6 +913,12 @@ public class KlinesServiceImpl implements KlinesService {
 						if(priceInfo == null) {
 							continue;
 						}
+						
+						//计算追踪止损触发价
+						BigDecimal activationPriceValue = new BigDecimal(
+								PriceUtil.formatDoubleDecimal(PriceUtil.calculateShortActivationPrice(priceInfo.getPriceDoubleValue(), activationPriceRatio), decimalNum)
+								);
+						BigDecimal callbackRateValue = new BigDecimal(callbackRate);
 						
 						//int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
 						
@@ -1071,7 +1092,8 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						
-						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit);
+						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit, 
+								callbackRateEnabled, activationPriceValue, callbackRateValue);
 						
 						//开仓邮件通知
 						String subject_ = "";

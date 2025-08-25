@@ -17,6 +17,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Method;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
+import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.binance.WorkingType;
@@ -101,7 +102,8 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	@Override
 	public BinanceOrderInfo order_place(String binanceApiKey, String binanceSecretKey, String symbol, Side side,
 			PositionSide ps, Type type, String newClientOrderId, BigDecimal quantity, BigDecimal price,
-			BigDecimal stopPrice, Boolean closePosition, WorkingType workingType) {
+			BigDecimal stopPrice, Boolean closePosition, WorkingType workingType,
+			BigDecimal activationPrice, BigDecimal callbackRate) {
 		BinanceOrderInfo order = new BinanceOrderInfo();
 		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.ORDER_PLACE);
 		JSONObject params = new JSONObject();
@@ -178,7 +180,24 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			params.put("closePosition", closePosition);//市价止损是否全部平仓
 			params.put("workingType", workingType);
 			params.put("timeInForce", "GTE_GTC");
+		} else if(type == Type.TRAILING_STOP_MARKET) {//追踪委托止损
+			params.put("symbol", symbol);
+			params.put("side", side);
+			params.put("positionSide", ps);
+			params.put("type", type);
+			if(StringUtil.isNotEmpty(newClientOrderId)) {
+				params.put("newClientOrderId", newClientOrderId);
+			}
+			
+			params.put("activationPrice", activationPrice.toString());//追踪止损激活价格，仅TRAILING_STOP_MARKET 需要此参数, 默认为下单当前市场价格(支持不同workingType)
+			params.put("callbackRate", callbackRate.toString());//追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
+			params.put("quantity", quantity.toString());//委托数量
+			//params.put("closePosition", closePosition);//市价止损是否全部平仓
+			params.put("workingType", workingType);//触发价格类型 最新价或标记价
+			params.put("timeInForce", "GTE_GTC");
 		}
+		
+		
 		params.put("timestamp", new Date().getTime());
 		
 		MethodDataUtil.generateSignature(params, binanceSecretKey);
@@ -262,46 +281,64 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 
 	@Override
 	public List<BinanceOrderInfo> tradeMarket(String binanceApiKey, String binanceSecretKey, String symbol,
-			PositionSide ps, BigDecimal quantity, BigDecimal stopLoss, BigDecimal takeProfit) {
+			PositionSide ps, BigDecimal quantity, BigDecimal stopLoss, BigDecimal takeProfit, CallbackRateEnabled callbackRateEnabled, 
+			BigDecimal activationPrice, BigDecimal callbackRate) {
 		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
 		if(ps == PositionSide.LONG) {//做多
 			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey, 
 			        symbol, Side.BUY, PositionSide.LONG, Type.MARKET, 
 			        null, quantity, null, 
-			        null, null, null);
+			        null, null, null, null, null);
 			
 			BinanceOrderInfo slOrder = order_place(binanceApiKey, binanceSecretKey, 
 			        symbol, Side.SELL, PositionSide.LONG, Type.STOP_MARKET, 
 			        null, new BigDecimal(order.getOrigQty()), null, 
-			        stopLoss, true, WorkingType.CONTRACT_PRICE);
+			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null);
 			
 			BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey, 
 			        symbol, Side.SELL, PositionSide.LONG, Type.TAKE_PROFIT_MARKET, 
 			        null, new BigDecimal(order.getOrigQty()), null, 
-			        takeProfit, true, WorkingType.CONTRACT_PRICE);
+			        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null);
 			
 			orders.add(order);
 			orders.add(slOrder);
 			orders.add(tpOrder);
+
+			if(callbackRateEnabled == CallbackRateEnabled.OPEN) {
+				BinanceOrderInfo cbOrder = order_place(binanceApiKey, binanceSecretKey, 
+				        symbol, Side.SELL, PositionSide.LONG, Type.TRAILING_STOP_MARKET, 
+				        null, new BigDecimal(order.getOrigQty()), null, 
+				        takeProfit, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate);
+				orders.add(cbOrder);
+			}
 			
 		} else {//做空
 			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey, 
 			        symbol, Side.SELL, PositionSide.SHORT, Type.MARKET, 
 			        null, quantity, null, 
-			        null, null, null);
+			        null, null, null, null, null);
 			
 			BinanceOrderInfo slOrder = order_place(binanceApiKey, binanceSecretKey, 
 			        symbol, Side.BUY, PositionSide.SHORT, Type.STOP_MARKET, 
 			        null, new BigDecimal(order.getOrigQty()), null, 
-			        stopLoss, true, WorkingType.CONTRACT_PRICE);
+			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null);
 			
 			BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey, 
 			        symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
 			        null, new BigDecimal(order.getOrigQty()), null, 
-			        takeProfit, true, WorkingType.CONTRACT_PRICE);
+			        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null);
+			
 			orders.add(order);
 			orders.add(slOrder);
 			orders.add(tpOrder);
+			
+			if(callbackRateEnabled == CallbackRateEnabled.OPEN) {
+				BinanceOrderInfo cbOrder = order_place(binanceApiKey, binanceSecretKey, 
+				        symbol, Side.BUY, PositionSide.SHORT, Type.TRAILING_STOP_MARKET, 
+				        null, new BigDecimal(order.getOrigQty()), null, 
+				        takeProfit, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate);
+				orders.add(cbOrder);
+			}
 		}
 		return orders;
 	}
