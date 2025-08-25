@@ -108,6 +108,12 @@ public class User implements UserDetails {
 	
 	private int breakthroughMonitor = 0; //是否监控突破行为 价格行为监控使用 0：否 1：是
 	
+	private double callbackRate = 3;// 追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
+	
+	private double activationPriceRatio = 3; // 追踪止损触发价比例 当价格从开仓价上涨或下跌幅度达到该值时触发追踪止损订单
+	
+	private int callbackRateEnabled = 0; // 是否启用追踪止损
+	
 	public String getId() {
 		return id;
 	}
@@ -468,5 +474,29 @@ public class User implements UserDetails {
 
 	public void setBreakthroughMonitor(int breakthroughMonitor) {
 		this.breakthroughMonitor = breakthroughMonitor;
+	}
+
+	public double getCallbackRate() {
+		return callbackRate;
+	}
+
+	public void setCallbackRate(double callbackRate) {
+		this.callbackRate = callbackRate;
+	}
+
+	public int getCallbackRateEnabled() {
+		return callbackRateEnabled;
+	}
+
+	public void setCallbackRateEnabled(int callbackRateEnabled) {
+		this.callbackRateEnabled = callbackRateEnabled;
+	}
+
+	public double getActivationPriceRatio() {
+		return activationPriceRatio;
+	}
+
+	public void setActivationPriceRatio(double activationPriceRatio) {
+		this.activationPriceRatio = activationPriceRatio;
 	}
 }

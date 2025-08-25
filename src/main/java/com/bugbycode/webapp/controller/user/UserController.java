@@ -25,6 +25,7 @@ import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.Balance;
+import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
@@ -121,12 +122,22 @@ public class UserController extends BaseController{
 		
 		BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(data.getBreakthroughTrade());
 		
+		CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(data.getCallbackRateEnabled());
+		
 		if(data.getCutLoss() == 0) {
 			data.setCutLoss(3);
 		}
 		
 		if(data.getProfit() == 0) {
 			data.setProfit(3);
+		}
+		
+		if(data.getCallbackRate() == 0) {
+			data.setCallbackRate(3);
+		}
+		
+		if(data.getActivationPriceRatio() == 0) {
+			data.setActivationPriceRatio(3);
 		}
 		
 		User user = getUserInfo();
@@ -150,7 +161,8 @@ public class UserController extends BaseController{
 					data.getBaseStepSize(),data.getLeverage(),data.getPositionValue(), data.getCutLoss(), data.getProfit(), autoTradeType.value(),
 					drawTrade.getValue(), recvTradeStatus.getValue(), recvCrossUnPnlStatus.getValue(), data.getRecvCrossUnPnlPercent(), 
 					tradeStepBackStatus.getValue(), tradeStyle.getValue(), data.getProfitLimit(), countertrendTradingStatus.getValue(), 
-					data.getFibLevelType(), data.getTradeNumber(), breakthroughTradeStatus.getValue());
+					data.getFibLevelType(), data.getTradeNumber(), breakthroughTradeStatus.getValue(), data.getCallbackRate(),
+					data.getActivationPriceRatio() , callbackRateEnabled.getValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -172,6 +184,9 @@ public class UserController extends BaseController{
 			user.setFibLevel(data.getFibLevelType().getValue());
 			user.setTradeNumber(data.getTradeNumber());
 			user.setBreakthroughTrade(data.getBreakthroughTrade());
+			user.setCallbackRate(data.getCallbackRate());
+			user.setCallbackRateEnabled(callbackRateEnabled.getValue());
+			user.setActivationPriceRatio(data.getActivationPriceRatio());
 			
 			json.put("message", "修改成功");
 		} else {
