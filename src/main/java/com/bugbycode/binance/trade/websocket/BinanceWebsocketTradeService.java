@@ -7,6 +7,7 @@ import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.PriceInfo;
+import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
@@ -74,11 +75,12 @@ public interface BinanceWebsocketTradeService {
 	 * @param callbackRateEnabled 是否启用追踪止损
 	 * @param activationPrice 追踪止损触发价
 	 * @param callbackRate 追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
+	 * @param profitOrderEnabled 是否启用止盈订单
 	 * @return
 	 */
 	public List<BinanceOrderInfo> tradeMarket(String binanceApiKey,String binanceSecretKey,String symbol,PositionSide ps,
 			BigDecimal quantity,BigDecimal stopLoss,BigDecimal takeProfit, CallbackRateEnabled callbackRateEnabled, 
-			BigDecimal activationPrice, BigDecimal callbackRate);
+			BigDecimal activationPrice, BigDecimal callbackRate, ProfitOrderEnabled profitOrderEnabled);
 	
 	/**
 	 * 获取市价单最少下单数量

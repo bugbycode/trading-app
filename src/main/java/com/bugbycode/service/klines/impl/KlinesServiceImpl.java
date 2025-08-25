@@ -17,6 +17,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.factory.ema.EmaTradingFactory;
+import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImplPlus_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -30,7 +32,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.LongOrShortType;
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.QUERY_SPLIT;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
@@ -45,6 +46,7 @@ import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.PriceInfo;
+import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.open_interest.OpenInterestHist;
@@ -63,7 +65,6 @@ import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
-import com.util.EmaFibUtil;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
@@ -642,6 +643,8 @@ public class KlinesServiceImpl implements KlinesService {
 					double activationPriceRatio = u.getActivationPriceRatio();
 					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
 					
+					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
+					
 					//活跃度限制
 					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
 						continue;
@@ -711,10 +714,11 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
-								takeProfitCode = FibCode.FIB618;
-								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
-								}
+								//指数均线不设置止盈 由追踪委托来自动平仓
+								profitOrderEnabled = ProfitOrderEnabled.CLOSE;
+								//强制启用追踪委托
+								callbackRateEnabled = CallbackRateEnabled.OPEN;
+								
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								FibCode code = codes[offset];
 								takeProfitCode = fibInfo.getPriceActionTakeProfit_v1(code);
@@ -729,9 +733,15 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							stopLoss = new BigDecimal(
 									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()),decimalNum));
-							takeProfit = new BigDecimal(
-									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-											);
+							if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+												);
+							} else {
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(PriceUtil.calculateLongActivationPrice(priceInfo.getPriceDoubleValue(), u.getProfit()),decimalNum)
+										);
+							}
 							
 							//计算预计盈利百分比
 							profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
@@ -836,7 +846,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit, 
-								callbackRateEnabled, activationPriceValue, callbackRateValue);
+								callbackRateEnabled, activationPriceValue, callbackRateValue, profitOrderEnabled);
 
 						//开仓邮件通知
 						String subject_ = "";
@@ -897,6 +907,8 @@ public class KlinesServiceImpl implements KlinesService {
 					double callbackRate = u.getCallbackRate();
 					double activationPriceRatio = u.getActivationPriceRatio();
 					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
+					
+					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 					
 					//活跃度限制
 					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
@@ -965,10 +977,11 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
-								takeProfitCode = FibCode.FIB618;
-								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
-								}
+								//指数均线不设置止盈 由追踪委托来自动平仓
+								profitOrderEnabled = ProfitOrderEnabled.CLOSE;
+								//强制启用追踪委托
+								callbackRateEnabled = CallbackRateEnabled.OPEN;
+								
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								FibCode code = codes[offset];
 								takeProfitCode = fibInfo.getPriceActionTakeProfit_v1(code);
@@ -984,9 +997,16 @@ public class KlinesServiceImpl implements KlinesService {
 							stopLoss = new BigDecimal(
 									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum)
 											);
-							takeProfit = new BigDecimal(
-									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-											);
+							
+							if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+												);
+							} else {
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(PriceUtil.calculateShortActivationPrice(priceInfo.getPriceDoubleValue(), u.getProfit()), decimalNum)
+										);
+							}
 							
 							//计算预计盈利百分比
 							profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
@@ -1093,7 +1113,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit, 
-								callbackRateEnabled, activationPriceValue, callbackRateValue);
+								callbackRateEnabled, activationPriceValue, callbackRateValue, profitOrderEnabled);
 						
 						//开仓邮件通知
 						String subject_ = "";
@@ -1144,105 +1164,64 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresEmaRiseAndFallMonitor(List<Klines> list_15m) {
-		if(CollectionUtils.isEmpty(list_15m)) {
-			return;
-		}
+	public void futuresEmaRiseAndFallMonitor(List<Klines> list, List<Klines> list_15m) {
+		
+		EmaTradingFactory factory = new EmaTradingFactoryImpl(list);
+		
+		List<OpenPrice> openPrices = factory.getOpenPrices();
 		
 		//================================================
 		Klines last = PriceUtil.getLastKlines(list_15m);
-		
-		double closePrice = last.getClosePriceDoubleValue();
 		String pair = last.getPair();
 		String dateStr = DateFormatUtil.format(new Date());
+		List<User> userList = userRepository.queryAllUserByEmaRiseAndFall(MonitorStatus.OPEN);
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		EmaFibUtil fu = new EmaFibUtil(list_15m);
-		FibInfo fibInfo = fu.getFibInfo();
-		
-		if(fibInfo == null || !fu.verifyOpen()) {
-			return;
-		}
-		
-		logger.debug("{} - {}", pair, fibInfo);
-		
-		//================================================
-		
-		double percent = 0;
-		
-		FibCode takeProfitCode = FibCode.FIB618;
-		List<User> userList = userRepository.queryAllUserByEmaRiseAndFall(MonitorStatus.OPEN);
-		
-		QuotationMode mode = fibInfo.getQuotationMode();
-		
-		if(mode == QuotationMode.SHORT) {
-			
-			tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX, fibInfo.getDecimalPoint()));
-			
-			for(User u : userList) {
-				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-				double profit = u.getMonitorProfit();
-				double profitLimit = u.getProfitLimit();
-				double cutLoss = u.getCutLoss();
+		for(OpenPrice price : openPrices) {
+			if(factory.isLong() && PriceUtil.isLong_v2(price.getPrice(), list_15m)) {
+				tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, null, AutoTradeType.EMA_INDEX, last.getDecimalNum()));
+				for(User u : userList) {
+					
+					double profit = u.getMonitorProfit();
+					
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+						continue;
+					}
+					
+					String percentStr = PriceUtil.formatDoubleDecimal(profit, 2);
+					
+					String subject = String.format("%s永续合约做多交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+
+					String text = subject;
+					
+					sendEmail(u, subject, text, u.getUsername());
+				}
+				break;
+			} else if(factory.isShort() && PriceUtil.isShort_v2(price.getPrice(), list_15m)) {
 				
-				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
-					continue;
+				tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, null, AutoTradeType.EMA_INDEX, last.getDecimalNum()));
+				
+
+				for(User u : userList) {
+					
+					double profit = u.getMonitorProfit();
+					
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+						continue;
+					}
+					
+					String percentStr = PriceUtil.formatDoubleDecimal(profit, 2);
+					
+					String subject = String.format("%s永续合约做空交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
+					
+					String text = subject;
+					
+					
+					sendEmail(u, subject, text, u.getUsername());
 				}
 				
-				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(closePrice, profit, profitLimit);
-				}
-				
-				percent = PriceUtil.getRiseFluctuationPercentage(closePrice, fibInfo.getFibValue(takeProfitCode)) * 100;
-				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
-				
-				String subject = String.format("%s永续合约做多交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
-				
-				if(percent < profit) {
-					continue;
-				}
-				
-				String text = StringUtil.formatLongMessage(pair, closePrice, fibInfo, PriceUtil.rectificationCutLossLongPrice_v3(closePrice, cutLoss), takeProfitCode);
-				text += "，预计盈利：" + percentStr + "%";
-				text += "\n\n" + fibInfo.toString();
-				
-				sendEmail(u, subject, text, u.getUsername());
-			}
-		} else if(mode == QuotationMode.LONG) {
-			
-			tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, fibInfo, AutoTradeType.EMA_INDEX, fibInfo.getDecimalPoint()));
-			
-			for(User u : userList) {
-				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-				double profit = u.getMonitorProfit();
-				double profitLimit = u.getProfitLimit();
-				double cutLoss = u.getCutLoss();
-				
-				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
-					continue;
-				}
-				
-				if(tradeStyle == TradeStyle.CONSERVATIVE) {
-					takeProfitCode = fibInfo.getEmaEmaRiseAndFallTakeProfit(closePrice, profit, profitLimit);
-				}
-				
-				percent = PriceUtil.getFallFluctuationPercentage(closePrice, fibInfo.getFibValue(takeProfitCode)) * 100;
-				String percentStr = PriceUtil.formatDoubleDecimal(percent, 2);
-				
-				String subject = String.format("%s永续合约做空交易机会(PNL:%s%%) %s", pair, percentStr, dateStr);
-				
-				if(percent < profit) {
-					continue;
-				}
-				
-				String text = StringUtil.formatShortMessage(pair, closePrice, fibInfo, PriceUtil.rectificationCutLossShortPrice_v3(closePrice, cutLoss), takeProfitCode);
-				
-				text += "，预计盈利：" + percentStr + "%";
-				
-				text += "\n\n" + fibInfo.toString();
-				
-				sendEmail(u, subject, text, u.getUsername());
+				break;
 			}
 		}
 	}

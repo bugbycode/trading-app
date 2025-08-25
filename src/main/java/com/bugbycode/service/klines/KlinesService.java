@@ -123,9 +123,10 @@ public interface KlinesService {
 	
 	/**
 	 * 指数均线监控
-	 * @param klinesList
+	 * @param list
+	 * @param list_15m
 	 */
-	public void futuresEmaRiseAndFallMonitor(List<Klines> list_15m);
+	public void futuresEmaRiseAndFallMonitor(List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 斐波那契回撤点位监控

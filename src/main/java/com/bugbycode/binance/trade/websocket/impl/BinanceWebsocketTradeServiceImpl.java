@@ -19,6 +19,7 @@ import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.PriceInfo;
+import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
@@ -285,7 +286,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	@Override
 	public List<BinanceOrderInfo> tradeMarket(String binanceApiKey, String binanceSecretKey, String symbol,
 			PositionSide ps, BigDecimal quantity, BigDecimal stopLoss, BigDecimal takeProfit, CallbackRateEnabled callbackRateEnabled, 
-			BigDecimal activationPrice, BigDecimal callbackRate) {
+			BigDecimal activationPrice, BigDecimal callbackRate, ProfitOrderEnabled profitOrderEnabled) {
 		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
 		if(ps == PositionSide.LONG) {//做多
 			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey, 
@@ -298,14 +299,16 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			        null, new BigDecimal(order.getOrigQty()), null, 
 			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null);
 			
-			BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey, 
-			        symbol, Side.SELL, PositionSide.LONG, Type.TAKE_PROFIT_MARKET, 
-			        null, new BigDecimal(order.getOrigQty()), null, 
-			        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null);
-			
 			orders.add(order);
 			orders.add(slOrder);
-			orders.add(tpOrder);
+			
+			if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+				BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey, 
+				        symbol, Side.SELL, PositionSide.LONG, Type.TAKE_PROFIT_MARKET, 
+				        null, new BigDecimal(order.getOrigQty()), null, 
+				        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null);
+				orders.add(tpOrder);
+			}
 
 			if(callbackRateEnabled == CallbackRateEnabled.OPEN) {
 				BinanceOrderInfo cbOrder = order_place(binanceApiKey, binanceSecretKey, 
@@ -326,14 +329,17 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			        null, new BigDecimal(order.getOrigQty()), null, 
 			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null);
 			
-			BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey, 
-			        symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
-			        null, new BigDecimal(order.getOrigQty()), null, 
-			        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null);
-			
 			orders.add(order);
 			orders.add(slOrder);
-			orders.add(tpOrder);
+			
+			if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+				BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey, 
+				        symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
+				        null, new BigDecimal(order.getOrigQty()), null, 
+				        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null);
+				orders.add(tpOrder);
+				
+			}
 			
 			if(callbackRateEnabled == CallbackRateEnabled.OPEN) {
 				BinanceOrderInfo cbOrder = order_place(binanceApiKey, binanceSecretKey, 
