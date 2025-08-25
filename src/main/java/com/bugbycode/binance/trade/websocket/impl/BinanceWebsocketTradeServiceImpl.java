@@ -2,7 +2,6 @@ package com.bugbycode.binance.trade.websocket.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +11,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Method;
@@ -35,6 +35,9 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	
 	@Autowired
 	private TradingWebSocketClientEndpoint websocketApi;
+	
+	@Autowired
+	private BinanceRestTradeService binanceRestTradeService;
 
 	@Override
 	public List<Balance> balance_v2(String apiKey, String secretKey) {
@@ -43,7 +46,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.BALANCE_V2);
 		JSONObject params = new JSONObject();
 		params.put("apiKey", apiKey);
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		
 		MethodDataUtil.generateSignature(params, secretKey);
 		
@@ -198,7 +201,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		}
 		
 		
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		
 		MethodDataUtil.generateSignature(params, binanceSecretKey);
 		
@@ -353,4 +356,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		return info.getMarketMinQuantity(Double.valueOf(price.getPrice()));
 	}
 
+	public long getTime() {
+		return binanceRestTradeService.getTime();
+	}
 }

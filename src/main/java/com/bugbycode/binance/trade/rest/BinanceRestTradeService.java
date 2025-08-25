@@ -175,4 +175,10 @@ public interface BinanceRestTradeService {
 	 */
 	public SymbolConfig getSymbolConfigBySymbol(String binanceApiKey,String binanceSecretKey,String symbol);
 	
+	/**
+	 * 获取服务器时间
+	 * @return
+	 */
+	public long getTime();
+	
 }

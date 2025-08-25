@@ -2,7 +2,6 @@ package com.bugbycode.binance.trade.rest.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	@Override
 	public Result dualSidePosition(String binanceApiKey,String binanceSecretKey,boolean dualSidePosition) {
 		ResultCode code = ResultCode.ERROR;
-		String queryString = String.format("dualSidePosition=%s&timestamp=%s", dualSidePosition, new Date().getTime());
+		String queryString = String.format("dualSidePosition=%s&timestamp=%s", dualSidePosition, getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		queryString += "&signature=" + signature;
 		
@@ -72,7 +71,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		boolean dualSidePosition = false;
 		
-		String queryString = String.format("timestamp=%s", new Date().getTime());
+		String queryString = String.format("timestamp=%s", getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		queryString += "&signature=" + signature;
 		
@@ -95,7 +94,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	public Leverage leverage(String binanceApiKey,String binanceSecretKey,String symbol, int leverage) {
 		Leverage lr = new Leverage(0, null, symbol);
 		
-		String queryString = String.format("symbol=%s&leverage=%s&timestamp=%s", symbol, leverage, new Date().getTime());
+		String queryString = String.format("symbol=%s&leverage=%s&timestamp=%s", symbol, leverage, getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		queryString += "&signature=" + signature;
 		
@@ -118,7 +117,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	@Override
 	public Result marginType(String binanceApiKey,String binanceSecretKey,String symbol, MarginType marginType) {
 		ResultCode code = ResultCode.ERROR;
-		String queryString = String.format("symbol=%s&marginType=%s&timestamp=%s", symbol, marginType, new Date().getTime());
+		String queryString = String.format("symbol=%s&marginType=%s&timestamp=%s", symbol, marginType, getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		queryString += "&signature=" + signature;
 		
@@ -142,7 +141,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
 		
-		String queryString = String.format("symbol=%s&timestamp=%s", symbol, new Date().getTime());
+		String queryString = String.format("symbol=%s&timestamp=%s", symbol, getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		queryString += "&signature=" + signature;
 		
@@ -208,7 +207,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("origClientOrderId", origClientOrderId);
 		}
 		
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		
@@ -267,7 +266,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		Map<String,Object> params = new HashMap<String, Object>();
 		params.put("symbol", symbol);
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		if(orderId > 0) {
 			params.put("orderId", orderId);
 		}
@@ -345,7 +344,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		Map<String,Object> params = new HashMap<String, Object>();
 		params.put("symbol", symbol);
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		if(orderId > 0) {
 			params.put("orderId", orderId);
 		}
@@ -485,7 +484,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("workingType", workingType);
 			params.put("timeInForce", "GTE_GTC");
 		}
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
@@ -567,7 +566,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		if(StringUtil.isNotEmpty(origClientOrderId)) {
 			params.put("origClientOrderId", origClientOrderId);
 		}
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
@@ -642,7 +641,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		List<Balance> blanceList = new ArrayList<Balance>();
 		
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
@@ -682,7 +681,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		List<SymbolConfig> scList = new ArrayList<SymbolConfig>();
 		
-		String queryString = String.format("symbol=%s&timestamp=%s", symbol, new Date().getTime());
+		String queryString = String.format("symbol=%s&timestamp=%s", symbol, getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		queryString += "&signature=" + signature;
 		
@@ -714,6 +713,19 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public long getTime() {
+		long t = 0;
+		String result = restTemplate.getForObject(AppConfig.REST_BASE_URL + "/fapi/v1/time", String.class);
+		if(StringUtil.isNotEmpty(result)) {
+			JSONObject json = new JSONObject(result);
+			if(json.has("serverTime")) {
+				t = json.getLong("serverTime");
+			}
+		}
+		return t;
 	}
 
 }
