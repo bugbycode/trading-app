@@ -615,6 +615,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, 
 			FibInfo fibInfo, AutoTradeType autoTradeType, int decimalNum) {
