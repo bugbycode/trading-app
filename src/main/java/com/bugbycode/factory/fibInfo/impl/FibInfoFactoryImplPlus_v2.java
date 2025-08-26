@@ -193,47 +193,55 @@ public class FibInfoFactoryImplPlus_v2 implements FibInfoFactory {
 			return;
 		}
 		
-		Klines afterLowKlines = null;
-		Klines afterHighKlines = null;
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
 		
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, list));
-			afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 		}
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		FibCode openCode = FibCode.FIB0;
-		//获取开仓点位
-		FibCode[] codes = FibCode.values();
-		for(int offset = 0; offset < codes.length; offset++) {
-			FibCode code = codes[offset];
-			double price = this.fibInfo.getFibValue(code);
-			if((mode == QuotationMode.LONG && PriceUtil.isLong_v2(price, list) && !PriceUtil.isObsoleteLong(fibInfo, afterLowKlines, codes, offset)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.isShort_v2(price, list) && !PriceUtil.isObsoleteShort(fibInfo, afterHighKlines, codes, offset))) {
-				openCode = code;
+		Klines fibEnd = null;
+		
+		for(int index = fibAfterKlines.size() - 1; index > 0; index--) {
+			Klines current = fibAfterKlines.get(index);
+			Klines parent = fibAfterKlines.get(index - 1);
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent)) 
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
+				fibEnd = current;
 				break;
 			}
 		}
 		
-		if(openCode.gte(FibCode.FIB236)) {
-			addPrices(new OpenPriceDetails(openCode, last.getClosePriceDoubleValue()));
+		if(fibEnd != null) {
+			double openPriceValue = fibEnd.getClosePriceDoubleValue();
+			FibCode openCode = FibCode.FIB0;
+			if(mode == QuotationMode.LONG) {
+				Klines low = PriceUtil.getMinPriceKLine(fibAfterKlines);
+				openCode = fibInfo.getFibCode(low.getLowPriceDoubleValue());
+			} else if(mode == QuotationMode.SHORT) {
+				Klines high = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+				openCode = fibInfo.getFibCode(high.getHighPriceDoubleValue());
+			}
+			if(openCode.gte(FibCode.FIB236)) {
+				addPrices(new OpenPriceDetails(openCode, openPriceValue));
+			}
+			
+			this.fibAfterKlines.clear();
+			
+			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+			
+			if(fibAfterFlag != null) {
+				
+				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+				this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			}
 		}
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
-		}
-		
-		this.fibAfterKlines.clear();
-		
-		if(fibAfterFlag != null) {
-			
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		
