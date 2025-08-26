@@ -59,9 +59,9 @@ public class EmaTradingFactoryImpl implements EmaTradingFactory {
 		
 		Klines last = PriceUtil.getLastKlines(list);
 		
-		if(last.getEma7() > last.getEma25()) {
+		if(last.getEma7() > last.getEma25() && last.getMacd() > 0) {
 			ps = PositionSide.LONG;
-		} else if(last.getEma7() < last.getEma25()) {
+		} else if(last.getEma7() < last.getEma25() && last.getMacd() < 0) {
 			ps = PositionSide.SHORT;
 		}
 		
@@ -69,6 +69,7 @@ public class EmaTradingFactoryImpl implements EmaTradingFactory {
 			return;
 		}
 		
+		//处理开仓点位
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
@@ -84,6 +85,9 @@ public class EmaTradingFactoryImpl implements EmaTradingFactory {
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
+		
+		//回撤信息
+		
 	}
 	
 	private void addPrices(OpenPrice price) {

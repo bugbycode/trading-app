@@ -8,7 +8,7 @@ import com.bugbycode.module.price.OpenPrice;
  * 指数均线交易指标接口信息
  */
 public interface EmaTradingFactory {
-
+	
 	/**
 	 * 获取开仓点位
 	 * @return
