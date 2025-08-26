@@ -111,8 +111,6 @@ public class FibInfoFactoryImplPlus_v2 implements FibInfoFactory {
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		
-		Klines last = PriceUtil.getLastKlines(list);
-		
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
 		
