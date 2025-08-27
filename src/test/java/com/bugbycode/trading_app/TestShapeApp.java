@@ -8,8 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -27,7 +26,6 @@ import com.util.StraightLineUtil;
 import com.util.page.Page;
 import com.util.page.SearchResult;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class TestShapeApp {
 

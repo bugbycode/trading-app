@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.bugbycode.module.BreakthroughTradeStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -14,9 +15,8 @@ import com.util.PriceUtil;
 public class TestApp {
 
 	public static void main(String[] args) throws ParseException {
-		FibCode[] codes = FibCode.values();
-		FibInfo fibInfo = new FibInfo(1, 0, 3, FibLevel.LEVEL_0);
-		System.out.println(fibInfo);
+		System.out.println(PriceUtil.calculateLongActivationPrice(100, 3));
+		System.out.println(PriceUtil.calculateShortActivationPrice(100, 3));
 	}
 
 }

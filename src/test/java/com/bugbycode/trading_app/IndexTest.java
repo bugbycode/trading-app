@@ -5,9 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -25,7 +24,6 @@ import com.util.StringUtil;
 
 import jakarta.annotation.Resource;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class IndexTest {
 
@@ -38,7 +36,7 @@ public class IndexTest {
 	@Autowired
 	private IndexesRepository indexesRepository;
 	
-	@Before
+	@BeforeAll
 	public void befor() {
 		AppConfig.DEBUG = true;
 	}

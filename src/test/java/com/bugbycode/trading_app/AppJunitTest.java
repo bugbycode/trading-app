@@ -5,8 +5,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Collation;
@@ -25,7 +24,7 @@ import com.util.PriceUtil;
 import jakarta.annotation.Resource;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
+
 @SpringBootTest
 public class AppJunitTest {
 

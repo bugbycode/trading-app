@@ -5,9 +5,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,8 +29,10 @@ import com.bugbycode.service.exchange.BinanceExchangeService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class TestTradeRestApi {
 
@@ -52,7 +51,7 @@ public class TestTradeRestApi {
 	
 	private String binanceSecretKey;
 
-    @Before
+    @BeforeAll
 	public void befor() {
         System.setProperty("https.proxyHost", "localhost");
 		System.setProperty("https.proxyPort", "50000");
@@ -225,7 +224,7 @@ public class TestTradeRestApi {
         }
     }
 
-    @Before
+    @AfterAll
     public void after() {
 
     }

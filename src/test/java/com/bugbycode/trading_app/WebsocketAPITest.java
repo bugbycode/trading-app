@@ -7,10 +7,9 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,9 +20,11 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
+import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.Leverage;
 import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.PriceInfo;
+import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.binance.WorkingType;
@@ -35,7 +36,6 @@ import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.util.PriceUtil;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class WebsocketAPITest {
 
@@ -59,7 +59,7 @@ public class WebsocketAPITest {
 	
 	private User user;
 	
-	@Before
+	@BeforeAll
 	public void befor() {
 		
 		System.setProperty("https.proxyHost", "localhost");
@@ -112,7 +112,7 @@ public class WebsocketAPITest {
         BinanceOrderInfo order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, 
         symbol, Side.SELL, PositionSide.SHORT, Type.MARKET, 
         null, new BigDecimal("6"), null, 
-        null, null, null);
+        null, null, null, null, null);
 
         long orderId = order.getOrderId();
 
@@ -144,7 +144,7 @@ public class WebsocketAPITest {
         BinanceOrderInfo stop_order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, 
         symbol, Side.BUY, PositionSide.SHORT, Type.STOP_MARKET, 
         null, new BigDecimal(order.getOrigQty()), null, 
-        new BigDecimal("0.9998"), true, WorkingType.CONTRACT_PRICE);
+        new BigDecimal("0.9998"), true, WorkingType.CONTRACT_PRICE, null, null);
 
         if(stop_order.getOrderId() > 0) {
             logger.info("市价止损下单成功");
@@ -154,7 +154,7 @@ public class WebsocketAPITest {
         BinanceOrderInfo take_order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, 
         symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
         null, new BigDecimal(order.getOrigQty()), null, 
-        new BigDecimal("0.998"), true, WorkingType.CONTRACT_PRICE);
+        new BigDecimal("0.998"), true, WorkingType.CONTRACT_PRICE, null, null);
         if(take_order.getOrderId() > 0) {
             logger.info("市价止盈下单成功");
         }
@@ -169,13 +169,28 @@ public class WebsocketAPITest {
 
 	@Test
 	public void testTradeMarket(){
-		String symbol = "DRIFTUSDT";
-		PositionSide ps = PositionSide.SHORT;
-		BigDecimal quantity = new BigDecimal(String.valueOf(4));
-		BigDecimal stopLoss = new BigDecimal(String.valueOf(1.469));
-		BigDecimal takeProfit = new BigDecimal(String.valueOf(1.4178));
+		String symbol = "USDCUSDT";
+		PositionSide ps = PositionSide.LONG;
+		BigDecimal quantity = new BigDecimal(String.valueOf(6));
+		BigDecimal stopLoss = new BigDecimal(String.valueOf(0.9994));
+		BigDecimal takeProfit = new BigDecimal(String.valueOf(1));
+		BigDecimal callbackRate = new BigDecimal("0.5");
+		BigDecimal activationPrice = new BigDecimal("0.9998");
+		ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 		binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, symbol, ps,
-		 quantity, stopLoss, takeProfit);
+		 quantity, stopLoss, takeProfit, CallbackRateEnabled.OPEN, activationPrice, callbackRate, profitOrderEnabled);
+	}
+	
+	@Test
+	public void testTradingStopMarket() {
+		String symbol = "OGUSDT";
+		PositionSide ps = PositionSide.LONG;
+		Side side = Side.SELL;
+		BigDecimal activationPrice = new BigDecimal("14");
+		BigDecimal callbackRate = new BigDecimal("3");
+        BigDecimal quantity = new BigDecimal("0.1");
+		binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, symbol, side, ps, Type.TRAILING_STOP_MARKET, 
+				null, quantity, null, null, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate);
 	}
 
     @Test
@@ -219,8 +234,9 @@ public class WebsocketAPITest {
         double takePrice = PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), 0.4);
         logger.info(takePrice);
     }
+    
 
-	@After
+	@AfterAll
 	public void after(){
 		
 	}

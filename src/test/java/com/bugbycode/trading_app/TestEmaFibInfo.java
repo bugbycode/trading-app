@@ -5,9 +5,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,7 +19,6 @@ import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
 import com.util.PriceUtil;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class TestEmaFibInfo {
 
@@ -35,7 +33,7 @@ public class TestEmaFibInfo {
     @Autowired
     private BinanceExchangeService binanceExchangeService;
 
-    @Before
+    @BeforeAll
 	public void befor() {
 		
 		System.setProperty("https.proxyHost", "localhost");

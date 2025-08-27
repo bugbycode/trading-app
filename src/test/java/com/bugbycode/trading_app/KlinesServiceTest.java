@@ -7,18 +7,20 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.factory.ema.EmaTradingFactory;
+import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImplPlus;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImplPlus_v2;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImplPlus;
@@ -39,11 +41,10 @@ import com.util.DateFormatUtil;
 import com.util.EmaFibUtil;
 import com.util.PriceUtil;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class TestKlinesService {
+public class KlinesServiceTest {
 
-    private final Logger logger = LogManager.getLogger(TestKlinesService.class);
+    private final Logger logger = LogManager.getLogger(KlinesServiceTest.class);
 
     @Autowired
     private KlinesService klinesService;
@@ -54,11 +55,11 @@ public class TestKlinesService {
     @Autowired
     private BinanceExchangeService binanceExchangeService;
 
-    @Before
+    @BeforeEach
 	public void befor() {
 		AppConfig.DEBUG = true;
-		System.setProperty("https.proxyHost", "localhost");
-		System.setProperty("https.proxyPort", "50000");
+		//System.setProperty("https.proxyHost", "localhost");
+		//System.setProperty("https.proxyPort", "50000");
 	}
 
     @Test
@@ -156,12 +157,12 @@ public class TestKlinesService {
 
     @Test
     public void testFibInfo(){
-        String pair = "SOONUSDT";
+        String pair = "MAGICUSDT";
         List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
-		FibInfoFactory factory = new FibInfoFactoryImplPlus(list, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl(list, list_15m);
 		//logger.info(PriceUtil.getLastKlines(list));
 		FibInfo fibInfo = factory.getFibInfo();
 		//FibInfo fibInfo_parent = factory.getFibInfo_parent();
@@ -201,10 +202,10 @@ public class TestKlinesService {
 
     @Test
     public void testPriceAction(){
-        String pair = "SOONUSDT";
-        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,5000);
-        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,5000);
-        PriceActionFactory factory = new PriceActionFactoryImplPlus(list_1h, list_15m);
+        String pair = "PENDLEUSDT";
+        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list_1h, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
             return;
@@ -225,12 +226,29 @@ public class TestKlinesService {
             FibCode code = fibInfo.getFibCode(price.getPrice());
             FibCode profiCodeNext = fibInfo.getPriceActionTakeProfit_nextCode(code);
             FibCode profitCode = fibInfo.getPriceActionTakeProfit_v1(code);
-            logger.info("{}({}) -> {}({}) ~ {}({})", code, price.getPrice(), profiCodeNext, fibInfo.getFibValue(profiCodeNext), profitCode, fibInfo.getFibValue(profitCode));
+            logger.info("{}({}) -> {}({}) ~ {}({}), isTreade:{}", code, price.getPrice(), profiCodeNext, fibInfo.getFibValue(profiCodeNext), profitCode, fibInfo.getFibValue(profitCode), 
+                PriceUtil.isTradedPriceAction(price.getPrice(), fibInfo));
         }
 
         logger.info(factory.getFibInfo());
         //logger.info(factory.verifyOpen(list_15m));
         //logger.info(factory.getFibAfterKlines());
+    }
+
+    @Test
+    public void testEmaFactory() {
+        String pair = "DOGEUSDT";
+        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,5000);
+        EmaTradingFactory factory = new EmaTradingFactoryImpl(list_1h);
+
+        if(!(factory.isLong() || factory.isShort())) {
+            return;
+        }
+
+        List<OpenPrice> openPrices = factory.getOpenPrices();
+        for(OpenPrice price : openPrices) {
+            logger.info("{}",price);
+        }
     }
 
     @Test

@@ -1,12 +1,12 @@
 package com.bugbycode.trading_app;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -18,7 +18,6 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class OpenInterestHistTest {
 	
@@ -30,7 +29,7 @@ public class OpenInterestHistTest {
 	@Autowired
 	private OpenInterestHistRepository openInterestHistRepository;
 
-	@Before
+	@BeforeAll
 	public void befor() {
 		AppConfig.DEBUG = true;
 		System.setProperty("https.proxyHost", "localhost");
@@ -53,10 +52,17 @@ public class OpenInterestHistTest {
 
 	@Test
 	public void testQuery() {
+		long now = new Date().getTime();
 		List<OpenInterestHist> list = openInterestHistRepository.query();
 		logger.info(list.size());
-		for(OpenInterestHist o : list) {
-			logger.info(o);
+		for(OpenInterestHist oih : list) {
+			long t = oih.getTimestamp();
+			long d = (now - t) / 1000 / 60 / 60 / 24;
+			if(d > 30) {
+				String pair = oih.getSymbol();
+				logger.info("{}交易对已超过{}天未更新数据", pair, d);
+			}
+			logger.info(oih);
 		}
 	}
 
