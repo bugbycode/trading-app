@@ -220,9 +220,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			Klines point = null;
 			for(MarketSentiment ms : msList) {
 				if(mode == QuotationMode.LONG) {
-					point = ms.getHigh();
+					point = ms.getMaxDif();
 				} else {
-					point = ms.getLow();
+					point = ms.getMinDif();
 				}
 				points.add(point);
 			}

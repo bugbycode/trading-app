@@ -19,6 +19,10 @@ public class MarketSentiment {
 	
 	private Klines lowBody;
 	
+	private Klines maxDif;
+	
+	private Klines minDif;
+	
 	public MarketSentiment(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list)) {
@@ -46,6 +50,16 @@ public class MarketSentiment {
 		low = PriceUtil.getMinPriceKLine(list);
 		highBody = PriceUtil.getMaxBodyHighPriceKLine(list);
 		lowBody = PriceUtil.getMinBodyLowPriceKLine(list);
+		maxDif = PriceUtil.getMaxDifKLine(list);
+		minDif = PriceUtil.getMinDifKLine(list);
+	}
+	
+	public Klines getMaxDif() {
+		return maxDif;
+	}
+	
+	public Klines getMinDif() {
+		return minDif;
 	}
 
 	public Klines getHigh() {

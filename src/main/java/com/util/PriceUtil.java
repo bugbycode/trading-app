@@ -117,6 +117,19 @@ public class PriceUtil {
 		return klinesList.subList(startIndex, endIndex);
 	}
 	
+	public static Klines getMaxDifKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getDif() < klinesList.get(index).getDif()) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
 	public static Klines getMaxPriceKLine(List<Klines> klinesList) {
 		Klines result = null;
 		if(!CollectionUtils.isEmpty(klinesList)) {
@@ -201,6 +214,19 @@ public class PriceUtil {
 				}
 				if(result.getBodyLowPriceDoubleValue() < current.getBodyLowPriceDoubleValue() && current.isFall()) {
 					result = current;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static Klines getMinDifKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getDif() > klinesList.get(index).getDif()) {
+					result = klinesList.get(index);
 				}
 			}
 		}
