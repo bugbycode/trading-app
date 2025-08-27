@@ -3,6 +3,8 @@ package com.bugbycode.factory.priceAction.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -25,6 +27,8 @@ import com.util.PriceUtil;
  */
 public class PriceActionFactoryImpl implements PriceActionFactory{
 
+	private final Logger logger = LogManager.getLogger(PriceActionFactoryImpl.class);
+	
 	private List<Klines> list;
 	
 	private List<Klines> fibAfterKlines;
@@ -231,9 +235,16 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			}
 			
 			if(points.size() > 1 && fibEnd != null) {
-				int lastIndex = points.size() - 1;
-				Klines lastPoint = points.get(lastIndex);
-				Klines parentPoint = points.get(lastIndex - 1);
+				Klines lastPoint = points.get(0);
+				Klines parentPoint = points.get(1);
+				
+				if(mode == QuotationMode.LONG) {
+					logger.debug("{}, {}", lastPoint.getHighPriceDoubleValue(), parentPoint.getHighPriceDoubleValue());
+				} else {
+					logger.debug("{}, {}", lastPoint.getLowPriceDoubleValue(), parentPoint.getLowPriceDoubleValue());
+				}
+				logger.debug("last dif: {}, parent dif: {}", lastPoint.getDif() , parentPoint.getDif());
+				
 				//检查MACD是否出现衰竭或强势信号
 				if((mode == QuotationMode.LONG && lastPoint.getDif() <= parentPoint.getDif()) 
 						|| (mode == QuotationMode.SHORT && lastPoint.getDif() >= parentPoint.getDif())) {
