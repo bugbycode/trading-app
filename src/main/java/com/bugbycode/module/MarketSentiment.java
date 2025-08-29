@@ -105,4 +105,8 @@ public class MarketSentiment {
 	public boolean isEmpty() {
 		return this.list == null || this.list.isEmpty();
 	}
+	
+	public boolean isNotEmpty() {
+		return !isEmpty();
+	}
 }
