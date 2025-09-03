@@ -194,7 +194,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 		}
 		
-		if(fibEnd != null) {
+		if(fibEnd != null && (
+				(mode == QuotationMode.LONG && fibEnd.getDea() > 0) || (mode == QuotationMode.SHORT && fibEnd.getDea() < 0)
+				)) {
 			FibCode openCode = FibCode.FIB0;
 			List<Klines> points_sub_list = PriceUtil.subList(fibAfterFlag, fibEnd, fibAfterKlines);
 			MarketSentiment ms = new MarketSentiment(points_sub_list);
@@ -248,11 +250,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
