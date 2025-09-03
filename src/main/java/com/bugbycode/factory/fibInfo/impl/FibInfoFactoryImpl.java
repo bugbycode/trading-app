@@ -10,7 +10,6 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -179,55 +178,34 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
 		
 		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list));
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
-		
-		Klines fibEnd = null;
-		for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
-			Klines current = fibAfterKlines.get(index);
-			Klines parent = fibAfterKlines.get(index - 1);
-			Klines next = fibAfterKlines.get(index - 2);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v10(current, parent, next)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v10(current, parent, next))) {
-				fibEnd = current;
-				break;
-			}
-		}
-		
-		if(fibEnd != null && (
-				(mode == QuotationMode.LONG && fibEnd.getDea() > 0) || (mode == QuotationMode.SHORT && fibEnd.getDea() < 0)
-				)) {
-			FibCode openCode = FibCode.FIB0;
-			List<Klines> points_sub_list = PriceUtil.subList(fibAfterFlag, fibEnd, fibAfterKlines);
-			MarketSentiment ms = new MarketSentiment(points_sub_list);
-			if(ms.isNotEmpty()) {
+
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		List<Klines> pointSubList = null;
+		Klines point = null;
+		double price = -1;
+		FibCode openCode = FibCode.FIB0;
+		for(int index = fibSubList.size() - 1; index > 0; index--) {
+			Klines current = fibSubList.get(index);
+			Klines parent = fibSubList.get(index - 1);
+			if(PriceUtil.verifyDecliningPrice_v8(current, parent) || PriceUtil.verifyPowerful_v8(current, parent)) {
+				pointSubList = PriceUtil.subList(current, end, fibSubList);
 				if(mode == QuotationMode.LONG) {
-					Klines low = ms.getLow();
-					Klines lowBody = ms.getLowBody();
-					openCode = this.fibInfo.getFibCode(low.getLowPriceDoubleValue());
-					addPrices(new OpenPriceDetails(openCode, low.getLowPriceDoubleValue()));
-					addPrices(new OpenPriceDetails(openCode, lowBody.getBodyLowPriceDoubleValue()));
+					point = PriceUtil.getMinPriceKLine(pointSubList);
+					price = point.getLowPriceDoubleValue();
 				} else {
-					Klines high = ms.getHigh();
-					Klines highBody = ms.getHighBody();
-					openCode = this.fibInfo.getFibCode(high.getHighPriceDoubleValue());
-					addPrices(new OpenPriceDetails(openCode, high.getHighPriceDoubleValue()));
-					addPrices(new OpenPriceDetails(openCode, highBody.getBodyHighPriceDoubleValue()));
+					point = PriceUtil.getMaxPriceKLine(pointSubList);
+					price = point.getHighPriceDoubleValue();
 				}
+				openCode = fibInfo.getFibCode(price);
+				addPrices(new OpenPriceDetails(openCode, price));
 			}
-			
-			this.fibAfterKlines.clear();
-
-			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
-			
-			if(fibAfterFlag != null) {
-				
-				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
-				this.fibInfo.setFibAfterKlines(fibAfterKlines);
-			}
-			
 		}
-
+		
+		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
+		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		} else {
@@ -258,11 +236,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private FibCode getFibCode() {
@@ -293,7 +271,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private void addPrices(OpenPrice price) {
-		if(!PriceUtil.contains(openPrices, price)) {
+		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			openPrices.add(price);
 		}
 	}
