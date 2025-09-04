@@ -713,6 +713,13 @@ public class KlinesServiceImpl implements KlinesService {
 								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 									continue;
 								}
+								//追踪委托价
+								if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
+									FibCode next = fibInfo.getNextFibCode(code);
+									activationPriceValue = new BigDecimal(
+											PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
+											);
+								}
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								//指数均线不设置止盈 由追踪委托来自动平仓
@@ -980,6 +987,13 @@ public class KlinesServiceImpl implements KlinesService {
 								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 									continue;
+								}
+								//追踪委托价
+								if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
+									FibCode next = fibInfo.getNextFibCode(code);
+									activationPriceValue = new BigDecimal(
+											PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
+											);
 								}
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
