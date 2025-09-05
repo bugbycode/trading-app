@@ -1,5 +1,6 @@
 package com.bugbycode.service.exchange.impl;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +28,7 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 	
 	@Override
 	public Set<String> exchangeInfo() {
-		
+		long now = new Date().getTime();
 		Set<String> pairs = new HashSet<String>();
 		//
 		String resultStr = restTemplate.getForObject(AppConfig.REST_BASE_URL + "/fapi/v1/exchangeInfo", String.class);
@@ -41,12 +42,20 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 					String statusStr = symbolJson.getString("status");
 					String symbol = symbolJson.getString("symbol");
 					//long onboardDate = symbolJson.getLong("onboardDate");
+					long deliveryDate = symbolJson.getLong("deliveryDate");
 					JSONArray filters = symbolJson.getJSONArray("filters");
 					
 					ContractType type = ContractType.resolve(contractType);
 					ContractStatus status = ContractStatus.resolve(statusStr);
 					
-					if(type == ContractType.PERPETUAL && status == ContractStatus.TRADING && !symbol.endsWith("USDC")) {
+					//交割到期/即将下架天数
+					long deliveryDay = (deliveryDate - now) / 1000 / 60 / 60 / 24;
+					
+					/*if(status == ContractStatus.TRADING && deliveryDay < 1000) {
+						logger.info("{}交易对{}天后交割或下架", symbol, deliveryDay);
+					}*/
+					
+					if(type == ContractType.PERPETUAL && status == ContractStatus.TRADING && !symbol.endsWith("USDC") && deliveryDay > 30) {
 						pairs.add(symbol);
 						SymbolExchangeInfo info = new SymbolExchangeInfo();
 						info.setSymbol(symbol);
