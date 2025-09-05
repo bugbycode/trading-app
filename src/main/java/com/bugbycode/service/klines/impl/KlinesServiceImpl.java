@@ -723,10 +723,9 @@ public class KlinesServiceImpl implements KlinesService {
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								//指数均线不设置止盈 由追踪委托来自动平仓
-								profitOrderEnabled = ProfitOrderEnabled.CLOSE;
+								//profitOrderEnabled = ProfitOrderEnabled.CLOSE;
 								//强制启用追踪委托
-								callbackRateEnabled = CallbackRateEnabled.OPEN;
-								
+								//callbackRateEnabled = CallbackRateEnabled.OPEN;
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								FibCode code = codes[offset];
 								takeProfitCode = fibInfo.getPriceActionTakeProfit_v1(code);
@@ -741,7 +740,7 @@ public class KlinesServiceImpl implements KlinesService {
 							
 							stopLoss = new BigDecimal(
 									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()),decimalNum));
-							if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+							if(fibInfo != null) {
 								takeProfit = new BigDecimal(
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
 												);
@@ -751,7 +750,7 @@ public class KlinesServiceImpl implements KlinesService {
 										);
 							}
 							
-							if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+							if(fibInfo != null) {
 
 								//计算预计盈利百分比
 								profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
@@ -998,9 +997,9 @@ public class KlinesServiceImpl implements KlinesService {
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								//指数均线不设置止盈 由追踪委托来自动平仓
-								profitOrderEnabled = ProfitOrderEnabled.CLOSE;
+								//profitOrderEnabled = ProfitOrderEnabled.CLOSE;
 								//强制启用追踪委托
-								callbackRateEnabled = CallbackRateEnabled.OPEN;
+								//callbackRateEnabled = CallbackRateEnabled.OPEN;
 								
 							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 								FibCode code = codes[offset];
@@ -1018,7 +1017,7 @@ public class KlinesServiceImpl implements KlinesService {
 									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum)
 											);
 							
-							if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+							if(fibInfo != null) {
 								takeProfit = new BigDecimal(
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
 												);
@@ -1028,7 +1027,7 @@ public class KlinesServiceImpl implements KlinesService {
 										);
 							}
 							
-							if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+							if(fibInfo != null) {
 								//计算预计盈利百分比
 								profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
 								
@@ -1204,7 +1203,7 @@ public class KlinesServiceImpl implements KlinesService {
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
 		for(OpenPrice price : openPrices) {
-			if(factory.isLong() && PriceUtil.isLong_v2(price.getPrice(), list_15m)) {
+			if(factory.isLong() && PriceUtil.isLong_v3(price.getPrice(), list_15m)) {
 				tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, 0, null, AutoTradeType.EMA_INDEX, last.getDecimalNum()));
 				for(User u : userList) {
 					
@@ -1223,7 +1222,7 @@ public class KlinesServiceImpl implements KlinesService {
 					sendEmail(u, subject, text, u.getUsername());
 				}
 				break;
-			} else if(factory.isShort() && PriceUtil.isShort_v2(price.getPrice(), list_15m)) {
+			} else if(factory.isShort() && PriceUtil.isShort_v3(price.getPrice(), list_15m)) {
 				
 				tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, 0, null, AutoTradeType.EMA_INDEX, last.getDecimalNum()));
 				

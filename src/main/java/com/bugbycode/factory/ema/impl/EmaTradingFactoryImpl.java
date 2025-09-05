@@ -57,11 +57,13 @@ public class EmaTradingFactoryImpl implements EmaTradingFactory {
 		
 		PriceUtil.calculateEMA_7_25_99(list);
 		
-		Klines last = PriceUtil.getLastKlines(list);
+		int index = list.size() - 1;
+		Klines current = list.get(index);
+		Klines parent = list.get(index - 1);
 		
-		if(last.getEma7() > last.getEma25() && last.getMacd() > 0) {
+		if(verifyLong(current)) {
 			ps = PositionSide.LONG;
-		} else if(last.getEma7() < last.getEma25() && last.getMacd() < 0) {
+		} else if(verifyShort(current)) {
 			ps = PositionSide.SHORT;
 		}
 		
@@ -70,24 +72,36 @@ public class EmaTradingFactoryImpl implements EmaTradingFactory {
 		}
 		
 		//处理开仓点位
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			if((ps == PositionSide.LONG && last.getClosePriceDoubleValue() > last.getEma25() && (PriceUtil.verifyPowerful_v11(current, parent) || PriceUtil.isBreachLong(current, current.getEma25()))) 
-					|| (ps == PositionSide.SHORT && last.getClosePriceDoubleValue() < last.getEma25() && (PriceUtil.verifyDecliningPrice_v11(current, parent) || PriceUtil.isBreachShort(current, current.getEma25())))) {
-				addPrices(new OpenPriceDetails(FibCode.FIB0, current.getClosePriceDoubleValue()));
-				break;
-			}
-		}
-		
 		if(ps == PositionSide.LONG) {
+			
+			if(PriceUtil.isBreachLong(current, current.getEma7()) && PriceUtil.isRise_v3(current, parent)) {
+				addPrices(new OpenPriceDetails(FibCode.FIB0, current.getClosePriceDoubleValue()));
+			}
+			
+			addPrices(new OpenPriceDetails(FibCode.FIB0, current.getEma25()));
+			
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		} else {
+			
+			if(PriceUtil.isBreachShort(current, current.getEma7()) && PriceUtil.isFall_v3(current, parent)) {
+				addPrices(new OpenPriceDetails(FibCode.FIB0, current.getClosePriceDoubleValue()));
+			}
+			
+			addPrices(new OpenPriceDetails(FibCode.FIB0, current.getEma25()));
+			
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
 		
 		//回撤信息
 		
+	}
+	
+	private boolean verifyLong(Klines k) {
+		return k.getEma7() > k.getEma25();
+	}
+	
+	private boolean verifyShort(Klines k) {
+		return k.getEma7() < k.getEma25();
 	}
 	
 	private void addPrices(OpenPrice price) {
