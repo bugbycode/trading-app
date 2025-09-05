@@ -59,7 +59,7 @@ public class EmaTradingFactoryImpl implements EmaTradingFactory {
 		
 		int index = list.size() - 1;
 		Klines current = list.get(index);
-		Klines parent = list.get(index - 1);
+		//Klines parent = list.get(index - 1);
 		
 		if(verifyLong(current)) {
 			ps = PositionSide.LONG;
@@ -73,19 +73,19 @@ public class EmaTradingFactoryImpl implements EmaTradingFactory {
 		
 		//处理开仓点位
 		if(ps == PositionSide.LONG) {
-			
+			/*
 			if(PriceUtil.isBreachLong(current, current.getEma7()) && PriceUtil.isRise_v3(current, parent)) {
 				addPrices(new OpenPriceDetails(FibCode.FIB0, current.getClosePriceDoubleValue()));
-			}
+			}*/
 			
 			addPrices(new OpenPriceDetails(FibCode.FIB0, current.getEma25()));
 			
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		} else {
 			
-			if(PriceUtil.isBreachShort(current, current.getEma7()) && PriceUtil.isFall_v3(current, parent)) {
+			/*if(PriceUtil.isBreachShort(current, current.getEma7()) && PriceUtil.isFall_v3(current, parent)) {
 				addPrices(new OpenPriceDetails(FibCode.FIB0, current.getClosePriceDoubleValue()));
-			}
+			}*/
 			
 			addPrices(new OpenPriceDetails(FibCode.FIB0, current.getEma25()));
 			
