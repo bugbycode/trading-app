@@ -428,6 +428,40 @@ public class FibInfo {
 		
 		return result;
 	}
+	
+	/**
+	 * 根据开仓点获取追踪委托触发的价格点位
+	 * 
+	 * @param current
+	 * @return
+	 */
+	public FibCode getActivationPriceCode(FibCode current) {
+		
+		FibCode result = FibCode.FIB0;
+		
+		if(current == FibCode.FIB1_272) {
+			result = FibCode.FIB1;
+		} else if(current == FibCode.FIB1) {
+			result = FibCode.FIB786;
+		} else if(current == FibCode.FIB786) {
+			result = FibCode.FIB618;
+		} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
+			result = FibCode.FIB5;
+		} else if(current == FibCode.FIB5) {
+			result = FibCode.FIB382;
+		} else {
+			FibCode codes[] = FibCode.values();
+			for(int index = 0; index < codes.length; index++) {
+				FibCode code = codes[index];
+				if(code == current && code != FibCode.FIB0) {
+					result = codes[index + 1];
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
 
 	public List<Klines> getFibAfterKlines() {
 		return fibAfterKlines;

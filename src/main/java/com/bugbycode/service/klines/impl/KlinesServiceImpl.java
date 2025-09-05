@@ -715,7 +715,7 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 								//追踪委托价
 								if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
-									FibCode next = fibInfo.getNextFibCode(code);
+									FibCode next = fibInfo.getActivationPriceCode(code);
 									activationPriceValue = new BigDecimal(
 											PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
 											);
@@ -989,7 +989,7 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 								//追踪委托价
 								if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
-									FibCode next = fibInfo.getNextFibCode(code);
+									FibCode next = fibInfo.getActivationPriceCode(code);
 									activationPriceValue = new BigDecimal(
 											PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
 											);
