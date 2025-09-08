@@ -281,6 +281,37 @@ public class FibInfo {
 	}
 	
 	/**
+	 * 根据开仓点获取追踪委托触发的价格点位 （价格行为）
+	 * @param code 当前开仓点
+	 * @return
+	 */
+	public FibCode getPriceActionActivationPriceCode(FibCode code) {
+		FibCode takeProfit = FibCode.FIB4_618;
+		if(code.lte(FibCode.FIB236)) { // 0 ~ 0.236 - 0.382
+			takeProfit = FibCode.FIB382;
+		} else if(code == FibCode.FIB382) { // 0.382 - 0.5
+			takeProfit = FibCode.FIB5;
+		} else if(code == FibCode.FIB5) { // 0.5 - 0.618
+			takeProfit = FibCode.FIB618;
+		} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 - 0.786
+			takeProfit = FibCode.FIB786;
+		} else if(code == FibCode.FIB786) {// 0.786 - 1
+			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1 || code == FibCode.FIB1_272) {// 1 || 1.272 - 1.618
+			takeProfit = FibCode.FIB1_618;
+		} else if(code == FibCode.FIB1_618) { // 1.618 - 2
+			takeProfit = FibCode.FIB2;
+		} else if(code == FibCode.FIB2) { // 2 - 2.618
+			takeProfit = FibCode.FIB2_618;
+		} else if(code == FibCode.FIB2_618) {// 2.618 - 3.618
+			takeProfit = FibCode.FIB3_618;
+		} else if(code == FibCode.FIB3_618) { // 3.618 - 4.618
+			takeProfit = FibCode.FIB4_618;
+		}
+		return takeProfit;
+	}
+	
+	/**
 	 * 价格行为止盈点位 (保守的交易风格) </br>
 	 * 
 	 * 1、当【盈利百分比】大于【用户止盈百分比限制】则止盈点位为下一个回撤点位 </br>

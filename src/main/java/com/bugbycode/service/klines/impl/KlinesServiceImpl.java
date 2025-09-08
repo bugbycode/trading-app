@@ -738,7 +738,7 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 								
 								//追踪委托价
-								FibCode next = fibInfo.getPriceActionTakeProfit_nextCode(code);
+								FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
 								activationPriceValue = new BigDecimal(
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
 										);
@@ -1019,7 +1019,7 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 								
 								//追踪委托价
-								FibCode next = fibInfo.getPriceActionTakeProfit_nextCode(code);
+								FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
 								activationPriceValue = new BigDecimal(
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
 										);

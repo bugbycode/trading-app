@@ -141,7 +141,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			return;
 		}
 		
-		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
+		List<Klines> firstSubList = PriceUtil.subList(first, third, list);
 		List<Klines> secondSubList = null;
 		Klines startAfter = null;
 		if(ps == PositionSide.LONG) {
@@ -238,11 +238,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getMacd() > 0;
+		return k.getDea() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getMacd() < 0;
+		return k.getDea() < 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
