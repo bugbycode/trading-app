@@ -144,7 +144,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			return;
 		}
 		
-		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
+		List<Klines> firstSubList = PriceUtil.subList(first, third, list);
 		
 		List<Klines> secondSubList = null;
 		
@@ -155,7 +155,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(startAfterFlag == null) {
 				startAfterFlag = start;
 			}
-			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
+			secondSubList = PriceUtil.subList(startAfterFlag, list);
 			end = PriceUtil.getMinPriceKLine(secondSubList);
 			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
 		} else if(ps == PositionSide.LONG) {
@@ -164,7 +164,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(startAfterFlag == null) {
 				startAfterFlag = start;
 			}
-			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
+			secondSubList = PriceUtil.subList(startAfterFlag, list);
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
 			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
 		}
