@@ -22,7 +22,7 @@ import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
-import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImplPlus;
+import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
@@ -736,6 +736,12 @@ public class KlinesServiceImpl implements KlinesService {
 								if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
 									continue;
 								}
+								
+								//追踪委托价
+								FibCode next = fibInfo.getPriceActionTakeProfit_nextCode(code);
+								activationPriceValue = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
+										);
 							}
 							
 							stopLoss = new BigDecimal(
@@ -1011,6 +1017,12 @@ public class KlinesServiceImpl implements KlinesService {
 								if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
 									continue;
 								}
+								
+								//追踪委托价
+								FibCode next = fibInfo.getPriceActionTakeProfit_nextCode(code);
+								activationPriceValue = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
+										);
 							}
 							
 							stopLoss = new BigDecimal(
@@ -1295,7 +1307,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresPriceAction(List<Klines> list_1h, List<Klines> list_15m) {
 		
-		PriceActionFactory factory = new PriceActionFactoryImplPlus(list_1h, list_15m);
+		PriceActionFactory factory = new PriceActionFactoryImpl(list_1h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		

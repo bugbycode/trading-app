@@ -3,8 +3,6 @@ package com.bugbycode.factory.priceAction.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -26,8 +24,6 @@ import com.util.PriceUtil;
  * 价格行为指标接口实现类
  */
 public class PriceActionFactoryImpl implements PriceActionFactory{
-
-	private final Logger logger = LogManager.getLogger(PriceActionFactoryImpl.class);
 	
 	private List<Klines> list;
 	
@@ -178,80 +174,31 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		Klines current = null;
-		//Klines parent = null;
-		//Klines next = null;
+		Klines parent = null;
 		Klines fibEnd = null;
-		Klines last = PriceUtil.getLastKlines(list);
 		
 		List<Klines> start_sub_list = PriceUtil.subList(start, list);
-		List<MarketSentiment> msList = new ArrayList<MarketSentiment>();
+		
 		List<Klines> points = new ArrayList<Klines>();
-		boolean searchStart = false;
-		if((mode == QuotationMode.LONG && last.getMacd() < 0) || (mode == QuotationMode.SHORT && last.getMacd() > 0)) {
-			searchStart = true;
-		}
 		
 		for(int index = start_sub_list.size() - 1; index > 0;index--) {
 			current = start_sub_list.get(index);
-			if(!searchStart && ((mode == QuotationMode.LONG && current.getMacd() < 0) || (mode == QuotationMode.SHORT && current.getMacd() > 0))) {
-				searchStart = true;
-			}
-			if(!searchStart) {
-				continue;
-			}
-			
-			if((mode == QuotationMode.LONG && current.getMacd() > 0) || (mode == QuotationMode.SHORT && current.getMacd() < 0)) {
+			parent = start_sub_list.get(index - 1);
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent)) || 
+					(mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))) {
 				points.add(current);
 			}
-			
-			if(((mode == QuotationMode.LONG && current.getMacd() < 0) || (mode == QuotationMode.SHORT && current.getMacd() > 0)) && !points.isEmpty()) {
-				msList.add(new MarketSentiment(points));
-				points = new ArrayList<Klines>();
-			}
 		}
 		
-		if(!points.isEmpty()) {
-			msList.add(new MarketSentiment(points));
-		}
+		MarketSentiment ms = new MarketSentiment(points);
 		
-		points = new ArrayList<Klines>();
-		
-		if(!msList.isEmpty()) {
-			Klines point = null;
-			for(MarketSentiment ms : msList) {
-				if(mode == QuotationMode.LONG) {
-					point = ms.getMaxDif();
-				} else {
-					point = ms.getMinDif();
-				}
-				points.add(point);
+		if(ms.isNotEmpty()) {
+			if(mode == QuotationMode.LONG) {
+				fibEnd = ms.getHigh();
+			} else {
+				fibEnd = ms.getLow();
 			}
-			for(int index = 0; index < start_sub_list.size(); index++) {
-				current = start_sub_list.get(index);
-				if(current.gt(points.get(0)) && ((mode == QuotationMode.LONG && current.getMacd() < 0) || (mode == QuotationMode.SHORT && current.getMacd() > 0))) {
-					fibEnd = current;
-					break;
-				}
-			}
-			
-			if(points.size() > 1 && fibEnd != null) {
-				Klines lastPoint = points.get(0);
-				Klines parentPoint = points.get(1);
-				
-				if(mode == QuotationMode.LONG) {
-					logger.debug("{}, {}", lastPoint.getHighPriceDoubleValue(), parentPoint.getHighPriceDoubleValue());
-				} else {
-					logger.debug("{}, {}", lastPoint.getLowPriceDoubleValue(), parentPoint.getLowPriceDoubleValue());
-				}
-				logger.debug("last dif: {}, parent dif: {}", lastPoint.getDif() , parentPoint.getDif());
-				
-				//检查MACD是否出现衰竭或强势信号
-				if((mode == QuotationMode.LONG && lastPoint.getDif() <= parentPoint.getDif()) 
-						|| (mode == QuotationMode.SHORT && lastPoint.getDif() >= parentPoint.getDif())) {
-					double closePrice = fibEnd.getClosePriceDoubleValue();
-					addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(closePrice), closePrice));
-				}
-			}
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(fibEnd.getClosePriceDoubleValue()), fibEnd.getClosePriceDoubleValue()));
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -264,9 +211,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		
 		if(fibEnd != null) {
 			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
-			
 			if(fibAfterFlag != null) {
-				
 				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 				this.fibInfo.setFibAfterKlines(fibAfterKlines);
 			}
@@ -285,19 +230,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getEma25() < current.getEma99() && current.getEma99() > 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getEma25() > current.getEma99() && current.getEma99() > 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99() && k.getEma99() > 0;
+		return k.getEma7() > k.getEma25() && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99() && k.getEma99() > 0;
+		return k.getEma7() < k.getEma25() && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
