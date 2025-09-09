@@ -1354,7 +1354,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(PriceUtil.isLong_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					&& !PriceUtil.isTradedPriceAction(price, fibInfo)) {
+					//&& !PriceUtil.isTradedPriceAction(price, fibInfo)
+					) {
 			
 				//市价做多
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.PRICE_ACTION, fibInfo.getDecimalPoint()));
@@ -1444,7 +1445,8 @@ public class KlinesServiceImpl implements KlinesService {
 			int offset = fibInfo.getFibCodeIndex(code);
 			if(PriceUtil.isShort_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					&& !PriceUtil.isTradedPriceAction(price, fibInfo)) {
+					//&& !PriceUtil.isTradedPriceAction(price, fibInfo)
+					) {
 			
 				//市价做空
 				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.PRICE_ACTION, fibInfo.getDecimalPoint()));
