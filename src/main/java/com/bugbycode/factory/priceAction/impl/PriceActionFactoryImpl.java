@@ -175,7 +175,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		
 		Klines current = null;
 		Klines parent = null;
-		Klines fibEnd = null;
 		
 		List<Klines> start_sub_list = PriceUtil.subList(start, list);
 		
@@ -186,7 +185,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			parent = start_sub_list.get(index - 1);
 			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent)) || 
 					(mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))) {
-				points.add(current);
+				points = PriceUtil.subList(start, current, this.list);
+				break;
 			}
 		}
 		
@@ -194,28 +194,23 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		
 		if(ms.isNotEmpty()) {
 			if(mode == QuotationMode.LONG) {
-				fibEnd = ms.getHigh();
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighBodyPrice()), ms.getHighBodyPrice()));
 			} else {
-				fibEnd = ms.getLow();
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowBodyPrice()), ms.getLowBodyPrice()));
 			}
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(fibEnd.getClosePriceDoubleValue()), fibEnd.getClosePriceDoubleValue()));
+			
 		}
 		
 		if(mode == QuotationMode.LONG) {
-			this.openPrices.sort(new PriceComparator(SortType.DESC));
-		} else {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
+		} else {
+			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
 		
 		this.fibAfterKlines.clear();
 		
-		if(fibEnd != null) {
-			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
-			if(fibAfterFlag != null) {
-				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
-				this.fibInfo.setFibAfterKlines(fibAfterKlines);
-			}
-		}
 	}
 
 	private PositionSide getPositionSide() {
@@ -230,11 +225,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() > 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() < 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
