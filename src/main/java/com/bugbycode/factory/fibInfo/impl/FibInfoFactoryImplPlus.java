@@ -223,10 +223,12 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 		
 		this.fibAfterKlines.clear();
 		
-		//fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
-		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+		if(fibEnd != null) {
+			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+			if(fibAfterFlag != null) {
+				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+				this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			}
 		}
 		
 		if(mode == QuotationMode.LONG) {
