@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -178,41 +179,47 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
 		
 		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list));
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
-
-		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
-		List<Klines> pointSubList = null;
-		Klines point = null;
-		double price = -1;
-		FibCode openCode = FibCode.FIB0;
-		for(int index = fibSubList.size() - 1; index > 0; index--) {
-			Klines current = fibSubList.get(index);
-			Klines parent = fibSubList.get(index - 1);
-			if((PriceUtil.verifyDecliningPrice_v8(current, parent) || PriceUtil.verifyPowerful_v8(current, parent)
-					) || (mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v15(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v15(current, parent))) {
-				pointSubList = PriceUtil.subList(current, end, fibSubList);
-				if(mode == QuotationMode.LONG) {
-					point = PriceUtil.getMinPriceKLine(pointSubList);
-					price = point.getLowPriceDoubleValue();
-					if(point.isEquals(current)) {
-						addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyLowPriceDoubleValue()), current.getBodyLowPriceDoubleValue()));
-					}
-				} else {
-					point = PriceUtil.getMaxPriceKLine(pointSubList);
-					price = point.getHighPriceDoubleValue();
-					if(point.isEquals(current)) {
-						addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyHighPriceDoubleValue()), current.getBodyHighPriceDoubleValue()));
-					}
-				}
-				openCode = fibInfo.getFibCode(price);
-				addPrices(new OpenPriceDetails(openCode, price));
+		
+		Klines fibEnd = null;
+		List<Klines> points = new ArrayList<Klines>();
+		
+		for(int index = fibAfterKlines.size() - 1; index > 0; index--) {
+			Klines current = fibAfterKlines.get(index);
+			Klines parent = fibAfterKlines.get(index - 1);
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent)) 
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
+				points = PriceUtil.subList(fibAfterFlag, current, fibAfterKlines);
+				fibEnd = current;
+				break;
+			}
+		}
+		
+		MarketSentiment ms = new MarketSentiment(points);
+		
+		if(ms.isNotEmpty()) {
+			if(mode == QuotationMode.SHORT) {
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighBodyPrice()));
+			} else {
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowBodyPrice()));
 			}
 		}
 		
 		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
+		
+		this.fibAfterKlines.clear();
+		
+		if(fibEnd != null) {
+			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+			if(fibAfterFlag != null) {
+				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+				this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			}
+		}
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
@@ -236,11 +243,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
