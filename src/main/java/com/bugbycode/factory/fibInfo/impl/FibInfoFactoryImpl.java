@@ -197,9 +197,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				if(mode == QuotationMode.LONG) {
 					point = PriceUtil.getMinPriceKLine(pointSubList);
 					price = point.getLowPriceDoubleValue();
+					if(point.isEquals(current)) {
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyLowPriceDoubleValue()), current.getBodyLowPriceDoubleValue()));
+					}
 				} else {
 					point = PriceUtil.getMaxPriceKLine(pointSubList);
 					price = point.getHighPriceDoubleValue();
+					if(point.isEquals(current)) {
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyHighPriceDoubleValue()), current.getBodyHighPriceDoubleValue()));
+					}
 				}
 				openCode = fibInfo.getFibCode(price);
 				addPrices(new OpenPriceDetails(openCode, price));
