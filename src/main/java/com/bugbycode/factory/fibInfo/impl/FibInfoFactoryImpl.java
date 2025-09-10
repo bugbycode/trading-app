@@ -209,7 +209,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 		}
 		
-		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
+		if(!verifyGte(FibCode.FIB1)) {
+			addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
+		}
 		
 		this.fibAfterKlines.clear();
 		
@@ -289,5 +291,16 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			openPrices.add(price);
 		}
+	}
+	
+	private boolean verifyGte(FibCode code) {
+		boolean result = false;
+		for(OpenPrice price : openPrices) {
+			if(code.lte(price.getCode())) {
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 }
