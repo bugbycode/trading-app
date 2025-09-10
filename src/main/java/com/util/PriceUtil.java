@@ -1850,6 +1850,18 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势  以dif强弱判断
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v16(Klines current, Klines parent, Klines next) {
+		return  parent.getDif() >= next.getDif() && current.getDif() < parent.getDif();
+	}
+	
+	/**
 	 * 判断是否出现颓势
 	 * 
 	 * @param current 当前k线
@@ -2003,6 +2015,17 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v10(Klines current,Klines parent, Klines next) {
 		return parent.getMacd() <= next.getMacd() && current.getMacd() > parent.getMacd();
+	}
+	
+	/**
+	 * 判断是否出现强势 以DIF强弱判断
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyPowerful_v16(Klines current,Klines parent, Klines next) {
+		return parent.getDif() <= next.getDif() && current.getDif() > parent.getDif();
 	}
 	
 	/**
