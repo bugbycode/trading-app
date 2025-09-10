@@ -1909,6 +1909,17 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v15(Klines current, Klines parent) {
+		return current.getDea() > 0 && current.getDif() < 0 && parent.getDif() >= 0;
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -2033,6 +2044,16 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v14(Klines current,Klines parent) {
 		return current.getMacd() > parent.getMacd();
+	}
+	
+	/**
+	 * 判断是否出现强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v15(Klines current,Klines parent) {
+		return current.getDea() < 0 && current.getDif() > 0 && parent.getDif() <= 0;
 	}
 	
 	/**

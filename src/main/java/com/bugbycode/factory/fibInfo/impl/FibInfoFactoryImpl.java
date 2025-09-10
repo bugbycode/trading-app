@@ -190,7 +190,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		for(int index = fibSubList.size() - 1; index > 0; index--) {
 			Klines current = fibSubList.get(index);
 			Klines parent = fibSubList.get(index - 1);
-			if(PriceUtil.verifyDecliningPrice_v8(current, parent) || PriceUtil.verifyPowerful_v8(current, parent)) {
+			if((PriceUtil.verifyDecliningPrice_v8(current, parent) || PriceUtil.verifyPowerful_v8(current, parent)
+					) || (mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v15(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v15(current, parent))) {
 				pointSubList = PriceUtil.subList(current, end, fibSubList);
 				if(mode == QuotationMode.LONG) {
 					point = PriceUtil.getMinPriceKLine(pointSubList);
@@ -228,11 +230,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() < 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() > 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
