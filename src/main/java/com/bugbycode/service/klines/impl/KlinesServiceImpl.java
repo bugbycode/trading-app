@@ -716,9 +716,11 @@ public class KlinesServiceImpl implements KlinesService {
 								//追踪委托价
 								if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
 									FibCode next = fibInfo.getActivationPriceCode(code);
-									activationPriceValue = new BigDecimal(
-											PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
-											);
+									if(fibInfo.getFibValue(next) > priceInfo.getPriceDoubleValue()) {
+										activationPriceValue = new BigDecimal(
+												PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
+												);
+									}
 								}
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
@@ -996,9 +998,11 @@ public class KlinesServiceImpl implements KlinesService {
 								//追踪委托价
 								if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
 									FibCode next = fibInfo.getActivationPriceCode(code);
-									activationPriceValue = new BigDecimal(
-											PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
-											);
+									if(fibInfo.getFibValue(next) < priceInfo.getPriceDoubleValue()) {
+										activationPriceValue = new BigDecimal(
+												PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
+												);
+									}
 								}
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
