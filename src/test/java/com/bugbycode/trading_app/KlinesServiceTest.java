@@ -54,8 +54,8 @@ public class KlinesServiceTest {
     @BeforeEach
 	public void befor() {
 		AppConfig.DEBUG = true;
-		//System.setProperty("https.proxyHost", "localhost");
-		//System.setProperty("https.proxyPort", "50000");
+		System.setProperty("https.proxyHost", "localhost");
+		System.setProperty("https.proxyPort", "50000");
 	}
 
     @Test
@@ -153,7 +153,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "MAGICUSDT";
+        String pair = "PEOPLEUSDT";
         List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
@@ -198,7 +198,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testPriceAction(){
-        String pair = "PENDLEUSDT";
+        String pair = "HYPERUSDT";
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         PriceActionFactory factory = new PriceActionFactoryImpl(list_1h, list_15m);
@@ -233,7 +233,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testEmaFactory() {
-        String pair = "DOGEUSDT";
+        String pair = "IDOLUSDT";
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,5000);
         EmaTradingFactory factory = new EmaTradingFactoryImpl(list_1h);
 
