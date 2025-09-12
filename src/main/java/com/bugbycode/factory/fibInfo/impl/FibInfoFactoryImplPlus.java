@@ -176,60 +176,31 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
-		
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list));
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
-		Klines fibEnd = null;
-		List<Klines> points = new ArrayList<Klines>();
-		
-		for(int index = fibAfterKlines.size() - 1; index > 1; index--) {
-			Klines current = fibAfterKlines.get(index);
-			Klines parent = fibAfterKlines.get(index - 1);
-			Klines next = fibAfterKlines.get(index - 2);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v16(current, parent, next)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v16(current, parent, next))) {
-				points.add(current);
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		for(int index = fibSubList.size() - 1; index > 1; index--) {
+			Klines current = fibSubList.get(index);
+			Klines parent = fibSubList.get(index - 1);
+			Klines next = fibSubList.get(index - 2);
+			if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) || PriceUtil.verifyPowerful_v10(current, parent, next)) {
+				List<Klines> points = PriceUtil.subList(current, fibSubList);
+				MarketSentiment ms = new MarketSentiment(points);
+				if(mode == QuotationMode.LONG) {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowBodyPrice()), ms.getLowBodyPrice()));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
+				} else {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighBodyPrice()), ms.getHighBodyPrice()));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
+				}
 			}
 		}
 		
-		MarketSentiment ms = new MarketSentiment(points);
-		
-		if(ms.isNotEmpty()) {
-			FibCode openCode = FibCode.FIB4_618;
-			if(mode == QuotationMode.SHORT) {
-				fibEnd = ms.getHigh();
-			} else {
-				fibEnd = ms.getLow();
-			}
-			//List<Klines> fibEndSubList = PriceUtil.subList(fibAfterFlag, fibEnd, fibAfterKlines);
-			MarketSentiment fibEndMs = new MarketSentiment(fibAfterKlines);
-			if(mode == QuotationMode.SHORT) {
-				openCode = fibInfo.getFibCode(fibEndMs.getHighPrice());
-			} else {
-				openCode = fibInfo.getFibCode(fibEndMs.getLowPrice());
-			}
-			
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue()));
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue()));
-		}
-		
-		if(!verifyGte(FibCode.FIB1)) {
-			addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
-		}
-		
-		this.fibAfterKlines.clear();
-		
-		if(fibEnd != null) {
-			fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
-			if(fibAfterFlag != null) {
-				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
-				this.fibInfo.setFibAfterKlines(fibAfterKlines);
-			}
-		}
+		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
@@ -253,11 +224,11 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() < 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() > 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
@@ -301,14 +272,4 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 		}
 	}
 	
-	private boolean verifyGte(FibCode code) {
-		boolean result = false;
-		for(OpenPrice price : openPrices) {
-			if(code.lte(price.getCode())) {
-				result = true;
-				break;
-			}
-		}
-		return result;
-	}
 }
