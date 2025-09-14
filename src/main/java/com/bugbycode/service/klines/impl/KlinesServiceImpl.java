@@ -714,14 +714,20 @@ public class KlinesServiceImpl implements KlinesService {
 									continue;
 								}
 								//追踪委托价
-								if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
+								/*if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
 									FibCode next = fibInfo.getActivationPriceCode(code);
 									if(fibInfo.getFibValue(next) > priceInfo.getPriceDoubleValue()) {
 										activationPriceValue = new BigDecimal(
 												PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
 												);
 									}
-								}
+								}*/
+								activationPriceValue = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(
+												PriceUtil.calculateLongActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
+												decimalNum
+										)
+									);
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								//指数均线不设置止盈 由追踪委托来自动平仓
@@ -740,10 +746,16 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 								
 								//追踪委托价
-								FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
+								/*FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
 								activationPriceValue = new BigDecimal(
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
-										);
+										);*/
+								activationPriceValue = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(
+												PriceUtil.calculateLongActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
+												decimalNum
+										)
+									);
 							}
 							
 							stopLoss = new BigDecimal(
@@ -996,14 +1008,20 @@ public class KlinesServiceImpl implements KlinesService {
 									continue;
 								}
 								//追踪委托价
-								if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
+								/*if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
 									FibCode next = fibInfo.getActivationPriceCode(code);
 									if(fibInfo.getFibValue(next) < priceInfo.getPriceDoubleValue()) {
 										activationPriceValue = new BigDecimal(
 												PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
 												);
 									}
-								}
+								}*/
+								activationPriceValue = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(
+												PriceUtil.calculateShortActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
+												decimalNum
+										)
+									);
 								
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								//指数均线不设置止盈 由追踪委托来自动平仓
@@ -1023,10 +1041,16 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 								
 								//追踪委托价
-								FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
+								/*FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
 								activationPriceValue = new BigDecimal(
 										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
-										);
+										);*/
+								activationPriceValue = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(
+												PriceUtil.calculateShortActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
+												decimalNum
+										)
+									);
 							}
 							
 							stopLoss = new BigDecimal(

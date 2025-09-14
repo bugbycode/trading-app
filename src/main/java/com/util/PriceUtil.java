@@ -815,6 +815,17 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 计算多头追踪止损触发价
+	 * @param price 参考价
+	 * @param activationPriceRatio 波动幅度 
+	 * @param takeProfitValue 止盈价
+	 * @return 计算方式: 参考价 + ((止盈价 - 参考价（当前价格）) * (波动幅度 * 0.1)) 
+	 */
+	public static double calculateLongActivationPrice_v2(double price, double activationPriceRatio, double takeProfitValue) {
+		return price + ((takeProfitValue - price) * (activationPriceRatio * 0.1));
+	}
+	
+	/**
 	 * 计算空头追踪止损触发价
 	 * @param price 参考价
 	 * @param activationPriceRatio 上涨幅度
@@ -822,6 +833,17 @@ public class PriceUtil {
 	 */
 	public static double calculateShortActivationPrice(double price, double activationPriceRatio) {
 		return price - (price * (activationPriceRatio * 0.01));
+	}
+	
+	/**
+	 * 计算空头追踪止损触发价
+	 * @param price 参考价
+	 * @param activationPriceRatio 波动幅度 
+	 * @param takeProfitValue 止盈价
+	 * @return 计算方式: 参考价 - ((参考价（当前价格） - 止盈价) * (波动幅度 * 0.1)) 
+	 */
+	public static double calculateShortActivationPrice_v2(double price, double activationPriceRatio, double takeProfitValue) {
+		return price - ((price - takeProfitValue) * (activationPriceRatio * 0.1));
 	}
 	
 	/**
