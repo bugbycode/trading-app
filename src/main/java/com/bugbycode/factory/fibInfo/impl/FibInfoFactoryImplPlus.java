@@ -97,6 +97,8 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateEMA_7_25_99(list);
 		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
 		
@@ -182,20 +184,23 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
-		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
-		for(int index = fibSubList.size() - 1; index > 1; index--) {
-			Klines current = fibSubList.get(index);
-			Klines parent = fibSubList.get(index - 1);
-			Klines next = fibSubList.get(index - 2);
-			if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) || PriceUtil.verifyPowerful_v10(current, parent, next)) {
-				List<Klines> points = PriceUtil.subList(current, fibSubList);
-				MarketSentiment ms = new MarketSentiment(points);
-				if(mode == QuotationMode.LONG) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowBodyPrice()), ms.getLowBodyPrice()));
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
-				} else {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighBodyPrice()), ms.getHighBodyPrice()));
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
+		if((mode == QuotationMode.LONG && last.getMacd() < 0) 
+				|| (mode == QuotationMode.SHORT && last.getMacd() > 0)) {
+			List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+			for(int index = fibSubList.size() - 1; index > 1; index--) {
+				Klines current = fibSubList.get(index);
+				Klines parent = fibSubList.get(index - 1);
+				Klines next = fibSubList.get(index - 2);
+				if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) || PriceUtil.verifyPowerful_v10(current, parent, next)) {
+					List<Klines> points = PriceUtil.subList(current, fibSubList);
+					MarketSentiment ms = new MarketSentiment(points);
+					if(mode == QuotationMode.LONG) {
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowBodyPrice()), ms.getLowBodyPrice()));
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
+					} else {
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighBodyPrice()), ms.getHighBodyPrice()));
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
+					}
 				}
 			}
 		}
