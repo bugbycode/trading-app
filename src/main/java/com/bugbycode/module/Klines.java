@@ -51,6 +51,10 @@ public class Klines {
 	private String iq;//主动买入的成交额
 	
 	private Double bbPercentB = 0.5;//BB %B
+	
+	private double delta;  // 当前K线的delta
+	
+    private double cvd;    // 当前K线的累计CVD
 
 	public Klines(String pair,long startTime, String openPrice, String highPrice, String lowPrice, 
 			String closePrice, long endTime,String interval,int decimalNum, String v, Long n, String q,
@@ -381,7 +385,23 @@ public class Klines {
     	return Double.valueOf(getBodyHighPrice());
     }
     
-    /**
+    public double getDelta() {
+		return delta;
+	}
+
+	public void setDelta(double delta) {
+		this.delta = delta;
+	}
+
+	public double getCvd() {
+		return cvd;
+	}
+
+	public void setCvd(double cvd) {
+		this.cvd = cvd;
+	}
+
+	/**
      * 获取k线实体部分最低价
      * @return
      */
@@ -422,8 +442,8 @@ public class Klines {
 	
 	@Override
 	public String toString() {
-		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s，时间级别：%s，成交量：%s，成交额：%s，成交笔数：%s，主动买入成交量：%s，主动买入成交额：%s", 
+		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s，时间级别：%s，成交量：%s，成交额：%s，成交笔数：%s，主动买入成交量：%s，主动买入成交额：%s，delta：%s，CVD：%s", 
 				pair,DateFormatUtil.format(startTime),getOpenPrice(),getHighPrice()
-				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime),this.interval, this.v, this.q, this.n, this.iv, this.iq);
+				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime),this.interval, this.v, this.q, this.n, this.iv, this.iq, this.delta, this.cvd);
 	}
 }

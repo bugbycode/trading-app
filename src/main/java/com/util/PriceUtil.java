@@ -3446,4 +3446,24 @@ public class PriceUtil {
             k.setMacd(macd);
         }
     }
+	
+	/**
+     * 计算每根K线的 Delta 和 CVD
+     * @param data 输入的K线列表（按时间升序）
+     */
+    public static void calculateDeltaAndCvd(List<Klines> data) {
+        double cumulativeCvd = 0.0;
+
+        for (Klines k : data) {
+            double volume = Double.parseDouble(k.getV());
+            double buyVolume = Double.parseDouble(k.getIv());
+
+            // delta = 主动买入成交量 - 主动卖出成交量
+            double delta = 2 * buyVolume - volume;
+            cumulativeCvd += delta;
+
+            k.setDelta(delta);
+            k.setCvd(cumulativeCvd);
+        }
+    }
 }
