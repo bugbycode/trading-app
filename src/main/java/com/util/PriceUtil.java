@@ -1860,6 +1860,17 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势 使用delta判断
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v17(Klines current, Klines parent) {
+		return  current.getDelta() < 0 && parent.getDelta() >= 0;
+	}
+	
+	/**
 	 * 判断是否出现颓势  以MACD强弱判断
 	 * 
 	 * @param current 当前k线
@@ -2026,6 +2037,16 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v8(Klines current,Klines parent) {
 		return current.getMacd() > 0 && parent.getMacd() <= 0;
+	}
+	
+	/**
+	 * 判断是否出现强势 以delta判断
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v17(Klines current,Klines parent) {
+		return current.getDelta() > 0 && parent.getDelta() <= 0;
 	}
 	
 	/**

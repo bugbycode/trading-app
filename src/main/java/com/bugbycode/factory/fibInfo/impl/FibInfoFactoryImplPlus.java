@@ -96,8 +96,9 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 		
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateDeltaAndCvd(list);
 		
-		Klines last = PriceUtil.getLastKlines(list);
+		//Klines last = PriceUtil.getLastKlines(list);
 		
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
@@ -184,14 +185,16 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
-		if((mode == QuotationMode.LONG && last.getMacd() < 0) 
-				|| (mode == QuotationMode.SHORT && last.getMacd() > 0)) {
+		/*if((mode == QuotationMode.LONG && last.getMacd() < 0) 
+				|| (mode == QuotationMode.SHORT && last.getMacd() > 0)) {*/
 			List<Klines> fibSubList = PriceUtil.subList(start, end, list);
-			for(int index = fibSubList.size() - 1; index > 1; index--) {
+			for(int index = fibSubList.size() - 1; index > 0; index--) {
 				Klines current = fibSubList.get(index);
 				Klines parent = fibSubList.get(index - 1);
-				Klines next = fibSubList.get(index - 2);
-				if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) || PriceUtil.verifyPowerful_v10(current, parent, next)) {
+				//Klines next = fibSubList.get(index - 2);
+				//if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) || PriceUtil.verifyPowerful_v10(current, parent, next)) {
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v17(current, parent))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v17(current, parent))) {
 					List<Klines> points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(points);
 					if(mode == QuotationMode.LONG) {
@@ -203,7 +206,7 @@ public class FibInfoFactoryImplPlus implements FibInfoFactory {
 					}
 				}
 			}
-		}
+		//}
 		
 		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
 		
