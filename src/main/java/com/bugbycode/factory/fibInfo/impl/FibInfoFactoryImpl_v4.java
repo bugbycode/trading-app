@@ -22,7 +22,7 @@ import com.util.PriceUtil;
 /**
  * 斐波那契回指标撤接口实现类
  */
-public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
+public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 
 	private List<Klines> list;
 	
@@ -32,17 +32,23 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	
 	private FibInfo fibInfo;
 	
+	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
+	
 	private Klines start = null;
 	
 	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
 	
-	public FibInfoFactoryImpl_v3(List<Klines> list_trend, List<Klines> list) {
+	public FibInfoFactoryImpl_v4(List<Klines> list, List<Klines> list_trend, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
 		}
@@ -86,19 +92,22 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 30 || list_trend.size() < 30) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 99 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
+		this.list_trend.sort(kc);
+		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateDeltaAndCvd(list);
+		PriceUtil.calculateDeltaAndCvd(list_15m);
 		
-		Klines last = PriceUtil.getLastKlines(list);
+		Klines last = PriceUtil.getLastKlines(list_15m);
 		
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
@@ -179,9 +188,9 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list));
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
