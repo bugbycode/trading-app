@@ -12,7 +12,6 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeFrequency;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
@@ -193,9 +192,7 @@ public class FibInfoFactoryImpl_v7 implements FibInfoFactory {
 		if(this.fibInfo == null) {
 			return;
 		}
-		//高频交易
-		this.fibInfo.setTradeFrequency(TradeFrequency.HIGH);
-
+		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
