@@ -112,6 +112,7 @@ public class FibInfoFactoryImpl_v6 implements FibInfoFactory {
 		PriceUtil.calculateMACD(list_trend);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateEMA_7_25_99(list_trend);
 		
 		PriceUtil.calculateDeltaAndCvd(list);
 		PriceUtil.calculateDeltaAndCvd(list_trend);
@@ -204,12 +205,16 @@ public class FibInfoFactoryImpl_v6 implements FibInfoFactory {
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
-		FibCode[] codes = FibCode.values();
-		for(FibCode code : codes) {
-			if(code.lt(FibCode.FIB236)) {
-				continue;
+		Klines last = PriceUtil.getLastKlines(list_15m);
+		
+		if((mode == QuotationMode.LONG && last.getDelta() > 0) || (mode == QuotationMode.SHORT && last.getDelta() < 0)) {
+			FibCode[] codes = FibCode.values();
+			for(FibCode code : codes) {
+				if(code.lt(FibCode.FIB236)) {
+					continue;
+				}
+				addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code)));
 			}
-			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code)));
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -231,19 +236,19 @@ public class FibInfoFactoryImpl_v6 implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDelta() > 0;
+		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDelta() < 0;
+		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
