@@ -123,6 +123,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		PositionSide ps = getPositionSide();
 		
+		Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		
 		Klines third = null;
 		Klines second = null;
 		Klines first = null;
@@ -209,11 +211,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		for(int index = fibSubList.size() - 1; index > 0; index--) {
 			Klines current = fibSubList.get(index);
 			Klines parent = fibSubList.get(index - 1);
-			if(mode == QuotationMode.LONG) {
+			if(mode == QuotationMode.LONG && last_15m.getDelta() > 0) {
 				if(PriceUtil.verifyPowerful_v8(current, parent)) {
 					double openPriceValue = current.getBodyHighPriceDoubleValue();
 					FibCode openCode = fibInfo.getFibCode(openPriceValue);
-					addPrices(new OpenPriceDetails(openCode, openPriceValue));
+					if(openCode.gte(FibCode.FIB382)) {
+						addPrices(new OpenPriceDetails(openCode, openPriceValue));
+					}
 				} else if(PriceUtil.verifyDecliningPrice_v8(current, parent)) {
 					List<Klines> points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(points);
@@ -221,11 +225,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 					FibCode openCode = fibInfo.getFibCode(openPriceValue);
 					addPrices(new OpenPriceDetails(openCode, openPriceValue));
 				}
-			} else if(mode == QuotationMode.SHORT) {
+			} else if(mode == QuotationMode.SHORT && last_15m.getDelta() < 0) {
 				if(PriceUtil.verifyDecliningPrice_v8(current, parent)) {
 					double openPriceValue = current.getBodyLowPriceDoubleValue();
 					FibCode openCode = fibInfo.getFibCode(openPriceValue);
-					addPrices(new OpenPriceDetails(openCode, openPriceValue));
+					if(openCode.gte(FibCode.FIB382)) {
+						addPrices(new OpenPriceDetails(openCode, openPriceValue));
+					}
 				} else if(PriceUtil.verifyPowerful_v8(current, parent)) {
 					List<Klines> points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(points);
@@ -236,7 +242,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 		}
 		
-		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
+		if((mode == QuotationMode.LONG && last_15m.getDelta() > 0)
+				|| (mode == QuotationMode.SHORT && last_15m.getDelta() < 0)) {
+			addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
+		}
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
@@ -257,11 +266,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
+		//return current.getEma7() > current.getEma25() && current.getEma25() > 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
+		//return current.getEma7() < current.getEma25() && current.getEma25() > 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
