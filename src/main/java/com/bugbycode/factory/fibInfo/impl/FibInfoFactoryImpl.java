@@ -224,6 +224,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 					double openPriceValue = ms.getLowPrice();
 					FibCode openCode = fibInfo.getFibCode(openPriceValue);
 					addPrices(new OpenPriceDetails(openCode, openPriceValue));
+					//最低实体价格
+					double openPriceLowBodyValue = ms.getLowBodyPrice();
+					FibCode openCodeLowBody = fibInfo.getFibCode(openPriceLowBodyValue);
+					addPrices(new OpenPriceDetails(openCodeLowBody, openPriceLowBodyValue));
 				}
 			} else if(mode == QuotationMode.SHORT && last_15m.getDelta() < 0) {
 				if(PriceUtil.verifyDecliningPrice_v8(current, parent)) {
@@ -238,6 +242,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 					double openPriceValue = ms.getHighPrice();
 					FibCode openCode = fibInfo.getFibCode(openPriceValue);
 					addPrices(new OpenPriceDetails(openCode, openPriceValue));
+					//最高实体价格
+					double openPriceHighBodyValue = ms.getHighBodyPrice();
+					FibCode openCodeHighBody = fibInfo.getFibCode(openPriceHighBodyValue);
+					addPrices(new OpenPriceDetails(openCodeHighBody, openPriceHighBodyValue));
 				}
 			}
 		}
