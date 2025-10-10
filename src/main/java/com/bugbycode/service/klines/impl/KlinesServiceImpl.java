@@ -20,7 +20,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.ema.EmaTradingFactory;
 import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v3;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -452,8 +452,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			
-			if( (PriceUtil.isLong(price, klinesList_hit) || PriceUtil.isLong_v3(price, klinesList_hit))
-					//PriceUtil.isLong_v2(price, klinesList_hit)
+			if( //(PriceUtil.isLong(price, klinesList_hit) || PriceUtil.isLong_v3(price, klinesList_hit))
+					PriceUtil.isLong_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
 					) {
@@ -550,8 +550,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			
-			if( (PriceUtil.isShort(price, klinesList_hit) || PriceUtil.isShort_v3(price, klinesList_hit))
-					//PriceUtil.isShort_v2(price, klinesList_hit)
+			if( //(PriceUtil.isShort(price, klinesList_hit) || PriceUtil.isShort_v3(price, klinesList_hit))
+					PriceUtil.isShort_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
 					) {
@@ -1296,11 +1296,15 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_1h, list_1h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v3(list_1h, list_1h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
-		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
+		if(!(factory.isLong() || factory.isShort())) {
+			return;
+		}
+		
+		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
 		
 		if(factory.isLong()) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
