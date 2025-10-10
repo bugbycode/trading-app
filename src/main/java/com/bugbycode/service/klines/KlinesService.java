@@ -255,9 +255,12 @@ public interface KlinesService {
     
     /**
      * 量价分析
-     * @param list
+     * @param list_1d
+     * @param list_4h
+     * @param list_1h
+     * @param list_15m
      */
-    public void volumeMonitor(List<Klines> list);
+    public void volumeMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h, List<Klines> list_15m);
     
     /**
      * 筹码密集区分布

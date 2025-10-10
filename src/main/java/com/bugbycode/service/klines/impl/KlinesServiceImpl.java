@@ -2260,13 +2260,15 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public void volumeMonitor(List<Klines> list) {
+	public void volumeMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h, List<Klines> list_15m) {
 		
-		if(CollectionUtils.isEmpty(list) || list.size() < 12) {
+		if(CollectionUtils.isEmpty(list_1h) || list_1h.size() < 12) {
 			return;
 		}
 		
-		List<Klines> list_1h = PriceUtil.to1HFor15MKlines(list);
+		PriceUtil.calculateDeltaAndCvd(list_1h);
+		
+		//List<Klines> list_1h = PriceUtil.to1HFor15MKlines(list);
 		
 		Klines last = PriceUtil.getLastKlines(list_1h);
 		String pair = last.getPair();
