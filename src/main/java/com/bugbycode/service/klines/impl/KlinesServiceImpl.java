@@ -453,8 +453,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			
-			if( (PriceUtil.isLong(price, klinesList_hit) || PriceUtil.isLong_v3(price, klinesList_hit))
-					//PriceUtil.isLong_v2(price, klinesList_hit)
+			if( //(PriceUtil.isLong(price, klinesList_hit) || PriceUtil.isLong_v3(price, klinesList_hit))
+					PriceUtil.isLong_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
 					) {
@@ -555,8 +555,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			
-			if( (PriceUtil.isShort(price, klinesList_hit) || PriceUtil.isShort_v3(price, klinesList_hit))
-					//PriceUtil.isShort_v2(price, klinesList_hit)
+			if( //(PriceUtil.isShort(price, klinesList_hit) || PriceUtil.isShort_v3(price, klinesList_hit))
+					PriceUtil.isShort_v2(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
 					) {

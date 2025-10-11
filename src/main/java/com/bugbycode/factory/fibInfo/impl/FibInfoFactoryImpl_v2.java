@@ -123,8 +123,6 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		
 		PositionSide ps = getPositionSide();
 		
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
-		
 		Klines third = null;
 		Klines second = null;
 		Klines first = null;
@@ -211,7 +209,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		for(int index = fibSubList.size() - 1; index > 0; index--) {
 			Klines current = fibSubList.get(index);
 			Klines parent = fibSubList.get(index - 1);
-			if(mode == QuotationMode.LONG && last_15m.getDelta() > 0) {
+			if(mode == QuotationMode.LONG) {
 				if(PriceUtil.verifyPowerful_v8(current, parent)) {
 					double openPriceValue = current.getBodyHighPriceDoubleValue();
 					FibCode openCode = fibInfo.getFibCode(openPriceValue);
@@ -227,7 +225,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 					FibCode openCodeLowBody = fibInfo.getFibCode(openPriceLowBodyValue);
 					addPrices(new OpenPriceDetails(openCodeLowBody, openPriceLowBodyValue));
 				}
-			} else if(mode == QuotationMode.SHORT && last_15m.getDelta() < 0) {
+			} else if(mode == QuotationMode.SHORT) {
 				if(PriceUtil.verifyDecliningPrice_v8(current, parent)) {
 					double openPriceValue = current.getBodyLowPriceDoubleValue();
 					FibCode openCode = fibInfo.getFibCode(openPriceValue);
@@ -246,10 +244,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			}
 		}
 		
-		if((mode == QuotationMode.LONG && last_15m.getDelta() > 0)
-				|| (mode == QuotationMode.SHORT && last_15m.getDelta() < 0)) {
-			addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
-		}
+		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
