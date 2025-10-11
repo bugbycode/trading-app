@@ -2,6 +2,7 @@ package com.bugbycode.module.user;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
@@ -113,6 +114,8 @@ public class User implements UserDetails {
 	private double activationPriceRatio = 3; // 追踪止损触发价比例 当价格从开仓价上涨或下跌幅度达到该值时触发追踪止损订单
 	
 	private int callbackRateEnabled = 0; // 是否启用追踪止损
+	
+	private List<String> pairPolicySelected;//行情交易对过滤(行情监控)
 	
 	public String getId() {
 		return id;
@@ -382,6 +385,7 @@ public class User implements UserDetails {
 		this.setMonitorProfit(user.getMonitorProfit());
 		this.setTradeNumberMonitor(user.getTradeNumberMonitor());
 		this.setBreakthroughMonitor(user.getBreakthroughMonitor());
+		this.setPairPolicySelected(user.getPairPolicySelected());
 	}
 
 	public String getSmtpUser2() {
@@ -498,5 +502,13 @@ public class User implements UserDetails {
 
 	public void setActivationPriceRatio(double activationPriceRatio) {
 		this.activationPriceRatio = activationPriceRatio;
+	}
+
+	public List<String> getPairPolicySelected() {
+		return pairPolicySelected;
+	}
+
+	public void setPairPolicySelected(List<String> pairPolicySelected) {
+		this.pairPolicySelected = pairPolicySelected;
 	}
 }
