@@ -1405,6 +1405,10 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
+					if(!PairPolicyUtil.verifyContainsPair(u.getPairPolicySelected(), pair)) {
+						continue;
+					}
+					
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
@@ -1495,6 +1499,10 @@ public class KlinesServiceImpl implements KlinesService {
 				List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
+					
+					if(!PairPolicyUtil.verifyContainsPair(u.getPairPolicySelected(), pair)) {
+						continue;
+					}
 					
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
