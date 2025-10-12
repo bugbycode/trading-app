@@ -211,9 +211,18 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			Klines parent = fibSubList.get(index - 1);
 			if(mode == QuotationMode.LONG) {
 				if(PriceUtil.verifyPowerful_v8(current, parent)) {
-					double openPriceValue = current.getBodyHighPriceDoubleValue();
-					FibCode openCode = fibInfo.getFibCode(openPriceValue);
-					addPrices(new OpenPriceDetails(openCode, openPriceValue));
+					Klines currentAfter = PriceUtil.getAfterKlines(current, fibSubList);
+					if(currentAfter != null) {
+						List<Klines> points = PriceUtil.subList(currentAfter, fibSubList);
+						MarketSentiment ms = new MarketSentiment(points);
+						double openPriceValue = ms.getLowPrice();
+						FibCode openCode = fibInfo.getFibCode(openPriceValue);
+						addPrices(new OpenPriceDetails(openCode, openPriceValue));
+						//最低实体价格
+						double openPriceLowBodyValue = ms.getLowBodyPrice();
+						FibCode openCodeLowBody = fibInfo.getFibCode(openPriceLowBodyValue);
+						addPrices(new OpenPriceDetails(openCodeLowBody, openPriceLowBodyValue));
+					}
 				} else if(PriceUtil.verifyDecliningPrice_v8(current, parent)) {
 					List<Klines> points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(points);
@@ -227,9 +236,18 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 				}
 			} else if(mode == QuotationMode.SHORT) {
 				if(PriceUtil.verifyDecliningPrice_v8(current, parent)) {
-					double openPriceValue = current.getBodyLowPriceDoubleValue();
-					FibCode openCode = fibInfo.getFibCode(openPriceValue);
-					addPrices(new OpenPriceDetails(openCode, openPriceValue));
+					Klines currentAfter = PriceUtil.getAfterKlines(current, fibSubList);
+					if(currentAfter != null) {
+						List<Klines> points = PriceUtil.subList(currentAfter, fibSubList);
+						MarketSentiment ms = new MarketSentiment(points);
+						double openPriceValue = ms.getHighPrice();
+						FibCode openCode = fibInfo.getFibCode(openPriceValue);
+						addPrices(new OpenPriceDetails(openCode, openPriceValue));
+						//最高实体价格
+						double openPriceHighBodyValue = ms.getHighBodyPrice();
+						FibCode openCodeHighBody = fibInfo.getFibCode(openPriceHighBodyValue);
+						addPrices(new OpenPriceDetails(openCodeHighBody, openPriceHighBodyValue));
+					}
 				} else if(PriceUtil.verifyPowerful_v8(current, parent)) {
 					List<Klines> points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(points);
