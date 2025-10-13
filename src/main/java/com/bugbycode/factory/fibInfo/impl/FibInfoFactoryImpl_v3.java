@@ -204,11 +204,23 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
-		FibCode[] codes = FibCode.values();
-		
-		for(FibCode code : codes) {
-			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code)));
+		for(int index = list_trend.size() - 1; index > 0; index--) {
+			Klines current = list_trend.get(index);
+			Klines parent = list_trend.get(index - 1);
+			if(mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent)) {
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyHighPriceDoubleValue()), current.getBodyHighPriceDoubleValue()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyLowPriceDoubleValue()), current.getBodyLowPriceDoubleValue()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getLowPriceDoubleValue()), current.getLowPriceDoubleValue()));
+				break;
+			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent)) {
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyHighPriceDoubleValue()), current.getBodyHighPriceDoubleValue()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyLowPriceDoubleValue()), current.getBodyLowPriceDoubleValue()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getHighPriceDoubleValue()), current.getHighPriceDoubleValue()));
+				break;
+			}
 		}
+		
+		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
@@ -237,11 +249,13 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
+		//return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
+		//return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
