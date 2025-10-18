@@ -139,13 +139,15 @@ public interface UserRepository {
 	 * @param callbackRate 追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
 	 * @param activationPriceRatio 追踪止损触发价比例 当价格从开仓价上涨或下跌幅度达到该值时触发追踪止损订单
 	 * @param callbackRateEnabled 是否启用追踪止损
+	 * @param tradePairPolicySelected 交易对过滤(自动交易)
+	 * @param tradePolicyType 自动交易策略类型（白名单/黑名单）
 	 * 
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
 			int baseStepSize,int leverage,double positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade,
 			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle,double profitLimit,
 			int countertrendTrading, FibLevel fibLevel, long tradeNumber, int breakthroughTrade, double callbackRate, 
-			double activationPriceRatio, int callbackRateEnabled);
+			double activationPriceRatio, int callbackRateEnabled, List<String> tradePairPolicySelected, int tradePolicyType);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

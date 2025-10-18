@@ -117,6 +117,12 @@ public class User implements UserDetails {
 	
 	private List<String> pairPolicySelected;//行情交易对过滤(行情监控)
 	
+	private int monitorPolicyType;//监控策略类型（1:白名单/0:黑名单）
+	
+	private List<String> tradePairPolicySelected;//交易对过滤(自动交易)
+	
+	private int tradePolicyType;//自动交易策略类型（1:白名单/0:黑名单）
+	
 	public String getId() {
 		return id;
 	}
@@ -386,6 +392,7 @@ public class User implements UserDetails {
 		this.setTradeNumberMonitor(user.getTradeNumberMonitor());
 		this.setBreakthroughMonitor(user.getBreakthroughMonitor());
 		this.setPairPolicySelected(user.getPairPolicySelected());
+		this.setMonitorPolicyType(user.getMonitorPolicyType());
 	}
 
 	public String getSmtpUser2() {
@@ -510,5 +517,29 @@ public class User implements UserDetails {
 
 	public void setPairPolicySelected(List<String> pairPolicySelected) {
 		this.pairPolicySelected = pairPolicySelected;
+	}
+
+	public int getMonitorPolicyType() {
+		return monitorPolicyType;
+	}
+
+	public void setMonitorPolicyType(int monitorPolicyType) {
+		this.monitorPolicyType = monitorPolicyType;
+	}
+
+	public List<String> getTradePairPolicySelected() {
+		return tradePairPolicySelected;
+	}
+
+	public void setTradePairPolicySelected(List<String> tradePairPolicySelected) {
+		this.tradePairPolicySelected = tradePairPolicySelected;
+	}
+
+	public int getTradePolicyType() {
+		return tradePolicyType;
+	}
+
+	public void setTradePolicyType(int tradePolicyType) {
+		this.tradePolicyType = tradePolicyType;
 	}
 }

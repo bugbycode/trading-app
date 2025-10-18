@@ -99,6 +99,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("tradeNumberMonitor", user.getTradeNumberMonitor());
 		update.set("breakthroughMonitor", user.getBreakthroughMonitor());
 		update.set("pairPolicySelected", user.getPairPolicySelected());
+		update.set("monitorPolicyType", user.getMonitorPolicyType());
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
@@ -142,7 +143,7 @@ public class UserRepositoryImpl implements UserRepository {
 			int baseStepSize,int leverage,double positionValue, double cutLoss,double profit,int autoTradeType,int drawTrade,
 			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle,double profitLimit,
 			int countertrendTrading, FibLevel fibLevel, long tradeNumber, int breakthroughTrade, double callbackRate, 
-			double activationPriceRatio, int callbackRateEnabled) {
+			double activationPriceRatio, int callbackRateEnabled, List<String> tradePairPolicySelected, int tradePolicyType) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
@@ -167,6 +168,8 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("callbackRate", callbackRate);
 		update.set("activationPriceRatio", activationPriceRatio);
 		update.set("callbackRateEnabled", callbackRateEnabled);
+		update.set("tradePairPolicySelected", tradePairPolicySelected);
+		update.set("tradePolicyType", tradePolicyType);
 		
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
