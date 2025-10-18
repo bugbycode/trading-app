@@ -467,7 +467,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(!PairPolicyUtil.verifyContainsPair(u.getPairPolicySelected(), pair)) {
+					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
 					}
 					
@@ -569,7 +569,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(!PairPolicyUtil.verifyContainsPair(u.getPairPolicySelected(), pair)) {
+					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
 					}
 					
@@ -657,6 +657,11 @@ public class KlinesServiceImpl implements KlinesService {
 					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
 					
 					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
+					
+					//筛选策略限制
+					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+						continue;
+					}
 					
 					//活跃度限制
 					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
@@ -953,6 +958,11 @@ public class KlinesServiceImpl implements KlinesService {
 					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
 					
 					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
+					
+					//筛选策略限制
+					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+						continue;
+					}
 					
 					//活跃度限制
 					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
@@ -1405,7 +1415,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(!PairPolicyUtil.verifyContainsPair(u.getPairPolicySelected(), pair)) {
+					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
 					}
 					
@@ -1500,7 +1510,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
-					if(!PairPolicyUtil.verifyContainsPair(u.getPairPolicySelected(), pair)) {
+					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
 					}
 					
