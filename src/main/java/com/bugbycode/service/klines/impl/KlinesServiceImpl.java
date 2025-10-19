@@ -20,7 +20,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.ema.EmaTradingFactory;
 import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v3;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -1315,7 +1315,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v3(list_4h, list_4h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_1h, list_4h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
