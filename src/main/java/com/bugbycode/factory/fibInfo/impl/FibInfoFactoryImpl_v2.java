@@ -220,13 +220,18 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		MarketSentiment ms = new MarketSentiment(points);
 		MarketSentiment code_ms = new MarketSentiment(fibAfterKlines);
 		if(ms.isNotEmpty()) {
+			FibCode openCode = FibCode.FIB236;
 			if(mode == QuotationMode.LONG) {
 				fibEnd = ms.getLow();
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(code_ms.getLowPrice()), fibEnd.getBodyHighPriceDoubleValue()));
+				openCode = fibInfo.getFibCode(code_ms.getLowPrice());
+				addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue()));
 			} else {
 				fibEnd = ms.getHigh();
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(code_ms.getHighPrice()), fibEnd.getBodyLowPriceDoubleValue()));
+				openCode = fibInfo.getFibCode(code_ms.getHighPrice());
+				addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue()));
 			}
+			
+			fibInfo.setLevel(FibLevel.valueOf(getLevelCode(openCode)));
 			
 			this.fibAfterKlines.clear();
 			
@@ -278,4 +283,13 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		}
 	}
 	
+	private FibCode getLevelCode(FibCode openCode) {
+		FibCode result = openCode;
+		if(openCode == FibCode.FIB66) {
+			result = FibCode.FIB618;
+		} else if(openCode.gt(FibCode.FIB1)) {
+			result = FibCode.FIB1;
+		}
+		return result;
+	}
 }

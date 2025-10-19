@@ -723,4 +723,8 @@ public class FibInfo {
 	public void setTradeFrequency(TradeFrequency frequency) {
 		this.frequency = frequency;
 	}
+
+	public void setLevel(FibLevel level) {
+		this.level = level;
+	}
 }
