@@ -1,6 +1,8 @@
 package com.bugbycode.service.klines.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.List;
 
@@ -132,6 +134,12 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		String url = uriBuilder.toUriString();
+		
+		try {
+			url = URLDecoder.decode(url, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		
 		logger.debug(url);
 		
