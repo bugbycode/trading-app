@@ -1,5 +1,7 @@
 package com.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,7 +35,11 @@ public class CoinPairSet extends HashSet<String> {
 			if(buffer.length() > 0) {
 				buffer.append("/");
 			}
-			buffer.append(it.next().toLowerCase() + "_perpetual@continuousKline_" + inerval.getDescption());
+			try {
+				buffer.append(URLEncoder.encode(it.next().toLowerCase(), "UTF-8") + "_perpetual@continuousKline_" + inerval.getDescption());
+			}catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		return buffer.toString();
 	}
