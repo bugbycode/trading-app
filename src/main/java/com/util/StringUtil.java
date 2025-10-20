@@ -1,5 +1,8 @@
 package com.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Set;
 
 import com.bugbycode.module.FibCode;
@@ -164,5 +167,27 @@ public class StringUtil {
 	
 	public static String formatCollectionName(Klines k) {
 		return formatCollectionName(k.getPair(), k.getInervalType());
+	}
+	
+	public static String urlEncoder(String str) {
+		String result = null;
+		try {
+			result = URLEncoder.encode(str, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			result = str;
+		}
+		return result;
+	}
+	
+	public static String urlDecoder(String str) {
+		String result = null;
+		try {
+			result = URLDecoder.decode(str, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			result = str;
+		}
+		return result;
 	}
 }

@@ -94,8 +94,10 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	public Leverage leverage(String binanceApiKey,String binanceSecretKey,String symbol, int leverage) {
 		Leverage lr = new Leverage(0, null, symbol);
 		
-		String queryString = String.format("symbol=%s&leverage=%s&timestamp=%s", symbol, leverage, getTime());
+		String queryString = String.format("symbol=%s&leverage=%s&timestamp=%s", StringUtil.urlEncoder(symbol), leverage, getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -117,8 +119,10 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	@Override
 	public Result marginType(String binanceApiKey,String binanceSecretKey,String symbol, MarginType marginType) {
 		ResultCode code = ResultCode.ERROR;
-		String queryString = String.format("symbol=%s&marginType=%s&timestamp=%s", symbol, marginType, getTime());
+		String queryString = String.format("symbol=%s&marginType=%s&timestamp=%s", StringUtil.urlEncoder(symbol), marginType, getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -141,8 +145,10 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
 		
-		String queryString = String.format("symbol=%s&timestamp=%s", symbol, getTime());
+		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -199,7 +205,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			String origClientOrderId) {
 		
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("symbol", symbol);
+		params.put("symbol", StringUtil.urlEncoder(symbol));
 		if(orderId > 0) {
 			params.put("orderId", orderId);
 		}
@@ -212,6 +218,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		String queryString = UrlQueryStringUtil.parse(params);
 		
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -265,7 +273,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
 		
 		Map<String,Object> params = new HashMap<String, Object>();
-		params.put("symbol", symbol);
+		params.put("symbol",  StringUtil.urlEncoder(symbol));
 		params.put("timestamp", getTime());
 		if(orderId > 0) {
 			params.put("orderId", orderId);
@@ -285,6 +293,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -343,7 +352,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			String origClientOrderId) {
 		
 		Map<String,Object> params = new HashMap<String, Object>();
-		params.put("symbol", symbol);
+		params.put("symbol", StringUtil.urlEncoder(symbol));
 		params.put("timestamp", getTime());
 		if(orderId > 0) {
 			params.put("orderId", orderId);
@@ -357,6 +366,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -413,7 +423,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		Map<String,Object> params = new HashMap<String, Object>();
 		//限价订单
 		if(type == Type.LIMIT) {
-			params.put("symbol", symbol);
+			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
 			params.put("positionSide", ps);
 			params.put("type", type);
@@ -424,7 +434,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("price", price);//委托价格
 			params.put("timeinforce", "GTC");
 		} else if(type == Type.MARKET) {//市价订单
-			params.put("symbol", symbol);
+			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
 			params.put("positionSide", ps);
 			params.put("type", type);
@@ -433,7 +443,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			}
 			params.put("quantity", quantity);//委托数量
 		} else if(type == Type.STOP) {//限价止损
-			params.put("symbol", symbol);
+			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
 			params.put("positionSide", ps);
 			params.put("type", type);
@@ -446,7 +456,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
 			params.put("timeInForce", "GTE_GTC");
 		} else if(type == Type.STOP_MARKET) { //市价止损
-			params.put("symbol", symbol);
+			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
 			params.put("positionSide", ps);
 			params.put("type", type);
@@ -458,7 +468,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
 			params.put("timeInForce", "GTE_GTC");
 		} else if(type == Type.TAKE_PROFIT) {//限价止盈
-			params.put("symbol", symbol);
+			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
 			params.put("positionSide", ps);
 			params.put("type", type);
@@ -471,7 +481,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
 			params.put("timeInForce", "GTE_GTC");
 		} else if(type == Type.TAKE_PROFIT_MARKET) {//市价止盈
-			params.put("symbol", symbol);
+			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
 			params.put("positionSide", ps);
 			params.put("type", type);
@@ -489,6 +499,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		String queryString = UrlQueryStringUtil.parse(params);
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -559,7 +570,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	@Override
 	public BinanceOrderInfo orderDelete(String binanceApiKey,String binanceSecretKey,String symbol,long orderId,String origClientOrderId) {
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("symbol", symbol);
+		params.put("symbol", StringUtil.urlEncoder(symbol));
 		if(orderId > 0) {
 			params.put("orderId", orderId);
 		}
@@ -570,6 +581,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -681,8 +694,10 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		List<SymbolConfig> scList = new ArrayList<SymbolConfig>();
 		
-		String queryString = String.format("symbol=%s&timestamp=%s", symbol, getTime());
+		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
 		queryString += "&signature=" + signature;
 		
 		HttpHeaders headers = new HttpHeaders();
