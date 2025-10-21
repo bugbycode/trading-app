@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -198,33 +199,58 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		for(int index = list.size() - 1; index > 1; index--) {
+			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
+			
+			if((((mode == QuotationMode.LONG && current.getDea() > 0) || (mode == QuotationMode.SHORT && current.getDea() < 0)) 
+					&& !current.isEquals(start)) || current.gt(end)) {
+				continue;
+			}
+			
+			if(current.lt(start)) {
+				break;
+			}
+			
+			if(mode == QuotationMode.LONG) {
+				if(PriceUtil.verifyPowerful_v10(current, parent, next)) {
+					double openPriceValue = parent.getBodyHighPriceDoubleValue();
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+				} else if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) && !end.isEquals(current)) {
+					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
+					MarketSentiment ms = new MarketSentiment(sub_points);
+					double openPriceValue = ms.getLowPrice();
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+				}
+			} else if(mode == QuotationMode.SHORT) {
+				if(PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
+					double openPriceValue = parent.getBodyLowPriceDoubleValue();
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+				} else if(PriceUtil.verifyPowerful_v10(current, parent, next) && !end.isEquals(current)) {
+					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
+					MarketSentiment ms = new MarketSentiment(sub_points);
+					double openPriceValue = ms.getHighPrice();
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+				}
+			}
+		}
+		
+		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
+		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
-		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
-		for(int index = fibSubList.size() - 1; index > 1; index--) {
-			Klines current = fibSubList.get(index);
-			Klines parent = fibSubList.get(index - 1);
-			Klines next = fibSubList.get(index - 2);
-			if(mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v10(current, parent, next)) {
-				double openPriceValue = parent.getBodyHighPriceDoubleValue();
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
-			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
-				double openPriceValue = parent.getBodyLowPriceDoubleValue();
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
-			}
-		}
-		
-		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
-		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
+		
 	}
 	
 	private PositionSide getPositionSide() {
@@ -239,11 +265,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
