@@ -121,6 +121,8 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
 		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		PositionSide ps = getPositionSide();
 		
 		Klines third = null;
@@ -213,22 +215,34 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			if(mode == QuotationMode.LONG) {
 				if(PriceUtil.verifyPowerful_v10(current, parent, next)) {
 					double openPriceValue = parent.getBodyHighPriceDoubleValue();
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
+					if(verifyOpenLongPrice(openPrice, last)) {
+						addPrices(openPrice);
+					}
 				} else if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) && !end.isEquals(current)) {
 					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(sub_points);
 					double openPriceValue = ms.getLowPrice();
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
+					if(verifyOpenLongPrice(openPrice, last)) {
+						addPrices(openPrice);
+					}
 				}
 			} else if(mode == QuotationMode.SHORT) {
 				if(PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
 					double openPriceValue = parent.getBodyLowPriceDoubleValue();
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
+					if(verifyOpenShortPrice(openPrice, last)) {
+						addPrices(openPrice);
+					}
 				} else if(PriceUtil.verifyPowerful_v10(current, parent, next) && !end.isEquals(current)) {
 					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(sub_points);
 					double openPriceValue = ms.getHighPrice();
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
+					if(verifyOpenShortPrice(openPrice, last)) {
+						addPrices(openPrice);
+					}
 				}
 			}
 		}
@@ -274,6 +288,14 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	
 	private boolean verifyLow(Klines k) {
 		return k.getDea() < 0 && k.getMacd() < 0;
+	}
+	
+	private boolean verifyOpenLongPrice(OpenPrice price, Klines last) {
+		return price.getPrice() <= last.getEma25();
+	}
+	
+	private boolean verifyOpenShortPrice(OpenPrice price, Klines last) {
+		return price.getPrice() >= last.getEma25();
 	}
 	
 	private void addPrices(OpenPrice price) {
