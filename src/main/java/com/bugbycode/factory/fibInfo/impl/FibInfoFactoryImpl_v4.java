@@ -16,6 +16,7 @@ import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
+import com.util.PriceComparator;
 import com.util.PriceUtil;
 
 /**
@@ -105,7 +106,8 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 		this.list.sort(kc);
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
-		
+
+		PriceUtil.calculateBollingerBands(list);
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
 		
@@ -195,9 +197,23 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 			return;
 		}
 		
-		double openPriceValue = last.getEma25();
+		QuotationMode mode = fibInfo.getQuotationMode();
+		
+		if(mode == QuotationMode.LONG) {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getLowerBand()), last.getLowerBand()));
+		} else {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getUpperBand()), last.getUpperBand()));
+		}
+		
+		double openPriceValue = last.getMiddleBand();
 		
 		addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+		
+		if(mode == QuotationMode.LONG) {
+			this.openPrices.sort(new PriceComparator(SortType.DESC));
+		} else {
+			this.openPrices.sort(new PriceComparator(SortType.ASC));
+		}
 	}
 	
 	private PositionSide getPositionSide() {

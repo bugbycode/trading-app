@@ -3508,4 +3508,56 @@ public class PriceUtil {
             k.setCvd(cumulativeCvd);
         }
     }
+    
+    /**
+     * 计算布林带信息
+     * @param klines
+     * @param period
+     */
+    public static void calculateBollingerBands(List<Klines> klines, int period) {
+        int size = klines.size();
+
+        // 确保我们有足够的 K 线数据
+        if (size < period) {
+            throw new RuntimeException("Not enough data points to calculate Bollinger Bands");
+        }
+
+        // 计算布林带
+        for (int i = size - period; i < size; i++) {
+            Klines kline = klines.get(i);
+            double sum = 0;
+            for (int j = i - period + 1; j <= i; j++) {
+                sum += Double.parseDouble(klines.get(j).getClosePrice());
+            }
+
+            // 计算中轨（SMA）
+            double middleBand = sum / period;
+            kline.setMiddleBand(middleBand);
+
+            // 计算标准差
+            double squaredSum = 0;
+            for (int j = i - period + 1; j <= i; j++) {
+                double closePrice = Double.parseDouble(klines.get(j).getClosePrice());
+                squaredSum += Math.pow(closePrice - middleBand, 2);
+            }
+            double standardDeviation = Math.sqrt(squaredSum / period);
+
+            // 计算上轨和下轨
+            double upperBand = middleBand + (2 * standardDeviation);
+            double lowerBand = middleBand - (2 * standardDeviation);
+
+            // 设置布林带的上下轨
+            kline.setUpperBand(upperBand);
+            kline.setLowerBand(lowerBand);
+        }
+    }
+    
+    /**
+     * 计算布林带信息
+     * @param klines
+     * @param period
+     */
+    public static void calculateBollingerBands(List<Klines> klines) {
+    	calculateBollingerBands(klines, 20);
+    }
 }
