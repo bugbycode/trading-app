@@ -121,7 +121,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
 		
-		//Klines last = PriceUtil.getLastKlines(list);
+		Klines last = PriceUtil.getLastKlines(list);
 		
 		PositionSide ps = getPositionSide();
 		
@@ -216,25 +216,33 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 				if(PriceUtil.verifyPowerful_v10(current, parent, next)) {
 					double openPriceValue = parent.getBodyHighPriceDoubleValue();
 					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					addPrices(openPrice);
+					if(!last.isEquals(current)) {
+						addPrices(openPrice);
+					}
 				} else if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) && !end.isEquals(current)) {
 					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(sub_points);
 					double openPriceValue = ms.getLowPrice();
 					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					addPrices(openPrice);
+					if(!last.isEquals(ms.getLow())) {
+						addPrices(openPrice);
+					}
 				}
 			} else if(mode == QuotationMode.SHORT) {
 				if(PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
 					double openPriceValue = parent.getBodyLowPriceDoubleValue();
 					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					addPrices(openPrice);
-				} else if(PriceUtil.verifyPowerful_v10(current, parent, next) && !end.isEquals(current)) {
+					if(!last.isEquals(current)) {
+						addPrices(openPrice);
+					}
+				} else if(PriceUtil.verifyPowerful_v10(current, parent, next)) {
 					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(sub_points);
 					double openPriceValue = ms.getHighPrice();
 					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					addPrices(openPrice);
+					if(!last.isEquals(ms.getHigh())) {
+						addPrices(openPrice);
+					}
 				}
 			}
 		}
