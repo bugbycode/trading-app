@@ -198,16 +198,24 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 		}
 		
 		QuotationMode mode = fibInfo.getQuotationMode();
-		/*
+		
+		FibCode openCode = FibCode.FIB0;
+		
 		if(mode == QuotationMode.LONG) {
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getLowerBand()), last.getLowerBand()));
+			openCode = fibInfo.getFibCode(last.getLowerBand());
+			//addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getLowerBand()), last.getLowerBand()));
 		} else {
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getUpperBand()), last.getUpperBand()));
-		}*/
+			openCode = fibInfo.getFibCode(last.getUpperBand());
+			//addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getUpperBand()), last.getUpperBand()));
+		}
 		
-		double openPriceValue = last.getMiddleBand();
+		double openPriceValue = fibInfo.getFibValue(openCode);
 		
-		addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+		addPrices(new OpenPriceDetails(openCode, openPriceValue));
+		
+		//double openPriceValue = last.getMiddleBand();
+		
+		//addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
@@ -236,11 +244,11 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return  k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
