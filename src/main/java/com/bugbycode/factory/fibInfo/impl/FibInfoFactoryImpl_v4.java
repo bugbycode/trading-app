@@ -198,12 +198,12 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 		}
 		
 		QuotationMode mode = fibInfo.getQuotationMode();
-		
+		/*
 		if(mode == QuotationMode.LONG) {
 			addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getLowerBand()), last.getLowerBand()));
 		} else {
 			addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getUpperBand()), last.getUpperBand()));
-		}
+		}*/
 		
 		double openPriceValue = last.getMiddleBand();
 		
