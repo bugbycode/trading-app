@@ -86,6 +86,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		this.list.sort(kc);
 		this.list_15m.sort(kc);
 		
+		PriceUtil.calculateBollingerBands(list);
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
 		
@@ -164,34 +165,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		if(fibInfo == null) {
 			return;
 		}
-		/*
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list);
-		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list));
-		}*/
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		for(int index = list.size() - 1; index > 1; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			Klines next = list.get(index - 2);
-			
-			if(current.lt(start)) {
-				break;
-			}
-			
-			if((mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v10(current, parent, next))
-					|| (mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v10(current, parent, next))) {
-				
-				double openPriceValue = current.getClosePriceDoubleValue();
-				OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-				addPrices(openPrice);
-				
-				break;
-			}
-		}
+		Klines last = PriceUtil.getLastKlines(list);
+		double openPriceValue = last.getMiddleBand();
 		
+		addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
