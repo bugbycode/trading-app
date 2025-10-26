@@ -23,6 +23,10 @@ public class MarketSentiment {
 	
 	private Klines minBodyHigh;
 	
+	private Klines minBodyLow;
+	
+	private Klines maxBodyHigh;
+	
 	private Klines maxDif;
 	
 	private Klines minDif;
@@ -52,12 +56,19 @@ public class MarketSentiment {
 		
 		high = PriceUtil.getMaxPriceKLine(list);
 		low = PriceUtil.getMinPriceKLine(list);
+		
 		highBody = PriceUtil.getMaxBodyHighPriceKLine(list);
 		lowBody = PriceUtil.getMinBodyLowPriceKLine(list);
+		
 		minBodyHigh = PriceUtil.getMinBodyHighPriceKLine(list);
 		maxBodyLow = PriceUtil.getMaxBodyLowPriceKLine(list);
+		
+		minBodyLow = PriceUtil.getMinBodyLowPriceKLine(list);
+		maxBodyHigh = PriceUtil.getMaxBodyHighPriceKLine(list);
+		
 		maxDif = PriceUtil.getMaxDifKLine(list);
 		minDif = PriceUtil.getMinDifKLine(list);
+		
 	}
 	
 	public Klines getMaxDif() {
@@ -92,6 +103,22 @@ public class MarketSentiment {
 		return minBodyHigh;
 	}
 	
+	public Klines getMinBodyLow() {
+		return minBodyLow;
+	}
+
+	public Klines getMaxBodyHigh() {
+		return maxBodyHigh;
+	}
+	
+	public double getMinBodyLowPrice() {
+		return minBodyLow == null ? 0 : minBodyLow.getBodyLowPriceDoubleValue();
+	}
+
+	public double getMaxBodyHighPrice() {
+		return maxBodyHigh == null ? 0 : maxBodyHigh.getBodyHighPriceDoubleValue();
+	}
+
 	public double getMaxBodyLowPrice() {
 		return maxBodyLow == null ? 0 : maxBodyLow.getBodyLowPriceDoubleValue();
 	}

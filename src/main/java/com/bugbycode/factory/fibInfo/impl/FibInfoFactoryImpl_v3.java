@@ -220,10 +220,8 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 					MarketSentiment ms = new MarketSentiment(sub_points);
 					double openPriceValue = ms.getMinBodyHighPrice();
 					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					//if(!last.isEquals(current)) {
-						addPrices(openPrice);
-					//}
-				} else if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) && !end.isEquals(current)) {
+					addPrices(openPrice);
+				} else if(PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
 					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(sub_points);
 					double openPriceValue = ms.getLowPrice();
@@ -285,11 +283,11 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
