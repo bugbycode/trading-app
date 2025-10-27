@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.factory.fibInfo.FibInfoFactory;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
@@ -37,6 +39,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
+	
+	private FibInfoFactory fibInfoFactory; 
 	
 	public PriceActionFactoryImpl(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -81,6 +85,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		if(CollectionUtils.isEmpty(list) || list.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
+		
+		this.fibInfoFactory = new FibInfoFactoryImpl(list, list, list_15m);
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
@@ -168,16 +174,20 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines last = PriceUtil.getLastKlines(list);
-		double openPriceValue = last.getMiddleBand();
-		
-		addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+		List<OpenPrice> priceList = this.fibInfoFactory.getOpenPrices();
+		if(!CollectionUtils.isEmpty(priceList)) {
+			for(OpenPrice p : priceList) {
+				addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(p.getPrice()), p.getPrice()));
+			}
+		}
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
+		
+		this.fibAfterKlines.addAll(this.fibInfoFactory.getFibAfterKlines());
 		
 	}
 
