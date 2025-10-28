@@ -2313,7 +2313,7 @@ public class KlinesServiceImpl implements KlinesService {
 		int size = list_15m.size();
 		
 		Klines current = list_15m.get(size - 1);
-		Klines parent = list_15m.get(size - 1);
+		Klines parent = list_15m.get(size - 2);
 		
 		Klines last = PriceUtil.getLastKlines(list_15m);
 		String pair = last.getPair();
