@@ -121,8 +121,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
 		
-		//Klines last = PriceUtil.getLastKlines(list);
-		
 		PositionSide ps = getPositionSide();
 		
 		Klines third = null;
@@ -201,40 +199,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		boolean split_price_bool = false;
+		Klines last = PriceUtil.getLastKlines(list);
 		
 		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
 		for(int index = list.size() - 1; index > 1; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
 			Klines next = list.get(index - 2);
+			
 			if(current.gt(end)) {
-				continue;
-			}
-			
-			if(((mode == QuotationMode.LONG && current.getDea() >= 0 && parent.getDea() < 0)
-					|| (mode == QuotationMode.SHORT && current.getDea() <= 0 && parent.getDea() > 0)) && !split_price_bool) {
-				split_price_bool = true;
-				List<Klines> points = PriceUtil.subList(parent, fibSubList);
-				MarketSentiment ms = new MarketSentiment(points);
-				
-				if(ms.isNotEmpty()) {
-					if(mode == QuotationMode.LONG) {
-						double lowPriceValue = ms.getLowPrice();
-						double bodyLowPrice = ms.getMinBodyLowPrice();
-						addPrices(new OpenPriceDetails(fibInfo.getFibCode(lowPriceValue), lowPriceValue));
-						addPrices(new OpenPriceDetails(fibInfo.getFibCode(bodyLowPrice), bodyLowPrice));
-					} else {
-						double highPriceValue = ms.getHighPrice();
-						double bodyHigPrice = ms.getMaxBodyHighPrice();
-						addPrices(new OpenPriceDetails(fibInfo.getFibCode(highPriceValue), highPriceValue));
-						addPrices(new OpenPriceDetails(fibInfo.getFibCode(bodyHigPrice), bodyHigPrice));
-					}
-				}
-			}
-			
-			if((mode == QuotationMode.LONG && current.getDea() > 0)
-					|| (mode == QuotationMode.SHORT && current.getDea() < 0)) {
 				continue;
 			}
 			
@@ -243,28 +216,24 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			if(mode == QuotationMode.LONG) {
-				if(PriceUtil.verifyPowerful_v10(current, parent, next)) {
+				if(PriceUtil.verifyPowerful_v10(current, parent, next) && !last.isEquals(current)) {
 					double openPriceValue = parent.getBodyHighPriceDoubleValue();
-					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					addPrices(openPrice);
-				} else if(PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+				} else if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) && !last.isEquals(current)) {
 					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(sub_points);
 					double openPriceValue = ms.getLowPrice();
-					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					addPrices(openPrice);
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
 				}
 			} else if(mode == QuotationMode.SHORT) {
-				if(PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
+				if(PriceUtil.verifyDecliningPrice_v10(current, parent, next) && !last.isEquals(current)) {
 					double openPriceValue = parent.getBodyLowPriceDoubleValue();
-					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					addPrices(openPrice);
-				} else if(PriceUtil.verifyPowerful_v10(current, parent, next)) {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+				} else if(PriceUtil.verifyPowerful_v10(current, parent, next) && !last.isEquals(current)) {
 					List<Klines> sub_points = PriceUtil.subList(current, fibSubList);
 					MarketSentiment ms = new MarketSentiment(sub_points);
 					double openPriceValue = ms.getHighPrice();
-					OpenPrice openPrice = new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue);
-					addPrices(openPrice);
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
 				}
 			}
 		}

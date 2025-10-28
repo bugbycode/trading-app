@@ -629,7 +629,7 @@ public class FibInfo {
 			} else if(price > this.getFibValue(FibCode.FIB382) && price <= this.getFibValue(FibCode.FIB236)) {// 0.382 ~ 0.236
 				code = FibCode.FIB236;
 			} else if(price > this.getFibValue(FibCode.FIB236) && price < this.getFibValue(FibCode.FIB0)) {// 0.236 ~ 0
-				code = FibCode.FIB236;
+				code = FibCode.FIB0;
 			}
 		} else {
 			if(price >= this.getFibValue(FibCode.FIB4_618)) {// 4.618
@@ -657,7 +657,7 @@ public class FibInfo {
 			} else if(price < this.getFibValue(FibCode.FIB382) && price >= this.getFibValue(FibCode.FIB236)) {// 0.382 ~ 0.236
 				code = FibCode.FIB236;
 			} else if(price < this.getFibValue(FibCode.FIB236) && price > this.getFibValue(FibCode.FIB0)) {// 0.236 ~ 0
-				code = FibCode.FIB236;
+				code = FibCode.FIB0;
 			}
 		}
 		
