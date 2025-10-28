@@ -2301,38 +2301,38 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void volumeMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h, List<Klines> list_15m) {
 		
-		if(CollectionUtils.isEmpty(list_1h) || list_1h.size() < 12) {
+		if(!(CollectionUtils.isEmpty(list_15m)) || list_15m.size() < 99) {
 			return;
 		}
 		
-		PriceUtil.calculateDeltaAndCvd(list_1h);
+		list_15m.sort(new KlinesComparator(SortType.ASC));
 		
-		//List<Klines> list_1h = PriceUtil.to1HFor15MKlines(list);
+		PriceUtil.calculateEMA_7_25_99(list_15m);
+		PriceUtil.calculateMACD(list_15m);
 		
-		Klines last = PriceUtil.getLastKlines(list_1h);
+		int size = list_15m.size();
+		
+		Klines current = list_15m.get(size - 1);
+		Klines parent = list_15m.get(size - 1);
+		
+		Klines last = PriceUtil.getLastKlines(list_15m);
 		String pair = last.getPair();
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
-		
-		/*
-		int minute = DateFormatUtil.getMinute(last.getEndTime());
-		if(minute != 59) {
-			return;
-		}*/
 		
 		String subject = "";
 		String text = last.toString();
 		
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		if(PriceUtil.isFall_v3(list_1h) && PriceUtil.isRelease(list_1h)) {//下跌
-			
-			subject = String.format("%s永续合约放量下跌 %s", pair, dateStr);
-			
-		} else if(PriceUtil.isRise_v3(list_1h) && PriceUtil.isRelease(list_1h)) { //上涨
-			
-			subject = String.format("%s永续合约放量上涨 %s", pair, dateStr);
-			
+		if(PriceUtil.verifyDecliningPrice_v11(current, parent) && current.getEma25() < current.getEma99()) {
+			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
+		} else if(PriceUtil.verifyPowerful_v11(current, parent) && current.getEma25() > current.getEma99()) {
+			subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
+		} else if(current.getDea() > 0 && parent.getEma7() <= parent.getEma99() && current.getEma7() > current.getEma99()) {
+			subject = String.format("%s永续合约买入信号 %s", pair, dateStr);
+		} else if(current.getDea() < 0 && parent.getEma7() >= parent.getEma99() && current.getEma7() < current.getEma99()) {
+			subject = String.format("%s永续合约卖出信号 %s", pair, dateStr);
 		}
 		
 		if(StringUtil.isNotEmpty(subject)) {
@@ -2342,29 +2342,8 @@ public class KlinesServiceImpl implements KlinesService {
 				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 					continue;
 				}
-				
-				sendEmail(u, subject, text, u.getUsername());
-			}
-		}
-		
-		subject = "";
-		
-		int minute = DateFormatUtil.getMinute(last.getEndTime());
-		if(minute != 59) {
-			return;
-		}
-		
-		if(PriceUtil.isPanicSell(list_1h)) {
-			subject = String.format("%s永续合约恐慌抛售 %s", pair, dateStr);
-		} else if(PriceUtil.isGreedyBuy(list_1h)) {
-			subject = String.format("%s永续合约疯狂购买 %s", pair, dateStr);
-		}
-		
-		if(StringUtil.isNotEmpty(subject)) {
-			List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
-			for(User u : userList) {
-				
-				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+
+				if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 					continue;
 				}
 				
