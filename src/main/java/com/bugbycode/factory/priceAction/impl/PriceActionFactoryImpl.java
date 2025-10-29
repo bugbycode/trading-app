@@ -5,17 +5,13 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
-import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
-import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceComparator;
@@ -39,8 +35,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
-	
-	private FibInfoFactory fibInfoFactory; 
 	
 	public PriceActionFactoryImpl(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -85,8 +79,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		if(CollectionUtils.isEmpty(list) || list.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
-		
-		this.fibInfoFactory = new FibInfoFactoryImpl(list, list, list_15m);
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
@@ -174,20 +166,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		List<OpenPrice> priceList = this.fibInfoFactory.getOpenPrices();
-		if(!CollectionUtils.isEmpty(priceList)) {
-			for(OpenPrice p : priceList) {
-				addPrices(new OpenPriceDetails(this.fibInfo.getFibCode(p.getPrice()), p.getPrice()));
-			}
-		}
-		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
-		
-		this.fibAfterKlines.addAll(this.fibInfoFactory.getFibAfterKlines());
 		
 	}
 
@@ -217,12 +200,12 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private boolean verifyLow(Klines k) {
 		return k.getDea() < 0 && k.getMacd() < 0;
 	}
-	
+	/*
 	private void addPrices(OpenPrice price) {
 		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price.getPrice()))) {
 			if(!PriceUtil.contains(openPrices, price)) {
 				openPrices.add(price);
 			}
 		}
-	}
+	}*/
 }
