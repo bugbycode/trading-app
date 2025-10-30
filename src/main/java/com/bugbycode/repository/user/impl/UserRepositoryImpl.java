@@ -100,6 +100,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("breakthroughMonitor", user.getBreakthroughMonitor());
 		update.set("pairPolicySelected", user.getPairPolicySelected());
 		update.set("monitorPolicyType", user.getMonitorPolicyType());
+		update.set("monitorfibLevel", user.getMonitorfibLevel());
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 

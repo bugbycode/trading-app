@@ -483,7 +483,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(code.lt(u.getFibLevelType().getLevelCode())) {
+					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
 						continue;
 					}
 					
@@ -585,7 +585,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(code.lt(u.getFibLevelType().getLevelCode())) {
+					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
 						continue;
 					}
 

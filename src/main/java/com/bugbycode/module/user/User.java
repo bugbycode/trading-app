@@ -99,7 +99,9 @@ public class User implements UserDetails {
 	
 	private int smtpIndex = 0;//smtp账号索引 发送邮件时轮换认证使用
 	
-	private int fibLevel = 0;//价格回撤级别
+	private int fibLevel = 0;//价格回撤级别（自动交易使用）
+	
+	private int monitorfibLevel = 0;//价格回撤级别（行情监控使用）
 	
 	private long tradeNumber = 60;//每分钟成交笔数限制（用来过滤不活跃的交易对）自动交易
 	
@@ -393,6 +395,7 @@ public class User implements UserDetails {
 		this.setBreakthroughMonitor(user.getBreakthroughMonitor());
 		this.setPairPolicySelected(user.getPairPolicySelected());
 		this.setMonitorPolicyType(user.getMonitorPolicyType());
+		this.setMonitorfibLevel(user.getMonitorfibLevel());
 	}
 
 	public String getSmtpUser2() {
@@ -453,6 +456,18 @@ public class User implements UserDetails {
 	
 	public FibLevel getFibLevelType() {
 		return FibLevel.valueOf(this.fibLevel);
+	}
+
+	public int getMonitorfibLevel() {
+		return monitorfibLevel;
+	}
+
+	public void setMonitorfibLevel(int monitorfibLevel) {
+		this.monitorfibLevel = monitorfibLevel;
+	}
+	
+	public FibLevel getMonitorFibLevelType() {
+		return FibLevel.valueOf(this.monitorfibLevel);
 	}
 
 	public long getTradeNumber() {
