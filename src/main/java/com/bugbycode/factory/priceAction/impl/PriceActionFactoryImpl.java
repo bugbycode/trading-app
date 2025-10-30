@@ -5,13 +5,16 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
+import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceComparator;
@@ -163,8 +166,31 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		if(fibInfo == null) {
 			return;
 		}
+
+		FibInfoFactoryImpl fibInfoFactory = new FibInfoFactoryImpl(list_15m, list, list_15m);
+		if(!(fibInfoFactory.isLong() || fibInfoFactory.isShort())) {
+			return;
+		}
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
+		
+		List<OpenPrice> openPriceList = fibInfoFactory.getOpenPrices();
+
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v18(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v18(current, parent))) {
+				if(current.gte(fibInfoFactory.getStart())) {
+					for(OpenPrice p : openPriceList) {
+						if(p.getCode().gte(FibCode.FIB5)) {
+							addPrices(new OpenPriceDetails(fibInfo.getFibCode(p.getPrice()), p.getPrice()));
+						}
+					}
+				}
+				break;
+			}
+		}
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
@@ -200,12 +226,12 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private boolean verifyLow(Klines k) {
 		return k.getDea() < 0 && k.getMacd() < 0;
 	}
-	/*
+	
 	private void addPrices(OpenPrice price) {
 		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price.getPrice()))) {
 			if(!PriceUtil.contains(openPrices, price)) {
 				openPrices.add(price);
 			}
 		}
-	}*/
+	}
 }

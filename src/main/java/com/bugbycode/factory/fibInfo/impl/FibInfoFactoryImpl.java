@@ -247,5 +247,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			openPrices.add(price);
 		}
 	}
+
+	public Klines getStart() {
+		return start;
+	}
+
+	public Klines getEnd() {
+		return end;
+	}
 	
 }
