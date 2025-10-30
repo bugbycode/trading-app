@@ -22,6 +22,7 @@ import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.util.PriceUtil;
+import com.util.StringUtil;
 
 /**
  * 历史合约持仓量信息同步任务
@@ -67,7 +68,7 @@ public class OpenInterestHistTaskSync {
 						.queryParam("period", Inerval.INERVAL_15M.getDescption())
 						.queryParam("limit", 1);
 				
-				String url = uriBuilder.toUriString();
+				String url = StringUtil.urlDecoder(uriBuilder.toUriString());
 				//
 				String result = restTemplate.getForObject(url, String.class);
 				
