@@ -187,6 +187,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 							addPrices(new OpenPriceDetails(fibInfo.getFibCode(p.getPrice()), p.getPrice()));
 						}
 					}
+					this.fibAfterKlines.addAll(fibInfoFactory.getFibAfterKlines());
 				}
 				break;
 			}
