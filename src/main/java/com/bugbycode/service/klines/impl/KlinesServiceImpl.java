@@ -1323,7 +1323,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl(list_1h, list_4h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl(list_15m, list_1h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
