@@ -204,6 +204,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		FibCode[] codes = FibCode.values();
 		for(FibCode code : codes) {
+			if(code == FibCode.FIB66) {
+				continue;
+			}
 			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code)));
 		}
 		
