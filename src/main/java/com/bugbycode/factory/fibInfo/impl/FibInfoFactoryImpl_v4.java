@@ -201,17 +201,20 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
+			if(current.lt(start)) {
+				break;
+			}
 			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent))
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
-				fibEnd = current;
-				break;
+				if(fibEnd == null) {
+					fibEnd = current;
+				}
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma7()), current.getEma7()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma25()), current.getEma25()));
 			}
 		}
 		
 		if(fibEnd != null) {
-			
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(fibEnd.getEma7()), fibEnd.getEma7()));
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(fibEnd.getEma25()), fibEnd.getEma25()));
 			
 			if(fibEnd.gte(end)) {
 				Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
