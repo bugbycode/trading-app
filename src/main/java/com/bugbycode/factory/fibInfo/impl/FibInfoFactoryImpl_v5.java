@@ -196,6 +196,8 @@ public class FibInfoFactoryImpl_v5 implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
@@ -207,8 +209,8 @@ public class FibInfoFactoryImpl_v5 implements FibInfoFactory {
 			if(current.lt(start)) {
 				break;
 			}
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
+			if(((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) && !current.isEquals(last)) {
 				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma7()), current.getEma7()));
 				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma25()), current.getEma25()));
 			}
