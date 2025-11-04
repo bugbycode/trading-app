@@ -244,11 +244,11 @@ public class FibInfoFactoryImpl_v5 implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getEma25() > current.getEma99() && current.getEma99() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getEma25() < current.getEma99() && current.getEma99() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
