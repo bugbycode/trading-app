@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
@@ -167,30 +166,17 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			return;
 		}
 
-		FibInfoFactoryImpl fibInfoFactory = new FibInfoFactoryImpl(list_15m, list, list_15m);
-		if(!(fibInfoFactory.isLong() || fibInfoFactory.isShort())) {
-			return;
-		}
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		List<OpenPrice> openPriceList = fibInfoFactory.getOpenPrices();
-
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v18(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v18(current, parent))) {
-				if(current.gte(fibInfoFactory.getStart())) {
-					for(OpenPrice p : openPriceList) {
-						if(p.getCode().gte(FibCode.FIB5)) {
-							addPrices(new OpenPriceDetails(fibInfo.getFibCode(p.getPrice()), p.getPrice()));
-						}
-					}
-					this.fibAfterKlines.addAll(fibInfoFactory.getFibAfterKlines());
-				}
-				break;
-			}
+		Klines last = PriceUtil.getLastKlines(list);
+		
+		addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getEma25()), last.getEma25()));
+		
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(last, this.list_15m);
+		if(fibAfterFlag != null) {
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -213,19 +199,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getEma7() > k.getEma25() && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getEma7() < k.getEma25() && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
