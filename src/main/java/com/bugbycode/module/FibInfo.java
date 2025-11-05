@@ -2,6 +2,7 @@ package com.bugbycode.module;
 
 import java.util.List;
 
+import com.bugbycode.module.price.OpenPrice;
 import com.util.PriceUtil;
 
 public class FibInfo {
@@ -566,6 +567,39 @@ public class FibInfo {
 			}
 		}
 		
+		return result;
+	}
+	
+	/**
+	 * 校验当前点位价格是否可开仓
+	 * @param openPrice 开仓点位
+	 * @param currentPrice 当前价格
+	 * @return
+	 */
+	public boolean verifyOpenPrice(OpenPrice openPrice, double currentPrice) {
+		boolean result = false;
+		QuotationMode qm = this.getQuotationMode();
+		FibCode next = getNext(openPrice.getCode());
+		double nextPrice = this.getFibValue(next);
+		if((qm == QuotationMode.LONG && currentPrice <= nextPrice) 
+				|| (qm == QuotationMode.SHORT && currentPrice >= nextPrice) ) {
+			result = true;
+		}
+		return result;
+	}
+	
+	public FibCode getNext(FibCode openCode) {
+		FibCode result = FibCode.FIB0;
+		FibCode codes[] = FibCode.values();
+		for(int index = 0; index < codes.length; index++) {
+			FibCode code = codes[index];
+			if(code == openCode && code != FibCode.FIB0) {
+				result = codes[index + 1];
+				if(openCode == FibCode.FIB66 || openCode == FibCode.FIB786) {
+					result = codes[index + 2];
+				}
+			}
+		}
 		return result;
 	}
 
