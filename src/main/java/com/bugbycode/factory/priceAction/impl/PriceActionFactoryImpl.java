@@ -5,16 +5,17 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
-import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceComparator;
 import com.util.PriceUtil;
@@ -31,10 +32,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private FibInfo fibInfo;
 	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
-	
-	private Klines start = null;
-	
-	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
 	
@@ -93,90 +90,40 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
 		
-		PositionSide ps = getPositionSide();
-		if(ps == PositionSide.DEFAULT) {
+		FibInfoFactoryImpl factory = new FibInfoFactoryImpl(list, list, list_15m);
+		if(!(factory.isLong() || factory.isShort())) {
 			return;
 		}
 		
-		Klines third = null;
-		Klines second = null;
-		Klines first = null;
-		
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			if(ps == PositionSide.LONG) {// low - high - low
-				if(third == null) {
-					if(verifyLow(current)) {
-						third = current;
-					}
-				} else if(second == null) {
-					if(verifyHigh(current)) {
-						second = current;
-					}
-				} else if(first == null) {
-					if(verifyLow(current)) {
-						first = current;
-						break;
-					}
-				}
-			} else if(ps == PositionSide.SHORT) { // high - low - high
-				if(third == null) {
-					if(verifyHigh(current)) {
-						third = current;
-					}
-				} else if(second == null) {
-					if(verifyLow(current)) {
-						second = current;
-					}
-				} else if(first == null) {
-					if(verifyHigh(current)) {
-						first = current;
-						break;
-					}
-				}
-			}
-		}
-		
-		if(first == null || second == null || third == null) {
+		FibInfo parentFibInfo = factory.getFibInfo();
+		List<Klines> parentAfterKlines = factory.getFibAfterKlines();
+		if(CollectionUtils.isEmpty(parentAfterKlines)) {
 			return;
 		}
 		
-		List<Klines> firstSubList = PriceUtil.subList(first, third, list);
-		List<Klines> secondSubList = null;
-		Klines startAfter = null;
-		if(ps == PositionSide.LONG) {
-			start = PriceUtil.getMaxPriceKLine(firstSubList);
-			startAfter = PriceUtil.getAfterKlines(start, list);
-			if(startAfter != null) {
-				secondSubList = PriceUtil.subList(startAfter, third, list);
-				end = PriceUtil.getMinPriceKLine(secondSubList);
-				fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
-			}
-		} else if(ps == PositionSide.SHORT) {
-			start = PriceUtil.getMinPriceKLine(firstSubList);
-			startAfter = PriceUtil.getAfterKlines(start, list);
-			if(startAfter != null) {
-				secondSubList = PriceUtil.subList(start, third, list);
-				end = PriceUtil.getMaxPriceKLine(secondSubList);
-				fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
-			}
-		}
+		QuotationMode parentMode = parentFibInfo.getQuotationMode();
 		
-		if(fibInfo == null) {
-			return;
+		MarketSentiment ms = new MarketSentiment(parentAfterKlines);
+		Klines fibEnd = null;
+		if(parentMode == QuotationMode.LONG) {
+			fibEnd = ms.getLow();
+			this.fibInfo = new FibInfo(parentFibInfo.getFibValue(FibCode.FIB0), ms.getLowPrice(), parentFibInfo.getDecimalPoint(), FibLevel.LEVEL_0);
+		} else {
+			fibEnd = ms.getHigh();
+			this.fibInfo = new FibInfo(parentFibInfo.getFibValue(FibCode.FIB0), ms.getHighPrice(), parentFibInfo.getDecimalPoint(), FibLevel.LEVEL_0);
 		}
-
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines last = PriceUtil.getLastKlines(list);
-		
-		addPrices(new OpenPriceDetails(fibInfo.getFibCode(last.getEma25()), last.getEma25()));
-		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(last, this.list_15m);
-		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+		//Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+		//if(fibAfterFlag != null) {
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibEnd, this.list_15m));
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+		//}
+		
+		List<OpenPrice> openPriceList = factory.getOpenPrices();
+		for(OpenPrice p : openPriceList) {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(p.getPrice()), p.getPrice()));
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -185,33 +132,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		}
 		
-	}
-
-	private PositionSide getPositionSide() {
-		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list);
-		if(verifyLong(last)) {
-			ps = PositionSide.LONG;
-		} else if(verifyShort(last)) {
-			ps = PositionSide.SHORT;
-		}
-		return ps;
-	}
-	
-	private boolean verifyLong(Klines current) {
-		return current.getMacd() > 0;
-	}
-	
-	private boolean verifyShort(Klines current) {
-		return current.getMacd() < 0;
-	}
-	
-	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
-	}
-	
-	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
