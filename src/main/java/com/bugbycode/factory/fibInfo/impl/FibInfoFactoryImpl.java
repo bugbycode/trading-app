@@ -213,7 +213,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 					) {
 				if(fibEnd == null) {
 					fibEnd = current;
+					if(fibEnd.lt(end)) {
+						fibEnd = end;
+					}
 				}
+				
 				List<Klines> points = PriceUtil.subList(current, fibEnd, list);
 				MarketSentiment ms = new MarketSentiment(points);
 				if(mode == QuotationMode.LONG) {
@@ -237,7 +241,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
 		
-		if(fibEnd == null || fibEnd.lt(end)) {
+		if(fibEnd == null) {
 			fibEnd = end;
 		}
 		
