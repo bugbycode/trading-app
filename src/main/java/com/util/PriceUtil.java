@@ -1976,6 +1976,16 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势 当ema25小于ema99时判定为颓势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v19(Klines current, Klines parent) {
+		return current.getEma25() < current.getEma99() && parent.getEma25() >= parent.getEma99() && parent.getEma99() > 0;
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -2141,6 +2151,16 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v18(Klines current,Klines parent) {
 		return current.getDea() > 0 && parent.getDea() <= 0;
+	}
+	
+	/**
+	 * 判断是否出现强势 当ema25大于ema99时判定为强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v19(Klines current, Klines parent) {
+		return current.getEma25() > current.getEma99() && parent.getEma25() <= parent.getEma99() && parent.getEma99() > 0;
 	}
 	
 	/**

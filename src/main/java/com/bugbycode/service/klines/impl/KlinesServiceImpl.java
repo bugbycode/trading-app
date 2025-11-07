@@ -2313,10 +2313,10 @@ public class KlinesServiceImpl implements KlinesService {
 		//PriceUtil.calculateMACD(list_15m);
 		PriceUtil.calculateEMA_7_25_99(list_1h);
 		
-		//int size = list_1h.size();
+		int size = list_1h.size();
 		
-		//Klines current = list_1h.get(size - 1);
-		//Klines parent = list_1h.get(size - 2);
+		Klines current = list_1h.get(size - 1);
+		Klines parent = list_1h.get(size - 2);
 		
 		Klines last = PriceUtil.getLastKlines(list_1h);
 		String pair = last.getPair();
@@ -2328,13 +2328,15 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		if(last.getEma25() > last.getEma99() && PriceUtil.isLong_v2(last.getEma25(), list_15m)) {//买入信号
+		//if(last.getEma25() > last.getEma99() && PriceUtil.isLong_v2(last.getEma25(), list_15m)) {
+		if(PriceUtil.verifyPowerful_v19(current, parent))	{
 			
-			subject = String.format("%s永续合约买入信号 %s", pair, dateStr);
+			subject = String.format("%s永续合约开始上涨 %s", pair, dateStr);
 			
-		} else if(last.getEma25() < last.getEma99() && PriceUtil.isShort_v2(last.getEma25(), list_15m)) {//卖出信号
+		//} else if(last.getEma25() < last.getEma99() && PriceUtil.isShort_v2(last.getEma25(), list_15m)) {
+		} else if(PriceUtil.verifyDecliningPrice_v19(current, parent)) {	
 			
-			subject = String.format("%s永续合约卖出信号 %s", pair, dateStr);
+			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 			
 		}
 		
