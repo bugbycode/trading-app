@@ -207,9 +207,14 @@ public class FibInfoFactoryImpl_v6 implements FibInfoFactory {
 			return;
 		}
 		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		List<OpenPrice> openPriceList = factory.getOpenPrices();
 		for(OpenPrice p : openPriceList) {
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(p.getPrice()), p.getPrice()));
+			if((mode == QuotationMode.LONG && p.getPrice() <= last.getEma25()) 
+					|| (mode == QuotationMode.SHORT && p.getPrice() >= last.getEma25())) {
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(p.getPrice()), p.getPrice()));
+			}
 		}
 		
 		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
