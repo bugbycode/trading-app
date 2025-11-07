@@ -2306,18 +2306,19 @@ public class KlinesServiceImpl implements KlinesService {
 		if(CollectionUtils.isEmpty(list_15m) || list_15m.size() < 99) {
 			return;
 		}
-		
+		list_1h.sort(new KlinesComparator(SortType.ASC));
 		list_15m.sort(new KlinesComparator(SortType.ASC));
 		
-		PriceUtil.calculateEMA_7_25_99(list_15m);
-		PriceUtil.calculateMACD(list_15m);
+		//PriceUtil.calculateEMA_7_25_99(list_15m);
+		//PriceUtil.calculateMACD(list_15m);
+		PriceUtil.calculateEMA_7_25_99(list_1h);
 		
-		int size = list_15m.size();
+		//int size = list_1h.size();
 		
-		Klines current = list_15m.get(size - 1);
-		Klines parent = list_15m.get(size - 2);
+		//Klines current = list_1h.get(size - 1);
+		//Klines parent = list_1h.get(size - 2);
 		
-		Klines last = PriceUtil.getLastKlines(list_15m);
+		Klines last = PriceUtil.getLastKlines(list_1h);
 		String pair = last.getPair();
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
@@ -2327,6 +2328,17 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String dateStr = DateFormatUtil.format(new Date());
 		
+		if(last.getEma25() > last.getEma99() && PriceUtil.isLong_v2(last.getEma25(), list_15m)) {//买入信号
+			
+			subject = String.format("%s永续合约买入信号 %s", pair, dateStr);
+			
+		} else if(last.getEma25() < last.getEma99() && PriceUtil.isShort_v2(last.getEma25(), list_15m)) {//卖出信号
+			
+			subject = String.format("%s永续合约卖出信号 %s", pair, dateStr);
+			
+		}
+		
+		/*
 		if(PriceUtil.verifyDecliningPrice_v11(current, parent) && current.getEma25() < current.getEma99()) {
 			subject = String.format("%s永续合约开始下跌 %s", pair, dateStr);
 		} else if(PriceUtil.verifyPowerful_v11(current, parent) && current.getEma25() > current.getEma99()) {
@@ -2335,7 +2347,7 @@ public class KlinesServiceImpl implements KlinesService {
 			subject = String.format("%s永续合约买入信号 %s", pair, dateStr);
 		} else if(current.getDea() < 0 && parent.getEma7() >= parent.getEma99() && current.getEma7() < current.getEma99()) {
 			subject = String.format("%s永续合约卖出信号 %s", pair, dateStr);
-		}
+		}*/
 		
 		if(StringUtil.isNotEmpty(subject)) {
 			List <User> userList = userRepository.queryByVolumeMonitorStatus(VolumeMonitorStatus.OPEN);
