@@ -1986,6 +1986,16 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势 当dif小于0时判定为颓势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v20(Klines current, Klines parent) {
+		return current.getDif() < 0 && parent.getDif() >= 0;
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -2161,6 +2171,16 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v19(Klines current, Klines parent) {
 		return current.getEma25() > current.getEma99() && parent.getEma25() <= parent.getEma99() && parent.getEma99() > 0;
+	}
+	
+	/**
+	 * 判断是否出现颓势 当dif大于0时判定为强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v20(Klines current, Klines parent) {
+		return current.getDif() > 0 && parent.getDif() <= 0;
 	}
 	
 	/**

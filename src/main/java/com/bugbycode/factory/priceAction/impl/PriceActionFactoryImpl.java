@@ -187,6 +187,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			}
 		}
 		
+		addPrices(new OpenPriceDetails(FibCode.FIB0, fibInfo.getFibValue(FibCode.FIB0)));
+		
 		if(fibEnd != null) {
 			Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
 			if(fibAfterFlag != null) {

@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -196,18 +197,22 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			
-			if(current.lt(start)) {
-				break;
-			}
-			
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v19(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v19(current, parent))) {
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma7()), current.getEma7()));
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma25()), current.getEma25()));
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		
+		for(int index = fibSubList.size() - 1; index > 0; index--) {
+			Klines current = fibSubList.get(index);
+			Klines parent = fibSubList.get(index - 1);
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v20(current, parent)) 
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v20(current, parent))) {
+				List<Klines> points = PriceUtil.subList(current, fibSubList);
+				MarketSentiment ms = new MarketSentiment(points);
+				if(mode == QuotationMode.LONG) {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice()));
+				} else {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice()));
+				}
 			}
 		}
 		
@@ -247,11 +252,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99() && k.getDea() > 0 && k.getEma99() > 0;
+		return k.getDea() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99() && k.getDea() < 0 && k.getEma99() > 0;
+		return k.getDea() < 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
