@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -167,6 +168,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		}
 
 		
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		MarketSentiment ms = new MarketSentiment(fibSubList);
+		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		Klines fibEnd = null;
@@ -177,14 +181,22 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			if(current.lte(end)) {
 				break;
 			}
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v19(current, parent)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v19(current, parent))) {
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v20(current, parent)) 
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v20(current, parent))) {
 				if(fibEnd == null) {
 					fibEnd = current;
 				}
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma7()), current.getEma7()));
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma25()), current.getEma25()));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getClosePriceDoubleValue()), current.getClosePriceDoubleValue()));
+				//addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma7()), current.getEma7()));
+				//addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma25()), current.getEma25()));
+				break;
 			}
+		}
+		
+		if(mode == QuotationMode.SHORT) {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice()));
+		} else {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice()));
 		}
 		
 		addPrices(new OpenPriceDetails(FibCode.FIB0, fibInfo.getFibValue(FibCode.FIB0)));
@@ -226,11 +238,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99() && k.getDea() > 0 && k.getEma99() > 0;
+		return k.getDea() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99() && k.getDea() < 0 && k.getEma99() > 0;
+		return k.getDea() < 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
