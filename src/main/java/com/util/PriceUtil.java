@@ -2470,6 +2470,90 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 当前价格判断是否可做多
+	 * @param list
+	 * @return
+	 */
+	public static boolean isLong_v5(List<Klines> list) {
+		
+		boolean result = false;
+		
+		if(!CollectionUtils.isEmpty(list) && list.size() >= 5) {
+			
+			int index = list.size() - 1;
+			Klines k0 = list.get(index);
+			Klines k1 = list.get(index -1);
+			Klines k2 = list.get(index -2);
+			Klines k3 = list.get(index -3);
+			Klines k4 = list.get(index -4);
+			
+			result = isPowerFulKlines(k0) && (isDeclinKlines(k1) || isDeclinKlines(k2) || isDeclinKlines(k3) || isDeclinKlines(k4));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 当前价格判断是否可做空
+	 * @param list
+	 * @return
+	 */
+	public static boolean isShort_v5(List<Klines> list) {
+		
+		boolean result = false;
+		
+		if(!CollectionUtils.isEmpty(list) && list.size() >= 5) {
+			
+			int index = list.size() - 1;
+			Klines k0 = list.get(index);
+			Klines k1 = list.get(index -1);
+			Klines k2 = list.get(index -2);
+			Klines k3 = list.get(index -3);
+			Klines k4 = list.get(index -4);
+			
+			result = isDecliningKlines(k0) && (isPowerKlines(k1) || isPowerKlines(k2) || isPowerKlines(k3) || isPowerKlines(k4));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * eam7 >= eam25
+	 * @param k
+	 * @return
+	 */
+	public static boolean isPowerKlines(Klines k) {
+		return k.getEma7() >= k.getEma25();
+	}
+	
+	/**
+	 * ema7 <= ema25
+	 * @param k
+	 * @return
+	 */
+	public static boolean isDeclinKlines(Klines k) {
+		return k.getEma7() <= k.getEma25();
+	}
+	
+	/**
+	 * ema7 > ema25
+	 * @param k
+	 * @return
+	 */
+	public static boolean isPowerFulKlines(Klines k) {
+		return k.getEma7() > k.getEma25();
+	}
+	
+	/**
+	 * ema7 < ema25
+	 * @param k
+	 * @return
+	 */
+	public static boolean isDecliningKlines(Klines k) {
+		return k.getEma7() < k.getEma25();
+	}
+	
+	/**
 	 * 判断是否可做多
 	 * @param price 价格
 	 * @param list k线
