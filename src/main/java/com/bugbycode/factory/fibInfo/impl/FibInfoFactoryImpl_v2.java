@@ -99,7 +99,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 50 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 99 || list_trend.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
