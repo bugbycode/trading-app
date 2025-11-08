@@ -91,6 +91,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
 		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
 		
@@ -193,13 +195,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			}
 		}
 		
-		if(mode == QuotationMode.SHORT) {
+		if(mode == QuotationMode.SHORT && last.getDif() > 0) {
 			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice()));
-		} else {
+			addPrices(new OpenPriceDetails(FibCode.FIB0, fibInfo.getFibValue(FibCode.FIB0)));
+		} else if(mode == QuotationMode.LONG && last.getDif() < 0) {
 			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice()));
+			addPrices(new OpenPriceDetails(FibCode.FIB0, fibInfo.getFibValue(FibCode.FIB0)));
 		}
 		
-		addPrices(new OpenPriceDetails(FibCode.FIB0, fibInfo.getFibValue(FibCode.FIB0)));
 		
 		if(fibEnd != null) {
 			Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
