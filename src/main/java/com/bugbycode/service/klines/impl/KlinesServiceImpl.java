@@ -2324,6 +2324,7 @@ public class KlinesServiceImpl implements KlinesService {
 		//PriceUtil.calculateEMA_7_25_99(list_15m);
 		//PriceUtil.calculateMACD(list_15m);
 		PriceUtil.calculateEMA_7_25_99(list_1h);
+		PriceUtil.calculateMACD(list_1h);
 		
 		int size = list_1h.size();
 		
