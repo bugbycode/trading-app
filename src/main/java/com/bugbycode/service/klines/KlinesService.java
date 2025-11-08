@@ -68,22 +68,20 @@ public interface KlinesService {
 	public List<Klines> continuousKlines4H(String pair,Date now,int limit,QUERY_SPLIT split);
 	
 	/**
-	 * 合约做多
-	 * @param tradeType 指标类型
+	 * 合约做多 (盘整区)
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterLowKlines 回撤之后的最低k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openLong(AutoTradeType tradeType, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	public void openLong(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
-	 * 合约做空
-	 * @param tradeType 指标类型
+	 * 合约做空 (盘整区)
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterHighKlines 回撤之后的最高k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
 	 */
-	public void openShort(AutoTradeType tradeType, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	public void openShort(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 合约做多

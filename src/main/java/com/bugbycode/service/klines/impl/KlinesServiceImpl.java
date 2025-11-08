@@ -19,6 +19,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.factory.area.AreaFibInfoFactory;
+import com.bugbycode.factory.area.impl.AreaFibInfoFactoryImpl;
+import com.bugbycode.factory.area.impl.ParentAreaFibInfoFactoryImpl;
 import com.bugbycode.factory.ema.EmaTradingFactory;
 import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
@@ -65,7 +68,6 @@ import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
-import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
@@ -225,11 +227,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openLong(AutoTradeType tradeType, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
-		
-		if(!(tradeType == AutoTradeType.AREA_INDEX || tradeType == AutoTradeType.FIB_RET)) {
-			return;
-		}
+	public void openLong(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit) {
 		
 		if(fibInfo == null) {
 			return;
@@ -240,8 +238,6 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		FibCode[] codes = FibCode.values();
-		
 		//开盘、收盘、最低、最高价格
 		double closePrice = hitKline.getClosePriceDoubleValue();
 		//double openPrice = hitKline.getOpenPrice();
@@ -249,35 +245,39 @@ public class KlinesServiceImpl implements KlinesService {
 		//double hightPrice = hitKline.getHighPrice();
 		double currentPrice = closePrice;
 		
-		//多头行情做多 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
-		for(int offset = 0;offset < codes.length;offset++) {
+		for(int index = 0;index < openPrices.size(); index++) {
 			
-			FibCode code = codes[offset];//当前斐波那契点位
+			OpenPrice openPrice = openPrices.get(index);
+			double price = openPrice.getPrice();
 			
-			if(code.isTrade() && code.gte(fibInfo.getLevel().getStartFibCode()) && code.lte(fibInfo.getEndCode()) 
-					&& PriceUtil.isLong_v2(fibInfo.getFibValue(code), klinesList_hit)
-					//&& (!PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset) || fibInfo.getEndCode() != FibCode.FIB4_618)
-					&& !PriceUtil.isObsoleteLong(fibInfo,afterLowKlines,codes,offset)
-					&& !PriceUtil.isTraded(code, fibInfo)) {
+			FibCode code = openPrice.getCode();//当前斐波那契点位
+			
+			int offset = fibInfo.getFibCodeIndex(code);
+			
+			if( //(PriceUtil.isLong(price, klinesList_hit) || PriceUtil.isLong_v3(price, klinesList_hit))
+					PriceUtil.isLong_v2(price, klinesList_hit)
+					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
+					&& !PriceUtil.isTraded(price, fibInfo)
+					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
+					) {
 				
 				//市价做多
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, tradeType, fibInfo.getDecimalPoint()));
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, offset, fibInfo, AutoTradeType.AREA_INDEX, fibInfo.getDecimalPoint()));
 				
 				//
-				List<User> userList = null;
-				if(tradeType == AutoTradeType.AREA_INDEX) {
-					userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
-				} else {
-					userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
-				}
+				List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
+					
+					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+						continue;
+					}
 					
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
 					
-					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
 						continue;
 					}
 					
@@ -328,11 +328,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 	}
 	
-	public void openShort(AutoTradeType tradeType, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
-
-		if(!(tradeType == AutoTradeType.AREA_INDEX || tradeType == AutoTradeType.FIB_RET)) {
-			return;
-		}
+	public void openShort(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit) {
 		
 		if(fibInfo == null) {
 			return;
@@ -350,37 +346,39 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		FibCode[] codes = FibCode.values();
-		
-		//空头行情做空 FIB1 FIB786 FIB66 FIB618 FIB5 FIB382 FIB236 FIB0
-		for(int offset = 0;offset < codes.length;offset++) {
+		for(int index = 0;index < openPrices.size(); index++) {
 			
-			FibCode code = codes[offset];//当前斐波那契点位
+			OpenPrice openPrice = openPrices.get(index);
+			double price = openPrice.getPrice();
 			
-			if(code.isTrade() && code.gte(fibInfo.getLevel().getStartFibCode()) && code.lte(fibInfo.getEndCode())  
-					&& PriceUtil.isShort_v2(fibInfo.getFibValue(code), klinesList_hit)
-					//&& (!PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset) || fibInfo.getEndCode() != FibCode.FIB4_618)
-					&& !PriceUtil.isObsoleteShort(fibInfo,afterHighKlines,codes,offset)
-					&& !PriceUtil.isTraded(code, fibInfo)) {
+			FibCode code = openPrice.getCode();//当前斐波那契点位
+			
+			int offset = fibInfo.getFibCodeIndex(code);
+			
+			if( //(PriceUtil.isShort(price, klinesList_hit) || PriceUtil.isShort_v3(price, klinesList_hit))
+					PriceUtil.isShort_v2(price, klinesList_hit)
+					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
+					&& !PriceUtil.isTraded(price, fibInfo)
+					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
+					) {
 				
 				//市价做空
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, tradeType, fibInfo.getDecimalPoint()));
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, offset,  fibInfo, AutoTradeType.AREA_INDEX, fibInfo.getDecimalPoint()));
 
 				//
-				List<User> userList = null;
-				if(tradeType == AutoTradeType.AREA_INDEX) {
-					userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
-				} else {
-					userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
-				}
+				List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
+					
+					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+						continue;
+					}
 					
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
 					
-					if(fibInfo.getLevel().lt(u.getFibLevelType())) {
+					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
 						continue;
 					}
 
@@ -1349,18 +1347,32 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void consolidationAreaMonitor(List<Klines> list, List<Klines> list_15m) {
 		
-		ConsolidationAreaFibUtil ca = new ConsolidationAreaFibUtil(list, list_15m);
+		//第一级回撤
+		AreaFibInfoFactory factory = new AreaFibInfoFactoryImpl(list, list, list_15m);
 		
-		FibInfo fibInfo = ca.getFibInfo();
+		FibInfo fibInfo = factory.getFibInfo();
 		
-		List<Klines> fibAfterKlines = ca.getFibAfterKlines();
+		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
-		if(ca.isLong()) {
+		if(factory.isLong()) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong(AutoTradeType.AREA_INDEX, fibInfo, afterLowKlines, list_15m);
-		} else if(ca.isShort()) {
+			openLong(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
+		} else if(factory.isShort()) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort(AutoTradeType.AREA_INDEX, fibInfo, afterHighKlines, list_15m);
+			openShort(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
+		}
+
+		//上一级回撤
+		AreaFibInfoFactory parentFactory = new ParentAreaFibInfoFactoryImpl(list, list, list_15m); 
+
+		FibInfo parentFibInfo = parentFactory.getFibInfo();
+		
+		if(parentFactory.isLong()) {
+			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+			openLong(parentFactory.getOpenPrices(), parentFibInfo, afterLowKlines, list_15m);
+		} else if(parentFactory.isShort()) {
+			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+			openShort(parentFactory.getOpenPrices(), parentFibInfo, afterHighKlines, list_15m);
 		}
 	}
 	
