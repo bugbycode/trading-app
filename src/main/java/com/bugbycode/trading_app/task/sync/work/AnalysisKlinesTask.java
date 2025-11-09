@@ -141,16 +141,16 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.futuresFibMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h_db, klines_list_15m);
             
             //盘整区分析
-            klinesService.consolidationAreaMonitor(klines_list_1h_db, klines_list_15m);
+            //klinesService.consolidationAreaMonitor(klines_list_1h_db, klines_list_15m);
             
             //指数均线
             //klinesService.futuresEmaRiseAndFallMonitor(klines_list_1h_db, klines_list_15m);
             
             //价格行为分析
-            klinesService.futuresPriceAction(klines_list_1h_db, klines_list_15m);
+            //klinesService.futuresPriceAction(klines_list_1h_db, klines_list_15m);
             
             //量价分析
-            klinesService.volumeMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h, klines_list_15m);
+            //klinesService.volumeMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h, klines_list_15m);
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
