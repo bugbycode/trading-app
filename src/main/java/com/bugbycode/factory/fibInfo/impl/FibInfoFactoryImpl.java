@@ -10,7 +10,6 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -197,24 +196,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
-		
-		for(int index = fibSubList.size() - 1; index > 0; index--) {
-			Klines current = fibSubList.get(index);
-			Klines parent = fibSubList.get(index - 1);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v20(current, parent)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v20(current, parent))) {
-				List<Klines> points = PriceUtil.subList(current, fibSubList);
-				MarketSentiment ms = new MarketSentiment(points);
-				if(mode == QuotationMode.LONG) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice()));
-				} else {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice()));
-				}
-			}
-		}
+		addPrices(new OpenPriceDetails(fibInfo.getFibCode(end.getEma25()), end.getEma25()));
+		addPrices(new OpenPriceDetails(fibInfo.getFibCode(end.getEma99()), end.getEma99()));
 		
 		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
 		
