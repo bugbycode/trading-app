@@ -1,5 +1,6 @@
 package com.bugbycode.module;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.bugbycode.module.price.OpenPrice;
@@ -696,6 +697,38 @@ public class FibInfo {
 		}
 		
 		return code;
+	}
+	
+	/**
+	 * 获取开仓点位
+	 * @param hitCode
+	 * @return
+	 */
+	public List<FibCode> getOpenCode(FibCode hitCode) {
+		List<FibCode> result = new ArrayList<FibCode>();
+		FibCode startCode = FibCode.FIB0;
+		if(hitCode == FibCode.FIB4_618 || hitCode == FibCode.FIB3_618) { // 4.618/3.618 -> 2.618
+			startCode = FibCode.FIB2_618;
+		} else if(hitCode == FibCode.FIB2_618) { // 2.618 - > 1.618
+			startCode = FibCode.FIB1_618;
+		} else if(hitCode == FibCode.FIB2 || hitCode == FibCode.FIB1_618) { // 2/1.618 -> 1
+			startCode = FibCode.FIB1;
+		} else if(hitCode == FibCode.FIB1_272) {
+			startCode = FibCode.FIB618;
+		} else if(hitCode.lte(FibCode.FIB1) && hitCode.gte(FibCode.FIB618)) {
+			startCode = FibCode.FIB382;
+		} else if(hitCode == FibCode.FIB5 || hitCode == FibCode.FIB382) {
+			startCode = FibCode.FIB236;
+		}
+		
+		FibCode[] codes = FibCode.values();
+		for(FibCode code : codes) {
+			if(code.lte(startCode) && code != FibCode.FIB66) {
+				result.add(code);
+			}
+		}
+		
+		return result;
 	}
 
 	@Override
