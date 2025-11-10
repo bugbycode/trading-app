@@ -707,8 +707,10 @@ public class FibInfo {
 	public List<FibCode> getOpenCode(FibCode hitCode) {
 		List<FibCode> result = new ArrayList<FibCode>();
 		FibCode startCode = FibCode.FIB0;
-		if(hitCode == FibCode.FIB4_618 || hitCode == FibCode.FIB3_618) { // 4.618/3.618 -> 2.618
+		if(hitCode == FibCode.FIB4_618) { // 4.618 -> 2.618
 			startCode = FibCode.FIB2_618;
+		} else if(hitCode == FibCode.FIB3_618) { // 3.618 -> 2
+			startCode = FibCode.FIB2;
 		} else if(hitCode == FibCode.FIB2_618) { // 2.618 - > 1.618
 			startCode = FibCode.FIB1_618;
 		} else if(hitCode == FibCode.FIB2 || hitCode == FibCode.FIB1_618) { // 2/1.618 -> 1
