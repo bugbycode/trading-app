@@ -713,13 +713,15 @@ public class FibInfo {
 			startCode = FibCode.FIB2;
 		} else if(hitCode == FibCode.FIB2_618) { // 2.618 - > 1.618
 			startCode = FibCode.FIB1_618;
-		} else if(hitCode == FibCode.FIB2 || hitCode == FibCode.FIB1_618) { // 2/1.618 -> 1
+		} else if(hitCode == FibCode.FIB2) { // 2 -> 1.272
+			startCode = FibCode.FIB1_272;
+		} else if(hitCode == FibCode.FIB1_618) { // 1.618 -> 1
 			startCode = FibCode.FIB1;
-		} else if(hitCode == FibCode.FIB1_272) {
+		} else if(hitCode == FibCode.FIB1_272) { // 1.272 -> 0.618
 			startCode = FibCode.FIB618;
-		} else if(hitCode.lte(FibCode.FIB1) && hitCode.gte(FibCode.FIB618)) {
+		} else if(hitCode.lte(FibCode.FIB1) && hitCode.gte(FibCode.FIB618)) { // 1 ~ 0.618 -> 0.382
 			startCode = FibCode.FIB382;
-		} else if(hitCode == FibCode.FIB5 || hitCode == FibCode.FIB382) {
+		} else if(hitCode == FibCode.FIB5 || hitCode == FibCode.FIB382) { // 0.5 ~ 0.382 -> 0.236
 			startCode = FibCode.FIB236;
 		}
 		
