@@ -99,7 +99,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 99 || list_trend.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 50 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
@@ -179,7 +179,9 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			}
 			secondSubList = PriceUtil.subList(startAfterFlag, list);
 			end = PriceUtil.getMinPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			if(end != null) {
+				this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			}
 		} else if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
 			startAfterFlag = PriceUtil.getAfterKlines(start, firstSubList);
@@ -188,7 +190,9 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			}
 			secondSubList = PriceUtil.subList(startAfterFlag, list);
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			if(end != null) {
+				this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			}
 		}
 		
 		if(this.fibInfo == null) {
