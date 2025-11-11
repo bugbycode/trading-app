@@ -143,7 +143,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			return;
 		}
 		
-		List<Klines> firstSubList = PriceUtil.subList(first, third, list);
+		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
 		List<Klines> secondSubList = null;
 		Klines startAfter = null;
 		if(ps == PositionSide.LONG) {
@@ -152,7 +152,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			if(startAfter != null) {
 				secondSubList = PriceUtil.subList(startAfter, third, list);
 				end = PriceUtil.getMinPriceKLine(secondSubList);
-				fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+				if(end != null) {
+					fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+				}
 			}
 		} else if(ps == PositionSide.SHORT) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
@@ -160,7 +162,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			if(startAfter != null) {
 				secondSubList = PriceUtil.subList(start, third, list);
 				end = PriceUtil.getMaxPriceKLine(secondSubList);
-				fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+				if(end != null) {
+					fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_1);
+				}
 			}
 		}
 		
