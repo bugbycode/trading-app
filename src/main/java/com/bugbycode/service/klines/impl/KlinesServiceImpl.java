@@ -1323,7 +1323,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl(list_4h, list_4h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
@@ -2318,20 +2318,20 @@ public class KlinesServiceImpl implements KlinesService {
 		if(CollectionUtils.isEmpty(list_15m) || list_15m.size() < 99) {
 			return;
 		}
-		list_1h.sort(new KlinesComparator(SortType.ASC));
+		//list_1h.sort(new KlinesComparator(SortType.ASC));
 		list_15m.sort(new KlinesComparator(SortType.ASC));
 		
-		//PriceUtil.calculateEMA_7_25_99(list_15m);
-		//PriceUtil.calculateMACD(list_15m);
-		PriceUtil.calculateEMA_7_25_99(list_1h);
-		PriceUtil.calculateMACD(list_1h);
+		PriceUtil.calculateEMA_7_25_99(list_15m);
+		PriceUtil.calculateMACD(list_15m);
+		//PriceUtil.calculateEMA_7_25_99(list_1h);
+		//PriceUtil.calculateMACD(list_1h);
 		
-		int size = list_1h.size();
+		int size = list_15m.size();
 		
-		Klines current = list_1h.get(size - 1);
-		Klines parent = list_1h.get(size - 2);
+		Klines current = list_15m.get(size - 1);
+		Klines parent = list_15m.get(size - 2);
 		
-		Klines last = PriceUtil.getLastKlines(list_1h);
+		Klines last = PriceUtil.getLastKlines(list_15m);
 		String pair = last.getPair();
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
@@ -2341,11 +2341,11 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String dateStr = DateFormatUtil.format(new Date());
 		
-		if(last.getEma25() > last.getEma99() && PriceUtil.isLong_v2(last.getEma25(), list_15m) && current.getMacd() > parent.getMacd()) {//买入信号
+		if(last.getEma25() > last.getEma99() && PriceUtil.isLong_v3(last.getEma25(), list_15m)) {//买入信号
 			
 			subject = String.format("%s永续合约买入信号 %s", pair, dateStr);
 			
-		} else if(last.getEma25() < last.getEma99() && PriceUtil.isShort_v2(last.getEma25(), list_15m) && current.getMacd() < parent.getMacd()) {//卖出信号
+		} else if(last.getEma25() < last.getEma99() && PriceUtil.isShort_v3(last.getEma25(), list_15m) && current.getMacd() < parent.getMacd()) {//卖出信号
 			
 			subject = String.format("%s永续合约卖出信号 %s", pair, dateStr);
 			
