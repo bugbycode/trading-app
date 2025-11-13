@@ -207,6 +207,11 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		
 		FibCode[] codes = FibCode.values();
 		for(FibCode code : codes) {
+			
+			if(end.isEquals(last)) {
+				continue;
+			}
+			
 			if(code == FibCode.FIB66) {
 				continue;
 			}
