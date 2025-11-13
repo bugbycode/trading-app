@@ -25,7 +25,7 @@ import com.bugbycode.factory.area.impl.ParentAreaFibInfoFactoryImpl;
 import com.bugbycode.factory.ema.EmaTradingFactory;
 import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -41,6 +41,7 @@ import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeFrequency;
 import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.VolumeMonitorStatus;
@@ -460,10 +461,13 @@ public class KlinesServiceImpl implements KlinesService {
 			int offset = fibInfo.getFibCodeIndex(code);
 			
 			if( //(PriceUtil.isLong(price, klinesList_hit) || PriceUtil.isLong_v3(price, klinesList_hit))
-					PriceUtil.isLong_v2(price, klinesList_hit)
+					(
+							( PriceUtil.isLong_v2(price, klinesList_hit) && fibInfo.getTradeFrequency() == TradeFrequency.LOW ) 
+							|| ( PriceUtil.isLong_v3(price, klinesList_hit) && fibInfo.getTradeFrequency() == TradeFrequency.HIGH )
+					)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
-					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
+					&& (fibInfo.verifyOpenPrice(openPrice, currentPrice) || fibInfo.getTradeFrequency() == TradeFrequency.HIGH)
 					) {
 			
 				//市价做多
@@ -563,10 +567,13 @@ public class KlinesServiceImpl implements KlinesService {
 			int offset = fibInfo.getFibCodeIndex(code);
 			
 			if( //(PriceUtil.isShort(price, klinesList_hit) || PriceUtil.isShort_v3(price, klinesList_hit))
-					PriceUtil.isShort_v2(price, klinesList_hit)
+					(
+							( PriceUtil.isShort_v2(price, klinesList_hit) && fibInfo.getTradeFrequency() == TradeFrequency.LOW)
+							|| ( PriceUtil.isShort_v3(price, klinesList_hit) && fibInfo.getTradeFrequency() == TradeFrequency.HIGH )
+					)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
-					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
+					&& (fibInfo.verifyOpenPrice(openPrice, currentPrice) || fibInfo.getTradeFrequency() == TradeFrequency.HIGH)
 					) {
 			
 				//市价做空
@@ -1323,7 +1330,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_15m, list_4h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
