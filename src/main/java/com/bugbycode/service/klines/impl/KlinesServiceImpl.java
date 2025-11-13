@@ -1431,7 +1431,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			int offset = fibInfo.getFibCodeIndex(code);
 			
-			if(PriceUtil.isLong_v2(price, klinesList_hit)
+			if(PriceUtil.isLong_v3(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTradedPriceAction(price, fibInfo)
 					) {
@@ -1526,7 +1526,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			int offset = fibInfo.getFibCodeIndex(code);
-			if(PriceUtil.isShort_v2(price, klinesList_hit)
+			if(PriceUtil.isShort_v3(price, klinesList_hit)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTradedPriceAction(price, fibInfo)
 					) {
