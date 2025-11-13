@@ -108,15 +108,15 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		//PriceUtil.calculateMACD(list);
+		//PriceUtil.calculateMACD(list_trend);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateEMA_7_25_99(list_trend);
 		
-		PriceUtil.calculateDeltaAndCvd(list);
-		PriceUtil.calculateDeltaAndCvd(list_trend);
-		PriceUtil.calculateDeltaAndCvd(list_15m);
+		//PriceUtil.calculateDeltaAndCvd(list);
+		//PriceUtil.calculateDeltaAndCvd(list_trend);
+		//PriceUtil.calculateDeltaAndCvd(list_15m);
 		
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
@@ -201,17 +201,27 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
+		QuotationMode mode = this.fibInfo.getQuotationMode();
+		
+		Klines last = PriceUtil.getLastKlines(list);
+		
 		FibCode[] codes = FibCode.values();
 		for(FibCode code : codes) {
 			if(code == FibCode.FIB66) {
 				continue;
 			}
+			
+			if( code.lte(FibCode.FIB5) && 
+					!( (mode == QuotationMode.LONG && last.getEma7() > last.getEma25() && last.getEma25() > last.getEma99()) 
+							|| (mode == QuotationMode.SHORT && last.getEma7() < last.getEma25() && last.getEma25() < last.getEma99()) ) 
+					 ) {
+				continue;
+			}
+			
 			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code)));
 		}
 		
 		this.fibInfo.setTradeFrequency(TradeFrequency.HIGH);
-		
-		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
