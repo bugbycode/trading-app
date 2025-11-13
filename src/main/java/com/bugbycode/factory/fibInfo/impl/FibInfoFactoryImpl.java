@@ -211,20 +211,22 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v20(current, parent) && current.getDea() <= 0) 
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v20(current, parent) && current.getDea() >= 0)) {
-				//List<Klines> parent_points = PriceUtil.subList(start, parent, list);
+				
 				List<Klines> current_points = PriceUtil.subList(parent, end, list);
-				//MarketSentiment parent_ms = new MarketSentiment(parent_points);
+				
 				MarketSentiment current_ms = new MarketSentiment(current_points);
-				FibCode openCode = FibCode.FIB0;
+				
+				double openPriceValue = 0;
+				
 				if(mode == QuotationMode.LONG) {
-					openCode = fibInfo.getFibCode(current_ms.getLowPrice());
-					addPrices(new OpenPriceDetails(openCode, current_ms.getLowPrice()));
-					//addPrices(new OpenPriceDetails(fibInfo.getFibCode(parent_ms.getMaxBodyHighPrice()), parent_ms.getMaxBodyHighPrice()));
+					openPriceValue = current_ms.getLowPrice();
 				} else {
-					openCode = fibInfo.getFibCode(current_ms.getHighPrice());
-					addPrices(new OpenPriceDetails(openCode, current_ms.getHighPrice()));
-					//addPrices(new OpenPriceDetails(fibInfo.getFibCode(parent_ms.getMinBodyLowPrice()), parent_ms.getMinBodyLowPrice()));
+					openPriceValue = current_ms.getHighPrice();
 				}
+				
+				FibCode openCode = fibInfo.getFibCode(openPriceValue);
+				
+				addPrices(new OpenPriceDetails(openCode, openPriceValue));
 				addPrices(new OpenPriceDetails(openCode, fibInfo.getFibValue(openCode)));
 				break;
 			}
