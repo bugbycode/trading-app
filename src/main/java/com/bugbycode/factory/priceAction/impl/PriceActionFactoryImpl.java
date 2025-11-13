@@ -185,14 +185,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				break;
 			}
 			
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v8(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v8(current, parent))) {
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v18(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v18(current, parent))) {
 				
-				if((mode == QuotationMode.LONG && current.getDelta() < 0) || (mode == QuotationMode.SHORT && current.getDelta() > 0)) {
+				//if((mode == QuotationMode.LONG && current.getDelta() < 0) || (mode == QuotationMode.SHORT && current.getDelta() > 0)) {
 					
 					addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getClosePriceDoubleValue()), current.getClosePriceDoubleValue()));
 					
-				}
+				//}
 				
 				fibEnd = current;
 				break;
@@ -239,19 +239,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() > 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() < 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
