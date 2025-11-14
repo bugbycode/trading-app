@@ -88,9 +88,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		this.list_15m.sort(kc);
 		
 		//PriceUtil.calculateBollingerBands(list);
-		//PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateEMA_7_25_99(list);
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateDeltaAndCvd(list);
+		//PriceUtil.calculateDeltaAndCvd(list);
 		
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
@@ -185,13 +185,17 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				break;
 			}
 			
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v18(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v18(current, parent))) {
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v11(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v11(current, parent))) {
 				
 				//if((mode == QuotationMode.LONG && current.getDelta() < 0) || (mode == QuotationMode.SHORT && current.getDelta() > 0)) {
 					
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getClosePriceDoubleValue()), current.getClosePriceDoubleValue()));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma25()), current.getEma25()));
 					
+					if((mode == QuotationMode.LONG && current.getHighPriceDoubleValue() < current.getEma7()) 
+							|| (mode == QuotationMode.SHORT && current.getLowPriceDoubleValue() > current.getEma7())) {
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma7()), current.getEma7()));
+					}
 				//}
 				
 				fibEnd = current;
@@ -239,19 +243,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
