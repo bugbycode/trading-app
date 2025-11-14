@@ -192,10 +192,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					
 					addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma25()), current.getEma25()));
 					
-					if((mode == QuotationMode.LONG && current.getHighPriceDoubleValue() < current.getEma7()) 
-							|| (mode == QuotationMode.SHORT && current.getLowPriceDoubleValue() > current.getEma7())) {
-						addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getEma7()), current.getEma7()));
-					}
 				//}
 				
 				fibEnd = current;
@@ -219,6 +215,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			if(fibAfterFlag != null) {
 				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 				this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			}
+			
+			if(this.fibAfterKlines.size() > 4) {
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(fibEnd.getEma7()), fibEnd.getEma7()));
 			}
 		}
 		
