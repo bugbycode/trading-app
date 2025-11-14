@@ -188,7 +188,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v15(current, parent))
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v15(current, parent))) {
 				
-				List<Klines> points = PriceUtil.subList(end, parent, list);
+				Klines s = end;
+				Klines e = parent;
+				if(s.gt(e)) {
+					s = parent;
+					e = end;
+				}
+				
+				List<Klines> points = PriceUtil.subList(s, e, list);
 				MarketSentiment ms = new MarketSentiment(points);
 				double priceValue = 0;
 				
