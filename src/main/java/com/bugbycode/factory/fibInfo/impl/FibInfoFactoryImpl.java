@@ -208,7 +208,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(current.lt(start)) {
 				break;
 			}
-			
+			/*
 			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v20(current, parent) && current.getDea() <= 0) 
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v20(current, parent) && current.getDea() >= 0)) {
 				
@@ -229,6 +229,35 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				addPrices(new OpenPriceDetails(openCode, openPriceValue));
 				addPrices(new OpenPriceDetails(openCode, fibInfo.getFibValue(openCode)));
 				break;
+			}*/
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent)) 
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
+				List<Klines> points = PriceUtil.subList(start, parent, list);
+				MarketSentiment ms = new MarketSentiment(points);
+				double openPriceValue = 0;
+				if(mode == QuotationMode.LONG) {
+					openPriceValue = ms.getHighPrice();
+				} else {
+					openPriceValue = ms.getLowPrice();
+				}
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
+			}
+			
+			if((mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v15(current, parent))
+					|| (mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v15(current, parent))) {
+				
+				List<Klines> points = PriceUtil.subList(start, parent, list);
+				MarketSentiment ms = new MarketSentiment(points);
+				double priceValue = 0;
+				
+				if(mode == QuotationMode.SHORT) {
+					priceValue = ms.getMinBodyLowPrice();
+				} else {
+					priceValue = ms.getMaxBodyHighPrice();
+				}
+				
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(priceValue), priceValue));
+				//break;
 			}
 		}
 		
@@ -269,11 +298,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getEma25() > current.getEma99() && current.getEma99() > 0;
+		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getEma25() < current.getEma99() && current.getEma99() > 0;
+		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
