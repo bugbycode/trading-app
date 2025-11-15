@@ -164,12 +164,12 @@ public class FibInfo {
 	public FibCode getTakeProfit_v2(FibCode code) {
 		FibCode takeProfit = FibCode.FIB0;
 		if(frequency == TradeFrequency.HIGH) {
-			if(code == FibCode.FIB4_618) { // 4.618 - 1
-				takeProfit = FibCode.FIB1;
-			} else if(code == FibCode.FIB3_618) { // 3.618 - 1
-				takeProfit = FibCode.FIB1;
-			} else if(code == FibCode.FIB2_618) { // 2.618 - 1
-				takeProfit = FibCode.FIB1;
+			if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+				takeProfit = FibCode.FIB2_618;
+			} else if(code == FibCode.FIB3_618) { // 3.618 - 1.618
+				takeProfit = FibCode.FIB1_618;
+			} else if(code == FibCode.FIB2_618) { // 2.618 - 1.272
+				takeProfit = FibCode.FIB1_272;
 			} else if(code == FibCode.FIB2) { // 2 - 1
 				takeProfit = FibCode.FIB1;
 			} else if(code == FibCode.FIB1_618) { // 1.618 - 1
@@ -182,10 +182,10 @@ public class FibInfo {
 				takeProfit = FibCode.FIB382;
 			} else if(code == FibCode.FIB618 || code == FibCode.FIB66) { // 0.618 -> 0.236
 				takeProfit = FibCode.FIB236;
-			} else if(code == FibCode.FIB5) { // 0.5 -> 0
-				takeProfit = FibCode.FIB0;
-			} else if(code == FibCode.FIB382) { // 0.382 -> 0
-				takeProfit = FibCode.FIB0;
+			} else if(code == FibCode.FIB5) { // 0.5 -> 0.236
+				takeProfit = FibCode.FIB236;
+			} else if(code == FibCode.FIB382) { // 0.382 -> 0.236
+				takeProfit = FibCode.FIB236;
 			} else if(code == FibCode.FIB236) { // 0.236 -> 0
 				takeProfit = FibCode.FIB0;
 			}
@@ -227,18 +227,18 @@ public class FibInfo {
 	public FibCode getTakeProfit_v1(FibCode code) {
 		FibCode takeProfit = FibCode.FIB0;
 		if(frequency == TradeFrequency.HIGH) {
-			if(code == FibCode.FIB4_618) { // 4.618 - 1.272
-				takeProfit = FibCode.FIB1_272;
-			} else if(code == FibCode.FIB3_618) { //3.618 - 1.272
-				takeProfit = FibCode.FIB1_272;
+			if(code == FibCode.FIB4_618) { // 4.618 - 2.618
+				takeProfit = FibCode.FIB2_618;
+			} else if(code == FibCode.FIB3_618) { //3.618 - 1.618
+				takeProfit = FibCode.FIB1_618;
 			} else if(code == FibCode.FIB2_618) { // 2.618 - 1.272
 				takeProfit = FibCode.FIB1_272;
 			} else if(code == FibCode.FIB2) {// 2 - 1
 				takeProfit = FibCode.FIB1;
 			} else if(code == FibCode.FIB1_618) { // 1.618 - 1
 				takeProfit = FibCode.FIB1;
-			} else if(code == FibCode.FIB1_272) {// 1.272 - 0.618
-				takeProfit = FibCode.FIB618;
+			} else if(code == FibCode.FIB1_272) {// 1.272 - 1
+				takeProfit = FibCode.FIB1;
 			} else if(code == FibCode.FIB1) { // 1 -> 0.5
 				takeProfit = FibCode.FIB5;
 			} else if(code == FibCode.FIB786) { // 0.786 -> 0.382
@@ -496,10 +496,18 @@ public class FibInfo {
 		
 		FibCode result = FibCode.FIB0;
 		if(frequency == TradeFrequency.HIGH) {
-			if(current.gt(FibCode.FIB1_272)) {
+			if(current == FibCode.FIB4_618) {
+				result = FibCode.FIB3_618;
+			} else if(current == FibCode.FIB3_618) { // 3.618 - 2
+				result = FibCode.FIB2;
+			} else if(current == FibCode.FIB2_618) { // 2.618 - 1.618
+				result = FibCode.FIB1_618;
+			} else if(current == FibCode.FIB2) { // 2 - 1.272
+				result = FibCode.FIB1_272;
+			} else if(current == FibCode.FIB1_618) { // 1.618 - 1.272
 				result = FibCode.FIB1_272;
 			} else if(current == FibCode.FIB1_272) {
-				result = FibCode.FIB1;
+				result = FibCode.FIB786;
 			} else if(current == FibCode.FIB1) {
 				result = FibCode.FIB618;
 			} else if(current == FibCode.FIB786) {
@@ -507,7 +515,7 @@ public class FibInfo {
 			} else if(current == FibCode.FIB618 || current == FibCode.FIB66) {
 				result = FibCode.FIB382;
 			} else if(current == FibCode.FIB5) {
-				result = FibCode.FIB236;
+				result = FibCode.FIB382;
 			} else if(current == FibCode.FIB382) {
 				result = FibCode.FIB236;
 			}
