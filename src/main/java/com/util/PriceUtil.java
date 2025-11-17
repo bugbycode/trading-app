@@ -2972,6 +2972,17 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 是否出现看涨吞没
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean isBullishSwallowing(Klines current, Klines parent) {
+		return current.isRise() && parent.isFall() && current.getClosePriceDoubleValue() >= parent.getOpenPriceDoubleValue();
+	}
+	
+	/**
 	 * 是否出现看涨吞没 <br/>
 	 * 
 	 * 1、出现买盘信号或卖盘衰竭信号且最后一根k线收盘价大于等于前一根k线开盘价
@@ -2987,6 +2998,16 @@ public class PriceUtil {
 		Klines k1 = list.get(index - 1);
 		
 		return (isBuying(list) || isSellingExhaustion(list)) && k0.getClosePriceDoubleValue() >= k1.getOpenPriceDoubleValue();
+	}
+	
+	/**
+	 * 是否出现看跌吞没
+	 * @param current 当前k线
+	 * @param parent 前一根K线
+	 * @return
+	 */
+	public static boolean isPutInto(Klines current, Klines parent) {
+		return current.isFall() && parent.isRise() && current.getClosePriceDoubleValue() <= parent.getOpenPriceDoubleValue();
 	}
 	
 	/**
