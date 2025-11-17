@@ -5,12 +5,13 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.factory.fibInfo.FibInfoFactory;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v4;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -172,76 +173,16 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			return;
 		}
 
-		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines fibEnd = null;
+		FibInfoFactory factory = new FibInfoFactoryImpl_v4(list, list, list_15m);
+		List<OpenPrice> openPriceList = factory.getOpenPrices();
 		
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			
-			if(current.lt(start)) {
-				break;
-			}
-			
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v15(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v15(current, parent))) {
-				
-				Klines s = end;
-				Klines e = parent;
-				if(s.gt(e)) {
-					s = parent;
-					e = end;
-				}
-				
-				List<Klines> points = PriceUtil.subList(s, e, list);
-				MarketSentiment ms = new MarketSentiment(points);
-				double priceValue = 0;
-				
-				if(mode == QuotationMode.LONG) {
-					priceValue = ms.getMinBodyLowPrice();
-				} else {
-					priceValue = ms.getMaxBodyHighPrice();
-				}
-				
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(priceValue), priceValue));
-				break;
-			}
+		for(OpenPrice price : openPriceList) {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(price.getPrice()), price.getPrice()));
 		}
 		
-		addPrices(new OpenPriceDetails(FibCode.FIB0, fibInfo.getFibValue(FibCode.FIB0)));
-		
-		List<Klines> points = PriceUtil.subList(start, end, list);
-		MarketSentiment ms = new MarketSentiment(points);
-		
-		if(mode == QuotationMode.LONG) {
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice()));
-		} else {
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice()));
-		}
-		
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			if(current.lte(end)) {
-				break;
-			}
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v18(current, parent)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v18(current, parent))) {
-				fibEnd = parent;
-				break;
-			}
-		}
-		
-		if(fibEnd != null) {
-			Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
-			if(fibAfterFlag != null) {
-				this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
-				this.fibInfo.setFibAfterKlines(fibAfterKlines);
-			}
-		}
-		
+		this.fibAfterKlines.addAll(factory.getFibAfterKlines());
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
@@ -263,19 +204,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
