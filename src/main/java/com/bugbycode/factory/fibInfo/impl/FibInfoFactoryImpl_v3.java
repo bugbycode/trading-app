@@ -12,7 +12,6 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeFrequency;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
@@ -226,7 +225,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code)));
 		}
 		
-		this.fibInfo.setTradeFrequency(TradeFrequency.HIGH);
+		//this.fibInfo.setTradeFrequency(TradeFrequency.HIGH);
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
