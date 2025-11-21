@@ -108,7 +108,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		//PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list);
 		//PriceUtil.calculateMACD(list_trend);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
@@ -256,11 +256,11 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() >0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
