@@ -10,9 +10,9 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeFrequency;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
@@ -21,7 +21,7 @@ import com.util.PriceComparator;
 import com.util.PriceUtil;
 
 /**
- * 斐波那契回指标撤接口实现类（支撑阻力互换位作为开仓点）
+ * 斐波那契回指标撤接口实现类（短线交易）
  */
 public class FibInfoFactoryImpl implements FibInfoFactory {
 
@@ -99,7 +99,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 50 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 99 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
@@ -112,11 +112,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		PriceUtil.calculateMACD(list_trend);
 		
 		PriceUtil.calculateEMA_7_25_99(list);
-		PriceUtil.calculateEMA_7_25_99(list_trend);
+		//PriceUtil.calculateEMA_7_25_99(list_trend);
 		
-		PriceUtil.calculateDeltaAndCvd(list);
-		PriceUtil.calculateDeltaAndCvd(list_trend);
-		PriceUtil.calculateDeltaAndCvd(list_15m);
+		//PriceUtil.calculateDeltaAndCvd(list);
+		//PriceUtil.calculateDeltaAndCvd(list_trend);
+		//PriceUtil.calculateDeltaAndCvd(list_15m);
 		
 		this.openPrices.clear();
 		this.fibAfterKlines.clear();
@@ -166,7 +166,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			return;
 		}
 		
-		List<Klines> firstSubList = PriceUtil.subList(first, third, list);
+		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
 		
 		List<Klines> secondSubList = null;
 		
@@ -177,7 +177,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(startAfterFlag == null) {
 				startAfterFlag = start;
 			}
-			secondSubList = PriceUtil.subList(startAfterFlag, list);
+			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
 			end = PriceUtil.getMinPriceKLine(secondSubList);
 			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
 		} else if(ps == PositionSide.LONG) {
@@ -186,7 +186,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(startAfterFlag == null) {
 				startAfterFlag = start;
 			}
-			secondSubList = PriceUtil.subList(startAfterFlag, list);
+			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
 			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
 		}
@@ -195,88 +195,38 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			return;
 		}
 		
-		QuotationMode mode = this.fibInfo.getQuotationMode();
-		
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			
-			if(current.gt(end)) {
-				continue;
-			}
-			
-			if(current.lt(start)) {
-				break;
-			}
-			/*
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v20(current, parent) && current.getDea() <= 0) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v20(current, parent) && current.getDea() >= 0)) {
-				
-				List<Klines> current_points = PriceUtil.subList(parent, end, list);
-				
-				MarketSentiment current_ms = new MarketSentiment(current_points);
-				
-				double openPriceValue = 0;
-				
-				if(mode == QuotationMode.LONG) {
-					openPriceValue = current_ms.getLowPrice();
-				} else {
-					openPriceValue = current_ms.getHighPrice();
-				}
-				
-				FibCode openCode = fibInfo.getFibCode(openPriceValue);
-				
-				addPrices(new OpenPriceDetails(openCode, openPriceValue));
-				addPrices(new OpenPriceDetails(openCode, fibInfo.getFibValue(openCode)));
-				break;
-			}*/
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v8(current, parent)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v8(current, parent))) {
-				List<Klines> points = PriceUtil.subList(start, parent, list);
-				MarketSentiment ms = new MarketSentiment(points);
-				double openPriceValue = 0;
-				if(mode == QuotationMode.LONG) {
-					openPriceValue = ms.getHighPrice();
-				} else {
-					openPriceValue = ms.getLowPrice();
-				}
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPriceValue), openPriceValue));
-			}
-			
-			if((mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v15(current, parent))
-					|| (mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v15(current, parent))) {
-				
-				List<Klines> points = PriceUtil.subList(start, parent, list);
-				MarketSentiment ms = new MarketSentiment(points);
-				double priceValue = 0;
-				
-				if(mode == QuotationMode.SHORT) {
-					priceValue = ms.getMinBodyLowPrice();
-				} else {
-					priceValue = ms.getMaxBodyHighPrice();
-				}
-				
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(priceValue), priceValue));
-				//break;
-			}
-		}
-		
-		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
-		MarketSentiment ms = new MarketSentiment(fibSubList);
-		
-		if(mode == QuotationMode.LONG) {
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice()));
-		} else {
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice()));
-		}
-		
-		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1)));
-		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
+		
+		QuotationMode mode = this.fibInfo.getQuotationMode();
+		
+		Klines last = PriceUtil.getLastKlines(list);
+		
+		FibCode[] codes = FibCode.values();
+		for(FibCode code : codes) {
+			
+			if(end.isEquals(last)) {
+				continue;
+			}
+			
+			if(code == FibCode.FIB66) {
+				continue;
+			}
+			
+			if( code.lte(FibCode.FIB5) && 
+					!( (mode == QuotationMode.LONG && last.getEma7() > last.getEma25() && last.getEma25() > last.getEma99()) 
+							|| (mode == QuotationMode.SHORT && last.getEma7() < last.getEma25() && last.getEma25() < last.getEma99()) ) 
+					 ) {
+				continue;
+			}
+			
+			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code)));
+		}
+		
+		this.fibInfo.setTradeFrequency(TradeFrequency.HIGH);
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
@@ -298,19 +248,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
