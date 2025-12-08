@@ -2007,6 +2007,17 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * MACD 连续衰竭
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean macdDeclining(Klines current, Klines parent, Klines next) {
+		return parent.getMacd() < next.getMacd() && current.getMacd() < parent.getMacd();
+	}
+	
+	/**
 	 * 判断是否出现强势
 	 * @param current
 	 * @param parent
@@ -2203,6 +2214,17 @@ public class PriceUtil {
 	public static boolean verifyPowerful_v21(Klines current, Klines parent) {
 		return (current.isRise() && current.getBodyHighPriceDoubleValue() >= parent.getBodyHighPriceDoubleValue())
 				|| (current.isFall() && current.getBodyLowPriceDoubleValue() > parent.getLowPriceDoubleValue());
+	}
+	
+	/**
+	 * MACD 连续强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean macdPowerful(Klines current, Klines parent, Klines next) {
+		return parent.getMacd() > next.getMacd() && current.getMacd() > parent.getMacd();
 	}
 	
 	/**

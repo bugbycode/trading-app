@@ -174,23 +174,34 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		for(int index = list.size() - 1; index > 0; index--) {
+		for(int index = list.size() - 1; index > 1; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
 			if(current.lte(end)) {
 				break;
 			}
 			if((mode == QuotationMode.LONG && (PriceUtil.verifyDecliningPrice_v18(current, parent) || PriceUtil.verifyDecliningPrice_v15(current, parent))) 
 					|| (mode == QuotationMode.SHORT && (PriceUtil.verifyPowerful_v18(current, parent) || PriceUtil.verifyPowerful_v15(current, parent)))) {
 				double openPrice = 0;
+				double bodyOpenPrice = 0;
 				if(mode == QuotationMode.LONG) {
 					openPrice = current.getHighPriceDoubleValue();
+					bodyOpenPrice = current.getBodyHighPriceDoubleValue();
 				} else {
 					openPrice = current.getLowPriceDoubleValue();
+					bodyOpenPrice = current.getBodyLowPriceDoubleValue();
 				}
 				addPrices(new OpenPriceDetails(fibInfo.getFibCode(openPrice), openPrice));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(bodyOpenPrice), bodyOpenPrice));
 				
 				if(CollectionUtils.isEmpty(fibAfterKlines)) {
+					
+					if((mode == QuotationMode.LONG && PriceUtil.macdDeclining(current, parent, next)) 
+							|| (mode == QuotationMode.SHORT && PriceUtil.macdPowerful(current, parent, next))) {
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getClosePriceDoubleValue()), current.getClosePriceDoubleValue()));
+					}
+					
 					Klines fibAfterFlag = PriceUtil.getAfterKlines(current, this.list_15m);
 					if(fibAfterFlag != null) {
 						this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
