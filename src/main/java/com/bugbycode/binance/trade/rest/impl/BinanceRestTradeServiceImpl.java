@@ -158,7 +158,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		headers.add("X-MBX-APIKEY", binanceApiKey);
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		
-		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/allAlgoOrders?" + queryString, HttpMethod.GET, entity, String.class);
+		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/openAlgoOrders?" + queryString, HttpMethod.GET, entity, String.class);
 		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
 		
 		if(status == HttpStatus.OK) {
