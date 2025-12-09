@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.AlgoType;
 import com.bugbycode.module.Method;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
@@ -109,8 +110,16 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			BigDecimal stopPrice, Boolean closePosition, WorkingType workingType,
 			BigDecimal activationPrice, BigDecimal callbackRate) {
 		BinanceOrderInfo order = new BinanceOrderInfo();
-		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.ORDER_PLACE);
+		
+		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.ALGO_ORDER_PLACE);
+		
 		JSONObject params = new JSONObject();
+		if(type == Type.LIMIT || type == Type.MARKET) {//非条件单
+			method = MethodDataUtil.getMethodJsonObjec(Method.ORDER_PLACE);
+		} else {
+			params.put("algoType", AlgoType.CONDITIONAL);
+		}
+		
 		params.put("apiKey", binanceApiKey);
 		//限价订单
 		if(type == Type.LIMIT) {
@@ -143,7 +152,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			}
 			params.put("quantity", quantity.toString());//委托数量
 			params.put("price", price.toString());//委托价
-			params.put("stopPrice", stopPrice.toString());//触发价
+			params.put("triggerPrice", stopPrice.toString());//触发价
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
 			params.put("timeInForce", "GTE_GTC");
 		} else if(type == Type.STOP_MARKET) { //市价止损
@@ -154,7 +163,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
-			params.put("stopPrice", stopPrice.toString());//触发价
+			params.put("triggerPrice", stopPrice.toString());//触发价
 			params.put("closePosition", closePosition);//市价止损是否全部平仓
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
 			params.put("timeInForce", "GTE_GTC");
@@ -168,7 +177,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			}
 			params.put("quantity", quantity.toString());//委托数量
 			params.put("price", price.toString());//委托价格
-			params.put("stopPrice", stopPrice.toString());//触发价
+			params.put("triggerPrice", stopPrice.toString());//触发价
 			params.put("workingType", workingType);//触发价格类型 最新价或标记价
 			params.put("timeInForce", "GTE_GTC");
 		} else if(type == Type.TAKE_PROFIT_MARKET) {//市价止盈
@@ -180,7 +189,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				params.put("newClientOrderId", newClientOrderId);
 			}
 			//params.put("quantity", quantity);//委托数量
-			params.put("stopPrice", stopPrice.toString());//触发价
+			params.put("triggerPrice", stopPrice.toString());//触发价
 			params.put("closePosition", closePosition);//市价止损是否全部平仓
 			params.put("workingType", workingType);
 			params.put("timeInForce", "GTE_GTC");
@@ -219,29 +228,65 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			if(o.has("avgPrice")) {
 				order.setAvgPrice(o.getString("avgPrice"));
 			}
-			order.setClientOrderId(o.getString("clientOrderId"));
-			order.setCumQuote(o.getString("cumQuote"));
-			order.setExecutedQty(o.getString("executedQty"));
-			order.setOrderId(o.getLong("orderId"));
-			order.setOrigQty(o.getString("origQty"));
-			order.setOrigType(o.getString("origType"));
+			
+			if(o.has("clientOrderId")) {
+				order.setClientOrderId(o.getString("clientOrderId"));
+			} else if(o.has("clientAlgoId")) {
+				order.setClientOrderId(o.getString("clientAlgoId"));
+			}
+			
+			if(o.has("cumQuote")) {
+				order.setCumQuote(o.getString("cumQuote"));
+			}
+			
+			if(o.has("executedQty")) {
+				order.setExecutedQty(o.getString("executedQty"));
+			}
+			
+			if(o.has("orderId")) {
+				order.setOrderId(o.getLong("orderId"));
+			} else if(o.has("algoId")) {
+				order.setOrderId(o.getLong("algoId"));
+			}
+			
+			if(o.has("origQty")) {
+				order.setOrigQty(o.getString("origQty"));
+			}
+			
+			if(o.has("origType")) {
+				order.setOrigType(o.getString("origType"));
+			}
+			
 			order.setPrice(o.getString("price"));
 			order.setReduceOnly(o.getBoolean("reduceOnly"));
 			order.setSide(o.getString("side"));
 			if(o.has("positionSide")) {
 				order.setPositionSide(o.getString("positionSide"));
 			}
-			order.setStatus(o.getString("status"));
+			
+			if(o.has("status")) {
+				order.setStatus(o.getString("status"));
+			} else if(o.has("algoStatus")) {
+				order.setStatus(o.getString("algoStatus"));
+			}
+			
 			if(o.has("stopPrice")) {
 				order.setStopPrice(o.getString("stopPrice"));
+			} else if(o.has("triggerPrice")) {
+				order.setStopPrice(o.getString("triggerPrice"));
 			}
+			
 			order.setClosePosition(o.getBoolean("closePosition"));
 			order.setSymbol(o.getString("symbol"));
 			if(o.has("time")) {
 				order.setTime(o.getLong("time"));
 			}
 			order.setTimeInForce(o.getString("timeInForce"));
-			order.setType(o.getString("type"));
+			if(o.has("type")) {
+				order.setType(o.getString("type"));
+			} else if(o.has("orderType")) {
+				order.setType(o.getString("orderType"));
+			}
 			if(o.has("activatePrice")) {
 				order.setActivatePrice(o.getString("activatePrice"));
 			}

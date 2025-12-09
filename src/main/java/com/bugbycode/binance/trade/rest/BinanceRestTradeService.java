@@ -5,8 +5,10 @@ import java.util.List;
 
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
+import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.Leverage;
 import com.bugbycode.module.binance.MarginType;
+import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.binance.WorkingType;
@@ -134,10 +136,32 @@ public interface BinanceRestTradeService {
 	 * @param stopPrice 触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数 创建止盈止损订单时使用
 	 * @param closePosition 触发stopPrice后是否全部平仓 仅支持STOP_MARKET和TAKE_PROFIT_MARKET；不与quantity合用；自带只平仓效果，不与reduceOnly 合用 止盈止损订单时使用
 	 * @param workingType stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
+	 * @param activationPrice 追踪止损激活价格，仅TRAILING_STOP_MARKET 需要此参数, 默认为下单当前市场价格(支持不同workingType)
+	 * @param callbackRate 追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
 	 * @return
 	 */
 	public BinanceOrderInfo orderPost(String binanceApiKey,String binanceSecretKey,String symbol,Side side,PositionSide ps,Type type,String newClientOrderId,
-			BigDecimal quantity,BigDecimal price,BigDecimal stopPrice,Boolean closePosition,WorkingType workingType);
+			BigDecimal quantity,BigDecimal price,BigDecimal stopPrice,Boolean closePosition,WorkingType workingType,
+			BigDecimal activationPrice, BigDecimal callbackRate);
+	
+	/**
+	 * 合约市价开仓
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @param ps 持仓方向 LONG/SHORT
+	 * @param quantity 委托数量
+	 * @param stopLoss 止损价
+	 * @param takeProfit 止盈价
+	 * @param callbackRateEnabled 是否启用追踪止损
+	 * @param activationPrice 追踪止损触发价
+	 * @param callbackRate 追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
+	 * @param profitOrderEnabled 是否启用止盈订单
+	 * @return
+	 */
+	public List<BinanceOrderInfo> tradeMarket(String binanceApiKey,String binanceSecretKey,String symbol,PositionSide ps,
+			BigDecimal quantity,BigDecimal stopLoss,BigDecimal takeProfit, CallbackRateEnabled callbackRateEnabled, 
+			BigDecimal activationPrice, BigDecimal callbackRate, ProfitOrderEnabled profitOrderEnabled);
 	
 	/**
 	 * 撤销订单

@@ -18,7 +18,12 @@ public enum Method {
 	/**
 	 * 下单 (TRADE)
 	 */
-	ORDER_PLACE("order.place");
+	ORDER_PLACE("order.place"),
+	
+	/**
+	 * 条件下单
+	 */
+	ALGO_ORDER_PLACE("algoOrder.place");
 
 	private String value;
 	
