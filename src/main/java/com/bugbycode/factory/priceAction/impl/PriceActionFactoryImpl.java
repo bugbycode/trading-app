@@ -174,10 +174,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		for(int index = list.size() - 1; index > 1; index--) {
+		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
-			Klines next = list.get(index - 2);
+			//Klines next = list.get(index - 2);
 			if(current.lte(end)) {
 				break;
 			}
@@ -196,11 +196,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				addPrices(new OpenPriceDetails(fibInfo.getFibCode(bodyOpenPrice), bodyOpenPrice));
 				
 				if(CollectionUtils.isEmpty(fibAfterKlines)) {
-					
+					/*
 					if((mode == QuotationMode.LONG && PriceUtil.macdDeclining(current, parent, next)) 
 							|| (mode == QuotationMode.SHORT && PriceUtil.macdPowerful(current, parent, next))) {
 						addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getClosePriceDoubleValue()), current.getClosePriceDoubleValue()));
-					}
+					}*/
 					
 					Klines fibAfterFlag = PriceUtil.getAfterKlines(current, this.list_15m);
 					if(fibAfterFlag != null) {
