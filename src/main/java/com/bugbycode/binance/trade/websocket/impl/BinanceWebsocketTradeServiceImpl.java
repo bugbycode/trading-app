@@ -1,8 +1,8 @@
 package com.bugbycode.binance.trade.websocket.impl;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -212,7 +212,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		}
 		
 		
-		params.put("timestamp", new Date().getTime());
+		params.put("timestamp", getTime());
 		
 		MethodDataUtil.generateSignature(params, binanceSecretKey);
 		
@@ -409,6 +409,10 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	}
 
 	public long getTime() {
-		return binanceRestTradeService.getTime();
+		long t = binanceRestTradeService.getTime();
+		if(t <= 0) {
+			t = new Date().getTime();
+		}
+		return t;
 	}
 }
