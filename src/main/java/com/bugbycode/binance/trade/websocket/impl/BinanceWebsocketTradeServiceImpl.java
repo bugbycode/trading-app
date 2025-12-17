@@ -1,6 +1,7 @@
 package com.bugbycode.binance.trade.websocket.impl;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -202,7 +203,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				params.put("newClientOrderId", newClientOrderId);
 			}
 			
-			params.put("activationPrice", activationPrice.toString());//追踪止损激活价格，仅TRAILING_STOP_MARKET 需要此参数, 默认为下单当前市场价格(支持不同workingType)
+			params.put("activatePrice", activationPrice.toString());//追踪止损激活价格，仅TRAILING_STOP_MARKET 需要此参数, 默认为下单当前市场价格(支持不同workingType)
 			params.put("callbackRate", callbackRate.toString());//追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
 			params.put("quantity", quantity.toString());//委托数量
 			//params.put("closePosition", closePosition);//市价止损是否全部平仓
@@ -211,7 +212,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		}
 		
 		
-		params.put("timestamp", getTime());
+		params.put("timestamp", new Date().getTime());
 		
 		MethodDataUtil.generateSignature(params, binanceSecretKey);
 		
@@ -220,7 +221,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		logger.debug(method);
 		
 		websocketApi.sendMessage(method);
-		
+		logger.info(method);
 		JSONObject result = websocketApi.read(method.getString("id"));
 		if(result.getInt("status") == 200 && result.has("result")) {
 			logger.debug(result);

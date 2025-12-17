@@ -513,8 +513,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
-			System.out.println(activationPrice.toString());
-			params.put("activationPrice", activationPrice.toString());//追踪止损激活价格，仅TRAILING_STOP_MARKET 需要此参数, 默认为下单当前市场价格(支持不同workingType)
+			
+			params.put("activatePrice", activationPrice.toString());//追踪止损激活价格，仅TRAILING_STOP_MARKET 需要此参数, 默认为下单当前市场价格(支持不同workingType)
 			params.put("callbackRate", callbackRate.toString());//追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
 			params.put("quantity", quantity.toString());//委托数量
 			//params.put("closePosition", closePosition);//市价止损是否全部平仓
@@ -534,13 +534,16 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		headers.add("X-MBX-APIKEY", binanceApiKey);
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		
+		String url = AppConfig.REST_BASE_URL + method + queryString;
+		logger.debug(url);
+		
 		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + method + queryString, HttpMethod.POST, entity, String.class);
 		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
 
 		BinanceOrderInfo order = new BinanceOrderInfo();
 		
 		if(status == HttpStatus.OK) {
-			logger.debug(result.getBody());
+			logger.info(result.getBody());
 			JSONObject o = new JSONObject(result.getBody());
 			if(o.has("avgPrice")) {
 				order.setAvgPrice(o.getString("avgPrice"));
