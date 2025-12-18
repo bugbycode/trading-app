@@ -947,7 +947,7 @@ public class KlinesServiceImpl implements KlinesService {
 						String title = "下单" + pair + "多头仓位时出现异常";
 						String message = e.getMessage();
 						if(e instanceof OrderPlaceException) {
-							title = ((OrderPlaceException)e).getMessage();
+							title = ((OrderPlaceException)e).getTitle();
 						}
 						sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
 						logger.error(e.getMessage(), e);
@@ -1256,7 +1256,7 @@ public class KlinesServiceImpl implements KlinesService {
 						String title = "下单" + pair + "空头仓位时出现异常";
 						String message = e.getMessage();
 						if(e instanceof OrderPlaceException) {
-							title = ((OrderPlaceException)e).getMessage();
+							title = ((OrderPlaceException)e).getTitle();
 						}
 						sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
 						logger.error(e.getMessage(), e);

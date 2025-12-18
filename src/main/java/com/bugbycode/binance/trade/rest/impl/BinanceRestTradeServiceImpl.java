@@ -633,7 +633,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		} else {
 			//logger.error(result.getBody());
 			String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常";
-			String message = type + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
+			String message = type.value() + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
 			throw new OrderPlaceException(title, message);
 		}
 		
