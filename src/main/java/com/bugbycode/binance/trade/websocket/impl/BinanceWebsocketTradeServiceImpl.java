@@ -21,6 +21,7 @@ import com.bugbycode.exception.OrderCancelException;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.module.AlgoType;
 import com.bugbycode.module.Method;
+import com.bugbycode.module.PlaceOrderAgain;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
@@ -31,6 +32,8 @@ import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
 import com.bugbycode.module.trading.Type;
+import com.bugbycode.trading_app.pool.WorkTaskPool;
+import com.bugbycode.trading_app.task.order.PlaceOrderAgainTask;
 import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 import com.util.MethodDataUtil;
 import com.util.StringUtil;
@@ -45,6 +48,9 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	
 	@Autowired
 	private BinanceRestTradeService binanceRestTradeService;
+	
+	@Autowired
+	private WorkTaskPool tradingTaskPool;
 
 	@Override
 	public List<Balance> balance_v2(String apiKey, String secretKey) {
@@ -113,7 +119,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	public BinanceOrderInfo order_place(String binanceApiKey, String binanceSecretKey, String symbol, Side side,
 			PositionSide ps, Type type, String newClientOrderId, BigDecimal quantity, BigDecimal price,
 			BigDecimal stopPrice, Boolean closePosition, WorkingType workingType,
-			BigDecimal activationPrice, BigDecimal callbackRate) {
+			BigDecimal activationPrice, BigDecimal callbackRate, PlaceOrderAgain again) {
 		BinanceOrderInfo order = new BinanceOrderInfo();
 		
 		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.ALGO_ORDER_PLACE);
@@ -317,6 +323,12 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				order.setGoodTillDate(o.getLong("goodTillDate"));
 			}
 		} else {
+			
+			if(again == PlaceOrderAgain.OPEN) {//再次下单
+				this.tradingTaskPool.add(new PlaceOrderAgainTask(this, binanceApiKey, binanceSecretKey, symbol, side, ps, 
+						type, newClientOrderId, quantity, price, stopPrice, closePosition, workingType, activationPrice, callbackRate));
+			}
+			
 			String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常";
 			String message = type.value() + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
 			throw new OrderPlaceException(title, message);
@@ -349,12 +361,12 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey,
 			        symbol, Side.BUY, PositionSide.LONG, Type.MARKET, 
 			        null, quantity, null, 
-			        null, null, null, null, null);
+			        null, null, null, null, null, PlaceOrderAgain.CLOSE);
 			
 			BinanceOrderInfo slOrder = order_place(binanceApiKey, binanceSecretKey,
 			        symbol, Side.SELL, PositionSide.LONG, Type.STOP_MARKET, 
 			        null, new BigDecimal(order.getOrigQty()), null, 
-			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null);
+			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.OPEN);
 			
 			orders.add(order);
 			orders.add(slOrder);
@@ -363,7 +375,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey,
 				        symbol, Side.SELL, PositionSide.LONG, Type.TAKE_PROFIT_MARKET, 
 				        null, new BigDecimal(order.getOrigQty()), null, 
-				        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null);
+				        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.OPEN);
 				orders.add(tpOrder);
 			}
 
@@ -371,7 +383,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				BinanceOrderInfo cbOrder = order_place(binanceApiKey, binanceSecretKey,
 				        symbol, Side.SELL, PositionSide.LONG, Type.TRAILING_STOP_MARKET, 
 				        null, new BigDecimal(order.getOrigQty()), null, 
-				        takeProfit, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate);
+				        takeProfit, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate, PlaceOrderAgain.OPEN);
 				orders.add(cbOrder);
 			}
 			
@@ -379,12 +391,12 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey,
 			        symbol, Side.SELL, PositionSide.SHORT, Type.MARKET, 
 			        null, quantity, null, 
-			        null, null, null, null, null);
+			        null, null, null, null, null, PlaceOrderAgain.CLOSE);
 			
 			BinanceOrderInfo slOrder = order_place(binanceApiKey, binanceSecretKey,
 			        symbol, Side.BUY, PositionSide.SHORT, Type.STOP_MARKET, 
 			        null, new BigDecimal(order.getOrigQty()), null, 
-			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null);
+			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.OPEN);
 			
 			orders.add(order);
 			orders.add(slOrder);
@@ -393,7 +405,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey,
 				        symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
 				        null, new BigDecimal(order.getOrigQty()), null, 
-				        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null);
+				        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.OPEN);
 				orders.add(tpOrder);
 				
 			}
@@ -402,7 +414,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				BinanceOrderInfo cbOrder = order_place(binanceApiKey, binanceSecretKey,
 				        symbol, Side.BUY, PositionSide.SHORT, Type.TRAILING_STOP_MARKET, 
 				        null, new BigDecimal(order.getOrigQty()), null, 
-				        takeProfit, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate);
+				        takeProfit, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate, PlaceOrderAgain.OPEN);
 				orders.add(cbOrder);
 			}
 		}

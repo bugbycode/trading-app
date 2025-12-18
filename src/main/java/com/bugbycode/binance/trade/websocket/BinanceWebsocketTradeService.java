@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.bugbycode.binance.module.order_cancel.OrderCancelResult;
+import com.bugbycode.module.PlaceOrderAgain;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
@@ -49,11 +50,12 @@ public interface BinanceWebsocketTradeService {
 	 * @param workingType stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
 	 * @param activationPrice 追踪止损激活价格，仅TRAILING_STOP_MARKET 需要此参数, 默认为下单当前市场价格(支持不同workingType)
 	 * @param callbackRate 追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
+	 * @param again 下单失败时是否再次下单 用于当下单失败时选择是否再次下单
 	 * @return
 	 */
 	public BinanceOrderInfo order_place(String binanceApiKey,String binanceSecretKey, String symbol,Side side,PositionSide ps,Type type,String newClientOrderId,
 			BigDecimal quantity,BigDecimal price,BigDecimal stopPrice,Boolean closePosition,WorkingType workingType,
-			BigDecimal activationPrice, BigDecimal callbackRate);
+			BigDecimal activationPrice, BigDecimal callbackRate, PlaceOrderAgain again);
 	
 	/**
 	 * 获取可下单余额
