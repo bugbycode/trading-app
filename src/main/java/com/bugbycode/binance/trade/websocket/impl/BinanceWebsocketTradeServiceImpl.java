@@ -32,8 +32,6 @@ import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
 import com.bugbycode.module.trading.Type;
-import com.bugbycode.trading_app.pool.WorkTaskPool;
-import com.bugbycode.trading_app.task.order.PlaceOrderAgainTask;
 import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 import com.util.MethodDataUtil;
 import com.util.StringUtil;
@@ -48,9 +46,6 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	
 	@Autowired
 	private BinanceRestTradeService binanceRestTradeService;
-	
-	@Autowired
-	private WorkTaskPool tradingTaskPool;
 
 	@Override
 	public List<Balance> balance_v2(String apiKey, String secretKey) {
@@ -325,13 +320,14 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		} else {
 			
 			if(again == PlaceOrderAgain.OPEN) {//再次下单
-				this.tradingTaskPool.add(new PlaceOrderAgainTask(this, binanceApiKey, binanceSecretKey, symbol, side, ps, 
-						type, newClientOrderId, quantity, price, stopPrice, closePosition, workingType, activationPrice, callbackRate));
+				order_place(binanceApiKey, binanceSecretKey, symbol, side, ps, type, newClientOrderId, quantity, price, stopPrice, 
+						closePosition, workingType, activationPrice, callbackRate, PlaceOrderAgain.CLOSE);
+			} else {
+				String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常";
+				String message = type.value() + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
+				throw new OrderPlaceException(title, message);
 			}
 			
-			String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常";
-			String message = type.value() + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
-			throw new OrderPlaceException(title, message);
 		}
 		order.setRequestData(method.toString());
 		order.setResponseData(result.toString());
