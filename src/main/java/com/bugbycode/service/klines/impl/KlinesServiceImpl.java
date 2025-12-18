@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFibInfoFactory;
 import com.bugbycode.factory.area.impl.AreaFibInfoFactoryImpl;
 import com.bugbycode.factory.area.impl.ParentAreaFibInfoFactoryImpl;
@@ -943,7 +944,12 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 					} catch (Exception e) {
-						sendEmail(u, "下单" + pair + "多头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
+						String title = "下单" + pair + "多头仓位时出现异常";
+						String message = e.getMessage();
+						if(e instanceof OrderPlaceException) {
+							title = ((OrderPlaceException)e).getMessage();
+						}
+						sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
 						logger.error(e.getMessage(), e);
 					}
 					
@@ -1247,7 +1253,12 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 					} catch (Exception e) {
-						sendEmail(u, "下单" + pair + "空头仓位时出现异常 " + dateStr, e.getMessage(), tradeUserEmail);
+						String title = "下单" + pair + "空头仓位时出现异常";
+						String message = e.getMessage();
+						if(e instanceof OrderPlaceException) {
+							title = ((OrderPlaceException)e).getMessage();
+						}
+						sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
 						logger.error(e.getMessage(), e);
 					}
 					

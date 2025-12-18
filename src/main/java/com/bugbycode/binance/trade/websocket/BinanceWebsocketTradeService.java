@@ -3,6 +3,7 @@ package com.bugbycode.binance.trade.websocket;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.bugbycode.binance.module.order_cancel.OrderCancelResult;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
@@ -50,7 +51,7 @@ public interface BinanceWebsocketTradeService {
 	 * @param callbackRate 追踪止损回调比例，可取值范围[0.1, 10],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
 	 * @return
 	 */
-	public BinanceOrderInfo order_place(String binanceApiKey,String binanceSecretKey,String symbol,Side side,PositionSide ps,Type type,String newClientOrderId,
+	public BinanceOrderInfo order_place(String binanceApiKey,String binanceSecretKey, String symbol,Side side,PositionSide ps,Type type,String newClientOrderId,
 			BigDecimal quantity,BigDecimal price,BigDecimal stopPrice,Boolean closePosition,WorkingType workingType,
 			BigDecimal activationPrice, BigDecimal callbackRate);
 	
@@ -88,4 +89,14 @@ public interface BinanceWebsocketTradeService {
 	 * @return
 	 */
 	public String getMarketMinQuantity(String symbol);
+	
+	/**
+	 * 撤销订单
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @param orderId 订单编号
+	 * @return 返回撤销结果
+	 */
+	public OrderCancelResult orderCancel(String binanceApiKey, String binanceSecretKey, String symbol, long orderId);
 }

@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.module.AlgoType;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.Balance;
@@ -437,8 +438,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		if(type == Type.LIMIT) {
 			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
-			params.put("positionSide", ps);
-			params.put("type", type);
+			params.put("positionSide", ps.value());
+			params.put("type", type.value());
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
@@ -448,8 +449,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		} else if(type == Type.MARKET) {//市价订单
 			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
-			params.put("positionSide", ps);
-			params.put("type", type);
+			params.put("positionSide", ps.value());
+			params.put("type", type.value());
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
@@ -457,8 +458,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		} else if(type == Type.STOP) {//限价止损
 			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
-			params.put("positionSide", ps);
-			params.put("type", type);
+			params.put("positionSide", ps.value());
+			params.put("type", type.value());
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
@@ -470,8 +471,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		} else if(type == Type.STOP_MARKET) { //市价止损
 			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
-			params.put("positionSide", ps);
-			params.put("type", type);
+			params.put("positionSide", ps.value());
+			params.put("type", type.value());
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
@@ -482,8 +483,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		} else if(type == Type.TAKE_PROFIT) {//限价止盈
 			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
-			params.put("positionSide", ps);
-			params.put("type", type);
+			params.put("positionSide", ps.value());
+			params.put("type", type.value());
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
@@ -495,8 +496,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		} else if(type == Type.TAKE_PROFIT_MARKET) {//市价止盈
 			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
-			params.put("positionSide", ps);
-			params.put("type", type);
+			params.put("positionSide", ps.value());
+			params.put("type", type.value());
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
@@ -508,8 +509,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		} else if(type == Type.TRAILING_STOP_MARKET) {//追踪委托止损
 			params.put("symbol", StringUtil.urlEncoder(symbol));
 			params.put("side", side);
-			params.put("positionSide", ps);
-			params.put("type", type);
+			params.put("positionSide", ps.value());
+			params.put("type", type.value());
 			if(StringUtil.isNotEmpty(newClientOrderId)) {
 				params.put("newClientOrderId", newClientOrderId);
 			}
@@ -630,7 +631,10 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 				order.setGoodTillDate(o.getLong("goodTillDate"));
 			}
 		} else {
-			logger.error(result.getBody());
+			//logger.error(result.getBody());
+			String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常";
+			String message = type + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
+			throw new OrderPlaceException(title, message);
 		}
 		
 		return order;

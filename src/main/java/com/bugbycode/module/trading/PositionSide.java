@@ -5,18 +5,25 @@ package com.bugbycode.module.trading;
  */
 public enum PositionSide {
 
-	DEFAULT("BOTH"),
-	LONG("LONG"),
-	SHORT("SHORT");
+	DEFAULT("BOTH", "BOTH"),
+	LONG("LONG", "多头"),
+	SHORT("SHORT", "空头");
 
 	private String positionSide;
 	
-	PositionSide(String positionSide) {
+	private String memo;
+	
+	PositionSide(String positionSide, String memo) {
 		this.positionSide = positionSide;
+		this.memo = memo;
 	}
 	
 	public String value() {
 		return this.positionSide;
+	}
+
+	public String getMemo() {
+		return memo;
 	}
 	
 }

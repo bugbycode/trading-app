@@ -8,45 +8,52 @@ public enum Type {
 	/**
 	 * 限价单
 	 */
-	LIMIT("LIMIT"),
+	LIMIT("LIMIT", "限价单"),
 	
 	/**
 	 * 市价单
 	 */
-	MARKET("MARKET"), 
+	MARKET("MARKET", "市价单"), 
 	
 	/**
 	 * 止损限价单
 	 */
-	STOP("STOP"), 
+	STOP("STOP", "止损限价单"), 
 	
 	/**
 	 * 止盈限价单
 	 */
-	TAKE_PROFIT("TAKE_PROFIT"), 
+	TAKE_PROFIT("TAKE_PROFIT", "止盈限价单"), 
 	
 	/**
 	 * 止损市价单
 	 */
-	STOP_MARKET("STOP_MARKET"), 
+	STOP_MARKET("STOP_MARKET", "止损市价单"), 
 	
 	/**
 	 * 止盈市价单
 	 */
-	TAKE_PROFIT_MARKET("TAKE_PROFIT_MARKET"), 
+	TAKE_PROFIT_MARKET("TAKE_PROFIT_MARKET", "止盈市价单"), 
 	
 	/**
 	 * 跟踪止损单
 	 */
-	TRAILING_STOP_MARKET("TRAILING_STOP_MARKET");
+	TRAILING_STOP_MARKET("TRAILING_STOP_MARKET", "跟踪止损单");
 
 	private String type;
 	
-	Type(String type) {
+	private String memo;
+	
+	Type(String type, String memo) {
 		this.type = type;
+		this.memo = memo;
 	}
 	
 	public String value() {
 		return this.type;
+	}
+
+	public String getMemo() {
+		return memo;
 	}
 }

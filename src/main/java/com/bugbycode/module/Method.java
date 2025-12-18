@@ -23,7 +23,12 @@ public enum Method {
 	/**
 	 * 条件下单
 	 */
-	ALGO_ORDER_PLACE("algoOrder.place");
+	ALGO_ORDER_PLACE("algoOrder.place"),
+	
+	/**
+	 * 撤销订单 (TRADE)
+	 */
+	ORDER_CANCEL("order.cancel");
 
 	private String value;
 	
