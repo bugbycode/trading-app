@@ -467,7 +467,7 @@ public class KlinesServiceImpl implements KlinesService {
 							|| ( PriceUtil.isBreachLong(hitKline, price) && fibInfo.getTradeFrequency() == TradeFrequency.HIGH )
 					)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					&& !PriceUtil.isTraded(price, fibInfo)
+					&& !PriceUtil.isTraded(code, fibInfo)
 					&& (fibInfo.verifyOpenPrice(openPrice, currentPrice) || fibInfo.getTradeFrequency() == TradeFrequency.HIGH)
 					) {
 			
@@ -573,7 +573,7 @@ public class KlinesServiceImpl implements KlinesService {
 							|| ( PriceUtil.isBreachShort(hitKline, price) && fibInfo.getTradeFrequency() == TradeFrequency.HIGH )
 					)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					&& !PriceUtil.isTraded(price, fibInfo)
+					&& !PriceUtil.isTraded(code, fibInfo)
 					&& (fibInfo.verifyOpenPrice(openPrice, currentPrice) || fibInfo.getTradeFrequency() == TradeFrequency.HIGH)
 					) {
 			
