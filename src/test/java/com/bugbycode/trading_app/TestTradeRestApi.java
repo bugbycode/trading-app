@@ -11,11 +11,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
+import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.Leverage;
 import com.bugbycode.module.binance.MarginType;
+import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
@@ -30,7 +33,9 @@ import com.bugbycode.service.exchange.BinanceExchangeService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 @SpringBootTest
@@ -51,7 +56,7 @@ public class TestTradeRestApi {
 	
 	private String binanceSecretKey;
 
-    @BeforeAll
+    @BeforeEach
 	public void befor() {
         System.setProperty("https.proxyHost", "localhost");
 		System.setProperty("https.proxyPort", "50000");
@@ -81,7 +86,7 @@ public class TestTradeRestApi {
 
     @Test
     public void TestLeverage(){
-        String symbol = "BTCUSDT";
+        String symbol = "币安人生USDT";
         int leverage = 31;
         Leverage lr = binanceRestTradeService.leverage(user.getBinanceApiKey(), user.getBinanceSecretKey(), symbol, leverage);
         logger.info(lr.getLeverage());
@@ -89,37 +94,69 @@ public class TestTradeRestApi {
     
     @Test
     public void testMarginType() {
-    	String symbol = "BTCUSDT";
+    	String symbol = "币安人生USDT";
     	Result result = binanceRestTradeService.marginType(user.getBinanceApiKey(), user.getBinanceSecretKey(), symbol, MarginType.CROSSED);
     	logger.info(result.getResult());
     }
 
     @Test
     public void testOpenOrders() {
-    	String symbol = "BTCUSDT";
+    	String symbol = "FILUSDT";
     	List<BinanceOrderInfo> orders = binanceRestTradeService.openOrders(user.getBinanceApiKey(), user.getBinanceSecretKey(), symbol);
         logger.info(new JSONArray(orders));
     }
 
     @Test
     public void testOpenOrder() {
-    	String symbol = "GLMUSDT";
+    	String symbol = "FARTCOINUSDT";
     	BinanceOrderInfo order = binanceRestTradeService.openOrder(user.getBinanceApiKey(), user.getBinanceSecretKey(), symbol,0,"ios_RmL9vjtV72Cegy3w5MbR");
         logger.info(new JSONObject(order));
     }
     
     @Test
     public void testAllOrders() {
-    	String symbol = "GLMUSDT";
-    	List<BinanceOrderInfo> orders = binanceRestTradeService.allOrders(user.getBinanceApiKey(), user.getBinanceSecretKey(), symbol,0,0,0,0);
+    	String symbol = "USDCUSDT";
+    	List<BinanceOrderInfo> orders = binanceRestTradeService.allOrders(user.getBinanceApiKey(), user.getBinanceSecretKey(), symbol,0,0,0,10);
         logger.info(new JSONArray(orders));
     }
 
     @Test
     public void testOrders() {
     	String symbol = "USDCUSDT";
-    	BinanceOrderInfo order = binanceRestTradeService.order(user.getBinanceApiKey(), user.getBinanceSecretKey(), symbol,1074704444,"");
+    	BinanceOrderInfo order = binanceRestTradeService.order(user.getBinanceApiKey(), user.getBinanceSecretKey(), symbol,2227339230l,"");
         logger.info(new JSONObject(order));
+    }
+    
+    @Test
+	public void testTradeMarket(){
+		String symbol = "USDC1USDT";
+		PositionSide ps = PositionSide.LONG;
+		BigDecimal quantity = new BigDecimal(String.valueOf(6));
+		BigDecimal stopLoss = new BigDecimal(String.valueOf(0.9994));
+		BigDecimal takeProfit = new BigDecimal(String.valueOf(1));
+		BigDecimal callbackRate = new BigDecimal("0.5");
+		BigDecimal activationPrice = new BigDecimal("0.9998");
+		ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
+		try {
+			binanceRestTradeService.tradeMarket(binanceApiKey, binanceSecretKey, symbol, ps,
+					quantity, stopLoss, takeProfit, CallbackRateEnabled.CLOSE, activationPrice, callbackRate, profitOrderEnabled);
+		} catch (Exception e) {
+			if(e instanceof OrderPlaceException) {
+				logger.error(((OrderPlaceException)e).getTitle(), e);
+			} else {
+				logger.error(e.getMessage(), e);
+			}
+		}
+	}
+    
+    @Test
+    public void testLimit() {
+    	String symbol = "USDCUSDT";
+    	BinanceOrderInfo order = binanceRestTradeService.orderPost(binanceApiKey, binanceSecretKey, 
+		        symbol, Side.BUY, PositionSide.LONG, Type.LIMIT, 
+		        null, new BigDecimal("6"), new BigDecimal("0.9"), 
+		        null, null, null, null, null);
+    	logger.info(order.getOrderId());
     }
 
     @Test
@@ -148,7 +185,7 @@ public class TestTradeRestApi {
         BinanceOrderInfo order = binanceRestTradeService.orderPost(binanceApiKey, binanceSecretKey, 
         symbol, Side.SELL, PositionSide.SHORT, Type.MARKET, 
         null, new BigDecimal("6"), null, 
-        null, null, null);
+        null, null, null, null, null);
 
         long orderId = order.getOrderId();
 
@@ -180,7 +217,7 @@ public class TestTradeRestApi {
         BinanceOrderInfo stop_order = binanceRestTradeService.orderPost(binanceApiKey, binanceSecretKey, 
         symbol, Side.BUY, PositionSide.SHORT, Type.STOP_MARKET, 
         null, new BigDecimal(order.getOrigQty()), null, 
-        new BigDecimal("0.9931"), true, WorkingType.CONTRACT_PRICE);
+        new BigDecimal("0.9931"), true, WorkingType.CONTRACT_PRICE, null, null);
 
         if(stop_order.getOrderId() > 0) {
             logger.info("市价止损下单成功");
@@ -190,7 +227,7 @@ public class TestTradeRestApi {
         BinanceOrderInfo take_order = binanceRestTradeService.orderPost(binanceApiKey, binanceSecretKey, 
         symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
         null, new BigDecimal(order.getOrigQty()), null, 
-        new BigDecimal("0.932"), true, WorkingType.CONTRACT_PRICE);
+        new BigDecimal("0.932"), true, WorkingType.CONTRACT_PRICE, null, null);
         if(take_order.getOrderId() > 0) {
             logger.info("市价止盈下单成功");
         }
@@ -210,21 +247,27 @@ public class TestTradeRestApi {
 
     @Test
     public void testSymbolConfig(){
-        List<SymbolConfig> scList = binanceRestTradeService.getSymbolConfig(binanceApiKey, binanceSecretKey, "BTCUSDT");
+        List<SymbolConfig> scList = binanceRestTradeService.getSymbolConfig(binanceApiKey, binanceSecretKey, "币安人生USDT");
         logger.info(new JSONArray(scList));
     }
 
     @Test
     public void getSymbolConfigBySymbol(){
-        String pair = "ETCUSDT";
+        String pair = "币安人生USDT";
         SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
         MarginType marginType = MarginType.resolve(sc.getMarginType());
         if(marginType != MarginType.ISOLATED) {
             binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
         }
     }
+    
+    @Test
+    public void testGetTime() {
+    	long t = binanceRestTradeService.getTime();
+    	logger.info(t);
+    }
 
-    @AfterAll
+    @AfterEach
     public void after() {
 
     }

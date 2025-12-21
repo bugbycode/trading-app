@@ -1,6 +1,8 @@
 package com.bugbycode.trading_app;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -14,10 +16,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.factory.area.AreaFibInfoFactory;
+import com.bugbycode.factory.area.impl.AreaFibInfoFactoryImpl;
+import com.bugbycode.factory.area.impl.ParentAreaFibInfoFactoryImpl;
 import com.bugbycode.factory.ema.EmaTradingFactory;
 import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.FibCode;
@@ -67,15 +73,15 @@ public class KlinesServiceTest {
     @Test
     public void testQuery() {
         Date now = new Date();
-        String pair = "PIPPINUSDT";
-        List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,10);
+        String pair = "币安人生USDT";
+        List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,20);
         
         klines_list_15m.remove(PriceUtil.getLastKlines(klines_list_15m)) ;
 
         for(Klines k : klines_list_15m) {
             logger.info(k);
         }
-        klinesService.volumeMonitor(klines_list_15m);
+        //klinesService.volumeMonitor(klines_list_15m);
     }
 
     @Test
@@ -129,9 +135,9 @@ public class KlinesServiceTest {
     }
 
     @Test
-    public void testSyncKlines() {
-        String pair = "BTCUSDT";
-        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 10, QUERY_SPLIT.NOT_ENDTIME);
+    public void testSyncKlines() throws UnsupportedEncodingException {
+        String pair = "币安人生USDT";
+        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL);
         logger.info(list);
     }
 
@@ -153,12 +159,74 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "PEOPLEUSDT";
-        List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
+        String pair = "ETHUSDT";
+        //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl(list, list_15m);
+        Klines last_15m = PriceUtil.getLastKlines(list_15m);
+        
+        //List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(list_15m);
+        
+        //logger.info(klines_list_1h);
+        
+        FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_1h, list_1h, list_15m);
+		//logger.info(PriceUtil.getLastKlines(list));
+		FibInfo fibInfo = factory.getFibInfo();
+		//FibInfo parentFibInfo = factory.getParentFibInfo();
+		//FibInfo fibInfo_parent = factory.getFibInfo_parent();
+
+        if(fibInfo != null) {
+            List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
+            if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+                for(Klines k : fibAfterKlines) {
+                    logger.info(k);
+                }
+            }
+            //logger.info(parentFibInfo);
+            logger.info(fibInfo);
+            QuotationMode mode = fibInfo.getQuotationMode();
+            if(mode == QuotationMode.LONG) {
+                logger.info(factory.isLong());
+            } else {
+                logger.info(factory.isShort());
+            }
+            
+            //logger.info(fibInfo.getTakeProfit_v2(FibCode.FIB786));
+            //logger.info(fibInfo.getNextFibCode(FibCode.FIB786));
+            //logger.info(fibInfo.getEndCode());
+            //logger.info(fibInfo.getLevel().getStartFibCode());
+            //logger.info(FibCode.FIB382.lte(fibInfo.getEndCode()));
+            List<OpenPrice> openPrices = factory.getOpenPrices();
+            for(OpenPrice price : openPrices) {
+                logger.info("{} - {} ~ {}, istrade: {}, verifyOpenPrice: {}", price, fibInfo.getNextFibCode(price.getCode()), fibInfo.getTakeProfit_v2(price.getCode()), 
+                		PriceUtil.isTraded(price.getPrice(), fibInfo), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
+            }
+
+            //logger.info(fibInfo.getFibCode(factory.getOpenPrices().get(0)));
+        }
+        //logger.info(PriceUtil.isTraded(FibCode.FIB618, fibInfo));
+        //logger.info(fibInfo.getNextFibCode(FibCode.FIB2));
+        //logger.info(fibInfo.getTakeProfit_v2(FibCode.FIB2));
+    }
+    
+    @Test
+    public void testAreaFibInfo(){
+        String pair = "BTCUSDT";
+        //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
+		
+        Klines last_15m = PriceUtil.getLastKlines(list_15m);
+        
+        //List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(list_15m);
+        
+        //logger.info(klines_list_1h);
+        
+		AreaFibInfoFactory factory = new AreaFibInfoFactoryImpl(list_1h, list_1h, list_15m);
+		AreaFibInfoFactory parentFactory = new ParentAreaFibInfoFactoryImpl(list_1h, list_1h, list_15m); 
 		//logger.info(PriceUtil.getLastKlines(list));
 		FibInfo fibInfo = factory.getFibInfo();
 		//FibInfo fibInfo_parent = factory.getFibInfo_parent();
@@ -171,6 +239,7 @@ public class KlinesServiceTest {
                 }
             }
             //logger.info(fibInfo_parent);
+            logger.info(parentFactory.getFibInfo());
             logger.info(fibInfo);
             QuotationMode mode = fibInfo.getQuotationMode();
             if(mode == QuotationMode.LONG) {
@@ -178,7 +247,7 @@ public class KlinesServiceTest {
             } else {
                 logger.info(factory.isShort());
             }
-
+            
             //logger.info(fibInfo.getTakeProfit_v2(FibCode.FIB786));
             //logger.info(fibInfo.getNextFibCode(FibCode.FIB786));
             //logger.info(fibInfo.getEndCode());
@@ -186,7 +255,8 @@ public class KlinesServiceTest {
             //logger.info(FibCode.FIB382.lte(fibInfo.getEndCode()));
             List<OpenPrice> openPrices = factory.getOpenPrices();
             for(OpenPrice price : openPrices) {
-                logger.info("{} - {} ~ {}, istrade:{}", price, fibInfo.getNextFibCode(price.getCode()), fibInfo.getTakeProfit_v2(price.getCode()), PriceUtil.isTraded(price.getPrice(), fibInfo));
+                logger.info("{} - {} ~ {}, istrade: {}, verifyOpenPrice: {}", price, fibInfo.getNextFibCode(price.getCode()), fibInfo.getTakeProfit_v2(price.getCode()), 
+                		PriceUtil.isTraded(price.getPrice(), fibInfo), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
             }
 
             //logger.info(fibInfo.getFibCode(factory.getOpenPrices().get(0)));
@@ -198,7 +268,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testPriceAction(){
-        String pair = "HYPERUSDT";
+        String pair = "BTCUSDT";
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         PriceActionFactory factory = new PriceActionFactoryImpl(list_1h, list_15m);
@@ -357,5 +427,34 @@ public class KlinesServiceTest {
             logger.info("macd:{}", k.getMacd());
         }
     }
+    
+    @Test
+    public void testDeltaAndCVD() {
+        String pair = "FHEUSDT";
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,100);
+        PriceUtil.calculateDeltaAndCvd(list);
+        for(Klines k : list) {
+        	logger.info("{}, {}, {}, {}, {}",k.getPair(), k.getInterval(),DateFormatUtil.format(k.getStartTime()) , k.getDelta(), k.getCvd());
+        }
+    }
 
+    @Test
+    public void testBand() {
+    	String pair = "BTCUSDT";
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,5000);
+        PriceUtil.calculateBollingerBands(list);
+        for(Klines k : list) {
+        	logger.info(k);
+        }
+    }
+    
+    @Test
+    public void testVolumeMonitor() {
+    	String pair = "ETHUSDT";
+        //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+      //  List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+       // List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
+        klinesService.volumeMonitor(null, null, null, list_15m);
+    }
 }

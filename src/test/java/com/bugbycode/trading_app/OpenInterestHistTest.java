@@ -18,6 +18,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
+import com.util.StringUtil;
 
 @SpringBootTest
 public class OpenInterestHistTest {
@@ -39,13 +40,14 @@ public class OpenInterestHistTest {
 	
 	@Test
 	public void testData() {
-		String symbol = "BTCUSDT";
+		String symbol = "币安人生USDT";
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(AppConfig.REST_BASE_URL + "/futures/data/openInterestHist")
 				.queryParam("symbol", symbol)
 				.queryParam("period", Inerval.INERVAL_15M.getDescption())
 				.queryParam("limit", 1);
 		
 		String url = uriBuilder.toUriString();
+		url = StringUtil.urlDecoder(url);
 		//
 		String result = restTemplate.getForObject(url, String.class);
 		logger.info(result);
@@ -69,7 +71,7 @@ public class OpenInterestHistTest {
 
 	@Test
 	public void testQueryOne() {
-		String symbol = "SKLUSDT";
+		String symbol = "币安人生USDT";
 		OpenInterestHist o = openInterestHistRepository.findOneBySymbol(symbol);
 		logger.info(o);
 	}

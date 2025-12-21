@@ -8,7 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +19,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.exception.OrderCancelException;
+import com.bugbycode.exception.OrderPlaceException;
+import com.bugbycode.module.PlaceOrderAgain;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
@@ -59,7 +64,7 @@ public class WebsocketAPITest {
 	
 	private User user;
 	
-	@BeforeAll
+	@BeforeEach
 	public void befor() {
 		
 		System.setProperty("https.proxyHost", "localhost");
@@ -109,10 +114,10 @@ public class WebsocketAPITest {
         Type.LIMIT, null, new BigDecimal("10.0"), 
         new BigDecimal("0.99"), null, null, null); */
         //市价单测试
-        BinanceOrderInfo order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, 
+        BinanceOrderInfo order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
         symbol, Side.SELL, PositionSide.SHORT, Type.MARKET, 
         null, new BigDecimal("6"), null, 
-        null, null, null, null, null);
+        null, null, null, null, null, PlaceOrderAgain.CLOSE);
 
         long orderId = order.getOrderId();
 
@@ -141,20 +146,20 @@ public class WebsocketAPITest {
         } */
 
         //市价止损订单测试
-        BinanceOrderInfo stop_order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, 
+        BinanceOrderInfo stop_order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
         symbol, Side.BUY, PositionSide.SHORT, Type.STOP_MARKET, 
         null, new BigDecimal(order.getOrigQty()), null, 
-        new BigDecimal("0.9998"), true, WorkingType.CONTRACT_PRICE, null, null);
+        new BigDecimal("0.9998"), true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.CLOSE);
 
         if(stop_order.getOrderId() > 0) {
             logger.info("市价止损下单成功");
         }
 
         //市价止盈单测试
-        BinanceOrderInfo take_order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, 
+        BinanceOrderInfo take_order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
         symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
         null, new BigDecimal(order.getOrigQty()), null, 
-        new BigDecimal("0.998"), true, WorkingType.CONTRACT_PRICE, null, null);
+        new BigDecimal("0.998"), true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.CLOSE);
         if(take_order.getOrderId() > 0) {
             logger.info("市价止盈下单成功");
         }
@@ -177,8 +182,31 @@ public class WebsocketAPITest {
 		BigDecimal callbackRate = new BigDecimal("0.5");
 		BigDecimal activationPrice = new BigDecimal("0.9998");
 		ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
-		binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, symbol, ps,
-		 quantity, stopLoss, takeProfit, CallbackRateEnabled.OPEN, activationPrice, callbackRate, profitOrderEnabled);
+		try {
+			binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, symbol, ps,
+					quantity, stopLoss, takeProfit, CallbackRateEnabled.OPEN, activationPrice, callbackRate, profitOrderEnabled);
+		} catch (Exception e) {
+			if(e instanceof OrderPlaceException) {
+				logger.error(((OrderPlaceException)e).getTitle(), e);
+			} else {
+				logger.error(e.getMessage(), e);
+			}
+		}
+	}
+	
+	@Test
+	public void testOrderCancel() {
+		long orderId = 2227229613l;
+		String symbol = "USDCUSDT";
+		try {
+			binanceWebsocketTradeService.orderCancel(binanceApiKey, binanceSecretKey, symbol, orderId);
+		} catch (Exception e) {
+			if(e instanceof OrderCancelException) {
+				logger.error(((OrderCancelException)e).getTitle(), e);
+			} else {
+				logger.error(e.getMessage(), e);
+			}
+		}
 	}
 	
 	@Test
@@ -190,7 +218,7 @@ public class WebsocketAPITest {
 		BigDecimal callbackRate = new BigDecimal("3");
         BigDecimal quantity = new BigDecimal("0.1");
 		binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, symbol, side, ps, Type.TRAILING_STOP_MARKET, 
-				null, quantity, null, null, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate);
+				null, quantity, null, null, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate, PlaceOrderAgain.CLOSE);
 	}
 
     @Test
@@ -202,7 +230,7 @@ public class WebsocketAPITest {
 
     @Test
     public void testPrice(){
-        PriceInfo priceInfo = binanceWebsocketTradeService.getPrice("THEUSDT");
+        PriceInfo priceInfo = binanceWebsocketTradeService.getPrice("币安人生USDT");
         logger.info(priceInfo.getPrice());
         int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
         logger.info(decimalNum);
@@ -235,8 +263,16 @@ public class WebsocketAPITest {
         logger.info(takePrice);
     }
     
+    @Test
+    public void testGetMarketMinQuantity() {
+    	String pair = "BTCUSDT";
+    	//最少下单数量
+		String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
+		logger.info(quantityNum);
+    }
+    
 
-	@AfterAll
+	@AfterEach
 	public void after(){
 		
 	}
