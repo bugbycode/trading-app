@@ -462,10 +462,11 @@ public class KlinesServiceImpl implements KlinesService {
 			int offset = fibInfo.getFibCodeIndex(code);
 			
 			if( //(PriceUtil.isLong(price, klinesList_hit) || PriceUtil.isLong_v3(price, klinesList_hit))
-					(
+					/*(
 							( PriceUtil.isLong_v2(price, klinesList_hit) && fibInfo.getTradeFrequency() == TradeFrequency.LOW ) 
 							|| ( PriceUtil.isBreachLong(hitKline, price) && fibInfo.getTradeFrequency() == TradeFrequency.HIGH )
-					)
+					)*/
+					PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTraded(code, fibInfo)
 					&& (fibInfo.verifyOpenPrice(openPrice, currentPrice) || fibInfo.getTradeFrequency() == TradeFrequency.HIGH)
@@ -568,10 +569,11 @@ public class KlinesServiceImpl implements KlinesService {
 			int offset = fibInfo.getFibCodeIndex(code);
 			
 			if( //(PriceUtil.isShort(price, klinesList_hit) || PriceUtil.isShort_v3(price, klinesList_hit))
-					(
+					/*(
 							( PriceUtil.isShort_v2(price, klinesList_hit) && fibInfo.getTradeFrequency() == TradeFrequency.LOW)
 							|| ( PriceUtil.isBreachShort(hitKline, price) && fibInfo.getTradeFrequency() == TradeFrequency.HIGH )
-					)
+					)*/
+					PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTraded(code, fibInfo)
 					&& (fibInfo.verifyOpenPrice(openPrice, currentPrice) || fibInfo.getTradeFrequency() == TradeFrequency.HIGH)
