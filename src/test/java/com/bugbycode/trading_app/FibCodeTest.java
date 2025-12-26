@@ -10,7 +10,7 @@ public class FibCodeTest {
 	public static void main(String[] args) {
 		
 		FibInfo fibInfo = new FibInfo(1, 100, 2, FibLevel.LEVEL_0);
-		//fibInfo.setTradeFrequency(TradeFrequency.HIGH);
+		fibInfo.setTradeFrequency(TradeFrequency.HIGH);
 		
 		FibCode[] codes = FibCode.values();
 		

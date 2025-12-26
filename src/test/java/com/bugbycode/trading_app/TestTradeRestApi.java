@@ -7,10 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
-import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.Balance;
@@ -21,20 +19,16 @@ import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
-import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
 import com.bugbycode.module.trading.Type;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
-import com.bugbycode.service.exchange.BinanceExchangeService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -267,6 +261,19 @@ public class TestTradeRestApi {
     	logger.info(t);
     }
 
+    @Test
+    public void testOpenAlgoOrders() {
+    	String pair = "ADAUSDT";
+    	List<BinanceOrderInfo> list = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair);
+    	logger.info(list.size());
+    }
+    
+    @Test
+    public void testAllCountOpenAlgoOrders() {
+    	int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
+    	logger.info(openAlgoOrdersCount);
+    }
+    
     @AfterEach
     public void after() {
 

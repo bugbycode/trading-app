@@ -23,7 +23,6 @@ import com.bugbycode.factory.ema.EmaTradingFactory;
 import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.FibCode;
@@ -171,7 +170,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_1h, list_1h, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
 		//logger.info(PriceUtil.getLastKlines(list));
 		FibInfo fibInfo = factory.getFibInfo();
 		//FibInfo parentFibInfo = factory.getParentFibInfo();
