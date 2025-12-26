@@ -50,7 +50,7 @@ public class SecurityConfig {
     	
     	.authorizeHttpRequests(authorize -> authorize
     			
-    			.requestMatchers("/shape/**",
+    			.requestMatchers("/shape/**", "/childApiKey/**",
     					"/user/**",
     					"/tradingview/**",
     					"/bot/**").hasAnyRole("LOGIN")
