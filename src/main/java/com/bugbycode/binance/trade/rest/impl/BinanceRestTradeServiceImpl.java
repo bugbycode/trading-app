@@ -159,7 +159,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		headers.add("X-MBX-APIKEY", binanceApiKey);
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		
-		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/openAlgoOrders?" + queryString, HttpMethod.GET, entity, String.class);
+		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/openOrders?" + queryString, HttpMethod.GET, entity, String.class);
 		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
 		
 		if(status == HttpStatus.OK) {
@@ -230,7 +230,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		headers.add("X-MBX-APIKEY", binanceApiKey);
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		
-		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/openAlgoOrders?" + queryString, HttpMethod.GET, entity, String.class);
+		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/openOrder?" + queryString, HttpMethod.GET, entity, String.class);
 		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
 
 		BinanceOrderInfo order = new BinanceOrderInfo();
@@ -884,5 +884,73 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		}
 		return t;
 	}
+	
+	@Override
+	public List<BinanceOrderInfo> openAlgoOrders(String binanceApiKey,String binanceSecretKey, String symbol) {
+		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
+		
+		String queryString = String.format("timestamp=%s", getTime());
+		
+		if(StringUtil.isNotEmpty(symbol)) {
+			queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getTime());
+		}
+		
+		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
+		queryString += "&signature=" + signature;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-MBX-APIKEY", binanceApiKey);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		
+		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/openAlgoOrders?" + queryString, HttpMethod.GET, entity, String.class);
+		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
+		
+		if(status == HttpStatus.OK) {
+			JSONArray jsonArr = new JSONArray(result.getBody());
+			jsonArr.forEach(obj -> {
+				JSONObject o = (JSONObject) obj;
+				BinanceOrderInfo order = new BinanceOrderInfo();
+				//order.setAvgPrice(o.getString("avgPrice"));
+				order.setClientOrderId(o.getString("clientAlgoId"));
+				//order.setCumQuote(o.getString("cumQuote"));
+				//order.setExecutedQty(o.getString("executedQty"));
+				order.setOrderId(o.getLong("algoId"));
+				order.setOrigQty(o.getString("quantity"));
+				order.setOrigType(o.getString("orderType"));
+				order.setPrice(o.getString("price"));
+				order.setReduceOnly(o.getBoolean("reduceOnly"));
+				order.setSide(o.getString("side"));
+				order.setPositionSide(o.getString("positionSide"));
+				order.setStatus(o.getString("algoStatus"));
+				order.setStopPrice(o.getString("triggerPrice"));
+				order.setClosePosition(o.getBoolean("closePosition"));
+				order.setSymbol(o.getString("symbol"));
+				order.setTime(o.getLong("createTime"));
+				order.setTimeInForce(o.getString("timeInForce"));
+				order.setType(o.getString("orderType"));
+				if(o.has("activatePrice")) {
+					order.setActivatePrice(o.getString("activatePrice"));
+				}
+				if(o.has("priceRate")) {
+					order.setPriceRate(o.getString("priceRate"));
+				}
+				order.setUpdateTime(o.getLong("updateTime"));
+				order.setWorkingType(o.getString("workingType"));
+				order.setPriceProtect(o.getBoolean("priceProtect"));
+				order.setPriceMatch(o.getString("priceMatch"));
+				order.setSelfTradePreventionMode(o.getString("selfTradePreventionMode"));
+				order.setGoodTillDate(o.getLong("goodTillDate"));
+				orders.add(order);
+			});
+		}
+		
+		return orders;
+	}
 
+	@Override
+	public int allCountOpenAlgoOrders(String binanceApiKey, String binanceSecretKey) {
+		return openAlgoOrders(binanceApiKey, binanceSecretKey, null).size();
+	}
 }

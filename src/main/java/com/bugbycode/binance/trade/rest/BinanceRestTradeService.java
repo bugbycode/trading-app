@@ -205,4 +205,24 @@ public interface BinanceRestTradeService {
 	 */
 	public long getTime();
 	
+	/**
+	 * 查看当前全部条件挂单 (USER_DATA) </br>
+	 * -请求权重 </br>
+	 *  1、带symbol 1 </br>
+	 *  2、不带 40 请小心使用不带symbol参数的调用 </br>
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol
+	 * @return
+	 */
+	public List<BinanceOrderInfo> openAlgoOrders(String binanceApiKey, String binanceSecretKey, String symbol);
+	
+	/**
+	 * 统计当前全部条件挂单总数量 (USER_DATA) </br>
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @return
+	 */
+	public int allCountOpenAlgoOrders(String binanceApiKey, String binanceSecretKey);
+	
 }

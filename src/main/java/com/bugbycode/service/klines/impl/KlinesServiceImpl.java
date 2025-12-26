@@ -26,7 +26,7 @@ import com.bugbycode.factory.area.impl.ParentAreaFibInfoFactoryImpl;
 import com.bugbycode.factory.ema.EmaTradingFactory;
 import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -676,6 +676,12 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 					
+					//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
+					int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
+					if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
+						continue;
+					}
+					
 					//筛选策略限制
 					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
 						continue;
@@ -839,7 +845,7 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 						}
 						
-						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
+						List<BinanceOrderInfo> orderList = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair);
 						if(!CollectionUtils.isEmpty(orderList)) {
 							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 							continue;
@@ -981,6 +987,12 @@ public class KlinesServiceImpl implements KlinesService {
 					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
 					
 					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
+					
+					//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
+					int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
+					if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
+						continue;
+					}
 					
 					//筛选策略限制
 					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
@@ -1146,7 +1158,7 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 						}
 
-						List<BinanceOrderInfo> orderList = binanceRestTradeService.openOrders(binanceApiKey, binanceSecretKey, pair);
+						List<BinanceOrderInfo> orderList = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair);
 						if(!CollectionUtils.isEmpty(orderList)) {
 							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 							continue;
@@ -1343,7 +1355,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_1h, list_1h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
