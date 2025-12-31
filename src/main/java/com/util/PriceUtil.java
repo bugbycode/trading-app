@@ -21,6 +21,7 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
+import com.bugbycode.module.PriceActionInfo;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ReversalPoint;
 import com.bugbycode.module.SortType;
@@ -2007,6 +2008,21 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v22(Klines current, Klines parent, Klines next) {
+		boolean result = false;
+		if(next.isRise() && parent.isFall() && current.isRise() && current.getBodyHighPriceDoubleValue() < parent.getBodyHighPriceDoubleValue()) {//颓势
+			result = true;
+		}
+		return result;
+	}
+	
+	/**
 	 * MACD 连续衰竭
 	 * @param current 当前k线
 	 * @param parent 前一根k线
@@ -2214,6 +2230,21 @@ public class PriceUtil {
 	public static boolean verifyPowerful_v21(Klines current, Klines parent) {
 		return (current.isRise() && current.getBodyHighPriceDoubleValue() >= parent.getBodyHighPriceDoubleValue())
 				|| (current.isFall() && current.getBodyLowPriceDoubleValue() > parent.getLowPriceDoubleValue());
+	}
+	
+	/**
+	 * 判断是否出现强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyPowerful_v22(Klines current, Klines parent, Klines next) {
+		boolean result = false;
+		if(next.isFall() && parent.isRise() && current.isFall() && current.getBodyLowPriceDoubleValue() > parent.getBodyLowPriceDoubleValue()) {//强势
+			result = true;
+		}
+		return result;
 	}
 	
 	/**
@@ -3045,6 +3076,42 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 是否出现看涨吞没
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean isBullishSwallowing_v2(Klines current, Klines parent, Klines next) {
+		boolean result = false;
+		//看涨吞没
+		if(parent.isFall() && current.isRise() && current.getBodyHighPriceDoubleValue() >= parent.getBodyHighPriceDoubleValue()) {
+			result = true;
+		}
+		return result;
+	}
+	
+	/**
+	 * 是否出现看涨吞没
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean isBullishSwallowing_v3(Klines current, Klines parent, Klines next) {
+		boolean result = false;
+		//看涨吞没
+		if(next.isFall() && parent.isRise() && current.isRise()
+				&& parent.getBodyHighPriceDoubleValue() < next.getBodyHighPriceDoubleValue() 
+				&& current.getBodyHighPriceDoubleValue() >= next.getBodyHighPriceDoubleValue()) {
+			result = true;
+		}
+		return result;
+	}
+	
+	/**
 	 * 是否出现看跌吞没
 	 * @param current 当前k线
 	 * @param parent 前一根K线
@@ -3070,6 +3137,40 @@ public class PriceUtil {
 		Klines k1 = list.get(index - 1);
 		
 		return (isSelling(list) || isBuyingExhaustion(list)) && k0.getClosePriceDoubleValue() <= k1.getOpenPriceDoubleValue();
+	}
+	
+	/**
+	 * 是否出现看跌吞没
+	 * @param current 当前k线
+	 * @param parent 前一根K线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean isPutInto_v2(Klines current, Klines parent, Klines next) {
+		boolean result = false;
+		//看跌吞没
+		if(parent.isRise() && current.isFall() && current.getBodyLowPriceDoubleValue() <= parent.getBodyLowPriceDoubleValue()) {
+			result = true;
+		}
+		return result;
+	}
+	
+	/**
+	 * 是否出现看跌吞没
+	 * @param current 当前k线
+	 * @param parent 前一根K线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean isPutInto_v3(Klines current, Klines parent, Klines next) {
+		boolean result = false;
+		//看跌吞没
+		if(next.isRise() && parent.isFall() && current.isFall()
+				&& parent.getBodyLowPriceDoubleValue() > next.getBodyLowPriceDoubleValue() 
+				&& current.getBodyLowPriceDoubleValue() <= next.getBodyLowPriceDoubleValue()) {//看跌吞没
+			result = true;
+		}
+		return result;
 	}
 	
 	/**
@@ -3748,5 +3849,31 @@ public class PriceUtil {
      */
     public static void calculateBollingerBands(List<Klines> klines) {
     	calculateBollingerBands(klines, 20);
+    }
+    
+    public static PriceActionInfo getMaxPriceActionInfo(List<PriceActionInfo> list) {
+    	PriceActionInfo result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		result = list.get(0);
+    		for(PriceActionInfo info : list) {
+    			if(info.getHigh().getHighPriceDoubleValue() > result.getHigh().getHighPriceDoubleValue()) {
+    				result = info;
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
+    public static PriceActionInfo getMinPriceActionInfo(List<PriceActionInfo> list) {
+    	PriceActionInfo result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		result = list.get(0);
+    		for(PriceActionInfo info : list) {
+    			if(info.getLow().getLowPriceDoubleValue() < result.getLow().getLowPriceDoubleValue()) {
+    				result = info;
+    			}
+    		}
+    	}
+    	return result;
     }
 }
