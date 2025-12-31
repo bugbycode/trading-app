@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.bugbycode.binance.module.order_cancel.OrderCancelResult;
 import com.bugbycode.module.PlaceOrderAgain;
+import com.bugbycode.module.Result;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
@@ -53,7 +54,7 @@ public interface BinanceWebsocketTradeService {
 	 * @param again 下单失败时是否再次下单 用于当下单失败时选择是否再次下单
 	 * @return
 	 */
-	public BinanceOrderInfo order_place(String binanceApiKey,String binanceSecretKey, String symbol,Side side,PositionSide ps,Type type,String newClientOrderId,
+	public Result<BinanceOrderInfo,RuntimeException> order_place(String binanceApiKey,String binanceSecretKey, String symbol,Side side,PositionSide ps,Type type,String newClientOrderId,
 			BigDecimal quantity,BigDecimal price,BigDecimal stopPrice,Boolean closePosition,WorkingType workingType,
 			BigDecimal activationPrice, BigDecimal callbackRate, PlaceOrderAgain again);
 	

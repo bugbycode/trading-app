@@ -22,6 +22,7 @@ import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.module.AlgoType;
 import com.bugbycode.module.Method;
 import com.bugbycode.module.PlaceOrderAgain;
+import com.bugbycode.module.Result;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
@@ -111,10 +112,11 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	}
 
 	@Override
-	public BinanceOrderInfo order_place(String binanceApiKey, String binanceSecretKey, String symbol, Side side,
+	public Result<BinanceOrderInfo,RuntimeException> order_place(String binanceApiKey, String binanceSecretKey, String symbol, Side side,
 			PositionSide ps, Type type, String newClientOrderId, BigDecimal quantity, BigDecimal price,
 			BigDecimal stopPrice, Boolean closePosition, WorkingType workingType,
 			BigDecimal activationPrice, BigDecimal callbackRate, PlaceOrderAgain again) {
+		
 		BinanceOrderInfo order = new BinanceOrderInfo();
 		
 		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.ALGO_ORDER_PLACE);
@@ -325,13 +327,14 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			} else {
 				String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常";
 				String message = type.value() + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
-				throw new OrderPlaceException(title, message);
+				//throw new OrderPlaceException(title, message);
+				return new Result<BinanceOrderInfo, RuntimeException>(order, new OrderPlaceException(title, message));
 			}
 			
 		}
 		order.setRequestData(method.toString());
 		order.setResponseData(result.toString());
-		return order;
+		return new Result<BinanceOrderInfo, RuntimeException>(order, null);
 	}
 
 	@Override
@@ -354,64 +357,108 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
 		
 		if(ps == PositionSide.LONG) {//做多
-			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey,
+			Result<BinanceOrderInfo,RuntimeException> order_rs = order_place(binanceApiKey, binanceSecretKey,
 			        symbol, Side.BUY, PositionSide.LONG, Type.MARKET, 
 			        null, quantity, null, 
 			        null, null, null, null, null, PlaceOrderAgain.CLOSE);
 			
-			BinanceOrderInfo slOrder = order_place(binanceApiKey, binanceSecretKey,
+			BinanceOrderInfo order = order_rs.getResult();
+			orders.add(order);
+			
+			if(order_rs.getErr() != null) {
+				throw order_rs.getErr();
+			}
+			
+			Result<BinanceOrderInfo,RuntimeException> slOrder_rs = order_place(binanceApiKey, binanceSecretKey,
 			        symbol, Side.SELL, PositionSide.LONG, Type.STOP_MARKET, 
 			        null, new BigDecimal(order.getOrigQty()), null, 
 			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.OPEN);
 			
-			orders.add(order);
+			BinanceOrderInfo slOrder = slOrder_rs.getResult();
 			orders.add(slOrder);
 			
+			Result<BinanceOrderInfo,RuntimeException> tpOrder_rs = null;
 			if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
-				BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey,
+				tpOrder_rs = order_place(binanceApiKey, binanceSecretKey,
 				        symbol, Side.SELL, PositionSide.LONG, Type.TAKE_PROFIT_MARKET, 
 				        null, new BigDecimal(order.getOrigQty()), null, 
 				        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.OPEN);
+				BinanceOrderInfo tpOrder = tpOrder_rs.getResult();
 				orders.add(tpOrder);
 			}
-
+			
+			Result<BinanceOrderInfo,RuntimeException> cbOrder_rs = null;
 			if(callbackRateEnabled == CallbackRateEnabled.OPEN) {
-				BinanceOrderInfo cbOrder = order_place(binanceApiKey, binanceSecretKey,
+				cbOrder_rs = order_place(binanceApiKey, binanceSecretKey,
 				        symbol, Side.SELL, PositionSide.LONG, Type.TRAILING_STOP_MARKET, 
 				        null, new BigDecimal(order.getOrigQty()), null, 
 				        takeProfit, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate, PlaceOrderAgain.OPEN);
+				BinanceOrderInfo cbOrder = cbOrder_rs.getResult();
 				orders.add(cbOrder);
 			}
 			
+			if(slOrder_rs.getErr() != null) {
+				throw slOrder_rs.getErr();
+			}
+			
+			if(tpOrder_rs != null && tpOrder_rs.getErr() != null) {
+				throw tpOrder_rs.getErr();
+			}
+			
+			if(cbOrder_rs != null && cbOrder_rs.getErr() != null) {
+				throw cbOrder_rs.getErr();
+			}
+			
 		} else {//做空
-			BinanceOrderInfo order = order_place(binanceApiKey, binanceSecretKey,
+			Result<BinanceOrderInfo,RuntimeException> order_rs = order_place(binanceApiKey, binanceSecretKey,
 			        symbol, Side.SELL, PositionSide.SHORT, Type.MARKET, 
 			        null, quantity, null, 
 			        null, null, null, null, null, PlaceOrderAgain.CLOSE);
 			
-			BinanceOrderInfo slOrder = order_place(binanceApiKey, binanceSecretKey,
+			BinanceOrderInfo order = order_rs.getResult();
+			orders.add(order);
+			
+			if(order_rs.getErr() != null) {
+				throw order_rs.getErr();
+			}
+			
+			Result<BinanceOrderInfo,RuntimeException> slOrder_rs = order_place(binanceApiKey, binanceSecretKey,
 			        symbol, Side.BUY, PositionSide.SHORT, Type.STOP_MARKET, 
 			        null, new BigDecimal(order.getOrigQty()), null, 
 			        stopLoss, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.OPEN);
-			
-			orders.add(order);
+			BinanceOrderInfo slOrder = slOrder_rs.getResult();
 			orders.add(slOrder);
 			
+			Result<BinanceOrderInfo,RuntimeException> tpOrder_rs = null;
 			if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
-				BinanceOrderInfo tpOrder = order_place(binanceApiKey, binanceSecretKey,
+				tpOrder_rs = order_place(binanceApiKey, binanceSecretKey,
 				        symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
 				        null, new BigDecimal(order.getOrigQty()), null, 
 				        takeProfit, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.OPEN);
+				BinanceOrderInfo tpOrder = tpOrder_rs.getResult();
 				orders.add(tpOrder);
-				
 			}
 			
+			Result<BinanceOrderInfo,RuntimeException> cbOrder_rs = null;
 			if(callbackRateEnabled == CallbackRateEnabled.OPEN) {
-				BinanceOrderInfo cbOrder = order_place(binanceApiKey, binanceSecretKey,
+				cbOrder_rs = order_place(binanceApiKey, binanceSecretKey,
 				        symbol, Side.BUY, PositionSide.SHORT, Type.TRAILING_STOP_MARKET, 
 				        null, new BigDecimal(order.getOrigQty()), null, 
 				        takeProfit, true, WorkingType.CONTRACT_PRICE, activationPrice, callbackRate, PlaceOrderAgain.OPEN);
+				BinanceOrderInfo cbOrder = cbOrder_rs.getResult();
 				orders.add(cbOrder);
+			}
+			
+			if(slOrder_rs.getErr() != null) {
+				throw slOrder_rs.getErr();
+			}
+			
+			if(tpOrder_rs != null && tpOrder_rs.getErr() != null) {
+				throw tpOrder_rs.getErr();
+			}
+			
+			if(cbOrder_rs != null && cbOrder_rs.getErr() != null) {
+				throw cbOrder_rs.getErr();
 			}
 		}
 		
