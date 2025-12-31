@@ -114,11 +114,12 @@ public class WebsocketAPITest {
         Type.LIMIT, null, new BigDecimal("10.0"), 
         new BigDecimal("0.99"), null, null, null); */
         //市价单测试
-        BinanceOrderInfo order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
+        com.bugbycode.module.Result<BinanceOrderInfo,RuntimeException> order_rs = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
         symbol, Side.SELL, PositionSide.SHORT, Type.MARKET, 
         null, new BigDecimal("6"), null, 
         null, null, null, null, null, PlaceOrderAgain.CLOSE);
 
+        BinanceOrderInfo order = order_rs.getResult();
         long orderId = order.getOrderId();
 
         //logger.info(new JSONObject(order));
@@ -146,20 +147,23 @@ public class WebsocketAPITest {
         } */
 
         //市价止损订单测试
-        BinanceOrderInfo stop_order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
+        com.bugbycode.module.Result<BinanceOrderInfo,RuntimeException> stop_order_rs = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
         symbol, Side.BUY, PositionSide.SHORT, Type.STOP_MARKET, 
         null, new BigDecimal(order.getOrigQty()), null, 
         new BigDecimal("0.9998"), true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.CLOSE);
 
+        BinanceOrderInfo stop_order = stop_order_rs.getResult();
         if(stop_order.getOrderId() > 0) {
             logger.info("市价止损下单成功");
         }
 
         //市价止盈单测试
-        BinanceOrderInfo take_order = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
+        com.bugbycode.module.Result<BinanceOrderInfo,RuntimeException> take_order_rs = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey,
         symbol, Side.BUY, PositionSide.SHORT, Type.TAKE_PROFIT_MARKET, 
         null, new BigDecimal(order.getOrigQty()), null, 
         new BigDecimal("0.998"), true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.CLOSE);
+        
+        BinanceOrderInfo take_order = take_order_rs.getResult();
         if(take_order.getOrderId() > 0) {
             logger.info("市价止盈下单成功");
         }
@@ -178,9 +182,9 @@ public class WebsocketAPITest {
 		PositionSide ps = PositionSide.LONG;
 		BigDecimal quantity = new BigDecimal(String.valueOf(6));
 		BigDecimal stopLoss = new BigDecimal(String.valueOf(0.9994));
-		BigDecimal takeProfit = new BigDecimal(String.valueOf(1));
+		BigDecimal takeProfit = new BigDecimal(String.valueOf(1.001));
 		BigDecimal callbackRate = new BigDecimal("0.5");
-		BigDecimal activationPrice = new BigDecimal("0.9998");
+		BigDecimal activationPrice = new BigDecimal("1.0009");
 		ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 		try {
 			binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, symbol, ps,

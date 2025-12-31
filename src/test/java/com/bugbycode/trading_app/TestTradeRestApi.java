@@ -23,8 +23,10 @@ import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
 import com.bugbycode.module.trading.Type;
+import com.bugbycode.module.user.ChildApiKeyConfig;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
+import com.bugbycode.service.user.ChildApiKeyConfigService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,7 +45,9 @@ public class TestTradeRestApi {
     @Autowired
     private BinanceRestTradeService binanceRestTradeService;
 
-
+    @Autowired
+    private ChildApiKeyConfigService childApiKeyConfigService;
+    
     private User user;
     
     private String binanceApiKey;
@@ -272,6 +276,18 @@ public class TestTradeRestApi {
     public void testAllCountOpenAlgoOrders() {
     	int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
     	logger.info(openAlgoOrdersCount);
+    }
+    
+    @Test
+    public void testChildCfgBalance() {
+    	List<ChildApiKeyConfig> child_list = childApiKeyConfigService.findByUsername(user.getUsername());
+    	for(ChildApiKeyConfig cfg : child_list) {
+    		List<Balance> balance_list = binanceRestTradeService.balance_v3(cfg.getBinanceApiKey(), cfg.getBinanceSecretKey());
+    		logger.info("{}: ",cfg.getEmail());
+    		for(Balance b : balance_list) {
+    			logger.info("{} - {}", b.getAsset(), b.getBalance());
+    		}
+    	}
     }
     
     @AfterEach
