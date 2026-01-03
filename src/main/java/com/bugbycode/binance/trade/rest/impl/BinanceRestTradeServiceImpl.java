@@ -2,6 +2,7 @@ package com.bugbycode.binance.trade.rest.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	@Override
 	public Result dualSidePosition(String binanceApiKey,String binanceSecretKey,boolean dualSidePosition) {
 		ResultCode code = ResultCode.ERROR;
-		String queryString = String.format("dualSidePosition=%s&timestamp=%s", dualSidePosition, getTime());
+		String queryString = String.format("dualSidePosition=%s&timestamp=%s", dualSidePosition, getLocalTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		queryString += "&signature=" + signature;
 		
@@ -75,7 +76,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		boolean dualSidePosition = false;
 		
-		String queryString = String.format("timestamp=%s", getTime());
+		String queryString = String.format("timestamp=%s", getLocalTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		queryString += "&signature=" + signature;
 		
@@ -98,7 +99,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	public Leverage leverage(String binanceApiKey,String binanceSecretKey,String symbol, int leverage) {
 		Leverage lr = new Leverage(0, null, symbol);
 		
-		String queryString = String.format("symbol=%s&leverage=%s&timestamp=%s", StringUtil.urlEncoder(symbol), leverage, getTime());
+		String queryString = String.format("symbol=%s&leverage=%s&timestamp=%s", StringUtil.urlEncoder(symbol), leverage, getLocalTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		
 		queryString = StringUtil.urlDecoder(queryString);
@@ -123,7 +124,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	@Override
 	public Result marginType(String binanceApiKey,String binanceSecretKey,String symbol, MarginType marginType) {
 		ResultCode code = ResultCode.ERROR;
-		String queryString = String.format("symbol=%s&marginType=%s&timestamp=%s", StringUtil.urlEncoder(symbol), marginType, getTime());
+		String queryString = String.format("symbol=%s&marginType=%s&timestamp=%s", StringUtil.urlEncoder(symbol), marginType, getLocalTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		
 		queryString = StringUtil.urlDecoder(queryString);
@@ -149,7 +150,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
 		
-		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getTime());
+		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getLocalTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		
 		queryString = StringUtil.urlDecoder(queryString);
@@ -217,7 +218,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("origClientOrderId", origClientOrderId);
 		}
 		
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		
@@ -278,7 +279,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		Map<String,Object> params = new HashMap<String, Object>();
 		params.put("symbol",  StringUtil.urlEncoder(symbol));
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		if(orderId > 0) {
 			params.put("orderId", orderId);
 		}
@@ -357,7 +358,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		Map<String,Object> params = new HashMap<String, Object>();
 		params.put("symbol", StringUtil.urlEncoder(symbol));
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		if(orderId > 0) {
 			params.put("orderId", orderId);
 		}
@@ -523,7 +524,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			params.put("timeInForce", "GTE_GTC");
 		}
 		
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
@@ -719,7 +720,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		if(StringUtil.isNotEmpty(origClientOrderId)) {
 			params.put("origClientOrderId", origClientOrderId);
 		}
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
@@ -796,7 +797,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		List<Balance> blanceList = new ArrayList<Balance>();
 		
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		
 		String queryString = UrlQueryStringUtil.parse(params);
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
@@ -836,7 +837,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		List<SymbolConfig> scList = new ArrayList<SymbolConfig>();
 		
-		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getTime());
+		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getLocalTime());
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 		
 		queryString = StringUtil.urlDecoder(queryString);
@@ -886,13 +887,18 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	}
 	
 	@Override
+	public long getLocalTime() {
+		return new Date().getTime();
+	}
+
+	@Override
 	public List<BinanceOrderInfo> openAlgoOrders(String binanceApiKey,String binanceSecretKey, String symbol) {
 		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
 		
-		String queryString = String.format("timestamp=%s", getTime());
+		String queryString = String.format("timestamp=%s", getLocalTime());
 		
 		if(StringUtil.isNotEmpty(symbol)) {
-			queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getTime());
+			queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getLocalTime());
 		}
 		
 		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);

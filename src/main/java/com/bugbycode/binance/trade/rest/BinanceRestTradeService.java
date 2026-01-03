@@ -206,6 +206,12 @@ public interface BinanceRestTradeService {
 	public long getTime();
 	
 	/**
+	 * 获取本地时间
+	 * @return
+	 */
+	public long getLocalTime();
+	
+	/**
 	 * 查看当前全部条件挂单 (USER_DATA) </br>
 	 * -请求权重 </br>
 	 *  1、带symbol 1 </br>
