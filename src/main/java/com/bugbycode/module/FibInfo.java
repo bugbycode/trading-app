@@ -289,8 +289,10 @@ public class FibInfo {
 	 */
 	public FibCode getPriceActionTakeProfit_v1(FibCode code) {
 		FibCode takeProfit = FibCode.FIB4_618;
-		if(code.lte(FibCode.FIB236)) { // 0 ~ 0.236 - 0.618
-			takeProfit = FibCode.FIB618;
+		if(code == FibCode.FIB0) { // 0 - 0.382
+			takeProfit = FibCode.FIB382;
+		} else if(code == FibCode.FIB236) { // 0.236 - 0.5
+			takeProfit = FibCode.FIB5;
 		} else if(code == FibCode.FIB382) { // 0.382 - 0.618
 			takeProfit = FibCode.FIB618;
 		} else if(code == FibCode.FIB5) { // 0.5 - 0.786
@@ -316,8 +318,10 @@ public class FibInfo {
 	 */
 	public FibCode getPriceActionTakeProfit_nextCode(FibCode code) {
 		FibCode takeProfit = FibCode.FIB4_618;
-		if(code.lte(FibCode.FIB236)) { // 0 ~ 0.236 - 0.5
-			takeProfit = FibCode.FIB5;
+		if(code == FibCode.FIB0) {// 0 - 0.236
+			takeProfit = FibCode.FIB236;
+		} else if(code == FibCode.FIB236) { // 0.236 - 0.382
+			takeProfit = FibCode.FIB382;
 		} else if(code == FibCode.FIB382) { // 0.382 - 0.5
 			takeProfit = FibCode.FIB5;
 		} else if(code == FibCode.FIB5) { // 0.5 - 0.618
@@ -672,7 +676,7 @@ public class FibInfo {
 			} else if(price > this.getFibValue(FibCode.FIB382) && price <= this.getFibValue(FibCode.FIB236)) {// 0.382 ~ 0.236
 				code = FibCode.FIB236;
 			} else if(price > this.getFibValue(FibCode.FIB236) && price < this.getFibValue(FibCode.FIB0)) {// 0.236 ~ 0
-				code = FibCode.FIB236;
+				code = FibCode.FIB0;
 			}
 		} else {
 			if(price >= this.getFibValue(FibCode.FIB4_618)) {// 4.618
@@ -700,7 +704,7 @@ public class FibInfo {
 			} else if(price < this.getFibValue(FibCode.FIB382) && price >= this.getFibValue(FibCode.FIB236)) {// 0.382 ~ 0.236
 				code = FibCode.FIB236;
 			} else if(price < this.getFibValue(FibCode.FIB236) && price > this.getFibValue(FibCode.FIB0)) {// 0.236 ~ 0
-				code = FibCode.FIB236;
+				code = FibCode.FIB0;
 			}
 		}
 		
