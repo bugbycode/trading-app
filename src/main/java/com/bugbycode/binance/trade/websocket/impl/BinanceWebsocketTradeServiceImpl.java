@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.bugbycode.binance.module.order_cancel.OrderCancelInfo;
 import com.bugbycode.binance.module.order_cancel.OrderCancelResult;
-import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderCancelException;
@@ -44,9 +43,6 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	
 	@Autowired
 	private TradingWebSocketClientEndpoint websocketApi;
-	
-	@Autowired
-	private BinanceRestTradeService binanceRestTradeService;
 
 	@Override
 	public List<Balance> balance_v2(String apiKey, String secretKey) {
@@ -55,7 +51,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.BALANCE_V2);
 		JSONObject params = new JSONObject();
 		params.put("apiKey", apiKey);
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		
 		MethodDataUtil.generateSignature(params, secretKey);
 		
@@ -219,7 +215,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		}
 		
 		
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		
 		MethodDataUtil.generateSignature(params, binanceSecretKey);
 		
@@ -475,12 +471,8 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		return info.getMarketMinQuantity(Double.valueOf(price.getPrice()));
 	}
 
-	public long getTime() {
-		long t = binanceRestTradeService.getTime();
-		if(t <= 0) {
-			t = new Date().getTime();
-		}
-		return t;
+	public long getLocalTime() {
+		return new Date().getTime();
 	}
 	
 	@Override
@@ -496,7 +488,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		
 		params.put("symbol", symbol);
 		
-		params.put("timestamp", getTime());
+		params.put("timestamp", getLocalTime());
 		
 		MethodDataUtil.generateSignature(params, binanceSecretKey);
 		
