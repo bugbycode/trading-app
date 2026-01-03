@@ -3103,9 +3103,13 @@ public class PriceUtil {
 	public static boolean isBullishSwallowing_v3(Klines current, Klines parent, Klines next) {
 		boolean result = false;
 		//看涨吞没
-		if(next.isFall() && parent.isRise() && current.isRise()
+		if(next.isFall() && current.isRise()
 				&& parent.getBodyHighPriceDoubleValue() < next.getBodyHighPriceDoubleValue() 
 				&& current.getBodyHighPriceDoubleValue() >= next.getBodyHighPriceDoubleValue()) {
+			result = true;
+		} else if(next.isFall() && parent.getBodyHighPriceDoubleValue() < next.getBodyHighPriceDoubleValue()
+				//&& current.getBodyHighPriceDoubleValue() < next.getBodyHighPriceDoubleValue() 
+				&& current.getBodyHighPriceDoubleValue() > parent.getHighPriceDoubleValue()) { //看跌吞没
 			result = true;
 		}
 		return result;
@@ -3165,9 +3169,13 @@ public class PriceUtil {
 	public static boolean isPutInto_v3(Klines current, Klines parent, Klines next) {
 		boolean result = false;
 		//看跌吞没
-		if(next.isRise() && parent.isFall() && current.isFall()
+		if(next.isRise() && current.isFall()
 				&& parent.getBodyLowPriceDoubleValue() > next.getBodyLowPriceDoubleValue() 
-				&& current.getBodyLowPriceDoubleValue() <= next.getBodyLowPriceDoubleValue()) {//看跌吞没
+				&& current.getBodyLowPriceDoubleValue() <= next.getBodyLowPriceDoubleValue()) { //看跌吞没
+			result = true;
+		} else if(next.isRise() && parent.getBodyLowPriceDoubleValue() > next.getBodyLowPriceDoubleValue()
+				//&& current.getBodyLowPriceDoubleValue() > next.getBodyLowPriceDoubleValue() 
+				&& current.getBodyLowPriceDoubleValue() < parent.getLowPriceDoubleValue()) { //看跌吞没
 			result = true;
 		}
 		return result;
