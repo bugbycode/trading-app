@@ -691,18 +691,6 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					try {
 						
-						//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
-						int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
-						if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
-							continue;
-						}
-						
-						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
-						if(!CollectionUtils.isEmpty(positionList)) {
-							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-							continue;
-						}
-						
 						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 						
 						if(priceInfo == null) {
@@ -890,6 +878,18 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
+						//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
+						int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
+						if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
+							continue;
+						}
+						
+						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+						if(!CollectionUtils.isEmpty(positionList)) {
+							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+							continue;
+						}
+						
 						boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
 						logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
 						if(!dualSidePosition) {
@@ -1002,18 +1002,6 @@ public class KlinesServiceImpl implements KlinesService {
 					double profitPercent = 0;
 					
 					try {
-						
-						//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
-						int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
-						if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
-							continue;
-						}
-
-						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
-						if(!CollectionUtils.isEmpty(positionList)) {
-							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-							continue;
-						}
 
 						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 						
@@ -1200,6 +1188,18 @@ public class KlinesServiceImpl implements KlinesService {
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 						if(Double.valueOf(availableBalanceStr) < minOrder_value) {
 							logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + "USDT");
+							continue;
+						}
+						
+						//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
+						int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
+						if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
+							continue;
+						}
+
+						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+						if(!CollectionUtils.isEmpty(positionList)) {
+							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 							continue;
 						}
 						
