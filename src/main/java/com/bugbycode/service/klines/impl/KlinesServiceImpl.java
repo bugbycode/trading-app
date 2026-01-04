@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
@@ -48,7 +49,6 @@ import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
-import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
 import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.binance.MarginType;
@@ -697,6 +697,12 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					try {
 						
+						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+						if(!CollectionUtils.isEmpty(positionList)) {
+							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+							continue;
+						}
+						
 						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 						
 						if(priceInfo == null) {
@@ -843,12 +849,6 @@ public class KlinesServiceImpl implements KlinesService {
 							if(!(priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
 								continue;
 							}
-						}
-						
-						List<BinanceOrderInfo> orderList = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair);
-						if(!CollectionUtils.isEmpty(orderList)) {
-							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-							continue;
 						}
 						
 						//最少下单数量
@@ -1009,6 +1009,12 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					try {
 
+						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+						if(!CollectionUtils.isEmpty(positionList)) {
+							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+							continue;
+						}
+
 						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 						
 						if(priceInfo == null) {
@@ -1156,12 +1162,6 @@ public class KlinesServiceImpl implements KlinesService {
 							if(!(priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
 								continue;
 							}
-						}
-
-						List<BinanceOrderInfo> orderList = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair);
-						if(!CollectionUtils.isEmpty(orderList)) {
-							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-							continue;
 						}
 
 						//最少下单数量

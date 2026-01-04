@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
@@ -958,5 +959,79 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	@Override
 	public int allCountOpenAlgoOrders(String binanceApiKey, String binanceSecretKey) {
 		return openAlgoOrders(binanceApiKey, binanceSecretKey, null).size();
+	}
+	
+	@Override
+	public List<PositionInfo> positionRisk_v3(String binanceApiKey, String binanceSecretKey, String symbol) {
+		
+		List<PositionInfo> list = new ArrayList<PositionInfo>();
+		
+		String queryString = String.format("timestamp=%s", getLocalTime());
+		
+		if(StringUtil.isNotEmpty(symbol)) {
+			queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getLocalTime());
+		}
+		
+		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
+		queryString += "&signature=" + signature;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-MBX-APIKEY", binanceApiKey);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		
+		String url = AppConfig.REST_BASE_URL + "/fapi/v3/positionRisk?" + queryString;
+		
+		logger.debug(url);
+		
+		ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
+		
+		if(status == HttpStatus.OK) {
+			
+			logger.debug(result.getBody());
+			
+			JSONArray jsonArr = new JSONArray(result.getBody());
+			jsonArr.forEach(obj -> {
+				JSONObject o = (JSONObject) obj;
+				PositionInfo info = new PositionInfo();
+				info.setSymbol(o.getString("symbol"));
+				info.setPositionSide(o.getString("positionSide"));
+				info.setPositionAmt(o.getString("positionAmt"));
+				info.setEntryPrice(o.getString("entryPrice"));
+				info.setBreakEvenPrice(o.getString("breakEvenPrice"));
+				info.setMarkPrice(o.getString("markPrice"));
+				info.setUnRealizedProfit(o.getString("unRealizedProfit"));
+				info.setLiquidationPrice(o.getString("liquidationPrice"));
+				info.setIsolatedMargin(o.getString("isolatedMargin"));
+				info.setNotional(o.getString("notional"));
+				info.setMarginAsset(o.getString("marginAsset"));
+				info.setIsolatedWallet(o.getString("isolatedWallet"));
+				info.setInitialMargin(o.getString("initialMargin"));
+				info.setMaintMargin(o.getString("maintMargin"));
+				info.setPositionInitialMargin(o.getString("positionInitialMargin"));
+				info.setOpenOrderInitialMargin(o.getString("openOrderInitialMargin"));
+				info.setAdl(o.getInt("adl"));
+				info.setBidNotional(o.getString("bidNotional"));
+				info.setAskNotional(o.getString("askNotional"));
+				info.setUpdateTime(o.getLong("updateTime"));
+				list.add(info);
+			});
+		}
+		
+		return list;
+	}
+	
+	@Override
+	public List<PositionInfo> getPositionInfo(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide side) {
+		List<PositionInfo> list = positionRisk_v3(binanceApiKey, binanceSecretKey, symbol);
+		List<PositionInfo> result = new ArrayList<PositionInfo>();
+		for(PositionInfo info : list) {
+			if(side.value().equals(info.getPositionSide())) {
+				result.add(info);
+			}
+		}
+		return result;
 	}
 }

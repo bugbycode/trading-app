@@ -3,6 +3,7 @@ package com.bugbycode.binance.trade.rest;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
@@ -231,4 +232,23 @@ public interface BinanceRestTradeService {
 	 */
 	public int allCountOpenAlgoOrders(String binanceApiKey, String binanceSecretKey);
 	
+	/**
+	 * 用户持仓风险V3 (USER_DATA) </br></br> 
+	 * <b>接口描述：</b> 查询持仓风险，仅返回有持仓或挂单的交易对
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @return
+	 */
+	public List<PositionInfo> positionRisk_v3(String binanceApiKey, String binanceSecretKey, String symbol);
+	
+	/**
+	 * 根据交易对和持仓方向获取持仓信息  (USER_DATA)
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @param side 持仓方向 LONG/SHORT
+	 * @return
+	 */
+	public List<PositionInfo> getPositionInfo(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide side);
 }
