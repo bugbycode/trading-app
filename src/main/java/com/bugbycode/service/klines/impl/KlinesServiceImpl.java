@@ -676,12 +676,6 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 					
-					//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
-					int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
-					if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
-						continue;
-					}
-					
 					//筛选策略限制
 					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
 						continue;
@@ -696,6 +690,12 @@ public class KlinesServiceImpl implements KlinesService {
 					double profitPercent = 0;
 					
 					try {
+						
+						//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
+						int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
+						if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
+							continue;
+						}
 						
 						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 						if(!CollectionUtils.isEmpty(positionList)) {
@@ -988,12 +988,6 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 					
-					//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
-					int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
-					if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
-						continue;
-					}
-					
 					//筛选策略限制
 					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
 						continue;
@@ -1008,6 +1002,12 @@ public class KlinesServiceImpl implements KlinesService {
 					double profitPercent = 0;
 					
 					try {
+						
+						//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
+						int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
+						if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
+							continue;
+						}
 
 						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 						if(!CollectionUtils.isEmpty(positionList)) {
