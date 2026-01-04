@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.module.ResultCode;
@@ -288,6 +289,20 @@ public class TestTradeRestApi {
     			logger.info("{} - {}", b.getAsset(), b.getBalance());
     		}
     	}
+    }
+    
+    @Test
+    public void testPositionRisk_v3() {
+    	String symbol = "DOTUSDT";
+    	List<PositionInfo> list = binanceRestTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, symbol);
+    	logger.info(list);
+    }
+    
+    @Test
+    public void testGetPositionInfo() {
+    	String symbol = "HUSDT";
+    	List<PositionInfo> list = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, symbol, PositionSide.SHORT);
+    	logger.info(list);
     }
     
     @AfterEach
