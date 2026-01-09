@@ -294,7 +294,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				}
 			}
 			
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue()));
+			if((mode == QuotationMode.LONG && info.getCurrent().getClosePriceDoubleValue() <= info.getParent().getBodyHighPriceDoubleValue()) 
+					|| (mode == QuotationMode.SHORT && info.getCurrent().getClosePriceDoubleValue() >= info.getParent().getBodyLowPriceDoubleValue())) {
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue()));
+			}
 			
 			Klines fibAfterFlag = PriceUtil.getAfterKlines(info.getCurrent(), this.list_15m);
 			if(fibAfterFlag != null) {
