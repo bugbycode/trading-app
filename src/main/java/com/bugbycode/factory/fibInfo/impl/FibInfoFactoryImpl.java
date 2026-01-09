@@ -260,6 +260,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			List<Klines> data = new ArrayList<Klines>();
 			PriceActionInfo info = null;
 			MarketSentiment ms = null;
+			FibCode openCode = FibCode.FIB0;
 			PriceActionType type = PriceActionType.DEFAULT;
 			if(mode == QuotationMode.SHORT) {
 				info = PriceUtil.getMaxPriceActionInfo(priceInfoList);
@@ -267,14 +268,17 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				data.add(info.getCurrent());
 				data.add(info.getParent());
 				ms = new MarketSentiment(data);
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice()));
+				
+				openCode = fibInfo.getFibCode(ms.getHighPrice());
+				
+				addPrices(new OpenPriceDetails(openCode, ms.getHighPrice()));
+				addPrices(new OpenPriceDetails(openCode, ms.getMaxBodyHighPrice()));
 				if(type != PriceActionType.DECL_POWER) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getBodyLowPriceDoubleValue()), info.getParent().getBodyLowPriceDoubleValue()));
+					addPrices(new OpenPriceDetails(openCode, info.getParent().getBodyLowPriceDoubleValue()));
 				}
 				
 				if(type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getLowPriceDoubleValue()), info.getParent().getLowPriceDoubleValue()));
+					addPrices(new OpenPriceDetails(openCode, info.getParent().getLowPriceDoubleValue()));
 				}
 				
 			} else {
@@ -283,20 +287,23 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				data.add(info.getCurrent());
 				data.add(info.getParent());
 				ms = new MarketSentiment(data);
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice()));
+				
+				openCode = fibInfo.getFibCode(ms.getLowPrice());
+				
+				addPrices(new OpenPriceDetails(openCode, ms.getLowPrice()));
+				addPrices(new OpenPriceDetails(openCode, ms.getMinBodyLowPrice()));
 				if(type != PriceActionType.DECL_POWER) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getBodyHighPriceDoubleValue()), info.getParent().getBodyHighPriceDoubleValue()));
+					addPrices(new OpenPriceDetails(openCode, info.getParent().getBodyHighPriceDoubleValue()));
 				}
 				
 				if(type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getHighPriceDoubleValue()), info.getParent().getHighPriceDoubleValue()));
+					addPrices(new OpenPriceDetails(openCode, info.getParent().getHighPriceDoubleValue()));
 				}
 			}
 			
 			if((mode == QuotationMode.LONG && info.getCurrent().getClosePriceDoubleValue() <= info.getParent().getBodyHighPriceDoubleValue()) 
 					|| (mode == QuotationMode.SHORT && info.getCurrent().getClosePriceDoubleValue() >= info.getParent().getBodyLowPriceDoubleValue())) {
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue()));
+				addPrices(new OpenPriceDetails(openCode, info.getCurrent().getClosePriceDoubleValue()));
 			}
 			
 			Klines fibAfterFlag = PriceUtil.getAfterKlines(info.getCurrent(), this.list_15m);
