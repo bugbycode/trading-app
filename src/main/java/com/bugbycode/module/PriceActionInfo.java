@@ -54,4 +54,19 @@ public class PriceActionInfo {
 		return parent;
 	}
 	
+	public boolean isLong() {
+		return checkLong(current) || checkLong(parent) || checkLong(next);
+	}
+	
+	public boolean isShort() {
+		return checkShort(current) || checkShort(parent) || checkShort(next);
+	}
+	
+	private boolean checkLong(Klines k) {
+		return k !=null && k.getDea() > 0;
+	}
+	
+	private boolean checkShort(Klines k) {
+		return k != null && k.getDea() < 0;
+	}
 }
