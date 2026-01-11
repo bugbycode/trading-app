@@ -236,6 +236,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getLowPriceDoubleValue()), info.getParent().getLowPriceDoubleValue()));
 					}
 					
+					if(PriceUtil.verifyDecliningPrice_v22(info.getCurrent(), info.getParent(), info.getNext())) {
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue()));
+					}
 				//}
 				
 			} else {
@@ -259,6 +262,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getHighPriceDoubleValue()), info.getParent().getHighPriceDoubleValue()));
 					}
 					
+					if(PriceUtil.verifyPowerful_v22(info.getCurrent(), info.getParent(), info.getNext())) {
+						addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue()));
+					}
 				//}
 				
 			}
