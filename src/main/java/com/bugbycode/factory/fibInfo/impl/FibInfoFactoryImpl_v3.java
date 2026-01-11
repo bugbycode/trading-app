@@ -201,6 +201,11 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		this.fibInfo.setTradeFrequency(TradeFrequency.HIGH);
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
+		if(fibAfterFlag != null) {
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
+			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+		}
+		
 		if(fibAfterFlag == null) {
 			return;
 		}
@@ -293,9 +298,6 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 					addPrices(new OpenPriceDetails(openCode, info.getCurrent().getClosePriceDoubleValue()));
 				}
 			}
-			
-			this.fibAfterKlines.addAll(PriceUtil.subList(info.getNext(), this.list_15m));
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(mode == QuotationMode.LONG) {

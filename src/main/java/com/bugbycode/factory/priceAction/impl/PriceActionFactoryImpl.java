@@ -218,7 +218,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				
 				info = PriceUtil.getMaxPriceActionInfo(priceInfoList);
 
-				if(info.isLong()) {
+				//if(info.isLong()) {
 					
 					type = info.getType();
 					data.add(info.getCurrent());
@@ -236,12 +236,12 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getLowPriceDoubleValue()), info.getParent().getLowPriceDoubleValue()));
 					}
 					
-				}
+				//}
 				
 			} else {
 				info = PriceUtil.getMinPriceActionInfo(priceInfoList);
 				
-				if(info.isShort()) {
+				//if(info.isShort()) {
 
 					type = info.getType();
 					data.add(info.getCurrent());
@@ -259,7 +259,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getHighPriceDoubleValue()), info.getParent().getHighPriceDoubleValue()));
 					}
 					
-				}
+				//}
 				
 			}
 			
