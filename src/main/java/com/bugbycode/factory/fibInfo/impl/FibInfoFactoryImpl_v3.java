@@ -265,6 +265,10 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 					addPrices(new OpenPriceDetails(openCode, info.getParent().getLowPriceDoubleValue()));
 				}
 				
+				if(PriceUtil.verifyDecliningPrice_v22(info.getCurrent(), info.getParent(), info.getNext())) {
+					addPrices(new OpenPriceDetails(openCode, info.getCurrent().getClosePriceDoubleValue()));
+				}
+				
 			} else {
 				info = PriceUtil.getMinPriceActionInfo(priceInfoList);
 				type = info.getType();
@@ -283,6 +287,10 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 				
 				if(type == PriceActionType.BACK) {
 					addPrices(new OpenPriceDetails(openCode, info.getParent().getHighPriceDoubleValue()));
+				}
+				
+				if(PriceUtil.verifyPowerful_v22(info.getCurrent(), info.getParent(), info.getNext())) {
+					addPrices(new OpenPriceDetails(openCode, info.getCurrent().getClosePriceDoubleValue()));
 				}
 			}
 			
