@@ -7,17 +7,17 @@ import com.util.PriceUtil;
 
 public class PriceActionInfo {
 
-	private Klines current;
+	private final Klines current;
 	
-	private Klines parent;
+	private final Klines parent;
 	
-	private Klines next;
+	private final Klines next;
 	
 	private List<Klines> data;
 	
-	private Klines low;
+	private final Klines low;
 	
-	private Klines high;
+	private final Klines high;
 	
 	private PriceActionType type;
 	
@@ -54,6 +54,10 @@ public class PriceActionInfo {
 		return parent;
 	}
 	
+	public Klines getNext() {
+		return next;
+	}
+
 	public boolean isLong() {
 		return checkLong(current) || checkLong(parent) || checkLong(next);
 	}
