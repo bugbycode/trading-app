@@ -26,7 +26,7 @@ import com.util.PriceUtil;
 /**
  * 斐波那契回指标撤接口实现类（短线交易）
  */
-public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
+public class FibInfoFactoryImpl implements FibInfoFactory {
 
 	private List<Klines> list;
 	
@@ -50,7 +50,7 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 	 * @param list_trend 行情走势参考的K线信息
 	 * @param list_15m 十五分钟级别k线信息
 	 */
-	public FibInfoFactoryImpl_v4(List<Klines> list, List<Klines> list_trend, List<Klines> list_15m) {
+	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_trend, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
