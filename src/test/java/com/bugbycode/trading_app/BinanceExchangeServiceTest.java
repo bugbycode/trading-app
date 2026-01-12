@@ -33,5 +33,6 @@ public class BinanceExchangeServiceTest {
     	for(String symbol : symbols) {
     		logger.info(symbol);
     	}
+    	logger.info("symbol total: {}", symbols.size());
     }
 }

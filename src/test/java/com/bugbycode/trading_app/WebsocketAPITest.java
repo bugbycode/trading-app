@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
@@ -269,13 +270,26 @@ public class WebsocketAPITest {
     
     @Test
     public void testGetMarketMinQuantity() {
-    	String pair = "BTCUSDT";
+    	String pair = "HFTUSDT";
     	//最少下单数量
 		String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
 		logger.info(quantityNum);
     }
     
+    @Test
+    public void testPositionRisk_v3() {
+    	String pair = "FILUSDT";
+    	List<PositionInfo> list = binanceWebsocketTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, pair);
+    	logger.info(list);
+    }
 
+    @Test
+    public void testGetPositionInfo() {
+    	String symbol = "FILUSDT";
+    	List<PositionInfo> list = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, symbol, PositionSide.SHORT);
+    	logger.info(list);
+    }
+    
 	@AfterEach
 	public void after(){
 		

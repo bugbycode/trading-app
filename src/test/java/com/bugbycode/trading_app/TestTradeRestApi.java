@@ -305,6 +305,12 @@ public class TestTradeRestApi {
     	logger.info(list);
     }
     
+    @Test
+    public void testCountPosition() {
+    	int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
+    	logger.info(positionCount);
+    }
+    
     @AfterEach
     public void after() {
 
