@@ -20,8 +20,6 @@ public class AppConfig {
 	
 	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
 	
-	public static final int BINANCE_ALGO_ORDER_LIMIT = 200;//币安条件单数量限制
-	
 	//交易对交易规则
 	public static Map<String,SymbolExchangeInfo> SYMBOL_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, SymbolExchangeInfo>());
 	

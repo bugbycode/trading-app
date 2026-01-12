@@ -125,6 +125,8 @@ public class User implements UserDetails {
 	
 	private int tradePolicyType;//自动交易策略类型（1:白名单/0:黑名单）
 	
+	private int positionCountLimit = 100;//仓位数量限制
+	
 	public String getId() {
 		return id;
 	}
@@ -556,5 +558,13 @@ public class User implements UserDetails {
 
 	public void setTradePolicyType(int tradePolicyType) {
 		this.tradePolicyType = tradePolicyType;
+	}
+
+	public int getPositionCountLimit() {
+		return positionCountLimit;
+	}
+
+	public void setPositionCountLimit(int positionCountLimit) {
+		this.positionCountLimit = positionCountLimit;
 	}
 }

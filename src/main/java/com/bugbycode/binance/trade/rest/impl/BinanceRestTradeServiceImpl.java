@@ -1013,4 +1013,9 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		}
 		return result;
 	}
+	
+	@Override
+	public int countPosition(String binanceApiKey, String binanceSecretKey) {
+		return positionRisk_v3(binanceApiKey, binanceSecretKey, null).size();
+	}
 }

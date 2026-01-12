@@ -251,4 +251,12 @@ public interface BinanceRestTradeService {
 	 * @return
 	 */
 	public List<PositionInfo> getPositionInfo(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide side);
+	
+	/**
+	 * 获取仓位数量
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @return
+	 */
+	public int countPosition(String binanceApiKey, String binanceSecretKey);
 }

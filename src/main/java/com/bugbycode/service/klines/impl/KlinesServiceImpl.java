@@ -878,9 +878,10 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
-						int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
-						if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
+						//仓位数量限制
+						int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
+						if(positionCount >= u.getPositionCountLimit()) {
+							logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
 							continue;
 						}
 						
@@ -1191,9 +1192,10 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						//条件订单数量查询并校验 目前币安交易所条件订单数量限制为200个
-						int openAlgoOrdersCount = binanceRestTradeService.allCountOpenAlgoOrders(binanceApiKey, binanceSecretKey);
-						if(openAlgoOrdersCount >= AppConfig.BINANCE_ALGO_ORDER_LIMIT) {
+						//仓位数量限制
+						int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
+						if(positionCount >= u.getPositionCountLimit()) {
+							logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
 							continue;
 						}
 

@@ -141,13 +141,15 @@ public interface UserRepository {
 	 * @param callbackRateEnabled 是否启用追踪止损
 	 * @param tradePairPolicySelected 交易对过滤(自动交易)
 	 * @param tradePolicyType 自动交易策略类型（白名单/黑名单）
+	 * @param positionCountLimit 持仓数量限制
 	 * 
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
 			int baseStepSize,int leverage,double positionValue,double cutLoss,double profit,int autoTradeType,int drawTrade,
 			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle,double profitLimit,
 			int countertrendTrading, FibLevel fibLevel, long tradeNumber, int breakthroughTrade, double callbackRate, 
-			double activationPriceRatio, int callbackRateEnabled, List<String> tradePairPolicySelected, int tradePolicyType);
+			double activationPriceRatio, int callbackRateEnabled, List<String> tradePairPolicySelected, int tradePolicyType,
+			int positionCountLimit);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

@@ -165,7 +165,8 @@ public class UserController extends BaseController{
 					drawTrade.getValue(), recvTradeStatus.getValue(), recvCrossUnPnlStatus.getValue(), data.getRecvCrossUnPnlPercent(), 
 					tradeStepBackStatus.getValue(), tradeStyle.getValue(), data.getProfitLimit(), countertrendTradingStatus.getValue(), 
 					data.getFibLevelType(), data.getTradeNumber(), breakthroughTradeStatus.getValue(), data.getCallbackRate(),
-					data.getActivationPriceRatio() , callbackRateEnabled.getValue(), data.getTradePairPolicySelected(), policyType.getValue());
+					data.getActivationPriceRatio() , callbackRateEnabled.getValue(), data.getTradePairPolicySelected(), policyType.getValue(), 
+					data.getPositionCountLimit());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -192,6 +193,7 @@ public class UserController extends BaseController{
 			user.setActivationPriceRatio(data.getActivationPriceRatio());
 			user.setTradePolicyType(policyType.getValue());
 			user.setTradePairPolicySelected(data.getTradePairPolicySelected());
+			user.setPositionCountLimit(data.getPositionCountLimit());
 			
 			json.put("message", "修改成功");
 		} else {
