@@ -28,7 +28,12 @@ public enum Method {
 	/**
 	 * 撤销订单 (TRADE)
 	 */
-	ORDER_CANCEL("order.cancel");
+	ORDER_CANCEL("order.cancel"),
+	
+	/**
+	 * 用户持仓风险V2 (USER_DATA)
+	 */
+	POSITION_RISK_V2("v2/account.position");
 
 	private String value;
 	

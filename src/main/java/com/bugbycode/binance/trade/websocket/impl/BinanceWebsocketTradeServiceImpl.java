@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.bugbycode.binance.module.order_cancel.OrderCancelInfo;
 import com.bugbycode.binance.module.order_cancel.OrderCancelResult;
+import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderCancelException;
@@ -494,13 +495,13 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		
 		method.put("params", params);
 		
-		logger.info(method);
+		logger.debug(method);
 		
 		websocketApi.sendMessage(method);
 		
 		JSONObject result = websocketApi.read(method.getString("id"));
 		
-		logger.info(result);
+		logger.debug(result);
 		
 		if(result.getInt("status") == 200 && result.has("result")) {
 			
@@ -611,5 +612,56 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 		} else {
 			throw new OrderCancelException("撤销" + symbol + "永续合约订单出现异常", result.toString());
 		}
+	}
+	
+	@Override
+	public List<PositionInfo> positionRisk_v3(String binanceApiKey, String binanceSecretKey, String symbol) {
+		
+		List<PositionInfo> list = new ArrayList<PositionInfo>();
+		
+		JSONObject method = MethodDataUtil.getMethodJsonObjec(Method.POSITION_RISK_V2);
+		
+		JSONObject params = new JSONObject();
+		
+		params.put("apiKey", binanceApiKey);
+		
+		params.put("symbol", symbol);
+		
+		params.put("timestamp", getLocalTime());
+		
+		MethodDataUtil.generateSignature(params, binanceSecretKey);
+		
+		method.put("params", params);
+		
+		logger.debug(method);
+		
+		websocketApi.sendMessage(method);
+		
+		JSONObject result = websocketApi.read(method.getString("id"));
+		
+		logger.debug(result);
+		
+		if(result.getInt("status") == 200 && result.has("result")) {
+			
+			JSONArray jsonArr = result.getJSONArray("result");
+			jsonArr.forEach(obj -> {
+				JSONObject o = (JSONObject) obj;
+				list.add(PositionInfo.parse(o));
+			});
+		}
+		
+		return list;
+	}
+	
+	@Override
+	public List<PositionInfo> getPositionInfo(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide side) {
+		List<PositionInfo> list = positionRisk_v3(binanceApiKey, binanceSecretKey, symbol);
+		List<PositionInfo> result = new ArrayList<PositionInfo>();
+		for(PositionInfo info : list) {
+			if(side.value().equals(info.getPositionSide())) {
+				result.add(info);
+			}
+		}
+		return result;
 	}
 }

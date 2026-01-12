@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.bugbycode.binance.module.order_cancel.OrderCancelResult;
+import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.module.PlaceOrderAgain;
 import com.bugbycode.module.Result;
 import com.bugbycode.module.binance.Balance;
@@ -102,4 +103,23 @@ public interface BinanceWebsocketTradeService {
 	 * @return 返回撤销结果
 	 */
 	public OrderCancelResult orderCancel(String binanceApiKey, String binanceSecretKey, String symbol, long orderId);
+	
+	/**
+	 * 用户持仓风险V2 (USER_DATA)
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @return
+	 */
+	public List<PositionInfo> positionRisk_v3(String binanceApiKey, String binanceSecretKey, String symbol);
+	
+	/**
+	 * 根据交易对和持仓方向获取持仓信息  (USER_DATA)
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @param side 持仓方向 LONG/SHORT
+	 * @return
+	 */
+	public List<PositionInfo> getPositionInfo(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide side);
 }

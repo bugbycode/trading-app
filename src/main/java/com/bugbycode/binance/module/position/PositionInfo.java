@@ -1,5 +1,7 @@
 package com.bugbycode.binance.module.position;
 
+import org.json.JSONObject;
+
 /**
  * 持仓信息
  */
@@ -237,4 +239,28 @@ public class PositionInfo {
 				+ askNotional + ", updateTime=" + updateTime + "]";
 	}
 	
+	public static PositionInfo parse(JSONObject o) {
+		PositionInfo info = new PositionInfo();
+		info.setSymbol(o.getString("symbol"));
+		info.setPositionSide(o.getString("positionSide"));
+		info.setPositionAmt(o.getString("positionAmt"));
+		info.setEntryPrice(o.getString("entryPrice"));
+		info.setBreakEvenPrice(o.getString("breakEvenPrice"));
+		info.setMarkPrice(o.getString("markPrice"));
+		info.setUnRealizedProfit(o.getString("unRealizedProfit"));
+		info.setLiquidationPrice(o.getString("liquidationPrice"));
+		info.setIsolatedMargin(o.getString("isolatedMargin"));
+		info.setNotional(o.getString("notional"));
+		info.setMarginAsset(o.getString("marginAsset"));
+		info.setIsolatedWallet(o.getString("isolatedWallet"));
+		info.setInitialMargin(o.getString("initialMargin"));
+		info.setMaintMargin(o.getString("maintMargin"));
+		info.setPositionInitialMargin(o.getString("positionInitialMargin"));
+		info.setOpenOrderInitialMargin(o.getString("openOrderInitialMargin"));
+		info.setAdl(o.getInt("adl"));
+		info.setBidNotional(o.getString("bidNotional"));
+		info.setAskNotional(o.getString("askNotional"));
+		info.setUpdateTime(o.getLong("updateTime"));
+		return info;
+	}
 }

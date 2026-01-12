@@ -884,7 +884,7 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 						if(!CollectionUtils.isEmpty(positionList)) {
 							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 							continue;
@@ -1197,7 +1197,7 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 
-						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 						if(!CollectionUtils.isEmpty(positionList)) {
 							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 							continue;
