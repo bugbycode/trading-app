@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.config.AppConfig;
@@ -1017,5 +1018,60 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	@Override
 	public int countPosition(String binanceApiKey, String binanceSecretKey) {
 		return positionRisk_v3(binanceApiKey, binanceSecretKey, null).size();
+	}
+
+	@Override
+	public List<LeverageBracketInfo> getLeverageBracketInfo(String binanceApiKey, String binanceSecretKey, String symbol) {
+		
+		if(StringUtil.isEmpty(symbol)) {
+			throw new RuntimeException("symbol is not null");
+		}
+		
+		List<LeverageBracketInfo> leverageList = new ArrayList<LeverageBracketInfo>();
+		
+		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getLocalTime());
+
+		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
+		queryString += "&signature=" + signature;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-MBX-APIKEY", binanceApiKey);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		
+		String url = AppConfig.REST_BASE_URL + "/fapi/v1/leverageBracket?" + queryString;
+		
+		logger.debug(url);
+		
+		ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
+		
+		if(status == HttpStatus.OK) {
+			
+			logger.debug(result.getBody());
+			
+			JSONArray resultJsonArr = new JSONArray(result.getBody());
+			resultJsonArr.forEach(rja -> {
+				
+				JSONObject resultJson = (JSONObject)rja;
+				
+				JSONArray jsonArr = resultJson.getJSONArray("brackets");
+				
+				jsonArr.forEach(obj -> {
+					JSONObject o = (JSONObject) obj;
+					leverageList.add(LeverageBracketInfo.parse(o));
+				});
+			});
+			
+		} else {
+			throw new RuntimeException("获取" + symbol + "杠杆分层标准时出现异常，status: " + status);
+		}
+		
+		if(leverageList.isEmpty()) {
+			throw new RuntimeException("无法获取" + symbol + "杠杆分层标准");
+		}
+		
+		return leverageList;
 	}
 }

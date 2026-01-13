@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
@@ -73,6 +74,7 @@ import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
+import com.util.LeverageBracketUtil;
 import com.util.PairPolicyUtil;
 import com.util.PriceUtil;
 import com.util.StraightLineUtil;
@@ -859,8 +861,19 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						//查询杠杆
 						SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-
+						
+						List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
+						
+						int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
+						int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
+						
 						int leverage = sc.getLeverage();
+						
+						logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
+						if(leverage != updateLeverage) {
+							logger.debug("开始修改" + pair + "杠杆倍数");
+							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
+						}
 						
 						//持仓价值 = 持仓数量 * 价格
 						double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
@@ -870,7 +883,7 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						double minOrder_value = (order_value / leverage) * 1.5;
+						double minOrder_value = (order_value / updateLeverage) * 1.5;
 						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 						if(Double.valueOf(availableBalanceStr) < minOrder_value) {
@@ -911,12 +924,6 @@ public class KlinesServiceImpl implements KlinesService {
 						if(marginType != MarginType.ISOLATED) {
 							logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 							binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
-						}
-						
-						logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
-						if(leverage != u.getLeverage()) {
-							logger.debug("开始修改" + pair + "杠杆倍数");
-							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, u.getLeverage());
 						}
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit, 
@@ -1174,7 +1181,19 @@ public class KlinesServiceImpl implements KlinesService {
 						//查询杠杆
 						SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
 
+						List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
+						
+						int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
+						int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
+						
 						int leverage = sc.getLeverage();
+						
+						logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
+						
+						if(leverage != updateLeverage) {
+							logger.debug("开始修改" + pair + "杠杆倍数");
+							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
+						}
 						
 						//持仓价值 = 持仓数量 * 价格
 						double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
@@ -1184,7 +1203,7 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						double minOrder_value = (order_value / leverage) * 1.5;
+						double minOrder_value = (order_value / updateLeverage) * 1.5;
 						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 						if(Double.valueOf(availableBalanceStr) < minOrder_value) {
@@ -1226,14 +1245,6 @@ public class KlinesServiceImpl implements KlinesService {
 							logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 							binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 						}
-						
-						logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
-						
-						if(leverage != u.getLeverage()) {
-							logger.debug("开始修改" + pair + "杠杆倍数");
-							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, u.getLeverage());
-						}
-						
 						
 						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit, 
 								callbackRateEnabled, activationPriceValue, callbackRateValue, profitOrderEnabled);

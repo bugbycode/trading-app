@@ -3,6 +3,7 @@ package com.bugbycode.binance.trade.rest;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
@@ -259,4 +260,14 @@ public interface BinanceRestTradeService {
 	 * @return
 	 */
 	public int countPosition(String binanceApiKey, String binanceSecretKey);
+	
+	/**
+	 * 杠杆分层标准 (USER_DATA)
+	 * 
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @return
+	 */
+	public List<LeverageBracketInfo> getLeverageBracketInfo(String binanceApiKey, String binanceSecretKey, String symbol);
 }
