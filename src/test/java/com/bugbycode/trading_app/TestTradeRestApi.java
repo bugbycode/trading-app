@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.bugbycode.binance.module.commission_rate.CommissionRate;
+import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.exception.OrderPlaceException;
@@ -28,6 +30,7 @@ import com.bugbycode.module.user.ChildApiKeyConfig;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.user.ChildApiKeyConfigService;
+import com.util.LeverageBracketUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -300,7 +303,7 @@ public class TestTradeRestApi {
     
     @Test
     public void testGetPositionInfo() {
-    	String symbol = "HUSDT";
+    	String symbol = "XRPUSDT";
     	List<PositionInfo> list = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, symbol, PositionSide.SHORT);
     	logger.info(list);
     }
@@ -309,6 +312,21 @@ public class TestTradeRestApi {
     public void testCountPosition() {
     	int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
     	logger.info(positionCount);
+    }
+    
+    @Test
+    public void testGetLeverageBracketInfo() {
+    	String symbol = "BNBUSDT";
+    	List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, symbol);
+    	logger.info("{} min initialLeverage as {}", symbol, LeverageBracketUtil.getMinLeverageBracketInfo(list).getInitialLeverage());
+    	logger.info("{} max initialLeverage as {}", symbol, LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage());
+    }
+    
+    @Test
+    public void testGetCommissionRate() {
+    	String symbol = "DYDXUSDT";
+    	CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, symbol);
+    	logger.info(rate);
     }
     
     @AfterEach
