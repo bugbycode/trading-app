@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
@@ -1073,5 +1074,37 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		}
 		
 		return leverageList;
+	}
+
+	@Override
+	public CommissionRate getCommissionRate(String binanceApiKey, String binanceSecretKey, String symbol) {
+		if(StringUtil.isEmpty(symbol)) {
+			throw new RuntimeException("symbol is not null");
+		}
+		
+		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getLocalTime());
+
+		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
+		queryString += "&signature=" + signature;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-MBX-APIKEY", binanceApiKey);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		
+		String url = AppConfig.REST_BASE_URL + "/fapi/v1/commissionRate?" + queryString;
+		
+		logger.debug(url);
+		
+		ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
+		
+		if(status == HttpStatus.OK) {
+			logger.debug(result.getBody());
+			return CommissionRate.parse(new JSONObject(result.getBody()));
+		} else {
+			throw new RuntimeException("获取" + symbol + "用户手续费率时出现异常，status: " + status);
+		}
 	}
 }

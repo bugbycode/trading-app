@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
@@ -883,7 +884,12 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						double minOrder_value = (order_value / updateLeverage) * 1.5;
+						//获取用户手续费率
+						CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
+						double orderBalance = (order_value / updateLeverage);//持仓所需保证金
+						
+						//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
+						double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
 						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 						if(Double.valueOf(availableBalanceStr) < minOrder_value) {
@@ -1203,7 +1209,12 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						double minOrder_value = (order_value / updateLeverage) * 1.5;
+						//获取用户手续费率
+						CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
+						double orderBalance = (order_value / updateLeverage);//持仓所需保证金
+						
+						//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
+						double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
 						
 						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
 						if(Double.valueOf(availableBalanceStr) < minOrder_value) {

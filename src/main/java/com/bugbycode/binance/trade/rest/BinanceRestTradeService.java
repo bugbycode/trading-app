@@ -3,6 +3,7 @@ package com.bugbycode.binance.trade.rest;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.module.binance.Balance;
@@ -270,4 +271,14 @@ public interface BinanceRestTradeService {
 	 * @return
 	 */
 	public List<LeverageBracketInfo> getLeverageBracketInfo(String binanceApiKey, String binanceSecretKey, String symbol);
+	
+	/**
+	 * 用户手续费率 (USER_DATA)
+	 * 
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 交易对
+	 * @return
+	 */
+	public CommissionRate getCommissionRate(String binanceApiKey, String binanceSecretKey, String symbol);
 }
