@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.factory.fibInfo.FibInfoFactory;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
@@ -84,6 +86,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		if(CollectionUtils.isEmpty(list) || list.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
+
+		FibInfoFactory factory = new FibInfoFactoryImpl(list, list, list_15m);
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
@@ -208,12 +212,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			}
 		}
 		
-		if(!CollectionUtils.isEmpty(priceInfoList)) {
+		if(!CollectionUtils.isEmpty(priceInfoList) && (factory.isLong() || factory.isShort())) {
 			Klines fibEnd = null;
 			List<Klines> data = new ArrayList<Klines>();
 			PriceActionInfo info = null;
 			MarketSentiment ms = null;
 			PriceActionType type = PriceActionType.DEFAULT;
+			FibInfo fib = factory.getFibInfo();
+			
 			if(mode == QuotationMode.LONG) {
 				
 				info = PriceUtil.getMaxPriceActionInfo(priceInfoList);
@@ -241,6 +247,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue(), ms.getMaxBodyHighPrice()));
 				}
 				
+				if(fib.getFibCode(stopLossLimit).lt(FibCode.FIB5)) {
+					openPrices.clear();
+				}
 			} else {
 				info = PriceUtil.getMinPriceActionInfo(priceInfoList);
 				
@@ -267,6 +276,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue(), ms.getMinBodyLowPrice()));
 				}
 				
+				if(fib.getFibCode(stopLossLimit).lt(FibCode.FIB5)) {
+					openPrices.clear();
+				}
 			}
 			
 			fibEnd = info.getCurrent();
