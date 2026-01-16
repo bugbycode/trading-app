@@ -233,7 +233,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				}
 				
 				if(type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getLowPriceDoubleValue()), info.getParent().getLowPriceDoubleValue(), ms.getMaxBodyHighPrice()));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getLowPriceDoubleValue()), info.getParent().getLowPriceDoubleValue(), 
+							info.getParent().getBodyLowPriceDoubleValue()));
 				}
 				
 				if(type == PriceActionType.DECL_POWER) {
@@ -258,7 +259,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				}
 				
 				if(type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getHighPriceDoubleValue()), info.getParent().getHighPriceDoubleValue(), ms.getMinBodyLowPrice()));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getHighPriceDoubleValue()), info.getParent().getHighPriceDoubleValue(), 
+							info.getParent().getBodyHighPriceDoubleValue()));
 				}
 				
 				if(type == PriceActionType.DECL_POWER) {
