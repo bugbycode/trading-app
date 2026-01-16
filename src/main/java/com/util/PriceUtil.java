@@ -2016,7 +2016,8 @@ public class PriceUtil {
 	 */
 	public static boolean verifyDecliningPrice_v22(Klines current, Klines parent, Klines next) {
 		boolean result = false;
-		if(next.isRise() && parent.isFall() && current.isRise() && current.getBodyHighPriceDoubleValue() < parent.getBodyHighPriceDoubleValue()) {//颓势
+		if(next.isRise() && parent.isFall() && current.isRise() && parent.getBodyLowPriceDoubleValue() > next.getBodyLowPriceDoubleValue()  
+				&& current.getBodyHighPriceDoubleValue() < parent.getBodyHighPriceDoubleValue()) {//颓势
 			result = true;
 		}
 		return result;
@@ -2241,7 +2242,8 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v22(Klines current, Klines parent, Klines next) {
 		boolean result = false;
-		if(next.isFall() && parent.isRise() && current.isFall() && current.getBodyLowPriceDoubleValue() > parent.getBodyLowPriceDoubleValue()) {//强势
+		if(next.isFall() && parent.isRise() && current.isFall() && parent.getBodyHighPriceDoubleValue() < next.getBodyHighPriceDoubleValue() 
+				&& current.getBodyLowPriceDoubleValue() > parent.getBodyLowPriceDoubleValue()) {//强势
 			result = true;
 		}
 		return result;
