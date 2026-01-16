@@ -268,16 +268,16 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				addPrices(new OpenPriceDetails(openCode, ms.getHighPrice(), stopLossLimit));
 				addPrices(new OpenPriceDetails(openCode, ms.getMaxBodyHighPrice(), stopLossLimit));
 				
-				if(type != PriceActionType.DECL_POWER) {
-					addPrices(new OpenPriceDetails(openCode, info.getParent().getBodyLowPriceDoubleValue(), stopLossLimit));
+				if(type == PriceActionType.DEFAULT || type == PriceActionType.BACK) {
+					addPrices(new OpenPriceDetails(openCode, info.getParent().getBodyLowPriceDoubleValue(), ms.getMaxBodyHighPrice()));
 				}
 				
 				if(type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(openCode, info.getParent().getLowPriceDoubleValue(), stopLossLimit));
+					addPrices(new OpenPriceDetails(openCode, info.getParent().getLowPriceDoubleValue(), ms.getMaxBodyHighPrice()));
 				}
 				
-				if(PriceUtil.verifyDecliningPrice_v22(info.getCurrent(), info.getParent(), info.getNext())) {
-					addPrices(new OpenPriceDetails(openCode, info.getCurrent().getClosePriceDoubleValue(), stopLossLimit));
+				if(type == PriceActionType.DECL_POWER) {
+					addPrices(new OpenPriceDetails(openCode, info.getCurrent().getClosePriceDoubleValue(), ms.getMaxBodyHighPrice()));
 				}
 				
 			} else {
@@ -301,16 +301,16 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				addPrices(new OpenPriceDetails(openCode, ms.getLowPrice(), stopLossLimit));
 				addPrices(new OpenPriceDetails(openCode, ms.getMinBodyLowPrice(), stopLossLimit));
 				
-				if(type != PriceActionType.DECL_POWER) {
-					addPrices(new OpenPriceDetails(openCode, info.getParent().getBodyHighPriceDoubleValue(), stopLossLimit));
+				if(type == PriceActionType.DEFAULT || type == PriceActionType.BACK) {
+					addPrices(new OpenPriceDetails(openCode, info.getParent().getBodyHighPriceDoubleValue(), ms.getMinBodyLowPrice()));
 				}
 				
 				if(type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(openCode, info.getParent().getHighPriceDoubleValue(), stopLossLimit));
+					addPrices(new OpenPriceDetails(openCode, info.getParent().getHighPriceDoubleValue(), ms.getMinBodyLowPrice()));
 				}
 				
-				if(PriceUtil.verifyPowerful_v22(info.getCurrent(), info.getParent(), info.getNext())) {
-					addPrices(new OpenPriceDetails(openCode, info.getCurrent().getClosePriceDoubleValue(), stopLossLimit));
+				if(type == PriceActionType.DECL_POWER) {
+					addPrices(new OpenPriceDetails(openCode, info.getCurrent().getClosePriceDoubleValue(), ms.getMinBodyLowPrice()));
 				}
 			}
 			
