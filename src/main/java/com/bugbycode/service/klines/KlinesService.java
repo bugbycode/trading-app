@@ -228,12 +228,12 @@ public interface KlinesService {
      * @param ps 持仓方向 LONG / SHORT 
      * @param stopLossDoubleValue 止损价 fibInfo为null时使用
      * @param takeProfitDoubleValue 止盈价 fibInfo为null时使用
-     * @param offset 当前所处斐波那契回撤点位索引
+     * @param openPrice 开仓价
      * @param fibInfo 斐波那契回撤点位信息
      * @param autoTradeType 自动交易参考指标
      * @param decimalNum 价格小数点个数
      */
-    public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, int offset, 
+    public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, OpenPrice openPrice, 
     		FibInfo fibInfo, AutoTradeType autoTradeType, int decimalNum);
     
     /**

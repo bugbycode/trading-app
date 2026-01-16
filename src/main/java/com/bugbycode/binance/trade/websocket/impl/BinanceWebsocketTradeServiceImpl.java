@@ -105,6 +105,11 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 			JSONObject data = result.getJSONObject("result");
 			info = new PriceInfo(data.getString("symbol"), data.getString("price"), data.getLong("time"));
 		}
+		
+		if(info == null || info.getPriceDoubleValue() <= 0) {
+			throw new RuntimeException("获取" + symbol + "最新价格时出现异常");
+		}
+		
 		return info;
 	}
 

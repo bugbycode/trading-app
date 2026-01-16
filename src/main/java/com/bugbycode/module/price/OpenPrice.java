@@ -18,4 +18,10 @@ public interface OpenPrice {
 	 * @return
 	 */
 	public FibCode getCode();
+	
+	/**
+	 * 获取最佳止损点
+	 * @return
+	 */
+	public double getStopLoss();
 }
