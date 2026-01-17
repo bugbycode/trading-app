@@ -68,22 +68,6 @@ public interface KlinesService {
 	public List<Klines> continuousKlines4H(String pair,Date now,int limit,QUERY_SPLIT split);
 	
 	/**
-	 * 合约做多 (盘整区)
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param afterLowKlines 回撤之后的最低k线
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openLong(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
-	
-	/**
-	 * 合约做空 (盘整区)
-	 * @param fibInfo 斐波那契回撤参考信息
-	 * @param afterHighKlines 回撤之后的最高k线
-	 * @param klinesList_hit 最近时间段内部分k线信息
-	 */
-	public void openShort(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
-	
-	/**
 	 * 合约做多
 	 * @param openPrices 开仓价格
 	 * @param fibInfo 斐波那契回撤参考信息
@@ -120,13 +104,6 @@ public interface KlinesService {
 	public void openShort_priceAction(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
-	 * 指数均线监控
-	 * @param list
-	 * @param list_15m
-	 */
-	public void futuresEmaRiseAndFallMonitor(List<Klines> list, List<Klines> list_15m);
-	
-	/**
 	 * 斐波那契回撤点位监控
 	 * 
 	 * @param list_1d 日线级别
@@ -135,13 +112,6 @@ public interface KlinesService {
 	 * @param list_15m 十五分钟级别
 	 */
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m);
-	
-	/**
-	 * 盘整区监控
-	 * @param list
-	 * @param list_15m
-	 */
-	public void consolidationAreaMonitor(List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 价格行为监控
