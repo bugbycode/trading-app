@@ -9,7 +9,7 @@ public class OpenPriceDetails implements OpenPrice {
 	
 	private double price;
 	
-	private double stopLoss;
+	private double stopLossLimit;
 	
 	/**
 	 * 开仓价格信息
@@ -19,7 +19,7 @@ public class OpenPriceDetails implements OpenPrice {
 	public OpenPriceDetails(FibCode code, double price) {
 		this.code = code;
 		this.price = price;
-		this.stopLoss = -1;
+		this.stopLossLimit = -1;
 	}
 	
 	/**
@@ -28,10 +28,10 @@ public class OpenPriceDetails implements OpenPrice {
 	 * @param price 开仓价
 	 * @param stopLoss 最佳止损点
 	 */
-	public OpenPriceDetails(FibCode code, double price, double stopLoss) {
+	public OpenPriceDetails(FibCode code, double price, double stopLossLimit) {
 		this.code = code;
 		this.price = price;
-		this.stopLoss = stopLoss;
+		this.stopLossLimit = stopLossLimit;
 	}
 
 	@Override
@@ -46,12 +46,12 @@ public class OpenPriceDetails implements OpenPrice {
 
 	@Override
 	public String toString() {
-		return "OpenPrice: " + code.getValue() + "(" + price + "), StopLossLimit: " + stopLoss;
+		return "OpenPrice: " + code.getValue() + "(" + price + "), StopLossLimit: " + stopLossLimit;
 	}
 
 	@Override
-	public double getStopLoss() {
-		return this.stopLoss;
+	public double getStopLossLimit() {
+		return this.stopLossLimit;
 	}
 
 }

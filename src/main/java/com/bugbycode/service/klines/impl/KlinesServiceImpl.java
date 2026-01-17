@@ -919,9 +919,9 @@ public class KlinesServiceImpl implements KlinesService {
 							binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 						}
 						
-						if(openPrice != null && openPrice.getStopLoss() > 0) {
+						if(openPrice != null && openPrice.getStopLossLimit() > 0) {
 							priceInfo = binanceWebsocketTradeService.getPrice(pair);
-							double stopLossLimit = openPrice.getStopLoss();
+							double stopLossLimit = openPrice.getStopLossLimit();
 							if(priceInfo.getPriceDoubleValue() <= stopLossLimit) {
 								continue;
 							}
@@ -1251,9 +1251,9 @@ public class KlinesServiceImpl implements KlinesService {
 							binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 						}
 						
-						if(openPrice != null && openPrice.getStopLoss() > 0) {
+						if(openPrice != null && openPrice.getStopLossLimit() > 0) {
 							priceInfo = binanceWebsocketTradeService.getPrice(pair);
-							double stopLossLimit = openPrice.getStopLoss();
+							double stopLossLimit = openPrice.getStopLossLimit();
 							if(priceInfo.getPriceDoubleValue() >= stopLossLimit) {
 								continue;
 							}

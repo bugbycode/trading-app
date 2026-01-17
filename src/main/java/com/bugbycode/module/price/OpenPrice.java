@@ -23,5 +23,5 @@ public interface OpenPrice {
 	 * 获取最佳止损点
 	 * @return
 	 */
-	public double getStopLoss();
+	public double getStopLossLimit();
 }
