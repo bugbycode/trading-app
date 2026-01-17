@@ -1,6 +1,7 @@
 package com.bugbycode.module.price;
 
 import com.bugbycode.module.FibCode;
+import com.bugbycode.module.QuotationMode;
 
 /**
  * 开仓价
@@ -36,4 +37,15 @@ public interface OpenPrice {
 	 * @return
 	 */
 	public double getSecondTakeProfit();
+	
+	/**
+	 * 获取止盈点 (盘整区指标)
+	 * @param price 当前价格
+	 * @param openPrice 开仓价
+	 * @param profit 用户盈利预期
+	 * @param profitLimit 用户止盈百分比限制
+	 * @param mode LONG/SHORT
+	 * @return
+	 */
+	public double getAreaTakeProfit(double price, OpenPrice openPrice, double profit, double profitLimit, QuotationMode mode);
 }

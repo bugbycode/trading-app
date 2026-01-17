@@ -515,7 +515,7 @@ public class KlinesServiceImpl implements KlinesService {
 							//止盈点位
 							FibCode takeProfitCode = FibCode.FIB618;
 							
-							if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.AREA_INDEX) {
+							if(autoTradeType == AutoTradeType.FIB_RET) {
 								
 								FibCode code = openPrice.getCode();
 								
@@ -552,7 +552,19 @@ public class KlinesServiceImpl implements KlinesService {
 												decimalNum
 										)
 									);
+
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+												);
 								
+							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
+								double profitPrice = openPrice.getSecondTakeProfit();
+								if(tradeStyle == TradeStyle.CONSERVATIVE) {
+									profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
+								}
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(profitPrice,decimalNum)
+												);
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								//指数均线不设置止盈 由追踪委托来自动平仓
 								//profitOrderEnabled = ProfitOrderEnabled.CLOSE;
@@ -580,43 +592,34 @@ public class KlinesServiceImpl implements KlinesService {
 												decimalNum
 										)
 									);
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+												);
 							}
 							
 							stopLoss = new BigDecimal(
 									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()),decimalNum));
-							if(fibInfo != null) {
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-												);
-							} else {
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(PriceUtil.calculateLongActivationPrice(priceInfo.getPriceDoubleValue(), u.getProfit()),decimalNum)
-										);
+							
+							//计算预计盈利百分比
+							profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+							
+							//盈利太少则不做交易
+							if((profitPercent * 100) < u.getProfit()) {
+								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+								continue;
 							}
 							
-							if(fibInfo != null) {
-
-								//计算预计盈利百分比
-								profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-								
-								//盈利太少则不做交易
-								if((profitPercent * 100) < u.getProfit()) {
-									logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
-									continue;
+							//根据交易风格设置盈利限制
+							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
+								double dbProfitLimit = u.getProfitLimit() / 100;
+								if(profitPercent > dbProfitLimit) {
+									profitPercent = dbProfitLimit;
 								}
-								
-								//根据交易风格设置盈利限制
-								if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
-									double dbProfitLimit = u.getProfitLimit() / 100;
-									if(profitPercent > dbProfitLimit) {
-										profitPercent = dbProfitLimit;
-									}
-									takeProfit = new BigDecimal(
-											PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
-													);
-									logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
-											PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
-								}
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
+												);
+								logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
+										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
 							}
 							
 						}
@@ -736,7 +739,7 @@ public class KlinesServiceImpl implements KlinesService {
 						String subject_ = "";
 						String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
 						
-						if((autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.AREA_INDEX
+						if((autoTradeType == AutoTradeType.FIB_RET
 								|| autoTradeType == AutoTradeType.PRICE_ACTION ) && fibInfo != null) {
 							
 							subject_ = String.format("%s多头仓位已下单[%s][%s(%s)][PNL:%s%%] %s", 
@@ -843,7 +846,7 @@ public class KlinesServiceImpl implements KlinesService {
 							//止盈点位
 							FibCode takeProfitCode = FibCode.FIB618;
 							
-							if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.AREA_INDEX) {
+							if(autoTradeType == AutoTradeType.FIB_RET) {
 								
 								FibCode code = openPrice.getCode();
 								
@@ -880,7 +883,18 @@ public class KlinesServiceImpl implements KlinesService {
 												decimalNum
 										)
 									);
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+												);
 								
+							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
+								double profitPrice = openPrice.getSecondTakeProfit();
+								if(tradeStyle == TradeStyle.CONSERVATIVE) {
+									profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
+								}
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(profitPrice,decimalNum)
+												);
 							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
 								//指数均线不设置止盈 由追踪委托来自动平仓
 								//profitOrderEnabled = ProfitOrderEnabled.CLOSE;
@@ -909,45 +923,36 @@ public class KlinesServiceImpl implements KlinesService {
 												decimalNum
 										)
 									);
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+												);
 							}
 							
 							stopLoss = new BigDecimal(
 									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum)
 											);
 							
-							if(fibInfo != null) {
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-												);
-							} else {
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(PriceUtil.calculateShortActivationPrice(priceInfo.getPriceDoubleValue(), u.getProfit()), decimalNum)
-										);
+							//计算预计盈利百分比
+							profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+							
+							//盈利太少则不做交易
+							if((profitPercent * 100) < u.getProfit()) {
+								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+								continue;
 							}
 							
-							if(fibInfo != null) {
-								//计算预计盈利百分比
-								profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-								
-								//盈利太少则不做交易
-								if((profitPercent * 100) < u.getProfit()) {
-									logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
-									continue;
+							//根据交易风格设置盈利限制
+							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
+								double dbProfitLimit = u.getProfitLimit() / 100;
+								if(profitPercent > dbProfitLimit) {
+									profitPercent = dbProfitLimit;
 								}
 								
-								//根据交易风格设置盈利限制
-								if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
-									double dbProfitLimit = u.getProfitLimit() / 100;
-									if(profitPercent > dbProfitLimit) {
-										profitPercent = dbProfitLimit;
-									}
-									
-									takeProfit = new BigDecimal(
-											PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
-													);
-									logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
-											PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
-								}
+								takeProfit = new BigDecimal(
+										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
+												);
+								logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
+										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
 							}
 							
 						}
@@ -1068,7 +1073,7 @@ public class KlinesServiceImpl implements KlinesService {
 						String subject_ = "";
 						String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
 						
-						if((autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.AREA_INDEX
+						if((autoTradeType == AutoTradeType.FIB_RET
 								|| autoTradeType == AutoTradeType.PRICE_ACTION) && fibInfo != null) {
 							
 							subject_ = String.format("%s空头仓位已下单[%s][%s(%s)][PNL:%s%%] %s", 
@@ -1185,6 +1190,8 @@ public class KlinesServiceImpl implements KlinesService {
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, factory)) {
 				
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
+				
 				List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
@@ -1202,7 +1209,7 @@ public class KlinesServiceImpl implements KlinesService {
 					double profitPrice = price.getSecondTakeProfit();
 					//保守的交易风格
 					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						profitPrice = factory.getTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
+						profitPrice = price.getAreaTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
 					}
 					
 					//计算预计盈利百分比
@@ -1229,6 +1236,8 @@ public class KlinesServiceImpl implements KlinesService {
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, factory)) {
 				
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
+				
 				List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
@@ -1246,7 +1255,7 @@ public class KlinesServiceImpl implements KlinesService {
 					double profitPrice = price.getSecondTakeProfit();
 					//保守的交易风格
 					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						profitPrice = factory.getTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
+						profitPrice = price.getAreaTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
 					}
 					
 					//计算预计盈利百分比

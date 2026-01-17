@@ -1,7 +1,9 @@
 package com.bugbycode.module.price.impl;
 
 import com.bugbycode.module.FibCode;
+import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.price.OpenPrice;
+import com.util.PriceUtil;
 
 public class OpenPriceDetails implements OpenPrice {
 
@@ -83,4 +85,17 @@ public class OpenPriceDetails implements OpenPrice {
 		return secondTakeProfit;
 	}
 
+
+	@Override
+	public double getAreaTakeProfit(double price, OpenPrice openPrice, double profit, double profitLimit, QuotationMode mode) {
+		double pricePercent = PriceUtil.getPercent(price, openPrice.getFirstTakeProfit(), mode);
+		double nextPricePercent = PriceUtil.getPercent(price, openPrice.getSecondTakeProfit(), mode);
+		
+		double takeProfit = openPrice.getFirstTakeProfit();
+		
+		if(PriceUtil.checkPercent(pricePercent, nextPricePercent, profit, profitLimit)) {
+			takeProfit = openPrice.getSecondTakeProfit();
+		}
+		return takeProfit;
+	}
 }

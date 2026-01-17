@@ -11,7 +11,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.PriceActionInfo;
 import com.bugbycode.module.PriceActionType;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -180,19 +179,6 @@ public class AreaFactoryImpl implements AreaFactory {
 	@Override
 	public boolean isShort() {
 		return this.ps == PositionSide.SHORT;
-	}
-
-	@Override
-	public double getTakeProfit(double price, OpenPrice openPrice, double profit, double profitLimit, QuotationMode mode) {
-		double pricePercent = PriceUtil.getPercent(price, openPrice.getFirstTakeProfit(), mode);
-		double nextPricePercent = PriceUtil.getPercent(price, openPrice.getSecondTakeProfit(), mode);
-		
-		double takeProfit = openPrice.getFirstTakeProfit();
-		
-		if(PriceUtil.checkPercent(pricePercent, nextPricePercent, profit, profitLimit)) {
-			takeProfit = openPrice.getSecondTakeProfit();
-		}
-		return takeProfit;
 	}
 
 }
