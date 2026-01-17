@@ -259,7 +259,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 
 		this.fibAfterKlines.clear();
 		
-		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, list);
+		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterKline, this.list_15m));
 			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
