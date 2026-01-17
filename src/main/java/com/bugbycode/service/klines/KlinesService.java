@@ -121,6 +121,13 @@ public interface KlinesService {
 	public void futuresPriceAction(List<Klines> list, List<Klines> list_15m);
 	
 	/**
+	 * 盘整区监控
+	 * @param list
+	 * @param list_15m
+	 */
+	public void consolidationAreaMonitor(List<Klines> list, List<Klines> list_15m);
+	
+	/**
 	 * 发送邮件
 	 * @param user 发件人信息（SMTP配置）
 	 * @param subject 主题

@@ -24,4 +24,16 @@ public interface OpenPrice {
 	 * @return
 	 */
 	public double getStopLossLimit();
+	
+	/**
+	 * 获取第一止盈点
+	 * @return
+	 */
+	public double getFirstTakeProfit();
+	
+	/**
+	 * 获取第二止盈点
+	 * @return
+	 */
+	public double getSecondTakeProfit();
 }

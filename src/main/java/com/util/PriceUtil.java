@@ -13,6 +13,7 @@ import java.util.Set;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.module.EMAType;
 import com.bugbycode.module.EmaTrade;
 import com.bugbycode.module.FibCode;
@@ -3535,6 +3536,45 @@ public class PriceUtil {
 				}
 				//判断是否命中止盈价
 				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(takeProfitCode))) {
+					hitTakeProfitCodeKlines = k;
+				}
+				
+				if(!(hitCodeKlines == null || hitTakeProfitCodeKlines == null)) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 判断开仓点是否交易过 （盘整区）
+	 * @param openPrice 开仓价
+	 * @param factory
+	 * @return
+	 */
+	public static boolean isTraded(OpenPrice openPrice, AreaFactory factory) {
+		
+		boolean result = false;
+		
+		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
+		
+		double price = openPrice.getPrice();
+		
+		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			fibAfterKlines.sort(new KlinesComparator(SortType.ASC));
+			Klines hitCodeKlines = null;
+			Klines hitTakeProfitCodeKlines = null;
+			for(int index = 0; index < fibAfterKlines.size(); index++) {
+				Klines k = fibAfterKlines.get(index);
+				//判断是否命中开仓价
+				if(hitCodeKlines == null && hitPrice(k, price)) {
+					hitCodeKlines = k;
+				}
+				//判断是否命中止盈价
+				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, openPrice.getFirstTakeProfit())) {
 					hitTakeProfitCodeKlines = k;
 				}
 				

@@ -11,6 +11,10 @@ public class OpenPriceDetails implements OpenPrice {
 	
 	private double stopLossLimit;
 	
+	private double firstTakeProfit;//第一止盈点
+	
+	private double secondTakeProfit;//第二止盈点
+	
 	/**
 	 * 开仓价格信息
 	 * @param code 所处的回撤点
@@ -33,6 +37,23 @@ public class OpenPriceDetails implements OpenPrice {
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
 	}
+	
+	/**
+	 * 开仓价格信息
+	 * @param code 所处的回撤点
+	 * @param price 开仓价
+	 * @param stopLoss 最佳止损点
+	 * @param firstTakeProfit 第一止盈点
+	 * @param secondTakeProfit 第二止盈点
+	 */
+	public OpenPriceDetails(FibCode code, double price, double stopLossLimit,
+			double firstTakeProfit, double secondTakeProfit) {
+		this.code = code;
+		this.price = price;
+		this.stopLossLimit = stopLossLimit;
+		this.firstTakeProfit = firstTakeProfit;
+		this.secondTakeProfit = secondTakeProfit;
+	}
 
 	@Override
 	public double getPrice() {
@@ -52,6 +73,14 @@ public class OpenPriceDetails implements OpenPrice {
 	@Override
 	public double getStopLossLimit() {
 		return this.stopLossLimit;
+	}
+
+	public double getFirstTakeProfit() {
+		return firstTakeProfit;
+	}
+
+	public double getSecondTakeProfit() {
+		return secondTakeProfit;
 	}
 
 }
