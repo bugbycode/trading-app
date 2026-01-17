@@ -240,8 +240,8 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		if(mode == QuotationMode.LONG) {
 			fibEnd = ms.getMinBodyLow();
 			
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getLowPriceDoubleValue(), fibEnd.getLowPriceDoubleValue()));
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue(), fibEnd.getLowPriceDoubleValue()));
+			addPrices(new OpenPriceDetails(openCode, fibEnd.getLowPriceDoubleValue()));
+			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue()));
 			
 			if(fibEnd.isRise()) {
 				addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), fibEnd.getOpenPriceDoubleValue()));
@@ -249,8 +249,8 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		} else {
 			fibEnd = ms.getMaxBodyHigh();
 			
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getHighPriceDoubleValue(), fibEnd.getHighPriceDoubleValue()));
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue(), fibEnd.getHighPriceDoubleValue()));
+			addPrices(new OpenPriceDetails(openCode, fibEnd.getHighPriceDoubleValue()));
+			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue()));
 			
 			if(fibEnd.isFall()) {
 				addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), fibEnd.getOpenPriceDoubleValue()));
@@ -258,8 +258,12 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		}
 
 		this.fibAfterKlines.clear();
-		this.fibAfterKlines.addAll(PriceUtil.subList(fibEnd, this.list_15m));
-		this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
+		
+		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, list);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterKline, this.list_15m));
+			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
+		}
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
