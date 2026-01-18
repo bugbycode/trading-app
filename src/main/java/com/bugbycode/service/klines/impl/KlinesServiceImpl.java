@@ -1133,15 +1133,13 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
+		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
 		if(factory.isLong()) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			//openLong(AutoTradeType.FIB_RET, fibInfo, afterLowKlines, list_15m);
 			openLong_v2(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
 		} else if(factory.isShort()) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			//openShort(AutoTradeType.FIB_RET, fibInfo, afterHighKlines, list_15m);
 			openShort_v2(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
 		}
 	}

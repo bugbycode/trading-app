@@ -196,13 +196,18 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			return;
 		}
 		
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, list_15m);
+		if(fibAfterKline != null) {
+			this.fibInfo.setFibAfterKlines(PriceUtil.subList(fibAfterKline, this.list_15m));
+		}
+		
 		this.fibInfo.setTradeFrequency(TradeFrequency.HIGH);
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		FibCode openCode = FibCode.FIB0;
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, list);
+		fibAfterKline = PriceUtil.getAfterKlines(end, list);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterKline, list));
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
@@ -265,9 +270,9 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		this.fibAfterKlines.clear();
 		
 		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, list_15m);
+		
 		if(fibAfterKline != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterKline, this.list_15m));
-			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
 		}
 		
 		if(mode == QuotationMode.LONG) {
