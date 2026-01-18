@@ -41,7 +41,7 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "ETHUSDT";
+        String pair = "XAIUSDT";
         
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         
@@ -76,7 +76,7 @@ public class PriceActionFactoryTest {
             FibCode code = fibInfo.getFibCode(price.getPrice());
             FibCode profiCodeNext = fibInfo.getPriceActionTakeProfit_nextCode(code);
             FibCode profitCode = fibInfo.getPriceActionTakeProfit_v1(code);
-            logger.info("{}({}) -> {}({}) ~ {}({}), isTreade:{}", code, price.getPrice(), profiCodeNext, fibInfo.getFibValue(profiCodeNext), profitCode, fibInfo.getFibValue(profitCode), 
+            logger.info("{} -> {}({}) ~ {}({}), isTreade:{}", price, profiCodeNext, fibInfo.getFibValue(profiCodeNext), profitCode, fibInfo.getFibValue(profitCode), 
                 PriceUtil.isTradedPriceAction(price.getPrice(), fibInfo));
         }
 

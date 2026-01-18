@@ -16,12 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.config.AppConfig;
-import com.bugbycode.factory.area.AreaFibInfoFactory;
-import com.bugbycode.factory.area.impl.AreaFibInfoFactoryImpl;
-import com.bugbycode.factory.area.impl.ParentAreaFibInfoFactoryImpl;
-import com.bugbycode.factory.ema.EmaTradingFactory;
-import com.bugbycode.factory.ema.impl.EmaTradingFactoryImpl;
+import com.bugbycode.factory.area.AreaFactory;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
@@ -158,7 +156,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "BTCUSDT";
+        String pair = "BCHUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -183,6 +181,15 @@ public class KlinesServiceTest {
                     logger.info(k);
                 }
             }
+            
+            logger.info("============================================================");
+            fibAfterKlines = factory.getFibAfterKlines();
+            if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+                for(Klines k : fibAfterKlines) {
+                    logger.info(k);
+                }
+            }
+            
             //logger.info(parentFibInfo);
             logger.info(fibInfo);
             QuotationMode mode = fibInfo.getQuotationMode();
@@ -200,7 +207,7 @@ public class KlinesServiceTest {
             List<OpenPrice> openPrices = factory.getOpenPrices();
             for(OpenPrice price : openPrices) {
                 logger.info("{} - {} ~ {}, istrade: {}, verifyOpenPrice: {}", price, fibInfo.getNextFibCode(price.getCode()), fibInfo.getTakeProfit_v2(price.getCode()), 
-                		PriceUtil.isTraded(price.getPrice(), fibInfo), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
+                		PriceUtil.isTraded(price.getCode(), fibInfo), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
             }
 
             //logger.info(fibInfo.getFibCode(factory.getOpenPrices().get(0)));
@@ -212,57 +219,24 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-        String pair = "BTCUSDT";
-        //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
-        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
-        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-		
-        Klines last_15m = PriceUtil.getLastKlines(list_15m);
+    	String pair = "ZECUSDT";
+        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
+        AreaFactory factory = new AreaFactoryImpl(list_1h, list_15m);
         
-        //List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(list_15m);
-        
-        //logger.info(klines_list_1h);
-        
-		AreaFibInfoFactory factory = new AreaFibInfoFactoryImpl(list_1h, list_1h, list_15m);
-		AreaFibInfoFactory parentFactory = new ParentAreaFibInfoFactoryImpl(list_1h, list_1h, list_15m); 
-		//logger.info(PriceUtil.getLastKlines(list));
-		FibInfo fibInfo = factory.getFibInfo();
-		//FibInfo fibInfo_parent = factory.getFibInfo_parent();
+        List<Klines> fibAfKlines = factory.getFibAfterKlines();
 
-        if(fibInfo != null) {
-            List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
-            if(!CollectionUtils.isEmpty(fibAfterKlines)) {
-                for(Klines k : fibAfterKlines) {
-                    logger.info(k);
-                }
+        if(!CollectionUtils.isEmpty(fibAfKlines)) {
+            for(Klines k : fibAfKlines) {
+                logger.info(k);
             }
-            //logger.info(fibInfo_parent);
-            logger.info(parentFactory.getFibInfo());
-            logger.info(fibInfo);
-            QuotationMode mode = fibInfo.getQuotationMode();
-            if(mode == QuotationMode.LONG) {
-                logger.info(factory.isLong());
-            } else {
-                logger.info(factory.isShort());
-            }
-            
-            //logger.info(fibInfo.getTakeProfit_v2(FibCode.FIB786));
-            //logger.info(fibInfo.getNextFibCode(FibCode.FIB786));
-            //logger.info(fibInfo.getEndCode());
-            //logger.info(fibInfo.getLevel().getStartFibCode());
-            //logger.info(FibCode.FIB382.lte(fibInfo.getEndCode()));
-            List<OpenPrice> openPrices = factory.getOpenPrices();
-            for(OpenPrice price : openPrices) {
-                logger.info("{} - {} ~ {}, istrade: {}, verifyOpenPrice: {}", price, fibInfo.getNextFibCode(price.getCode()), fibInfo.getTakeProfit_v2(price.getCode()), 
-                		PriceUtil.isTraded(price.getPrice(), fibInfo), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
-            }
-
-            //logger.info(fibInfo.getFibCode(factory.getOpenPrices().get(0)));
         }
-        //logger.info(PriceUtil.isTraded(FibCode.FIB618, fibInfo));
-        //logger.info(fibInfo.getNextFibCode(FibCode.FIB2));
-        //logger.info(fibInfo.getTakeProfit_v2(FibCode.FIB2));
+        
+        List<OpenPrice> openPrices = factory.getOpenPrices();
+        
+        for(OpenPrice price : openPrices) {
+        	logger.info("{} -> {} ~ {}, istread: {}", price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), PriceUtil.isTraded(price, factory));
+        }
     }
 
     @Test
@@ -302,18 +276,8 @@ public class KlinesServiceTest {
 
     @Test
     public void testEmaFactory() {
-        String pair = "IDOLUSDT";
-        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,5000);
-        EmaTradingFactory factory = new EmaTradingFactoryImpl(list_1h);
-
-        if(!(factory.isLong() || factory.isShort())) {
-            return;
-        }
-
-        List<OpenPrice> openPrices = factory.getOpenPrices();
-        for(OpenPrice price : openPrices) {
-            logger.info("{}",price);
-        }
+       String pair = "IDOLUSDT";
+       
     }
 
     @Test
