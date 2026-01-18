@@ -236,24 +236,29 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			return;
 		}
 		
+		double stopLossLimit = -1;
+		if(openCode.lt(FibCode.FIB4_618)) {
+			stopLossLimit = fibInfo.getFibValue(getParentFibCode(openCode));
+		}
+		
 		Klines fibEnd = null;
 		if(mode == QuotationMode.LONG) {
 			fibEnd = ms.getMinBodyLow();
 			
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getLowPriceDoubleValue()));
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue()));
+			addPrices(new OpenPriceDetails(openCode, fibEnd.getLowPriceDoubleValue(), stopLossLimit));
+			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue(), stopLossLimit));
 			
 			if(fibEnd.isRise()) {
-				addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), fibEnd.getOpenPriceDoubleValue()));
+				addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLossLimit));
 			}
 		} else {
 			fibEnd = ms.getMaxBodyHigh();
 			
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getHighPriceDoubleValue()));
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue()));
+			addPrices(new OpenPriceDetails(openCode, fibEnd.getHighPriceDoubleValue(), stopLossLimit));
+			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue(), stopLossLimit));
 			
 			if(fibEnd.isFall()) {
-				addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), fibEnd.getOpenPriceDoubleValue()));
+				addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLossLimit));
 			}
 		}
 
@@ -304,6 +309,22 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			openPrices.add(price);
 		}
+	}
+	
+	private FibCode getParentFibCode(FibCode code) {
+		FibCode parent = FibCode.FIB4_618;
+		FibCode[] codes = FibCode.values();
+		for(int index = codes.length - 1; index > 0; index--) {
+			FibCode current = codes[index];
+			if(code == current) {
+				parent = codes[index - 1];
+				if(current == FibCode.FIB618) {
+					parent = FibCode.FIB786;
+				}
+				break;
+			}
+		}
+		return parent;
 	}
 
 	public Klines getStart() {
