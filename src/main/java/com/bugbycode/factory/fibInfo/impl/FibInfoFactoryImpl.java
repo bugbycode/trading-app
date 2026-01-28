@@ -250,21 +250,29 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		if(mode == QuotationMode.LONG) {
 			fibEnd = ms.getMinBodyLow();
 			
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getLowPriceDoubleValue(), stopLossLimit));
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue(), stopLossLimit));
-			
-			if(fibEnd.isRise()) {
-				addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLossLimit));
+			if(fibEnd.getDea() >= 0 || (fibEnd.getDea() < 0 && openCode.lte(FibCode.FIB1_272))) {
+				
+				addPrices(new OpenPriceDetails(openCode, fibEnd.getLowPriceDoubleValue(), stopLossLimit));
+				addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue(), stopLossLimit));
+				
+				if(fibEnd.isRise()) {
+					addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLossLimit));
+				}
 			}
+			
 		} else {
 			fibEnd = ms.getMaxBodyHigh();
 			
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getHighPriceDoubleValue(), stopLossLimit));
-			addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue(), stopLossLimit));
-			
-			if(fibEnd.isFall()) {
-				addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLossLimit));
+			if(fibEnd.getDea() <= 0 || (fibEnd.getDea() > 0 && openCode.lte(FibCode.FIB1_272))) {
+				
+				addPrices(new OpenPriceDetails(openCode, fibEnd.getHighPriceDoubleValue(), stopLossLimit));
+				addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue(), stopLossLimit));
+				
+				if(fibEnd.isFall()) {
+					addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLossLimit));
+				}
 			}
+			
 		}
 
 		this.fibAfterKlines.clear();
@@ -295,11 +303,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
