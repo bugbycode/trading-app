@@ -206,6 +206,11 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
 			Klines next = list.get(index - 2);
+			
+			if(current.gt(end)) {
+				continue;
+			}
+			
 			PriceActionType type = null;
 			if(mode == QuotationMode.LONG) {
 				if(PriceUtil.isBullishSwallowing_v2(current, parent, next) || PriceUtil.isBullishSwallowing_v3(current, parent, next)) {
@@ -319,11 +324,11 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() > 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() < 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
