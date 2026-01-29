@@ -2491,6 +2491,18 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断两根k线是否为上涨 V4 
+	 * </br>
+	 * 
+	 * @param current 当前k线
+	 * @param parrent 前一根k线
+	 * @return
+	 */
+	public static boolean isRise_v4(Klines current, Klines parent) {
+		return current.getBodyHighPriceDoubleValue() > parent.getBodyHighPriceDoubleValue();
+	}
+	
+	/**
 	 * 判断是否处于下跌状态
 	 * @param list
 	 * @return
@@ -2504,6 +2516,16 @@ public class PriceUtil {
 			flag = true;
 		}
 		return flag;
+	}
+	
+	/**
+	 * 判断是否处于下跌状态
+	 * @param current 当前K线
+	 * @param parent 前一根K线
+	 * @return
+	 */
+	public static boolean isFall_v4(Klines current, Klines parent) {
+		return current.getBodyLowPriceDoubleValue() < parent.getBodyLowPriceDoubleValue();
 	}
 	
 	/**
@@ -3572,6 +3594,7 @@ public class PriceUtil {
 				//判断是否命中开仓价
 				if(hitCodeKlines == null && hitPrice(k, price)) {
 					hitCodeKlines = k;
+					continue;
 				}
 				//判断是否命中止盈价
 				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, openPrice.getFirstTakeProfit())) {

@@ -24,7 +24,7 @@ import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
-import com.bugbycode.factory.area.impl.AreaFactoryImpl;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -1164,7 +1164,7 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void consolidationAreaMonitor(List<Klines> list, List<Klines> list_15m) {
-		AreaFactory factory = new AreaFactoryImpl(list, list_15m);
+		AreaFactory factory = new AreaFactoryImpl_v2(list, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
