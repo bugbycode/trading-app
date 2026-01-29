@@ -197,7 +197,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, list_15m);
 		if(fibAfterKline != null) {
-			this.fibInfo.setFibAfterKlines(PriceUtil.subList(fibAfterKline, this.list_15m));
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
 		}
 		
 		this.fibInfo.setTradeFrequency(TradeFrequency.HIGH);
