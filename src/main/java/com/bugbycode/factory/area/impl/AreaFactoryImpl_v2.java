@@ -100,6 +100,10 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 			addPrices(new OpenPriceDetails(openCode, parentBodyHighPrice, bodyLowPrice, bodyHighPrice, highPrice));//前一根k线最高实体价
 			addPrices(new OpenPriceDetails(openCode, bodyLowPrice, lowPrice, bodyHighPrice, highPrice));//最低实体价
 		
+			if(current.getBodyHighPriceDoubleValue() > parent.getHighPriceDoubleValue()) {//当前K线实体价格高于前一根K线最高价情况
+				addPrices(new OpenPriceDetails(openCode, parent.getHighPriceDoubleValue(), parentBodyHighPrice, bodyHighPrice, highPrice));
+			}
+			
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 			
 		} else {//做空
@@ -107,6 +111,10 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 			addPrices(new OpenPriceDetails(openCode, closePrice, parentBodyLowPrice, lowPrice, lowPrice));//收盘价
 			addPrices(new OpenPriceDetails(openCode, parentBodyLowPrice, bodyHighPrice, bodyLowPrice, lowPrice));//前一根K线最低实体价
 			addPrices(new OpenPriceDetails(openCode, bodyHighPrice, highPrice, bodyLowPrice, lowPrice)); //最高实体价
+			
+			if(current.getBodyLowPriceDoubleValue() < parent.getLowPriceDoubleValue()) {//当前k线实体价格低于前一根k线最低价情况
+				addPrices(new OpenPriceDetails(openCode, parent.getLowPriceDoubleValue(), parentBodyLowPrice, bodyLowPrice, lowPrice));
+			}
 			
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 			
