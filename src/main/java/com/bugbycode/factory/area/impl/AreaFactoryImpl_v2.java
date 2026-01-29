@@ -54,7 +54,7 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 		this.list.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PositionSide ps = PositionSide.DEFAULT;
+		ps = PositionSide.DEFAULT;
 		
 		Klines current = null;
 		Klines parent = null;
