@@ -2499,7 +2499,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static boolean isRise_v4(Klines current, Klines parent) {
-		return current.getBodyHighPriceDoubleValue() > parent.getBodyHighPriceDoubleValue();
+		return current.isRise() && current.getBodyHighPriceDoubleValue() > parent.getBodyHighPriceDoubleValue();
 	}
 	
 	/**
@@ -2525,7 +2525,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static boolean isFall_v4(Klines current, Klines parent) {
-		return current.getBodyLowPriceDoubleValue() < parent.getBodyLowPriceDoubleValue();
+		return current.isFall() && current.getBodyLowPriceDoubleValue() < parent.getBodyLowPriceDoubleValue();
 	}
 	
 	/**
