@@ -68,7 +68,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	@Override
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && end.getDea() > 0) {
 			result = true;
 		}
 		return result;
@@ -77,7 +77,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	@Override
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && end.getDea() < 0) {
 			result = true;
 		}
 		return result;
