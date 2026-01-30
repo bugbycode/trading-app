@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
+import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl_v2;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
@@ -41,7 +42,7 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "XAIUSDT";
+        String pair = "BTCUSDT";
         
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         
@@ -51,7 +52,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
+        PriceActionFactory factory = new PriceActionFactoryImpl_v2(list, list_15m);
         
         logger.info("init factory finish.");
         

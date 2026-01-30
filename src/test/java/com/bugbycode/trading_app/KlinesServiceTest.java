@@ -18,8 +18,8 @@ import org.springframework.util.CollectionUtils;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
@@ -156,7 +156,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "BCHUSDT";
+        String pair = "ETHUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -169,6 +169,11 @@ public class KlinesServiceTest {
         //logger.info(klines_list_1h);
         
         FibInfoFactory factory = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
+        
+        if(!(factory.isLong() || factory.isShort())) {
+        	return;
+        }
+        
 		//logger.info(PriceUtil.getLastKlines(list));
 		FibInfo fibInfo = factory.getFibInfo();
 		//FibInfo parentFibInfo = factory.getParentFibInfo();
@@ -219,10 +224,13 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "ZECUSDT";
+    	String pair = "ETHUSDT";
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
-        AreaFactory factory = new AreaFactoryImpl(list_1h, list_15m);
+        AreaFactory factory = new AreaFactoryImpl_v2(list_1h, list_15m);
+        if(!(factory.isLong() || factory.isShort())) {
+        	return;
+        }
         
         List<Klines> fibAfKlines = factory.getFibAfterKlines();
 
@@ -393,7 +401,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testDeltaAndCVD() {
-        String pair = "ZAMAUSDT";
+        String pair = "WETUSDT";
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,5000);
         PriceUtil.calculateDeltaAndCvd(list);
         for(Klines k : list) {
