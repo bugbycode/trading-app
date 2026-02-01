@@ -240,13 +240,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		//FibCode[] codes = FibCode.values();
-		
-		//开盘、收盘、最低、最高价格
+		//收盘价格
 		double closePrice = hitKline.getClosePriceDoubleValue();
-		//double openPrice = hitKline.getOpenPrice();
-		//double lowPrice = hitKline.getLowPriceDoubleValue();
-		//double hightPrice = hitKline.getHighPrice();
 		double currentPrice = closePrice;
 		
 		for(int index = 0;index < openPrices.size(); index++) {
@@ -256,12 +251,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			if( //(PriceUtil.isLong(price, klinesList_hit) || PriceUtil.isLong_v3(price, klinesList_hit))
-					/*(
-							( PriceUtil.isLong_v2(price, klinesList_hit) && fibInfo.getTradeFrequency() == TradeFrequency.LOW ) 
-							|| ( PriceUtil.isBreachLong(hitKline, price) && fibInfo.getTradeFrequency() == TradeFrequency.HIGH )
-					)*/
-					PriceUtil.isBreachLong(hitKline, price)
+			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
 					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
@@ -342,17 +332,12 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
-		//开盘、收盘、最低、最高价格
+		//收盘价格
 		double closePrice = hitKline.getClosePriceDoubleValue();
-		//double openPrice = hitKline.getOpenPrice();
-		//double lowPrice = hitKline.getLowPrice();
-		//double hightPrice = hitKline.getHighPriceDoubleValue();
 		double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
-		
-		//FibCode[] codes = FibCode.values();
 		
 		for(int index = 0;index < openPrices.size(); index++) {
 			
@@ -361,12 +346,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			if( //(PriceUtil.isShort(price, klinesList_hit) || PriceUtil.isShort_v3(price, klinesList_hit))
-					/*(
-							( PriceUtil.isShort_v2(price, klinesList_hit) && fibInfo.getTradeFrequency() == TradeFrequency.LOW)
-							|| ( PriceUtil.isBreachShort(hitKline, price) && fibInfo.getTradeFrequency() == TradeFrequency.HIGH )
-					)*/
-					PriceUtil.isBreachShort(hitKline, price)
+			if(PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
 					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
