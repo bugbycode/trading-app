@@ -43,7 +43,6 @@ import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeFrequency;
 import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.VolumeMonitorStatus;
@@ -265,7 +264,7 @@ public class KlinesServiceImpl implements KlinesService {
 					PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
-					&& (fibInfo.verifyOpenPrice(openPrice, currentPrice) || fibInfo.getTradeFrequency() == TradeFrequency.HIGH)
+					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
 					) {
 			
 				//市价做多
@@ -370,7 +369,7 @@ public class KlinesServiceImpl implements KlinesService {
 					PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
-					&& (fibInfo.verifyOpenPrice(openPrice, currentPrice) || fibInfo.getTradeFrequency() == TradeFrequency.HIGH)
+					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
 					) {
 			
 				//市价做空
