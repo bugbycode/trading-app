@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -60,7 +61,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(PositionSide.DEFAULT);
 		}
 	}
 	
@@ -97,7 +98,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return openPrices;
 	}
 	
-	private void init() {
+	private void init(PositionSide ps_mode) {
 		if(CollectionUtils.isEmpty(list) || list.size() < 99 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -117,10 +118,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		//PriceUtil.calculateDeltaAndCvd(list_trend);
 		//PriceUtil.calculateDeltaAndCvd(list_15m);
 		
-		this.openPrices.clear();
-		this.fibAfterKlines.clear();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
 		
-		PositionSide ps = getPositionSide();
+		PositionSide ps = PositionSide.DEFAULT;
+		if(ps_mode == PositionSide.DEFAULT) {
+			ps = getPositionSide();
+		} else {
+			ps = ps_mode;
+		}
 		
 		Klines third = null;
 		Klines second = null;
@@ -238,12 +244,35 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 		}
 		
+		addPrices(new OpenPriceDetails(FibCode.FIB1_272, fibInfo.getFibValue(FibCode.FIB1_272), fibInfo.getFibValue(FibCode.FIB1_618)));
+		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
 		
+		MarketSentiment ms = new MarketSentiment(fibAfterKlines);
+		
+		if(ps_mode != PositionSide.DEFAULT || ms.isEmpty()) {
+			return;
+		}
+		
+		FibCode hitCode = FibCode.FIB0;
+		
+		if(mode == QuotationMode.LONG) {
+			hitCode = fibInfo.getFibCode(ms.getLowPrice());
+		} else {
+			hitCode = fibInfo.getFibCode(ms.getHighPrice());
+		}
+		
+		if(hitCode.gt(FibCode.FIB1_272)) {
+			if(mode == QuotationMode.LONG) {
+				this.init(PositionSide.SHORT);
+			} else {
+				this.init(PositionSide.LONG);
+			}
+		}
 	}
 	
 	private PositionSide getPositionSide() {
