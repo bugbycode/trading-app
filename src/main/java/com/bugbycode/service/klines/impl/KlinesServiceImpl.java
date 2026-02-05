@@ -55,6 +55,7 @@ import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
@@ -119,9 +120,11 @@ public class KlinesServiceImpl implements KlinesService {
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
 			Inerval interval,QUERY_SPLIT split) {
 		
+		SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+		
 				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
 				.queryParam("pair", pair)
-				.queryParam("contractType", "PERPETUAL")
+				.queryParam("contractType", info.getContractType().getValue())
 				.queryParam("startTime", startTime)
 				.queryParam("interval", interval.getDescption())
 				.queryParam("limit", 1500);

@@ -27,9 +27,9 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 	private RestTemplate restTemplate;
 	
 	@Override
-	public Set<String> exchangeInfo() {
+	public Set<SymbolExchangeInfo> exchangeInfo() {
 		long now = new Date().getTime();
-		Set<String> pairs = new HashSet<String>();
+		Set<SymbolExchangeInfo> pairs = new HashSet<SymbolExchangeInfo>();
 		//
 		String resultStr = restTemplate.getForObject(AppConfig.REST_BASE_URL + "/fapi/v1/exchangeInfo", String.class);
 		JSONObject result = new JSONObject(resultStr);
@@ -56,9 +56,10 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 					}*/
 					
 					if((type == ContractType.PERPETUAL || type == ContractType.TRADIFI_PERPETUAL) && status == ContractStatus.TRADING && !symbol.endsWith("USDC") && deliveryDay > 30) {
-						pairs.add(symbol);
+						
 						SymbolExchangeInfo info = new SymbolExchangeInfo();
 						info.setSymbol(symbol);
+						info.setContractType(type);
 						
 						filters.forEach(filter -> {
 							JSONObject f = (JSONObject) filter;
@@ -79,6 +80,8 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 						});
 						
 						AppConfig.SYMBOL_EXCHANGE_INFO.put(symbol, info);
+						
+						pairs.add(info);
 					}
 				}
 			});

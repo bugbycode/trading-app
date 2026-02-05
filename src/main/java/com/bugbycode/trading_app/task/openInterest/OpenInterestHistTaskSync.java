@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
@@ -57,9 +58,11 @@ public class OpenInterestHistTaskSync {
 			return;
 		}
 		
-		Set<String> symbolSet = binanceExchangeService.exchangeInfo();
+		Set<SymbolExchangeInfo> symbolSet = binanceExchangeService.exchangeInfo();
 		
-		for(String symbol : symbolSet) {
+		for(SymbolExchangeInfo info : symbolSet) {
+			
+			String symbol = info.getSymbol();
 			
 			try {
 				

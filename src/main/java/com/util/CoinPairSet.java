@@ -8,8 +8,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.bugbycode.module.Inerval;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 
-public class CoinPairSet extends HashSet<String> {
+public class CoinPairSet extends HashSet<SymbolExchangeInfo> {
 
 	/**
 	 * 
@@ -30,13 +31,19 @@ public class CoinPairSet extends HashSet<String> {
 
 	public String getStreamName() {
 		StringBuffer buffer = new StringBuffer();
-		Iterator<String> it = this.iterator();
+		Iterator<SymbolExchangeInfo> it = this.iterator();
 		while(it.hasNext()) {
 			if(buffer.length() > 0) {
 				buffer.append("/");
 			}
 			try {
-				buffer.append(URLEncoder.encode(it.next().toLowerCase(), "UTF-8") + "_perpetual@continuousKline_" + inerval.getDescption());
+				
+				SymbolExchangeInfo info = it.next();
+				
+				String pair = info.getSymbol().toLowerCase();
+				String contractType = info.getContractType().getValue().toLowerCase();
+				
+				buffer.append(URLEncoder.encode(pair, "UTF-8") + "_" + contractType + "@continuousKline_" + inerval.getDescption());
 			}catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -46,7 +53,7 @@ public class CoinPairSet extends HashSet<String> {
 	
 	
 	@Override
-	public boolean add(String e) {
+	public boolean add(SymbolExchangeInfo e) {
 		if(isFull()) {
 			return false;
 		}

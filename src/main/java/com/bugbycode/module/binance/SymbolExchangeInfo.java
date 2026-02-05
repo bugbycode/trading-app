@@ -16,6 +16,8 @@ public class SymbolExchangeInfo {
 	
 	private String symbol;
 	
+	private ContractType contractType;//合约类型
+	
 	private double lot_stepSize;// 市价订单最小数量间隔
 	
 	private double lot_minQty;//数量下限, 最小数量
@@ -46,6 +48,14 @@ public class SymbolExchangeInfo {
 
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
+	}
+
+	public ContractType getContractType() {
+		return contractType;
+	}
+
+	public void setContractType(ContractType contractType) {
+		this.contractType = contractType;
 	}
 
 	public double getLot_stepSize() {

@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
@@ -58,9 +59,10 @@ public class OperationsTask {
 			long before_15m_time = DateFormatUtil.getStartTimeBySetMinute(now, - Inerval.INERVAL_15M.getNumber() * total).getTime();
 			long before_1h_time = DateFormatUtil.getStartTimeBySetHour(now, - Inerval.INERVAL_1H.getNumber() * total).getTime();
 			long before_4h_time = DateFormatUtil.getStartTimeBySetHour(now, - Inerval.INERVAL_4H.getNumber() * 4 * total).getTime();
-			Set<String> pairSet = binanceExchangeService.exchangeInfo();
+			Set<SymbolExchangeInfo> pairSet = binanceExchangeService.exchangeInfo();
 			
-			for(String pair : pairSet) {
+			for(SymbolExchangeInfo info : pairSet) {
+				String pair = info.getSymbol();
 				this.removeKlinesTaskPool.add(new RemoveKlinesTask(pair, before_15m_time, Inerval.INERVAL_15M, klinesRepository));
 				this.removeKlinesTaskPool.add(new RemoveKlinesTask(pair, before_1h_time, Inerval.INERVAL_1H, klinesRepository));
 				this.removeKlinesTaskPool.add(new RemoveKlinesTask(pair, before_4h_time, Inerval.INERVAL_4H, klinesRepository));

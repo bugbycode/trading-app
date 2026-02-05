@@ -55,7 +55,8 @@ public class ShapeTradingTask {
 		if(AppConfig.DEBUG) {
 			return;
 		}
-		
+		//
+		/*
 		logger.debug("ShapeTradingTask executeShapeTask start.");
 		Inerval inerval = Inerval.INERVAL_5M;
 		
@@ -87,7 +88,7 @@ public class ShapeTradingTask {
 				client.connectToServer();
 			}
 		}
-		
+		*/
 		logger.debug("ShapeTradingTask executeShapeTask end.");
 	}
 }
