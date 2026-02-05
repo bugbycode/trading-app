@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
@@ -66,13 +67,13 @@ public class WebsocketSyncKlinesTest {
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
-		Set<String> pairs = binanceExchangeService.exchangeInfo();
+		Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
 		
 		CoinPairSet set = new CoinPairSet(inerval);
 		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
-		for(String coin : pairs) {
+		for(SymbolExchangeInfo coin : pairs) {
 			
-			AppConfig.SYNC_15M_KLINES_RECORD.put(coin, new Date().getTime());
+			AppConfig.SYNC_15M_KLINES_RECORD.put(coin.getSymbol(), new Date().getTime());
 			
 			set.add(coin);
 			if(set.isFull()) {

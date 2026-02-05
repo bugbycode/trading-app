@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.Inerval;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.service.exchange.BinanceExchangeService;
+import com.util.CoinPairSet;
 
 @SpringBootTest
 public class BinanceExchangeServiceTest {
@@ -29,10 +32,20 @@ public class BinanceExchangeServiceTest {
     
     @Test
     public void testExchangeInfo() {
-    	Set<String> symbols = binanceExchangeService.exchangeInfo();
-    	for(String symbol : symbols) {
-    		logger.info(symbol);
+    	Set<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
+    	for(SymbolExchangeInfo info : symbols) {
+    		logger.info(info.getSymbol());
     	}
     	logger.info("symbol total: {}", symbols.size());
+    }
+    
+    @Test
+    public void testCoinSet() {
+    	Set<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
+    	for(SymbolExchangeInfo info : symbols) {
+    		CoinPairSet set = new CoinPairSet(Inerval.INERVAL_15M);
+    		set.add(info);
+    		logger.info(set.getStreamName());
+    	}
     }
 }

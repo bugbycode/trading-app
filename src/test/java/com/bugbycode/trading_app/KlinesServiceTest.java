@@ -156,7 +156,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "BCHUSDT";
+        String pair = "STABLEUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -187,13 +187,13 @@ public class KlinesServiceTest {
                 }
             }
             
-            logger.info("============================================================");
+            /*logger.info("============================================================");
             fibAfterKlines = factory.getFibAfterKlines();
             if(!CollectionUtils.isEmpty(fibAfterKlines)) {
                 for(Klines k : fibAfterKlines) {
                     logger.info(k);
                 }
-            }
+            }*/
             
             //logger.info(parentFibInfo);
             logger.info(fibInfo);
@@ -332,7 +332,7 @@ public class KlinesServiceTest {
     @Test
     public void testKlines(){
         String pair = "ETHUSDT";
-        List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
+        List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
         for(Klines k : klines_list_1d) {
             logger.info(k);
         }

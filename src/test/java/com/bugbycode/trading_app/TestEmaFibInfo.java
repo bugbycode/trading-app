@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
@@ -33,7 +35,7 @@ public class TestEmaFibInfo {
     @Autowired
     private BinanceExchangeService binanceExchangeService;
 
-    @BeforeAll
+    @BeforeEach
 	public void befor() {
 		
 		System.setProperty("https.proxyHost", "localhost");
@@ -52,7 +54,7 @@ public class TestEmaFibInfo {
     
     @Test
     public void testExchangePair() {
-    	Set<String> set = binanceExchangeService.exchangeInfo();
+    	Set<SymbolExchangeInfo> set = binanceExchangeService.exchangeInfo();
     	logger.info(set);
     }
 }
