@@ -11,6 +11,11 @@ public enum ContractType {
 	PERPETUAL("PERPETUAL","永续合约"),
 	
 	/**
+	 * 传统金融永续合约
+	 */
+	TRADIFI_PERPETUAL("TRADIFI_PERPETUAL", "传统金融永续合约"),
+	
+	/**
 	 * 当月交割合约
 	 */
 	CURRENT_MONTH("CURRENT_MONTH","当月交割合约"),
