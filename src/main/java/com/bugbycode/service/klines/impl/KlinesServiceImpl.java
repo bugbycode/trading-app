@@ -431,672 +431,621 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		if(ps == PositionSide.LONG) {//做多
-			//只做U本位(USDT)合约
-			if(pair.endsWith("USDT")) {
-				List<User> userList = null;
-				if(autoTradeType == AutoTradeType.DEFAULT) {
-					userList = userDetailsService.queryByDrawTrade(DrawTrade.OPEN);
-				} else {
-					userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
-				}
-				for(User u : userList) {
-					String binanceApiKey = u.getBinanceApiKey();
-					String binanceSecretKey = u.getBinanceSecretKey();
-					String tradeUserEmail = u.getUsername();
-					String dateStr = DateFormatUtil.format(new Date());
-					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughTrade());
-					double callbackRate = u.getCallbackRate();
-					double activationPriceRatio = u.getActivationPriceRatio();
-					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
-					
-					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
-					
-					//筛选策略限制
-					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
-						continue;
-					}
-					
-					//活跃度限制
-					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
-						continue;
-					}
-					
-					//计算预计盈利百分比
-					double profitPercent = 0;
-					
-					try {
-						
-						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
-						
-						//计算追踪止损触发价
-						BigDecimal activationPriceValue = new BigDecimal(
-								PriceUtil.formatDoubleDecimal(PriceUtil.calculateLongActivationPrice(priceInfo.getPriceDoubleValue(), activationPriceRatio), decimalNum)
-								);
-						BigDecimal callbackRateValue = new BigDecimal(callbackRate);
-						
-						//int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
-						
-						BigDecimal stopLoss = new BigDecimal(0);
-						BigDecimal takeProfit = new BigDecimal(0);
+		SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+		if(info == null) {
+			throw new RuntimeException(pair + "交易规则未初始化");
+		}
+		
+		String marginAsset = info.getMarginAsset();
 
-						if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
-							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossDoubleValue, decimalNum));
-							takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(takeProfitDoubleValue , decimalNum));
+		//只做U本位(USDT)合约
+		if(!"USDT".equals(marginAsset)) {
+			logger.info(pair + "保证金资产为" + marginAsset);
+			return;
+		}
+		
+		List<User> userList = null;
+		if(autoTradeType == AutoTradeType.DEFAULT) {
+			userList = userDetailsService.queryByDrawTrade(DrawTrade.OPEN);
+		} else {
+			userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
+		}
+		
+		for(User u : userList) {
+			
+			String binanceApiKey = u.getBinanceApiKey();
+			String binanceSecretKey = u.getBinanceSecretKey();
+			String tradeUserEmail = u.getUsername();
+			String dateStr = DateFormatUtil.format(new Date());
+			RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
+			TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+			BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughTrade());
+			double callbackRate = u.getCallbackRate();
+			double activationPriceRatio = u.getActivationPriceRatio();
+			CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
+			
+			ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
+			
+			//筛选策略限制
+			if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+				continue;
+			}
+			
+			//活跃度限制
+			if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+				continue;
+			}
+			//计算预计盈利百分比
+			double profitPercent = 0;
+			
+			BigDecimal callbackRateValue = new BigDecimal(callbackRate);
+			BigDecimal stopLoss = new BigDecimal(0);
+			BigDecimal takeProfit = new BigDecimal(0);
+			
+			if(ps == PositionSide.LONG) {//做多
+					
+				try {
+					
+					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
+					
+					//计算追踪止损触发价
+					BigDecimal activationPriceValue = new BigDecimal(
+							PriceUtil.formatDoubleDecimal(PriceUtil.calculateLongActivationPrice(priceInfo.getPriceDoubleValue(), activationPriceRatio), decimalNum)
+							);
+					
+					if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
+						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossDoubleValue, decimalNum));
+						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(takeProfitDoubleValue , decimalNum));
+						
+						//计算预计盈利百分比
+						profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+						
+						//盈利太少则不做交易
+						if((profitPercent * 100) < u.getProfit()) {
+							logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+							continue;
+						}
+						
+					} else {
+						
+						//止盈点位
+						FibCode takeProfitCode = FibCode.FIB618;
+						
+						if(autoTradeType == AutoTradeType.FIB_RET) {
 							
-							//计算预计盈利百分比
-							profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+							FibCode code = openPrice.getCode();
 							
-							//盈利太少则不做交易
-							if((profitPercent * 100) < u.getProfit()) {
-								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+							if(code.lt(u.getFibLevelType().getLevelCode())) {
 								continue;
 							}
 							
-						} else {
-							
-							//止盈点位
-							FibCode takeProfitCode = FibCode.FIB618;
-							
-							if(autoTradeType == AutoTradeType.FIB_RET) {
-								
-								FibCode code = openPrice.getCode();
-								
-								if(code.lt(u.getFibLevelType().getLevelCode())) {
-									continue;
-								}
-								
-								takeProfitCode = fibInfo.getTakeProfit_v2(code);
-								
-								//根据交易风格设置盈利限制
-								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfitCode = fibInfo.getTakeProfit_v3(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
-								}
-								
-								logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
-								
-								//回踩单判断
-								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-									continue;
-								}
-								//追踪委托价
-								/*if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
-									FibCode next = fibInfo.getActivationPriceCode(code);
-									if(fibInfo.getFibValue(next) > priceInfo.getPriceDoubleValue()) {
-										activationPriceValue = new BigDecimal(
-												PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
-												);
-									}
-								}*/
-								activationPriceValue = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(
-												PriceUtil.calculateLongActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
-												decimalNum
-										)
-									);
-
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-												);
-								
-							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-								double profitPrice = openPrice.getSecondTakeProfit();
-								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
-								}
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(profitPrice,decimalNum)
-												);
-							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
-								//指数均线不设置止盈 由追踪委托来自动平仓
-								//profitOrderEnabled = ProfitOrderEnabled.CLOSE;
-								//强制启用追踪委托
-								//callbackRateEnabled = CallbackRateEnabled.OPEN;
-							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								FibCode code = openPrice.getCode();
-								takeProfitCode = fibInfo.getPriceActionTakeProfit_v1(code);
-								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfitCode = fibInfo.getPriceActionTakeProfit(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
-								}
-								//突破交易控制
-								if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
-									continue;
-								}
-								
-								//追踪委托价
-								/*FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
-								activationPriceValue = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
-										);*/
-								activationPriceValue = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(
-												PriceUtil.calculateLongActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
-												decimalNum
-										)
-									);
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-												);
-							}
-							
-							stopLoss = new BigDecimal(
-									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()),decimalNum));
-							
-							//计算预计盈利百分比
-							profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-							
-							//盈利太少则不做交易
-							if((profitPercent * 100) < u.getProfit()) {
-								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
-								continue;
-							}
+							takeProfitCode = fibInfo.getTakeProfit_v2(code);
 							
 							//根据交易风格设置盈利限制
-							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
-								double dbProfitLimit = u.getProfitLimit() / 100;
-								if(profitPercent > dbProfitLimit) {
-									profitPercent = dbProfitLimit;
-								}
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
-												);
-								logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
-										PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
+							if(tradeStyle == TradeStyle.CONSERVATIVE) {
+								takeProfitCode = fibInfo.getTakeProfit_v3(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
 							}
 							
-						}
-						
-						if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
-							//多头的止盈价格必须大于当前价格
-							if(!(priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
+							logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
+							
+							//回踩单判断
+							TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+							if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 								continue;
 							}
-						}
-						
-						//最少下单数量
-						String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
-						BigDecimal minQuantity = new BigDecimal(quantityNum);
-						
-						//预期持仓数量
-						BigDecimal quantity = minQuantity.multiply(new BigDecimal(u.getBaseStepSize()));
-
-						logger.debug("{}交易对多头预期持仓数量：{}", pair, quantity);
-						
-						//修正持仓数量
-						quantity = PriceUtil.rectificationQuantity(quantity, minQuantity, u.getBaseStepSize(), u.getPositionValue(), priceInfo);
-						
-						logger.debug("{}交易对多头修正后持仓数量：{}", pair, quantity);
-						
-						if(quantity.doubleValue() == 0) {
-							continue;
-						}
-						
-						//查询杠杆
-						SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-						
-						List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
-						
-						int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
-						int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
-						
-						int leverage = sc.getLeverage();
-						
-						logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
-						if(leverage != updateLeverage) {
-							logger.debug("开始修改" + pair + "杠杆倍数");
-							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
-						}
-						
-						//持仓价值 = 持仓数量 * 价格
-						double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
-						
-						if(order_value > u.getPositionValue()) {
-							logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + "USDT");
-							continue;
-						}
-						
-						//获取用户手续费率
-						CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
-						double orderBalance = (order_value / updateLeverage);//持仓所需保证金
-						
-						//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
-						double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
-						
-						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
-						if(Double.valueOf(availableBalanceStr) < minOrder_value) {
-							logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + "USDT");
-							continue;
-						}
-						
-						//仓位数量限制
-						int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
-						if(positionCount >= u.getPositionCountLimit()) {
-							logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
-							continue;
-						}
-						
-						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
-						if(!CollectionUtils.isEmpty(positionList)) {
-							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-							continue;
-						}
-						
-						boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
-						logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
-						if(!dualSidePosition) {
-							logger.debug("开始修改持仓模式为双向持仓");
-							Result result = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey, true);
-							if(result.getResult() == ResultCode.SUCCESS) {
-								logger.debug("修改持仓模式成功");
-							} else {
-								logger.debug("修改持仓模式失败，失败原因：" + result.getMsg());
-								sendEmail(u, "修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
-							}
-						}
-						
-						MarginType marginType = MarginType.resolve(sc.getMarginType());
-						
-						logger.debug(pair + "当前保证金模式：" + marginType);
-						
-						if(marginType != MarginType.ISOLATED) {
-							logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
-							binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
-						}
-						
-						if(openPrice != null && openPrice.getStopLossLimit() > 0) {
-							priceInfo = binanceWebsocketTradeService.getPrice(pair);
-							double stopLossLimit = openPrice.getStopLossLimit();
-							if(priceInfo.getPriceDoubleValue() <= stopLossLimit) {
-								continue;
-							}
-							if(stopLoss.doubleValue() < stopLossLimit) {
-								stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
-							}
-						}
-						
-						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit, 
-								callbackRateEnabled, activationPriceValue, callbackRateValue, profitOrderEnabled);
-
-						//开仓邮件通知
-						String subject_ = "";
-						String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
-						
-						if((autoTradeType == AutoTradeType.FIB_RET
-								|| autoTradeType == AutoTradeType.PRICE_ACTION ) && fibInfo != null) {
 							
-							subject_ = String.format("%s多头仓位已下单[%s][%s(%s)][PNL:%s%%] %s", 
-									pair, 
-									fibInfo.getLevel().getLabel(),
-									openPrice.getCode().getDescription(), 
-									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(openPrice.getCode()),fibInfo.getDecimalPoint()),
-									pnlStr, 
-									dateStr);
-							
-						} else {
-							subject_ = String.format("%s多头仓位已下单[PNL:%s%%] %s", pair, pnlStr, dateStr);
-						}
-						
-						String text_ = StringUtil.formatLongMessage_v2(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
-								takeProfit.doubleValue(), decimalNum, pnlStr);
-						
-						if(fibInfo != null) {
-							text_ += "\n\n" + fibInfo.toString();
-						}
-						
-						if(recvTradeStatus == RecvTradeStatus.OPEN) {
-							sendEmail(u, subject_, text_, tradeUserEmail);
-						}
-						
-					} catch (Exception e) {
-						String title = "下单" + pair + "多头仓位时出现异常";
-						String message = e.getMessage();
-						if(e instanceof OrderPlaceException) {
-							title = ((OrderPlaceException)e).getTitle();
-						}
-						sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
-						logger.error(e.getMessage(), e);
-					}
-					
-				}
-			}
-		} else {//做空
-			//只做U本位(USDT)合约
-			if(pair.endsWith("USDT")) {
-				List<User> userList = null;
-				if(autoTradeType == AutoTradeType.DEFAULT) {
-					userList = userDetailsService.queryByDrawTrade(DrawTrade.OPEN);
-				} else {
-					userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
-				}
-				for(User u : userList) {
-					
-					String binanceApiKey = u.getBinanceApiKey();
-					String binanceSecretKey = u.getBinanceSecretKey();
-					String tradeUserEmail = u.getUsername();
-					String dateStr = DateFormatUtil.format(new Date());
-					RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughTrade());
-					
-					double callbackRate = u.getCallbackRate();
-					double activationPriceRatio = u.getActivationPriceRatio();
-					CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
-					
-					ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
-					
-					//筛选策略限制
-					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
-						continue;
-					}
-					
-					//活跃度限制
-					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
-						continue;
-					}
-					
-					//计算预计盈利百分比
-					double profitPercent = 0;
-					
-					try {
-
-						PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
-						
-						//计算追踪止损触发价
-						BigDecimal activationPriceValue = new BigDecimal(
-								PriceUtil.formatDoubleDecimal(PriceUtil.calculateShortActivationPrice(priceInfo.getPriceDoubleValue(), activationPriceRatio), decimalNum)
+							//追踪委托价
+							activationPriceValue = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(
+											PriceUtil.calculateLongActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
+											decimalNum
+									)
 								);
-						BigDecimal callbackRateValue = new BigDecimal(callbackRate);
-						
-						//int decimalNum = new BigDecimal(String.valueOf(Double.valueOf(priceInfo.getPrice()))).scale();
-						
-						BigDecimal stopLoss = new BigDecimal(0);
-						BigDecimal takeProfit = new BigDecimal(0); 
 
-						if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
-							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossDoubleValue, decimalNum));
-							takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(takeProfitDoubleValue , decimalNum));
-							
-							//计算预计盈利百分比
-							profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-							
-							//盈利太少则不做交易
-							if((profitPercent * 100) < u.getProfit()) {
-								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
-								continue;
-							}
-						} else {
-							//止盈点位
-							FibCode takeProfitCode = FibCode.FIB618;
-							
-							if(autoTradeType == AutoTradeType.FIB_RET) {
-								
-								FibCode code = openPrice.getCode();
-								
-								if(code.lt(u.getFibLevelType().getLevelCode())) {
-									continue;
-								}
-
-								takeProfitCode = fibInfo.getTakeProfit_v2(code);
-								
-								//根据交易风格设置盈利限制
-								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfitCode = fibInfo.getTakeProfit_v3(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
-								}
-								
-								logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
-								
-								//回踩单判断
-								TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-								if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-									continue;
-								}
-								//追踪委托价
-								/*if(autoTradeType == AutoTradeType.FIB_RET && code != FibCode.FIB236) {
-									FibCode next = fibInfo.getActivationPriceCode(code);
-									if(fibInfo.getFibValue(next) < priceInfo.getPriceDoubleValue()) {
-										activationPriceValue = new BigDecimal(
-												PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
-												);
-									}
-								}*/
-								activationPriceValue = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(
-												PriceUtil.calculateShortActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
-												decimalNum
-										)
-									);
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-												);
-								
-							} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
-								double profitPrice = openPrice.getSecondTakeProfit();
-								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
-								}
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(profitPrice,decimalNum)
-												);
-							} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
-								//指数均线不设置止盈 由追踪委托来自动平仓
-								//profitOrderEnabled = ProfitOrderEnabled.CLOSE;
-								//强制启用追踪委托
-								//callbackRateEnabled = CallbackRateEnabled.OPEN;
-								
-							} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-								FibCode code = openPrice.getCode();
-								takeProfitCode = fibInfo.getPriceActionTakeProfit_v1(code);
-								if(tradeStyle == TradeStyle.CONSERVATIVE) {
-									takeProfitCode = fibInfo.getPriceActionTakeProfit(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
-								}
-								//突破交易控制
-								if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
-									continue;
-								}
-								
-								//追踪委托价
-								/*FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
-								activationPriceValue = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
-										);*/
-								activationPriceValue = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(
-												PriceUtil.calculateShortActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
-												decimalNum
-										)
-									);
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
-												);
-							}
-							
-							stopLoss = new BigDecimal(
-									PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum)
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
 											);
 							
-							//计算预计盈利百分比
-							profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
-							
-							//盈利太少则不做交易
-							if((profitPercent * 100) < u.getProfit()) {
-								logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+						} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
+							double profitPrice = openPrice.getSecondTakeProfit();
+							if(tradeStyle == TradeStyle.CONSERVATIVE) {
+								profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
+							}
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(profitPrice,decimalNum)
+											);
+						} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
+							//指数均线不设置止盈 由追踪委托来自动平仓
+							//profitOrderEnabled = ProfitOrderEnabled.CLOSE;
+							//强制启用追踪委托
+							//callbackRateEnabled = CallbackRateEnabled.OPEN;
+						} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
+							FibCode code = openPrice.getCode();
+							takeProfitCode = fibInfo.getPriceActionTakeProfit_v1(code);
+							if(tradeStyle == TradeStyle.CONSERVATIVE) {
+								takeProfitCode = fibInfo.getPriceActionTakeProfit(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+							}
+							//突破交易控制
+							if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
 								continue;
 							}
 							
-							//根据交易风格设置盈利限制
-							if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
-								double dbProfitLimit = u.getProfitLimit() / 100;
-								if(profitPercent > dbProfitLimit) {
-									profitPercent = dbProfitLimit;
-								}
-								
-								takeProfit = new BigDecimal(
-										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
-												);
-								logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
-										PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
-							}
-							
+							//追踪委托价
+							activationPriceValue = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(
+											PriceUtil.calculateLongActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
+											decimalNum
+									)
+								);
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+											);
 						}
 						
-						if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
-							//空头止盈价格必须小于当前价格
-							if(!(priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
-								continue;
-							}
-						}
-
-						//最少下单数量
-						String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
-						BigDecimal minQuantity = new BigDecimal(quantityNum);
+						stopLoss = new BigDecimal(
+								PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()),decimalNum));
 						
-						//预期持仓数量
-						BigDecimal quantity = minQuantity.multiply(new BigDecimal(u.getBaseStepSize()));
-
-						logger.debug("{}交易对空头预期持仓数量：{}", pair, quantity);
+						//计算预计盈利百分比
+						profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
 						
-						//修正持仓数量
-						quantity = PriceUtil.rectificationQuantity(quantity, minQuantity, u.getBaseStepSize(), u.getPositionValue(), priceInfo);
-						
-						logger.debug("{}交易对空头修正后持仓数量：{}", pair, quantity);
-						
-						if(quantity.doubleValue() == 0) {
+						//盈利太少则不做交易
+						if((profitPercent * 100) < u.getProfit()) {
+							logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
 							continue;
 						}
 						
-						//查询杠杆
-						SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-
-						List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
-						
-						int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
-						int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
-						
-						int leverage = sc.getLeverage();
-						
-						logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
-						
-						if(leverage != updateLeverage) {
-							logger.debug("开始修改" + pair + "杠杆倍数");
-							binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
-						}
-						
-						//持仓价值 = 持仓数量 * 价格
-						double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
-						
-						if(order_value > u.getPositionValue()) {
-							logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + "USDT");
-							continue;
-						}
-						
-						//获取用户手续费率
-						CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
-						double orderBalance = (order_value / updateLeverage);//持仓所需保证金
-						
-						//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
-						double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
-						
-						String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, "USDT");
-						if(Double.valueOf(availableBalanceStr) < minOrder_value) {
-							logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + "USDT");
-							continue;
-						}
-						
-						//仓位数量限制
-						int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
-						if(positionCount >= u.getPositionCountLimit()) {
-							logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
-							continue;
-						}
-
-						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
-						if(!CollectionUtils.isEmpty(positionList)) {
-							logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-							continue;
-						}
-						
-						boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
-						logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
-						if(!dualSidePosition) {
-							logger.debug("开始修改持仓模式为双向持仓");
-							Result result = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey, true);
-							if(result.getResult() == ResultCode.SUCCESS) {
-								logger.debug("修改持仓模式成功");
-							} else {
-								logger.debug("修改持仓模式失败，失败原因：" + result.getMsg());
-								sendEmail(u, "修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
+						//根据交易风格设置盈利限制
+						if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
+							double dbProfitLimit = u.getProfitLimit() / 100;
+							if(profitPercent > dbProfitLimit) {
+								profitPercent = dbProfitLimit;
 							}
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
+											);
+							logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
+									PriceUtil.formatDoubleDecimal( PriceUtil.getLongTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
 						}
 						
-						MarginType marginType = MarginType.resolve(sc.getMarginType());
-
-						logger.debug(pair + "当前保证金模式：" + marginType);
-						
-						if(marginType != MarginType.ISOLATED) {
-							logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
-							binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
-						}
-						
-						if(openPrice != null && openPrice.getStopLossLimit() > 0) {
-							priceInfo = binanceWebsocketTradeService.getPrice(pair);
-							double stopLossLimit = openPrice.getStopLossLimit();
-							if(priceInfo.getPriceDoubleValue() >= stopLossLimit) {
-								continue;
-							}
-							if(stopLoss.doubleValue() > stopLossLimit) {
-								stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
-							}
-						}
-						
-						binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit, 
-								callbackRateEnabled, activationPriceValue, callbackRateValue, profitOrderEnabled);
-						
-						//开仓邮件通知
-						String subject_ = "";
-						String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
-						
-						if((autoTradeType == AutoTradeType.FIB_RET
-								|| autoTradeType == AutoTradeType.PRICE_ACTION) && fibInfo != null) {
-							
-							subject_ = String.format("%s空头仓位已下单[%s][%s(%s)][PNL:%s%%] %s", 
-									pair, 
-									fibInfo.getLevel().getLabel(),
-									openPrice.getCode().getDescription(), 
-									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(openPrice.getCode()),fibInfo.getDecimalPoint()),
-									pnlStr, 
-									dateStr);
-							
-						} else {
-							subject_ = String.format("%s空头仓位已下单[PNL:%s%%] %s", pair, pnlStr, dateStr);
-						}
-						
-						String text_ = StringUtil.formatShortMessage_v2(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
-								stopLoss.doubleValue(), decimalNum, pnlStr);
-						
-						if(fibInfo != null) {
-							text_ += "\n\n" + fibInfo.toString();
-						}
-						
-						if(recvTradeStatus == RecvTradeStatus.OPEN) {
-							sendEmail(u, subject_, text_, tradeUserEmail);
-						}
-						
-					} catch (Exception e) {
-						String title = "下单" + pair + "空头仓位时出现异常";
-						String message = e.getMessage();
-						if(e instanceof OrderPlaceException) {
-							title = ((OrderPlaceException)e).getTitle();
-						}
-						sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
-						logger.error(e.getMessage(), e);
 					}
 					
+					if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+						//多头的止盈价格必须大于当前价格
+						if(!(priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
+							continue;
+						}
+					}
+					
+					//最少下单数量
+					String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
+					BigDecimal minQuantity = new BigDecimal(quantityNum);
+					
+					//预期持仓数量
+					BigDecimal quantity = minQuantity.multiply(new BigDecimal(u.getBaseStepSize()));
+
+					logger.debug("{}交易对多头预期持仓数量：{}", pair, quantity);
+					
+					//修正持仓数量
+					quantity = PriceUtil.rectificationQuantity(quantity, minQuantity, u.getBaseStepSize(), u.getPositionValue(), priceInfo);
+					
+					logger.debug("{}交易对多头修正后持仓数量：{}", pair, quantity);
+					
+					if(quantity.doubleValue() == 0) {
+						continue;
+					}
+					
+					//查询杠杆
+					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
+					
+					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
+					
+					int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
+					int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
+					
+					int leverage = sc.getLeverage();
+					
+					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
+					if(leverage != updateLeverage) {
+						logger.debug("开始修改" + pair + "杠杆倍数");
+						binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
+					}
+					
+					//持仓价值 = 持仓数量 * 价格
+					double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
+					
+					if(order_value > u.getPositionValue()) {
+						logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + marginAsset);
+						continue;
+					}
+					
+					//获取用户手续费率
+					CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
+					double orderBalance = (order_value / updateLeverage);//持仓所需保证金
+					
+					//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
+					double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
+					
+					String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, marginAsset);
+					if(Double.valueOf(availableBalanceStr) < minOrder_value) {
+						logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + marginAsset);
+						continue;
+					}
+					
+					//仓位数量限制
+					int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
+					if(positionCount >= u.getPositionCountLimit()) {
+						logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
+						continue;
+					}
+					
+					List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+					if(!CollectionUtils.isEmpty(positionList)) {
+						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+						continue;
+					}
+					
+					boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
+					logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
+					if(!dualSidePosition) {
+						logger.debug("开始修改持仓模式为双向持仓");
+						Result result = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey, true);
+						if(result.getResult() == ResultCode.SUCCESS) {
+							logger.debug("修改持仓模式成功");
+						} else {
+							logger.debug("修改持仓模式失败，失败原因：" + result.getMsg());
+							sendEmail(u, "修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
+						}
+					}
+					
+					MarginType marginType = MarginType.resolve(sc.getMarginType());
+					
+					logger.debug(pair + "当前保证金模式：" + marginType);
+					
+					if(marginType != MarginType.ISOLATED) {
+						logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
+						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
+					}
+					
+					if(openPrice != null && openPrice.getStopLossLimit() > 0) {
+						priceInfo = binanceWebsocketTradeService.getPrice(pair);
+						double stopLossLimit = openPrice.getStopLossLimit();
+						if(priceInfo.getPriceDoubleValue() <= stopLossLimit) {
+							continue;
+						}
+						if(stopLoss.doubleValue() < stopLossLimit) {
+							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
+						}
+					}
+					
+					binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit, 
+							callbackRateEnabled, activationPriceValue, callbackRateValue, profitOrderEnabled);
+
+					//开仓邮件通知
+					String subject_ = "";
+					String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
+					
+					if((autoTradeType == AutoTradeType.FIB_RET
+							|| autoTradeType == AutoTradeType.PRICE_ACTION ) && fibInfo != null) {
+						
+						subject_ = String.format("%s多头仓位已下单[%s][%s(%s)][PNL:%s%%] %s", 
+								pair, 
+								fibInfo.getLevel().getLabel(),
+								openPrice.getCode().getDescription(), 
+								PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(openPrice.getCode()),fibInfo.getDecimalPoint()),
+								pnlStr, 
+								dateStr);
+						
+					} else {
+						subject_ = String.format("%s多头仓位已下单[PNL:%s%%] %s", pair, pnlStr, dateStr);
+					}
+					
+					String text_ = StringUtil.formatLongMessage_v2(pair, Double.valueOf(priceInfo.getPrice()), stopLoss.doubleValue(), 
+							takeProfit.doubleValue(), decimalNum, pnlStr);
+					
+					if(fibInfo != null) {
+						text_ += "\n\n" + fibInfo.toString();
+					}
+					
+					if(recvTradeStatus == RecvTradeStatus.OPEN) {
+						sendEmail(u, subject_, text_, tradeUserEmail);
+					}
+					
+				} catch (Exception e) {
+					String title = "下单" + pair + "多头仓位时出现异常";
+					String message = e.getMessage();
+					if(e instanceof OrderPlaceException) {
+						title = ((OrderPlaceException)e).getTitle();
+					}
+					sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
+					logger.error(e.getMessage(), e);
 				}
+					
+			} else {//做空
+				
+				try {
+
+					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
+					
+					//计算追踪止损触发价
+					BigDecimal activationPriceValue = new BigDecimal(
+							PriceUtil.formatDoubleDecimal(PriceUtil.calculateShortActivationPrice(priceInfo.getPriceDoubleValue(), activationPriceRatio), decimalNum)
+							);
+					
+					if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
+						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossDoubleValue, decimalNum));
+						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(takeProfitDoubleValue , decimalNum));
+						
+						//计算预计盈利百分比
+						profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+						
+						//盈利太少则不做交易
+						if((profitPercent * 100) < u.getProfit()) {
+							logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+							continue;
+						}
+					} else {
+						//止盈点位
+						FibCode takeProfitCode = FibCode.FIB618;
+						
+						if(autoTradeType == AutoTradeType.FIB_RET) {
+							
+							FibCode code = openPrice.getCode();
+							
+							if(code.lt(u.getFibLevelType().getLevelCode())) {
+								continue;
+							}
+
+							takeProfitCode = fibInfo.getTakeProfit_v2(code);
+							
+							//根据交易风格设置盈利限制
+							if(tradeStyle == TradeStyle.CONSERVATIVE) {
+								takeProfitCode = fibInfo.getTakeProfit_v3(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+							}
+							
+							logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
+							
+							//回踩单判断
+							TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+							if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+								continue;
+							}
+							
+							//追踪委托价
+							activationPriceValue = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(
+											PriceUtil.calculateShortActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
+											decimalNum
+									)
+								);
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+											);
+							
+						} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
+							double profitPrice = openPrice.getSecondTakeProfit();
+							if(tradeStyle == TradeStyle.CONSERVATIVE) {
+								profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
+							}
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(profitPrice,decimalNum)
+											);
+						} else if(autoTradeType == AutoTradeType.EMA_INDEX) {
+							//指数均线不设置止盈 由追踪委托来自动平仓
+							//profitOrderEnabled = ProfitOrderEnabled.CLOSE;
+							//强制启用追踪委托
+							//callbackRateEnabled = CallbackRateEnabled.OPEN;
+							
+						} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
+							FibCode code = openPrice.getCode();
+							takeProfitCode = fibInfo.getPriceActionTakeProfit_v1(code);
+							if(tradeStyle == TradeStyle.CONSERVATIVE) {
+								takeProfitCode = fibInfo.getPriceActionTakeProfit(code, priceInfo.getPriceDoubleValue(), u.getProfit(), u.getProfitLimit());
+							}
+							//突破交易控制
+							if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
+								continue;
+							}
+							
+							//追踪委托价
+							/*FibCode next = fibInfo.getPriceActionActivationPriceCode(code);
+							activationPriceValue = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(next), decimalNum)
+									);*/
+							activationPriceValue = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(
+											PriceUtil.calculateShortActivationPrice_v2(priceInfo.getPriceDoubleValue(), activationPriceRatio, fibInfo.getFibValue(takeProfitCode)),
+											decimalNum
+									)
+								);
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(takeProfitCode),decimalNum)
+											);
+						}
+						
+						stopLoss = new BigDecimal(
+								PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum)
+										);
+						
+						//计算预计盈利百分比
+						profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
+						
+						//盈利太少则不做交易
+						if((profitPercent * 100) < u.getProfit()) {
+							logger.debug(pair + "预计盈利：" + PriceUtil.formatDoubleDecimal(profitPercent * 100, 2) + "%，不做交易");
+							continue;
+						}
+						
+						//根据交易风格设置盈利限制
+						if(tradeStyle == TradeStyle.CONSERVATIVE && autoTradeType == AutoTradeType.DEFAULT) {
+							double dbProfitLimit = u.getProfitLimit() / 100;
+							if(profitPercent > dbProfitLimit) {
+								profitPercent = dbProfitLimit;
+							}
+							
+							takeProfit = new BigDecimal(
+									PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum)
+											);
+							logger.debug("交易对：{}，当前价格：{}，波动幅度：{}，止盈价格：{}",pair,priceInfo.getPriceDoubleValue(),profitPercent,
+									PriceUtil.formatDoubleDecimal( PriceUtil.getShortTakeProfitForPercent(priceInfo.getPriceDoubleValue(), profitPercent) ,decimalNum));
+						}
+						
+					}
+					
+					if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+						//空头止盈价格必须小于当前价格
+						if(!(priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
+							continue;
+						}
+					}
+
+					//最少下单数量
+					String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
+					BigDecimal minQuantity = new BigDecimal(quantityNum);
+					
+					//预期持仓数量
+					BigDecimal quantity = minQuantity.multiply(new BigDecimal(u.getBaseStepSize()));
+
+					logger.debug("{}交易对空头预期持仓数量：{}", pair, quantity);
+					
+					//修正持仓数量
+					quantity = PriceUtil.rectificationQuantity(quantity, minQuantity, u.getBaseStepSize(), u.getPositionValue(), priceInfo);
+					
+					logger.debug("{}交易对空头修正后持仓数量：{}", pair, quantity);
+					
+					if(quantity.doubleValue() == 0) {
+						continue;
+					}
+					
+					//查询杠杆
+					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
+
+					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
+					
+					int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
+					int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
+					
+					int leverage = sc.getLeverage();
+					
+					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
+					
+					if(leverage != updateLeverage) {
+						logger.debug("开始修改" + pair + "杠杆倍数");
+						binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
+					}
+					
+					//持仓价值 = 持仓数量 * 价格
+					double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
+					
+					if(order_value > u.getPositionValue()) {
+						logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + marginAsset);
+						continue;
+					}
+					
+					//获取用户手续费率
+					CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
+					double orderBalance = (order_value / updateLeverage);//持仓所需保证金
+					
+					//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
+					double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
+					
+					String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, marginAsset);
+					if(Double.valueOf(availableBalanceStr) < minOrder_value) {
+						logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + marginAsset);
+						continue;
+					}
+					
+					//仓位数量限制
+					int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
+					if(positionCount >= u.getPositionCountLimit()) {
+						logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
+						continue;
+					}
+
+					List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+					if(!CollectionUtils.isEmpty(positionList)) {
+						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+						continue;
+					}
+					
+					boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
+					logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
+					if(!dualSidePosition) {
+						logger.debug("开始修改持仓模式为双向持仓");
+						Result result = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey, true);
+						if(result.getResult() == ResultCode.SUCCESS) {
+							logger.debug("修改持仓模式成功");
+						} else {
+							logger.debug("修改持仓模式失败，失败原因：" + result.getMsg());
+							sendEmail(u, "修改持仓模式失败 " + dateStr, "修改持仓模式失败，失败原因：" + result.getMsg(), tradeUserEmail);
+						}
+					}
+					
+					MarginType marginType = MarginType.resolve(sc.getMarginType());
+
+					logger.debug(pair + "当前保证金模式：" + marginType);
+					
+					if(marginType != MarginType.ISOLATED) {
+						logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
+						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
+					}
+					
+					if(openPrice != null && openPrice.getStopLossLimit() > 0) {
+						priceInfo = binanceWebsocketTradeService.getPrice(pair);
+						double stopLossLimit = openPrice.getStopLossLimit();
+						if(priceInfo.getPriceDoubleValue() >= stopLossLimit) {
+							continue;
+						}
+						if(stopLoss.doubleValue() > stopLossLimit) {
+							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
+						}
+					}
+					
+					binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit, 
+							callbackRateEnabled, activationPriceValue, callbackRateValue, profitOrderEnabled);
+					
+					//开仓邮件通知
+					String subject_ = "";
+					String pnlStr = PriceUtil.formatDoubleDecimal(profitPercent * 100, 2);
+					
+					if((autoTradeType == AutoTradeType.FIB_RET
+							|| autoTradeType == AutoTradeType.PRICE_ACTION) && fibInfo != null) {
+						
+						subject_ = String.format("%s空头仓位已下单[%s][%s(%s)][PNL:%s%%] %s", 
+								pair, 
+								fibInfo.getLevel().getLabel(),
+								openPrice.getCode().getDescription(), 
+								PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(openPrice.getCode()),fibInfo.getDecimalPoint()),
+								pnlStr, 
+								dateStr);
+						
+					} else {
+						subject_ = String.format("%s空头仓位已下单[PNL:%s%%] %s", pair, pnlStr, dateStr);
+					}
+					
+					String text_ = StringUtil.formatShortMessage_v2(pair, Double.valueOf(priceInfo.getPrice()), takeProfit.doubleValue(), 
+							stopLoss.doubleValue(), decimalNum, pnlStr);
+					
+					if(fibInfo != null) {
+						text_ += "\n\n" + fibInfo.toString();
+					}
+					
+					if(recvTradeStatus == RecvTradeStatus.OPEN) {
+						sendEmail(u, subject_, text_, tradeUserEmail);
+					}
+					
+				} catch (Exception e) {
+					String title = "下单" + pair + "空头仓位时出现异常";
+					String message = e.getMessage();
+					if(e instanceof OrderPlaceException) {
+						title = ((OrderPlaceException)e).getTitle();
+					}
+					sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
+					logger.error(e.getMessage(), e);
+				}
+				
 			}
 		}
+		
 	}
 	
 	public void sendEmail(User user, String subject,String text,String recEmail) {

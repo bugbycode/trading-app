@@ -14,7 +14,17 @@ public class SymbolExchangeInfo {
 	@Id
 	private String id;
 	
-	private String symbol;
+	private String symbol;//交易对
+	
+	private String pair;//标的交易对
+	
+	private ContractStatus status;//交易对状态
+	
+	private String baseAsset;// 标的资产
+	
+	private String quoteAsset;//报价资产
+	
+	private String marginAsset;//保证金资产
 	
 	private ContractType contractType;//合约类型
 	
@@ -48,6 +58,46 @@ public class SymbolExchangeInfo {
 
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
+	}
+
+	public String getPair() {
+		return pair;
+	}
+
+	public void setPair(String pair) {
+		this.pair = pair;
+	}
+
+	public ContractStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(ContractStatus status) {
+		this.status = status;
+	}
+
+	public String getBaseAsset() {
+		return baseAsset;
+	}
+
+	public void setBaseAsset(String baseAsset) {
+		this.baseAsset = baseAsset;
+	}
+
+	public String getQuoteAsset() {
+		return quoteAsset;
+	}
+
+	public void setQuoteAsset(String quoteAsset) {
+		this.quoteAsset = quoteAsset;
+	}
+
+	public String getMarginAsset() {
+		return marginAsset;
+	}
+
+	public void setMarginAsset(String marginAsset) {
+		this.marginAsset = marginAsset;
 	}
 
 	public ContractType getContractType() {

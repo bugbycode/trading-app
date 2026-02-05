@@ -41,6 +41,11 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 					String contractType = symbolJson.getString("contractType");
 					String statusStr = symbolJson.getString("status");
 					String symbol = symbolJson.getString("symbol");
+					String pair = symbolJson.getString("pair");
+					String baseAsset = symbolJson.getString("baseAsset");
+					String quoteAsset = symbolJson.getString("quoteAsset");
+					String marginAsset = symbolJson.getString("marginAsset");
+					
 					//long onboardDate = symbolJson.getLong("onboardDate");
 					long deliveryDate = symbolJson.getLong("deliveryDate");
 					JSONArray filters = symbolJson.getJSONArray("filters");
@@ -55,11 +60,16 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 						logger.info("{}交易对{}天后交割或下架", symbol, deliveryDay);
 					}*/
 					
-					if((type == ContractType.PERPETUAL || type == ContractType.TRADIFI_PERPETUAL) && status == ContractStatus.TRADING && !symbol.endsWith("USDC") && deliveryDay > 30) {
+					if((type == ContractType.PERPETUAL || type == ContractType.TRADIFI_PERPETUAL) && status == ContractStatus.TRADING && marginAsset.equals("USDT") && deliveryDay > 30) {
 						
 						SymbolExchangeInfo info = new SymbolExchangeInfo();
 						info.setSymbol(symbol);
+						info.setPair(pair);
 						info.setContractType(type);
+						info.setStatus(status);
+						info.setBaseAsset(baseAsset);
+						info.setQuoteAsset(quoteAsset);
+						info.setMarginAsset(marginAsset);
 						
 						filters.forEach(filter -> {
 							JSONObject f = (JSONObject) filter;
