@@ -16,7 +16,9 @@ import org.springframework.util.CollectionUtils;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.ShapeInfo;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.shape.ShapeRepository;
+import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.websocket.client.endpoint.PerpetualWebSocketClientEndpoint;
@@ -39,6 +41,9 @@ public class ShapeTradingTask {
 	private KlinesService klinesService;
 	
 	@Autowired
+    private BinanceExchangeService binanceExchangeService;
+	
+	@Autowired
 	public WorkTaskPool workTaskPool;
 	
 	@Autowired
@@ -55,22 +60,29 @@ public class ShapeTradingTask {
 		if(AppConfig.DEBUG) {
 			return;
 		}
-		//
-		/*
+		
 		logger.debug("ShapeTradingTask executeShapeTask start.");
+		
+		binanceExchangeService.exchangeInfo();
+		
 		Inerval inerval = Inerval.INERVAL_5M;
 		
 		List<ShapeInfo> shapeList = shapeRepository.query();
 		//所有交易对
-		Set<String> pairSet = new HashSet<String>();
+		Set<SymbolExchangeInfo> pairSet = new HashSet<SymbolExchangeInfo>();
 		if(!CollectionUtils.isEmpty(shapeList)) {
 			for(ShapeInfo shape : shapeList) {
-				pairSet.add(shape.getSymbol());
+				SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(shape.getSymbol());
+				if(info == null) {
+					logger.info("未找到{}交易规则信息", shape.getSymbol());
+					continue;
+				}
+				pairSet.add(info);
 			}
 			CoinPairSet set = new CoinPairSet(inerval);
 			List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
-			for(String coin : pairSet) {
-				set.add(coin);
+			for(SymbolExchangeInfo info : pairSet) {
+				set.add(info);
 				if(set.isFull()) {
 					coinList.add(set);
 					set = new CoinPairSet(inerval);
@@ -88,7 +100,7 @@ public class ShapeTradingTask {
 				client.connectToServer();
 			}
 		}
-		*/
+		
 		logger.debug("ShapeTradingTask executeShapeTask end.");
 	}
 }
