@@ -121,8 +121,11 @@ public class KlinesServiceImpl implements KlinesService {
 			Inerval interval,QUERY_SPLIT split) {
 		
 		SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+		if(info == null) {
+			throw new RuntimeException("交易规则和交易对信息未初始化");
+		}
 		
-				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
 				.queryParam("pair", pair)
 				.queryParam("contractType", info.getContractType().getValue())
 				.queryParam("startTime", startTime)
