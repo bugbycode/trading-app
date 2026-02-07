@@ -26,6 +26,7 @@ import com.bugbycode.module.PriceActionInfo;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ReversalPoint;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.StepPriceInfo;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
 
@@ -3948,5 +3949,38 @@ public class PriceUtil {
     		}
     	}
     	return result;
+    }
+    
+    public static StepPriceInfo calculateStepPrice(String value, int decimalNum) {
+    	char[] c_arr = value.toCharArray();
+    	char[] step_arr = new char[c_arr.length];
+    	char[] current_arr = new char[c_arr.length];
+    	for(int index = 0;index < c_arr.length; index++) {
+    		char c = c_arr[index];
+    		if(c == '.') {
+    			step_arr[index] = c;
+    			current_arr[index] = c;
+    		} else {
+    			step_arr[index] = '0';
+    			current_arr[index] = '0';
+    		}
+    	}
+    	for(int index = 0;index < c_arr.length; index++) {
+    		char c = c_arr[index];
+    		if(c != '0' && c != '.') {
+        		char c_next = c_arr[index + 1];
+    			current_arr[index] = c;
+    			if(c_next == '.') {
+        			step_arr[index + 2] = '1';
+        			current_arr[index + 2] = c_arr[index + 2];
+    			} else {
+        			step_arr[index + 1] = '1';
+    				current_arr[index + 1] = c_next;
+    			}
+    			break;
+    		}
+    	}
+    	
+    	return new StepPriceInfo(new String(current_arr), new String(step_arr), decimalNum);
     }
 }

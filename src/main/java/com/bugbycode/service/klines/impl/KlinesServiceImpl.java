@@ -23,8 +23,6 @@ import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
-import com.bugbycode.factory.area.AreaFactory;
-import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -43,6 +41,7 @@ import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.StepPriceInfo;
 import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.VolumeMonitorStatus;
@@ -60,6 +59,7 @@ import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
 import com.bugbycode.module.price.OpenPrice;
+import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
@@ -1098,115 +1098,104 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void consolidationAreaMonitor(List<Klines> list, List<Klines> list_15m) {
-		AreaFactory factory = new AreaFactoryImpl_v2(list, list_15m);
-		
-		if(!(factory.isLong() || factory.isShort())) {
+		if(CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
-		
 		Klines last = PriceUtil.getLastKlines(list_15m);
 		String pair = last.getPair();
+		StepPriceInfo info = PriceUtil.calculateStepPrice(last.getClosePrice(), last.getDecimalNum());
+		double hitPrice = info.getHitPriceDoubleValue();
 		
 		double currentPrice = last.getClosePriceDoubleValue();
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
-		Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-		Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-		List<OpenPrice> openPrices = factory.getOpenPrices();
+		if(PriceUtil.isBreachLong(last, hitPrice)) {
+			OpenPrice price = new OpenPriceDetails(FibCode.FIB618, hitPrice, info.getLowPriceDoubleValue(), 
+					info.getHighPriceDoubleValue(), info.getNextHighPriceDoubleValue());
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
 		
-		for (int index = 0; index < openPrices.size(); index++) {
-			OpenPrice price = openPrices.get(index);
-			if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice()) 
-					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					&& !PriceUtil.isTraded(price, factory)) {
-				
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
-				
-				List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
-				
-				for(User u : userList) {
-					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
-						continue;
-					}
-					
-					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
-						continue;
-					}
-					
-					//根据交易风格设置盈利限制
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					
-					double profitPrice = price.getSecondTakeProfit();
-					//保守的交易风格
-					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						profitPrice = price.getAreaTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
-					}
-					
-					//计算预计盈利百分比
-					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, profitPrice) * 100;
-					
-					if(profitPercent < u.getMonitorProfit()) {
-						continue;
-					}
-					
-					//开仓订阅提醒
-					String subject = String.format("%s永续合约做多机会(PNL:%s%%) %s", pair,
-							PriceUtil.formatDoubleDecimal(profitPercent, 2),
-							DateFormatUtil.format(new Date()));
-					
-					String text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
-							profitPrice, last.getDecimalNum());
-					
-					sendEmail(u, subject, text, u.getUsername());
-					
+			List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
+			
+			for(User u : userList) {
+				if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+					continue;
 				}
 				
-				
-			} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice()) 
-					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					&& !PriceUtil.isTraded(price, factory)) {
-				
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
-				
-				List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
-				
-				for(User u : userList) {
-					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
-						continue;
-					}
-					
-					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
-						continue;
-					}
-					
-					//根据交易风格设置盈利限制
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					
-					double profitPrice = price.getSecondTakeProfit();
-					//保守的交易风格
-					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						profitPrice = price.getAreaTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
-					}
-					
-					//计算预计盈利百分比
-					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, profitPrice) * 100;
-					
-					if(profitPercent < u.getMonitorProfit()) {
-						continue;
-					}
-					
-					//开仓订阅提醒
-					String subject = String.format("%s永续合约做空机会(PNL:%s%%) %s", pair,
-							PriceUtil.formatDoubleDecimal(profitPercent, 2),
-							DateFormatUtil.format(new Date()));
-					
-					String text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossShortPrice_v3(currentPrice, u.getCutLoss()), 
-							profitPrice, last.getDecimalNum());
-					
-					sendEmail(u, subject, text, u.getUsername());
+				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+					continue;
 				}
+				
+				//根据交易风格设置盈利限制
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				
+				double profitPrice = price.getSecondTakeProfit();
+				//保守的交易风格
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					profitPrice = price.getAreaTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
+				}
+				
+				//计算预计盈利百分比
+				double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, profitPrice) * 100;
+				
+				if(profitPercent < u.getMonitorProfit()) {
+					continue;
+				}
+				
+				//开仓订阅提醒
+				String subject = String.format("%s永续合约做多机会(PNL:%s%%) %s", pair,
+						PriceUtil.formatDoubleDecimal(profitPercent, 2),
+						DateFormatUtil.format(new Date()));
+				
+				String text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
+						profitPrice, last.getDecimalNum());
+				
+				sendEmail(u, subject, text, u.getUsername());
+				
+			}
+		}
+		
+		if(PriceUtil.isBreachShort(last, hitPrice)) {
+			OpenPrice price = new OpenPriceDetails(FibCode.FIB618, hitPrice, info.getHighPriceDoubleValue(), 
+					info.getLowPriceDoubleValue(), info.getNextLowPriceDoubleValue());
+			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
+		
+			List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
+			
+			for(User u : userList) {
+				if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+					continue;
+				}
+				
+				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+					continue;
+				}
+				
+				//根据交易风格设置盈利限制
+				TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+				
+				double profitPrice = price.getSecondTakeProfit();
+				//保守的交易风格
+				if(tradeStyle == TradeStyle.CONSERVATIVE) {
+					profitPrice = price.getAreaTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
+				}
+				
+				//计算预计盈利百分比
+				double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, profitPrice) * 100;
+				
+				if(profitPercent < u.getMonitorProfit()) {
+					continue;
+				}
+				
+				//开仓订阅提醒
+				String subject = String.format("%s永续合约做空机会(PNL:%s%%) %s", pair,
+						PriceUtil.formatDoubleDecimal(profitPercent, 2),
+						DateFormatUtil.format(new Date()));
+				
+				String text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossShortPrice_v3(currentPrice, u.getCutLoss()), 
+						profitPrice, last.getDecimalNum());
+				
+				sendEmail(u, subject, text, u.getUsername());
 			}
 		}
 	}
