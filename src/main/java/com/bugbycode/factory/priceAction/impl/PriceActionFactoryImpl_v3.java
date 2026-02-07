@@ -317,8 +317,30 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 	private void addPrices(OpenPrice price) {
 		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price.getPrice()))) {
 			if(!PriceUtil.contains(openPrices, price)) {
-				openPrices.add(price);
+				//openPrices.add(price);
+				FibCode parentCode = getParentFibCode(price.getCode());
+				if(price.getCode() == FibCode.FIB0) {
+					openPrices.add(new OpenPriceDetails(price.getCode(), price.getPrice()));
+				} else {
+					openPrices.add(new OpenPriceDetails(price.getCode(), price.getPrice(), fibInfo.getFibValue(parentCode)));
+				}
 			}
 		}
+	}
+	
+	private FibCode getParentFibCode(FibCode code) {
+		FibCode parent = FibCode.FIB0;
+		FibCode[] codes = FibCode.values();
+		for(int index = 0; index < codes.length - 1; index++) { // 4.618 ~ 0
+			FibCode current = codes[index];
+			if(code == current) {
+				parent = codes[index + 1];
+				if(current == FibCode.FIB786) {
+					parent = FibCode.FIB618;
+				}
+				break;
+			}
+		}
+		return parent;
 	}
 }
