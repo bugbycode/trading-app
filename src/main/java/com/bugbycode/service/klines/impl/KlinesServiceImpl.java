@@ -1104,14 +1104,15 @@ public class KlinesServiceImpl implements KlinesService {
 		Klines last = PriceUtil.getLastKlines(list_15m);
 		String pair = last.getPair();
 		StepPriceInfo info = PriceUtil.calculateStepPrice(last.getClosePrice(), last.getDecimalNum());
-		double hitPrice = info.getHitPriceDoubleValue();
+		double longHitPrice = info.getHitPriceDoubleValue();
+		double shortHitPrice = info.getHighPriceDoubleValue();
 		
 		double currentPrice = last.getClosePriceDoubleValue();
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		if(PriceUtil.isBreachLong(last, hitPrice)) {
-			OpenPrice price = new OpenPriceDetails(FibCode.FIB618, hitPrice, info.getLowPriceDoubleValue(), 
+		if(PriceUtil.isBreachLong(last, longHitPrice)) {
+			OpenPrice price = new OpenPriceDetails(FibCode.FIB618, longHitPrice, info.getLowPriceDoubleValue(), 
 					info.getNextHighPriceDoubleValue(), info.getHighPriceDoubleValue());
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
 		
@@ -1155,9 +1156,9 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 		}
 		
-		if(PriceUtil.isBreachShort(last, hitPrice)) {
-			OpenPrice price = new OpenPriceDetails(FibCode.FIB618, hitPrice, info.getHighPriceDoubleValue(), 
-					info.getNextLowPriceDoubleValue(), info.getLowPriceDoubleValue());
+		if(PriceUtil.isBreachShort(last, shortHitPrice)) {
+			OpenPrice price = new OpenPriceDetails(FibCode.FIB618, shortHitPrice, info.getNextHighPriceDoubleValue(), 
+					info.getLowPriceDoubleValue(), info.getHitPriceDoubleValue());
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
 		
 			List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
