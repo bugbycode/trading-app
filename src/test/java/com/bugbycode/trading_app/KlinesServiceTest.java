@@ -31,6 +31,8 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.LongOrShortType;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.StepPriceInfo;
+import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
@@ -59,6 +61,7 @@ public class KlinesServiceTest {
 		AppConfig.DEBUG = true;
 		System.setProperty("https.proxyHost", "localhost");
 		System.setProperty("https.proxyPort", "50000");
+		binanceExchangeService.exchangeInfo();
 	}
 
     @Test
@@ -133,7 +136,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testSyncKlines() throws UnsupportedEncodingException {
-        String pair = "币安人生USDT";
+        String pair = "XAUUSDT";
         List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL);
         logger.info(list);
     }
@@ -434,5 +437,18 @@ public class KlinesServiceTest {
     	String pair = "ETHUSDT";
     	boolean isEmpty = klinesRepository.isEmpty(pair, Inerval.INERVAL_15M);
     	logger.info(isEmpty);
+    }
+    
+    @Test
+    public void testCalculateStepPrice() {
+    	String pair = "DOGEUSDT";
+    	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1);
+    	if(CollectionUtils.isEmpty(list_15m)) {
+    		return;
+    	}
+    	Klines last = PriceUtil.getLastKlines(list_15m);
+    	StepPriceInfo info = PriceUtil.calculateStepPrice(last.getClosePrice(), last.getDecimalNum());
+    	logger.info("{} : {} - {}", pair, info.getHitPrice(), info.getStepPrice());
+    	logger.info("{} : {} ~ {} <- {} -> {} ~ {}", pair, info.getNextLowPrice(), info.getLowPrice(), info.getHitPrice(), info.getHighPrice(), info.getNextHighPrice());
     }
 }
