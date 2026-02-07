@@ -69,7 +69,8 @@ public class OpenPriceDetails implements OpenPrice {
 
 	@Override
 	public String toString() {
-		return "OpenPrice: " + code.getValue() + "(" + price + "), StopLossLimit: " + stopLossLimit;
+		return "OpenPrice: " + code.getValue() + "(" + price + "), StopLossLimit: " + stopLossLimit + 
+				", FirstTakeProfit: " + firstTakeProfit + ", SecondTakeProfit: " + secondTakeProfit;
 	}
 
 	@Override

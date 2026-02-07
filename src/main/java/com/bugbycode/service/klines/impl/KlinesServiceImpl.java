@@ -1112,7 +1112,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(PriceUtil.isBreachLong(last, hitPrice)) {
 			OpenPrice price = new OpenPriceDetails(FibCode.FIB618, hitPrice, info.getLowPriceDoubleValue(), 
-					info.getHighPriceDoubleValue(), info.getNextHighPriceDoubleValue());
+					info.getNextHighPriceDoubleValue(), info.getHighPriceDoubleValue());
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
 		
 			List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
@@ -1157,7 +1157,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(PriceUtil.isBreachShort(last, hitPrice)) {
 			OpenPrice price = new OpenPriceDetails(FibCode.FIB618, hitPrice, info.getHighPriceDoubleValue(), 
-					info.getLowPriceDoubleValue(), info.getNextLowPriceDoubleValue());
+					info.getNextLowPriceDoubleValue(), info.getLowPriceDoubleValue());
 			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, 0, 0, price, null, AutoTradeType.AREA_INDEX, last.getDecimalNum()));
 		
 			List<User> userList = userRepository.queryAllUserByAreaMonitor(MonitorStatus.OPEN);
