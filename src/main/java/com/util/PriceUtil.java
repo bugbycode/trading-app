@@ -2026,6 +2026,16 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v23(Klines current, Klines parent) {
+		return current.isFall() && current.getBodyLowPriceDoubleValue() < parent.getLowPriceDoubleValue();
+	}
+	
+	/**
 	 * MACD 连续衰竭
 	 * @param current 当前k线
 	 * @param parent 前一根k线
@@ -2249,6 +2259,16 @@ public class PriceUtil {
 			result = true;
 		}
 		return result;
+	}
+	
+	/**
+	 * 判断是否出现强势
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v23(Klines current, Klines parent) {
+		return current.isRise() && current.getBodyHighPriceDoubleValue() > parent.getHighPriceDoubleValue();
 	}
 	
 	/**
