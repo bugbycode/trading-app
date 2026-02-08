@@ -120,9 +120,9 @@ public class AreaFactoryImpl_v3 implements AreaFactory {
 		
 		OpenPrice p = null;
 		if(mode == QuotationMode.LONG) {
-			p = new OpenPriceDetails(openCode, startPrice, startPrice - stepPrice, startPrice + stepPrice, startPrice + stepPrice * 2);
+			p = new OpenPriceDetails(openCode, startPrice, startPrice - stepPrice, startPrice + stepPrice * 2, startPrice + stepPrice);
 		} else {
-			p = new OpenPriceDetails(openCode, startPrice, startPrice + stepPrice, startPrice - stepPrice, startPrice - stepPrice * 2);
+			p = new OpenPriceDetails(openCode, startPrice, startPrice + stepPrice, startPrice - stepPrice * 2, startPrice - stepPrice);
 		}
 		
 		addPrices(p);
