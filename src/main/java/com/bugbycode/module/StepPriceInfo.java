@@ -37,6 +37,10 @@ public class StepPriceInfo {
 		this.stepPrice = stepPrice;
 	}
 	
+	public double getStepPriceDoubleValue() {
+		return Double.valueOf(getStepPrice());
+	}
+	
 	public String getHighPrice() {
 		return PriceUtil.formatDoubleDecimal(Double.valueOf(getHitPrice()) + Double.valueOf(getStepPrice()), decimalNum);
 	}
