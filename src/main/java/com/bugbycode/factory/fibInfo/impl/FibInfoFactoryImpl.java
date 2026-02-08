@@ -214,6 +214,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
 			if(current.gt(end)) {
 				continue;
 			}
@@ -238,6 +239,16 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossLimit));
 			addPrices(new OpenPriceDetails(openCode, bodyPrice, stopLossLimit));
+
+			if(mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v23(current, parent)) {
+				
+				addPrices(new OpenPriceDetails(openCode, parent.getHighPriceDoubleValue(), current.getBodyLowPriceDoubleValue()));
+				
+			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v23(current, parent)) {
+				
+				addPrices(new OpenPriceDetails(openCode, parent.getLowPriceDoubleValue(), current.getBodyHighPriceDoubleValue()));
+				
+			}
 			
 			if(current.lte(start)) {
 				break;
