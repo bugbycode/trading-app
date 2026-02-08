@@ -239,14 +239,12 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossLimit));
 			addPrices(new OpenPriceDetails(openCode, bodyPrice, stopLossLimit));
+			
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v23(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v23(current, parent))) {
 
-			if(mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v23(current, parent)) {
-				
-				addPrices(new OpenPriceDetails(openCode, parent.getHighPriceDoubleValue(), stopLossLimit));
-				
-			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v23(current, parent)) {
-				
-				addPrices(new OpenPriceDetails(openCode, parent.getLowPriceDoubleValue(), stopLossLimit));
+				double codePrice = fibInfo.getFibValue(openCode);
+				addPrices(new OpenPriceDetails(openCode, codePrice, stopLossLimit));
 				
 			}
 			
