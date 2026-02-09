@@ -20,15 +20,29 @@
 		<version>4.1.0-M1</version>
 	</parent>
   <dependencies>
-	  <dependency>
+  	  	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+	  	</dependency>
+	  	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-logging</artifactId>
 				</exclusion>
+				<exclusion>
+                    <artifactId>logback-classic</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                </exclusion>
 			</exclusions>
+		</dependency>
+		
+		<!-- Log4j -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-core -->
@@ -59,6 +73,14 @@
 					<groupId>com.vaadin.external.google</groupId>
     				<artifactId>android-json</artifactId>
 				</exclusion>
+		    	<exclusion>
+		    		<groupId>org.apache.logging.log4j</groupId>
+		    		<artifactId>log4j-to-slf4j</artifactId>
+		    	</exclusion>
+		    	<exclusion>
+		    		<groupId>org.slf4j</groupId>
+		    		<artifactId>jul-to-slf4j</artifactId>
+		    	</exclusion>
 		    </exclusions>
 		</dependency>
 		
