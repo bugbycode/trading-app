@@ -3,6 +3,7 @@ package com.bugbycode.trading_app.init;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.net.URI;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
@@ -96,16 +98,14 @@ public class InitConfig implements ApplicationRunner {
 		
 		private final Logger logger = LogManager.getLogger(HttpResponseErrorHandler.class);
 		
-		@SuppressWarnings("null")
 		@Override
 		public boolean hasError(ClientHttpResponse response) throws IOException {
 			return response.getStatusCode().value() == HttpStatus.Series.CLIENT_ERROR.value() 
 		               || response.getStatusCode().value() == HttpStatus.Series.SERVER_ERROR.value();
 		}
 		
-		@SuppressWarnings("null")
 		@Override
-		public void handleError(ClientHttpResponse response) throws IOException {
+		public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
 			logger.error("Error response received with status code: " + response.getStatusCode());
 		}
 	}
