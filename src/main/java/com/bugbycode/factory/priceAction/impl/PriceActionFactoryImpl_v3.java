@@ -181,30 +181,31 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
 			Klines next = list.get(index - 2);
-			if((mode == QuotationMode.SHORT && current.getMacd() < 0) 
-					|| (mode == QuotationMode.LONG && current.getMacd() > 0)) {
+			if((mode == QuotationMode.SHORT && current.getMacd() > 0) 
+					|| (mode == QuotationMode.LONG && current.getMacd() < 0)) {
 				break;
 			}
-			if(mode == QuotationMode.LONG) {
+			PriceActionType type = PriceActionType.DECL_POWER;
+			if(mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
 				if(PriceUtil.isPutInto_v2(current, parent, next) || PriceUtil.isPutInto_v3(current, parent, next)) {
-					PriceActionType type = PriceActionType.DEFAULT;
+					type = PriceActionType.DEFAULT;
 					if(current.getBodyLowPriceDoubleValue() < parent.getLowPriceDoubleValue()) {
 						type = PriceActionType.BACK;
 					}
-					priceInfoList.add(new PriceActionInfo(current, parent, next, type));
 				} else if(PriceUtil.verifyDecliningPrice_v22(current, parent, next)) {
-					priceInfoList.add(new PriceActionInfo(current, parent, next, PriceActionType.DECL_POWER));
+					type = PriceActionType.DECL_POWER;
 				}
-			} else {
+				priceInfoList.add(new PriceActionInfo(current, parent, next, type));
+			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v10(current, parent, next)) {
 				if(PriceUtil.isBullishSwallowing_v2(current, parent, next) || PriceUtil.isBullishSwallowing_v3(current, parent, next)) {
-					PriceActionType type = PriceActionType.DEFAULT;
+					type = PriceActionType.DEFAULT;
 					if(current.getBodyHighPriceDoubleValue() > parent.getHighPriceDoubleValue()) {
 						type = PriceActionType.BACK;
 					}
-					priceInfoList.add(new PriceActionInfo(current, parent, next, type));
 				} else if(PriceUtil.verifyPowerful_v22(current, parent, next)) {
-					priceInfoList.add(new PriceActionInfo(current, parent, next, PriceActionType.DECL_POWER));
+					type = PriceActionType.DECL_POWER;
 				}
+				priceInfoList.add(new PriceActionInfo(current, parent, next, type));
 			}
 		}
 		
@@ -226,7 +227,7 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 				
 				double stopLossLimit = ms.getHighPrice();
 				
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice(), stopLossLimit));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
 				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice(), stopLossLimit));
 				
 				if(type == PriceActionType.DEFAULT || type == PriceActionType.BACK) {
@@ -252,7 +253,7 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 				
 				double stopLossLimit = ms.getLowPrice();
 				
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice(), stopLossLimit));
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
 				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice(), stopLossLimit));
 				
 				if(type == PriceActionType.DEFAULT || type == PriceActionType.BACK) {
@@ -271,6 +272,9 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 			}
 			
 			fibEnd = info.getCurrent();
+			if(fibEnd.lt(end)) {
+				fibEnd = end;
+			}
 			
 			Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
 			if(fibAfterFlag != null) {
@@ -299,11 +303,11 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() > 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() < 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
@@ -317,30 +321,8 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 	private void addPrices(OpenPrice price) {
 		if(fibInfo != null && FibCode.FIB4_618.gt(fibInfo.getFibCode(price.getPrice()))) {
 			if(!PriceUtil.contains(openPrices, price)) {
-				//openPrices.add(price);
-				FibCode parentCode = getParentFibCode(price.getCode());
-				if(price.getCode() == FibCode.FIB0) {
-					openPrices.add(new OpenPriceDetails(price.getCode(), price.getPrice()));
-				} else {
-					openPrices.add(new OpenPriceDetails(price.getCode(), price.getPrice(), fibInfo.getFibValue(parentCode)));
-				}
+				openPrices.add(price);
 			}
 		}
-	}
-	
-	private FibCode getParentFibCode(FibCode code) {
-		FibCode parent = FibCode.FIB0;
-		FibCode[] codes = FibCode.values();
-		for(int index = 0; index < codes.length - 1; index++) { // 4.618 ~ 0
-			FibCode current = codes[index];
-			if(code == current) {
-				parent = codes[index + 1];
-				if(current == FibCode.FIB786) {
-					parent = FibCode.FIB618;
-				}
-				break;
-			}
-		}
-		return parent;
 	}
 }
