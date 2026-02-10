@@ -127,6 +127,8 @@ public class User implements UserDetails {
 	
 	private int positionCountLimit = 100;//仓位数量限制
 	
+	private int eoptionsStatus = 0;//期权交易机会监控  0：否 1：是
+	
 	public String getId() {
 		return id;
 	}
@@ -398,6 +400,7 @@ public class User implements UserDetails {
 		this.setPairPolicySelected(user.getPairPolicySelected());
 		this.setMonitorPolicyType(user.getMonitorPolicyType());
 		this.setMonitorfibLevel(user.getMonitorfibLevel());
+		this.setEoptionsStatus(user.getEoptionsStatus());
 	}
 
 	public String getSmtpUser2() {
@@ -566,5 +569,13 @@ public class User implements UserDetails {
 
 	public void setPositionCountLimit(int positionCountLimit) {
 		this.positionCountLimit = positionCountLimit;
+	}
+
+	public int getEoptionsStatus() {
+		return eoptionsStatus;
+	}
+
+	public void setEoptionsStatus(int eoptionsStatus) {
+		this.eoptionsStatus = eoptionsStatus;
 	}
 }

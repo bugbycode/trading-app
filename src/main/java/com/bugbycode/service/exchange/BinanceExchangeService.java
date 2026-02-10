@@ -1,7 +1,9 @@
 package com.bugbycode.service.exchange;
 
+import java.util.List;
 import java.util.Set;
 
+import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 
 public interface BinanceExchangeService {
@@ -11,4 +13,10 @@ public interface BinanceExchangeService {
 	 * @return
 	 */
 	public Set<SymbolExchangeInfo> exchangeInfo();
+	
+	/**
+	 * 获取所有期权交易合约底层资产信息
+	 * @return
+	 */
+	public List<EoptionContracts> eOptionsExchangeInfo();
 }

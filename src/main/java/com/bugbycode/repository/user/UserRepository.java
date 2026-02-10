@@ -101,6 +101,13 @@ public interface UserRepository {
 	public List<User> queryAllUserByHighOrLowMonitor(MonitorStatus status);
 	
 	/**
+	 * 根据期权交易监控状态查询所有用户
+	 * @param status
+	 * @return
+	 */
+	public List<User> queryAllUserByEoptionsStatus(MonitorStatus status);
+	
+	/**
 	 * 根据订阅盘整区间状态查询所有用户
 	 * @param status
 	 * @return

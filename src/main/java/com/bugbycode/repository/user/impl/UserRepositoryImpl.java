@@ -101,6 +101,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("pairPolicySelected", user.getPairPolicySelected());
 		update.set("monitorPolicyType", user.getMonitorPolicyType());
 		update.set("monitorfibLevel", user.getMonitorfibLevel());
+		update.set("eoptionsStatus", user.getEoptionsStatus());
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
 
@@ -132,6 +133,11 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public List<User> queryAllUserByAreaMonitor(MonitorStatus status) {
 		return template.find(Query.query(Criteria.where("areaMonitor").is(status.getValue())), User.class);
+	}
+	
+	@Override
+	public List<User> queryAllUserByEoptionsStatus(MonitorStatus status) {
+		return template.find(Query.query(Criteria.where("eoptionsStatus").is(status.getValue())), User.class);
 	}
 
 	@Override

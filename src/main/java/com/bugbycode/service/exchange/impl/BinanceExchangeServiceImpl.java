@@ -1,7 +1,9 @@
 package com.bugbycode.service.exchange.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.binance.ContractStatus;
 import com.bugbycode.module.binance.ContractType;
@@ -100,6 +103,23 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 		logger.debug(resultStr);
 		logger.debug(pairs);
 		return pairs;
+	}
+
+	@Override
+	public List<EoptionContracts> eOptionsExchangeInfo() {
+		List<EoptionContracts> list = new ArrayList<EoptionContracts>();
+		String resultStr = restTemplate.getForObject(AppConfig.EOPTIONS_BASE_URL + "/eapi/v1/exchangeInfo", String.class);
+		JSONObject result = new JSONObject(resultStr);
+		if(result.has("optionContracts")) {
+			JSONArray arr = result.getJSONArray("optionContracts");
+			arr.forEach(item -> {
+				if(item instanceof JSONObject) {
+					JSONObject o = (JSONObject) item;
+					list.add(EoptionContracts.parse(o));
+				}
+			});
+		}
+		return list;
 	}
 
 }

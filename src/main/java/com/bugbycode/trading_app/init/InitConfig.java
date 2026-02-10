@@ -40,12 +40,16 @@ public class InitConfig implements ApplicationRunner {
 	@Value("${google.recaptcha.secret}")
 	private String recapt_secret;
 	
+	@Value("${binance.baseUrl.eoption_rest}")
+	private String eoptionRestBaseUrl;
+	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		AppConfig.WEBSOCKET_API_URL = websocketApiBaseUrl;
 		AppConfig.WEBSOCKET_URL = websocketBaseUrl;
 		AppConfig.REST_BASE_URL = restBaseUrl;
 		AppConfig.RECAPTCHA_SECRET = recapt_secret;
+		AppConfig.EOPTIONS_BASE_URL = eoptionRestBaseUrl;
 
 		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
         List<String> arguments = runtimeMxBean.getInputArguments();

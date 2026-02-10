@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
@@ -68,6 +69,13 @@ public class FuturesKlinesWebSocketTask {
 		
 		AppConfig.SYNC_15M_KLINES_RECORD.clear();
 		AppConfig.SYNC_15M_KLINES_FINISH.clear();
+		AppConfig.EOPTION_EXCHANGE_INFO.clear();
+		
+		//初始化期权底层资产信息 
+		List<EoptionContracts> list = binanceExchangeService.eOptionsExchangeInfo();
+		for(EoptionContracts ec : list) {
+			AppConfig.EOPTION_EXCHANGE_INFO.put(ec.getUnderlying(), ec);
+		}
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		

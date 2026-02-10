@@ -121,6 +121,31 @@ public interface KlinesService {
 	public void futuresPriceAction(List<Klines> list, List<Klines> list_15m);
 	
 	/**
+	 * 期权交易机会监控
+	 * @param list_4h
+	 * @param list_15m
+	 */
+	public void eoptionMonitor(List<Klines> list_4h, List<Klines> list_15m);
+	
+	/**
+	 * 看涨期权买入机会
+	 * @param openPrices 开仓价格
+	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param afterLowKlines 回撤之后的最低k线
+	 * @param klinesList_hit 最近时间段内部分k线信息
+	 */
+	public void openLong_eOption(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
+	
+	/**
+	 * 看跌期权买入机会
+	 * @param openPrices 开仓价格
+	 * @param fibInfo 斐波那契回撤参考信息
+	 * @param afterHighKlines 回撤之后的最高k线
+	 * @param klinesList_hit 最近时间段内部分k线信息
+	 */
+	public void openShort_eOption(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
+	
+	/**
 	 * 盘整区监控
 	 * @param list
 	 * @param list_15m

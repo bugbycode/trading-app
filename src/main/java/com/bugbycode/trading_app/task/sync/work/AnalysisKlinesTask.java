@@ -149,6 +149,9 @@ public class AnalysisKlinesTask implements Runnable{
             //价格行为分析
             klinesService.futuresPriceAction(klines_list_1h_db, klines_list_15m);
             
+            //期权交易机会监控
+            klinesService.eoptionMonitor(klines_list_4h_db, klines_list_15m);
+            
             //量价分析
             //klinesService.volumeMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h, klines_list_15m);
 
