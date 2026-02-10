@@ -1098,6 +1098,18 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void eoptionMonitor(List<Klines> list_4h, List<Klines> list_15m) {
+		
+		if(CollectionUtils.isEmpty(list_15m)) {
+			return;
+		}
+		
+		Klines last = PriceUtil.getLastKlines(list_15m);
+		String pair = last.getPair();
+		//限制非期权交易对
+		if(AppConfig.EOPTION_EXCHANGE_INFO.get(pair) == null) {
+			return;
+		}
+		
 		PriceActionFactory factory = new PriceActionFactoryImpl_v3(list_4h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
