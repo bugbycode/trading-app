@@ -1110,7 +1110,7 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		logger.info("execute {} eoptionMonitor." , pair);
+		logger.debug("execute {} eoptionMonitor." , pair);
 		
 		PriceActionFactory factory = new PriceActionFactoryImpl_v3(list_4h, list_15m);
 		
