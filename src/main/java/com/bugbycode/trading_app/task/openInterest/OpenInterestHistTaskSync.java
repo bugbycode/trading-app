@@ -101,5 +101,23 @@ public class OpenInterestHistTaskSync {
 				logger.error("同步历史合约持仓量信息时出现异常", e);
 			}
 		}
+		
+		List<SymbolExchangeInfo> list = binanceExchangeService.eOptionsExchangeInfoSymbol();
+		for(SymbolExchangeInfo info : list) {
+			try {
+				OpenInterestHist dbOih = openInterestHistRepository.findOneBySymbol(info.getUnderlying());
+				if(dbOih == null) {
+					continue;
+				}
+				OpenInterestHist oih = new OpenInterestHist();
+				oih.setSymbol(dbOih.getSymbol());
+				oih.setSumOpenInterest(dbOih.getSumOpenInterest());
+				oih.setSumOpenInterestValue(dbOih.getSumOpenInterestValue());
+				oih.setTimestamp(dbOih.getTimestamp());
+				openInterestHistRepository.save(oih);
+			} catch (Exception e) {
+				logger.error("同步期权历史合约持仓量信息时出现异常", e);
+			}
+		}
 	}
 }

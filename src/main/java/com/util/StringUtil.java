@@ -162,7 +162,7 @@ public class StringUtil {
 	}
 	
 	public static String formatCollectionName(String pair,Inerval interval) {
-		return pair + "_" + interval.getDescption();
+		return pair.replace("-", "_") + "_" + interval.getDescption();
 	}
 	
 	public static String formatCollectionName(Klines k) {

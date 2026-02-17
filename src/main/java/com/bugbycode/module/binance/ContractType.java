@@ -41,6 +41,11 @@ public enum ContractType {
 	PERPETUAL_DELIVERING("PERPETUAL_DELIVERING","交割结算中合约"),
 	
 	/**
+	 * 欧式期权
+	 */
+	E_OPTIONS("E_OPTIONS","欧式期权"),
+	
+	/**
 	 * 未知合约
 	 */
 	UNKNOWN("UNKNOWN","未知合约"),

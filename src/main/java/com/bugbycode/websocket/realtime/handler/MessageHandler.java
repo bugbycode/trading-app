@@ -1,5 +1,6 @@
 package com.bugbycode.websocket.realtime.handler;
 
+import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -10,6 +11,6 @@ public interface MessageHandler {
 	
 	public void handleMessage(String message,PerpetualWebSocketClientEndpoint client, KlinesService klinesService, 
 			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, 
-			WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool);
+			WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool, ContractType contractType);
 	
 }

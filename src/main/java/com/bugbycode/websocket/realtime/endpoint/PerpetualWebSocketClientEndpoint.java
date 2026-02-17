@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -51,9 +52,11 @@ public class PerpetualWebSocketClientEndpoint {
     
     private OpenInterestHistRepository openInterestHistRepository;
     
+    private ContractType contractType;
+    
     public PerpetualWebSocketClientEndpoint(CoinPairSet coinPairSet,MessageHandler messageHandler, 
     		KlinesService klinesService, KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, 
-    		WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool) {
+    		WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool, ContractType contractType) {
     	this.coinPairSet = coinPairSet;
     	this.messageHandler = messageHandler;
         this.container = ContainerProvider.getWebSocketContainer();
@@ -62,6 +65,7 @@ public class PerpetualWebSocketClientEndpoint {
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
         this.openInterestHistRepository = openInterestHistRepository;
+        this.contractType = contractType;
         try {
             this.connectToServer();
         } catch (Exception e) {
@@ -71,7 +75,11 @@ public class PerpetualWebSocketClientEndpoint {
     
     private void connectToServer() throws RuntimeException {
     	try {
-			this.container.connectToServer(this, new URI(AppConfig.WEBSOCKET_URL + "/ws/" + coinPairSet.getStreamName()));
+    		String baseUrl = AppConfig.WEBSOCKET_URL + "/ws/" + coinPairSet.getStreamName();
+    		if(contractType == ContractType.E_OPTIONS) {
+    			baseUrl = AppConfig.EOPTIONS_WEBSOCKET_API_URL_MARKET + coinPairSet.getStreamName();
+    		}
+			this.container.connectToServer(this, new URI(baseUrl));
 			logger.debug("开始连接websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -91,7 +99,7 @@ public class PerpetualWebSocketClientEndpoint {
 
     @OnMessage
     public void onMessage(String message) {
-    	this.messageHandler.handleMessage(message, this, klinesService, klinesRepository, openInterestHistRepository, this.analysisWorkTaskPool, this.workTaskPool);
+    	this.messageHandler.handleMessage(message, this, klinesService, klinesRepository, openInterestHistRepository, this.analysisWorkTaskPool, this.workTaskPool, contractType);
     }
     
     public void sendMessage(String message) {

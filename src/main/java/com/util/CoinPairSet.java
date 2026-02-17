@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.bugbycode.module.Inerval;
+import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 
 public class CoinPairSet extends HashSet<SymbolExchangeInfo> {
@@ -19,10 +20,13 @@ public class CoinPairSet extends HashSet<SymbolExchangeInfo> {
 
 	private Inerval inerval;
 	
+	private ContractType contractType;
+	
 	private Set<String> finishPair = Collections.synchronizedSet(new HashSet<String>());
 	
-	public CoinPairSet(Inerval inerval) {
+	public CoinPairSet(Inerval inerval, ContractType contractType) {
 		this.inerval = inerval;
+		this.contractType = contractType;
 	}
 
 	public Inerval getInerval() {
@@ -41,9 +45,12 @@ public class CoinPairSet extends HashSet<SymbolExchangeInfo> {
 				SymbolExchangeInfo info = it.next();
 				
 				String pair = info.getSymbol().toLowerCase();
-				String contractType = info.getContractType().getValue().toLowerCase();
-				
-				buffer.append(URLEncoder.encode(pair, "UTF-8") + "_" + contractType + "@continuousKline_" + inerval.getDescption());
+				if(this.contractType == ContractType.E_OPTIONS) {
+					buffer.append(pair + "@kline_" + inerval.getDescption());
+				} else {
+					String contractTypeStr = info.getContractType().getValue().toLowerCase();
+					buffer.append(URLEncoder.encode(pair, "UTF-8") + "_" + contractTypeStr + "@continuousKline_" + inerval.getDescption());
+				}
 			}catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}

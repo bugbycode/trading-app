@@ -49,6 +49,7 @@ import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.CallbackRateEnabled;
+import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.DrawTrade;
 import com.bugbycode.module.binance.MarginType;
 import com.bugbycode.module.binance.PriceInfo;
@@ -118,19 +119,30 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
-			Inerval interval,QUERY_SPLIT split) {
+			Inerval interval,QUERY_SPLIT split, ContractType contractType) {
 		
 		SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
 		if(info == null) {
 			throw new RuntimeException("交易规则和交易对信息未初始化");
 		}
 		
-		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines")
+		String baseUrl = AppConfig.REST_BASE_URL + "/fapi/v1/continuousKlines";
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(baseUrl)
 				.queryParam("pair", pair)
 				.queryParam("contractType", info.getContractType().getValue())
 				.queryParam("startTime", startTime)
 				.queryParam("interval", interval.getDescption())
 				.queryParam("limit", 1500);
+		if(contractType == ContractType.E_OPTIONS) {
+			baseUrl = AppConfig.EOPTIONS_BASE_URL + "/eapi/v1/klines";
+			uriBuilder = UriComponentsBuilder.fromUriString(baseUrl)
+					.queryParam("symbol", pair)
+					//.queryParam("contractType", info.getContractType().getValue())
+					.queryParam("startTime", startTime)
+					.queryParam("interval", interval.getDescption())
+					.queryParam("limit", 1500);
+		}
+		
 		
 		switch (split) {
 		case NOT_ENDTIME:
@@ -165,7 +177,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public List<Klines> continuousKlines1Day(String pair, Date now, int limit,QUERY_SPLIT split) {
+	public List<Klines> continuousKlines1Day(String pair, Date now, int limit,QUERY_SPLIT split, ContractType contractType) {
 		
 		int hours = DateFormatUtil.getHours(now.getTime());
 		Date lastDayStartTimeDate = DateFormatUtil.getStartTime(hours);//前一天K线起始时间 yyyy-MM-dd 08:00:00
@@ -174,11 +186,11 @@ public class KlinesServiceImpl implements KlinesService {
 		Date firstDayStartTime = DateFormatUtil.getStartTimeBySetDay(lastDayStartTimeDate, -limit);//多少天以前起始时间
 		
 		return continuousKlines(pair, firstDayStartTime.getTime(), 
-				lastDayEndTimeDate.getTime() + 999, Inerval.INERVAL_1D,split);
+				lastDayEndTimeDate.getTime() + 999, Inerval.INERVAL_1D,split, contractType);
 	}
 
 	@Override
-	public List<Klines> continuousKlines5M(String pair, Date now, int limit,QUERY_SPLIT split) {
+	public List<Klines> continuousKlines5M(String pair, Date now, int limit,QUERY_SPLIT split, ContractType contractType) {
 		List<Klines> result = null;
 		try {
 			
@@ -187,7 +199,7 @@ public class KlinesServiceImpl implements KlinesService {
 			endTime_5m = DateFormatUtil.getStartTimeBySetMillisecond(endTime_5m, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime_5m.getTime(),
-					endTime_5m.getTime(), Inerval.INERVAL_5M,split);
+					endTime_5m.getTime(), Inerval.INERVAL_5M,split, contractType);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -197,7 +209,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public List<Klines> continuousKlines15M(String pair, Date now, int limit,QUERY_SPLIT split) {
+	public List<Klines> continuousKlines15M(String pair, Date now, int limit,QUERY_SPLIT split, ContractType contractType) {
 		List<Klines> result = null;
 		try {
 			
@@ -206,7 +218,7 @@ public class KlinesServiceImpl implements KlinesService {
 			endTime = DateFormatUtil.getStartTimeBySetMillisecond(endTime, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime.getTime(),
-					endTime.getTime(), Inerval.INERVAL_15M,split);
+					endTime.getTime(), Inerval.INERVAL_15M,split,contractType);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -216,7 +228,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public List<Klines> continuousKlines4H(String pair,Date now,int limit,QUERY_SPLIT split) {
+	public List<Klines> continuousKlines4H(String pair,Date now,int limit,QUERY_SPLIT split, ContractType contractType) {
 		List<Klines> result = null;
 		try {
 			
@@ -225,7 +237,7 @@ public class KlinesServiceImpl implements KlinesService {
 			endTime = DateFormatUtil.getStartTimeBySetMillisecond(endTime, -1);//收盘时间
 			
 			result = continuousKlines(pair, startTime.getTime(),
-					endTime.getTime(), Inerval.INERVAL_4H,split);
+					endTime.getTime(), Inerval.INERVAL_4H,split,contractType);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2118,7 +2130,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-    public boolean checkData(List<Klines> list) {
+    public boolean checkData(List<Klines> list, ContractType contractType) {
         boolean result = true;
         if(!CollectionUtils.isEmpty(list)){
             list.sort(new KlinesComparator(SortType.ASC));
@@ -2159,7 +2171,7 @@ public class KlinesServiceImpl implements KlinesService {
                 	String fileName = current.getPair() + "_" + current.getInterval() + "_" + startTime + "_" + endTime + ".defect";
                 	if(!FileUtil.exists(fileName)) {
                     	result = false;
-                    	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInervalType(), QUERY_SPLIT.NOT_ENDTIME);
+                    	List<Klines> data = continuousKlines(current.getPair(), startTime, endTime, current.getInervalType(), QUERY_SPLIT.NOT_ENDTIME, contractType);
                     	logger.info(current.getPair() + "交易对" + current.getInterval() + "级别k线信息数据有缺矢，已同步" + data.size() 
                     				+ "条数据，缺失时间段：" + DateFormatUtil.format(startTime) + " ~ " + DateFormatUtil.format(endTime));
                     	klinesRepository.insert(data);
@@ -2206,7 +2218,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 
 	@Override
-	public boolean verifyUpdateDayKlines(List<Klines> list) {
+	public boolean verifyUpdateDayKlines(List<Klines> list, ContractType contractType) {
 		Date now = new Date();
 		//开盘时间不校验更新
 		if(DateFormatUtil.verifyLastDayStartTime(now)) {
@@ -2227,7 +2239,7 @@ public class KlinesServiceImpl implements KlinesService {
 			//获取需要更新的时间段信息
 			long startTime = DateFormatUtil.parse(DateFormatUtil.format(last.getEndTime())).getTime() + 1000;
 			long endTime = DateFormatUtil.getEndTime(DateFormatUtil.getHours(now.getTime())).getTime();
-			List<Klines> list_day = this.continuousKlines(last.getPair(), startTime, endTime, Inerval.INERVAL_1D, QUERY_SPLIT.NOT_ENDTIME);
+			List<Klines> list_day = this.continuousKlines(last.getPair(), startTime, endTime, Inerval.INERVAL_1D, QUERY_SPLIT.NOT_ENDTIME,contractType);
 			if(CollectionUtils.isEmpty(list_day)) {
 				String message = "未同步到时间段" + DateFormatUtil.format(startTime) + "~" + DateFormatUtil.format(endTime) + last.getPair() + "交易对日线级别K线信息";
 				throw new RuntimeException(message);

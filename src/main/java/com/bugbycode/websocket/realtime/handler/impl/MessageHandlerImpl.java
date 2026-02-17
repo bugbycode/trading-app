@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
@@ -31,7 +32,7 @@ public class MessageHandlerImpl implements MessageHandler{
 	@Override
 	public void handleMessage(String message, PerpetualWebSocketClientEndpoint client, KlinesService klinesService, 
 			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, WorkTaskPool analysisWorkTaskPool,
-			WorkTaskPool workTaskPool) {
+			WorkTaskPool workTaskPool, ContractType contractType) {
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
@@ -57,7 +58,7 @@ public class MessageHandlerImpl implements MessageHandler{
 			//15分钟k线分析
 			boolean isEmpty = klinesRepository.isEmpty(kline.getPair(), Inerval.INERVAL_1D);
 			if(isEmpty) {
-				workTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository));
+				workTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository, contractType));
 			} else {
 				klinesRepository.insert(kline);
 			}
@@ -96,7 +97,7 @@ public class MessageHandlerImpl implements MessageHandler{
 						
 						while(!pairs_linked.isEmpty()) {
 							
-							analysisWorkTaskPool.add(new AnalysisKlinesTask(pairs_linked.removeFirst(), klinesService, klinesRepository));
+							analysisWorkTaskPool.add(new AnalysisKlinesTask(pairs_linked.removeFirst(), klinesService, klinesRepository, contractType));
 							
 						}
 						

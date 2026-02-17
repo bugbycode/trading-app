@@ -19,4 +19,10 @@ public interface BinanceExchangeService {
 	 * @return
 	 */
 	public List<EoptionContracts> eOptionsExchangeInfo();
+	
+	/**
+	 * 获取所有期权交易对信息
+	 * @return
+	 */
+	public List<SymbolExchangeInfo> eOptionsExchangeInfoSymbol();
 }

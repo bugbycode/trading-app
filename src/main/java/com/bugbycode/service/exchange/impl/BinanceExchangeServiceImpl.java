@@ -122,4 +122,64 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 		return list;
 	}
 
+	@Override
+	public List<SymbolExchangeInfo> eOptionsExchangeInfoSymbol() {
+		List<SymbolExchangeInfo> list = new ArrayList<SymbolExchangeInfo>();
+		String resultStr = restTemplate.getForObject(AppConfig.EOPTIONS_BASE_URL + "/eapi/v1/exchangeInfo", String.class);
+		JSONObject result = new JSONObject(resultStr);
+		if(result.has("optionSymbols")) {
+			JSONArray arr = result.getJSONArray("optionSymbols");
+			arr.forEach(item -> {
+				if(item instanceof JSONObject) {
+					
+					SymbolExchangeInfo info = new SymbolExchangeInfo();
+					
+					JSONObject symbolJson = (JSONObject) item;
+					String symbol = symbolJson.getString("symbol");
+					String statusStr = symbolJson.getString("status");
+					int priceScale = symbolJson.getInt("priceScale");
+					String side = symbolJson.getString("side");
+					ContractType type = ContractType.E_OPTIONS;
+					ContractStatus status = ContractStatus.resolve(statusStr);
+					String underlying = symbolJson.getString("underlying");
+					
+					if(status == ContractStatus.TRADING) {
+
+						info.setSymbol(symbol);
+						info.setStatus(status);
+						info.setContractType(type);
+						info.setPriceScale(priceScale);
+						info.setSide(side);
+						info.setUnderlying(underlying);
+						
+						JSONArray filters = symbolJson.getJSONArray("filters");
+						filters.forEach(filter -> {
+							JSONObject f = (JSONObject) filter;
+							String filterType = f.getString("filterType");
+							if("LOT_SIZE".equals(filterType)) {//限价单交易规则
+								info.setLot_stepSize(f.getDouble("stepSize"));
+								info.setLot_minQty(f.getDouble("minQty"));
+								info.setLot_maxQty(f.getDouble("maxQty"));
+								
+								info.setLot_market_stepSize(f.getDouble("stepSize"));
+								info.setLot_market_minQty(f.getDouble("minQty"));
+								info.setLot_market_maxQty(f.getDouble("maxQty"));
+								
+								info.setTickSize(f.getString("stepSize"));
+								
+							}
+							
+							info.setMin_notional(5);
+						});
+						
+						AppConfig.SYMBOL_EXCHANGE_INFO.put(symbol, info);
+						
+						list.add(info);
+					}
+					
+				}
+			});
+		}
+ 		return list;
+	}
 }

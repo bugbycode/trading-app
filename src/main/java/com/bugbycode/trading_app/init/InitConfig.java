@@ -43,6 +43,9 @@ public class InitConfig implements ApplicationRunner {
 	@Value("${binance.baseUrl.eoption_rest}")
 	private String eoptionRestBaseUrl;
 	
+	@Value("${binance.baseUrl.eoption_websocket_api_market}")
+	private String eoptionWebsocketApiBaseUrl_market;
+	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		AppConfig.WEBSOCKET_API_URL = websocketApiBaseUrl;
@@ -50,6 +53,7 @@ public class InitConfig implements ApplicationRunner {
 		AppConfig.REST_BASE_URL = restBaseUrl;
 		AppConfig.RECAPTCHA_SECRET = recapt_secret;
 		AppConfig.EOPTIONS_BASE_URL = eoptionRestBaseUrl;
+		AppConfig.EOPTIONS_WEBSOCKET_API_URL_MARKET = eoptionWebsocketApiBaseUrl_market;
 
 		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
         List<String> arguments = runtimeMxBean.getInputArguments();

@@ -43,6 +43,12 @@ public class SymbolExchangeInfo {
 	private double min_notional;//最小名义价值
 	
 	private String tickSize;//订单最小价格间隔
+	
+	private String side;//期权交易方向 CALL/PUT
+	
+	private int priceScale;//期权价格精度
+	
+	private String underlying;//期权合约底层资产
 
 	public String getId() {
 		return id;
@@ -172,17 +178,44 @@ public class SymbolExchangeInfo {
 		this.tickSize = tickSize;
 	}
 
+	public String getSide() {
+		return side;
+	}
+
+	public void setSide(String side) {
+		this.side = side;
+	}
+
+	public int getPriceScale() {
+		return priceScale;
+	}
+
+	public void setPriceScale(int priceScale) {
+		this.priceScale = priceScale;
+	}
+
+	public String getUnderlying() {
+		return underlying;
+	}
+
+	public void setUnderlying(String underlying) {
+		this.underlying = underlying;
+	}
+
 	public int getDecimalNum() {
-		
-		char[] arr = this.tickSize.toCharArray();
-		int index = arr.length - 1;
-		for(; index >= 0; index--) {
-			if(arr[index] != '0') {
-				break;
+		if(contractType == ContractType.E_OPTIONS) {
+			return this.priceScale;
+		} else {
+			char[] arr = this.tickSize.toCharArray();
+			int index = arr.length - 1;
+			for(; index >= 0; index--) {
+				if(arr[index] != '0') {
+					break;
+				}
 			}
+			
+			return new BigDecimal(tickSize.substring(0, index + 1)).scale();
 		}
-		
-		return new BigDecimal(tickSize.substring(0, index + 1)).scale();
 	}
 	
 	/**

@@ -19,6 +19,8 @@ public class AppConfig {
 	
 	public static String WEBSOCKET_URL;
 	
+	public static String EOPTIONS_WEBSOCKET_API_URL_MARKET;
+	
 	public static String WEBSOCKET_API_URL;
 	
 	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
