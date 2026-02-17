@@ -8,7 +8,9 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.binance.ContractType;
+import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.util.DateFormatUtil;
 import com.util.PriceUtil;
@@ -29,12 +31,16 @@ public class AnalysisKlinesTask implements Runnable{
 
     private KlinesRepository klinesRepository;
     
+    private OpenInterestHistRepository openInterestHistRepository;
+    
     private ContractType contractType;
 
-    public AnalysisKlinesTask(String pair, KlinesService klinesService, KlinesRepository klinesRepository,ContractType contractType){
+    public AnalysisKlinesTask(String pair, KlinesService klinesService, KlinesRepository klinesRepository,
+    		OpenInterestHistRepository openInterestHistRepository, ContractType contractType){
         this.pair = pair;
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
+        this.openInterestHistRepository = openInterestHistRepository;
         this.contractType = contractType;
     }
 
@@ -42,6 +48,12 @@ public class AnalysisKlinesTask implements Runnable{
     public void run() {
         try {
             
+        	OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
+        	if(oih == null) {
+        		logger.info("无法查询到{}合约持仓量相关信息.");
+        		return;
+        	}
+        	
             //查询15分钟级别k线信息 START ============================================================================
             List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
             if(CollectionUtils.isEmpty(klines_list_15m)){
