@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.user.User;
@@ -50,5 +51,13 @@ public class TestUserCrud {
     public void testQuery() {
         User u = userRepository.queryByUsername("test@gmail.com");
         logger.info(u.getTradeNumber());
+    }
+    
+    @Test
+    public void testQueryEoptionUser() {
+    	List<User> list = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
+    	for(User u : list) {
+    		logger.info(u);
+    	}
     }
 }

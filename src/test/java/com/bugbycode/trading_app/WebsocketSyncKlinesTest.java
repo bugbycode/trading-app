@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
+import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
@@ -69,7 +70,7 @@ public class WebsocketSyncKlinesTest {
 		
 		Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
 		
-		CoinPairSet set = new CoinPairSet(inerval);
+		CoinPairSet set = new CoinPairSet(inerval, ContractType.PERPETUAL);
 		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
 		for(SymbolExchangeInfo coin : pairs) {
 			
@@ -78,7 +79,7 @@ public class WebsocketSyncKlinesTest {
 			set.add(coin);
 			if(set.isFull()) {
 				coinList.add(set);
-				set = new CoinPairSet(inerval);
+				set = new CoinPairSet(inerval, ContractType.PERPETUAL);
 			}
 		}
 		
@@ -87,7 +88,7 @@ public class WebsocketSyncKlinesTest {
 		}
 		
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool, ContractType.PERPETUAL);
 		}
 		
 		Thread.sleep(60 * 60 * 1000);

@@ -43,7 +43,7 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "LAUSDT";
+        String pair = "BCHUSDT";
         
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         
@@ -74,6 +74,8 @@ public class PriceActionFactoryTest {
         FibInfo fibInfo = factory.getFibInfo();
         List<OpenPrice> openPrices = factory.getOpenPrices();
 
+        logger.info(factory.getFibInfo());
+
         for(OpenPrice price : openPrices) {
             FibCode code = fibInfo.getFibCode(price.getPrice());
             FibCode profiCodeNext = fibInfo.getPriceActionTakeProfit_nextCode(code);
@@ -81,8 +83,6 @@ public class PriceActionFactoryTest {
             logger.info("{} -> {}({}) ~ {}({}), isTreade:{}", price, profiCodeNext, fibInfo.getFibValue(profiCodeNext), profitCode, fibInfo.getFibValue(profitCode), 
                 PriceUtil.isTradedPriceAction(price.getPrice(), fibInfo));
         }
-
-        logger.info(factory.getFibInfo());
         //logger.info(factory.verifyOpen(list_15m));
         //logger.info(factory.getFibAfterKlines());
     }

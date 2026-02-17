@@ -19,8 +19,10 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.FibCode;
@@ -32,8 +34,10 @@ import com.bugbycode.module.LongOrShortType;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.StepPriceInfo;
+import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
+import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
@@ -62,6 +66,7 @@ public class KlinesServiceTest {
 		System.setProperty("https.proxyHost", "localhost");
 		System.setProperty("https.proxyPort", "50000");
 		binanceExchangeService.exchangeInfo();
+		binanceExchangeService.eOptionsExchangeInfoSymbol();
 	}
 
     @Test
@@ -73,10 +78,10 @@ public class KlinesServiceTest {
     @Test
     public void testQuery() {
         Date now = new Date();
-        String pair = "币安人生USDT";
+        String pair = "BTC-260220-74000-P";
         List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,20);
         
-        klines_list_15m.remove(PriceUtil.getLastKlines(klines_list_15m)) ;
+        //klines_list_15m.remove(PriceUtil.getLastKlines(klines_list_15m)) ;
 
         for(Klines k : klines_list_15m) {
             logger.info(k);
@@ -96,9 +101,9 @@ public class KlinesServiceTest {
         }*/
         
         List<Klines> list_day = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
-        if(klinesService.verifyUpdateDayKlines(list_day)){
+        if(klinesService.verifyUpdateDayKlines(list_day, ContractType.PERPETUAL)){
             list_day = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
-            klinesService.checkData(list_day);
+            klinesService.checkData(list_day, ContractType.PERPETUAL);
         } 
     }
 
@@ -137,8 +142,16 @@ public class KlinesServiceTest {
     @Test
     public void testSyncKlines() throws UnsupportedEncodingException {
         String pair = "XAUUSDT";
-        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL);
+        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL, ContractType.PERPETUAL);
         logger.info(list);
+    }
+    
+    @Test
+    public void testSyncKlinesEoptions() throws UnsupportedEncodingException {
+        String pair = "BTC-260220-74000-P";
+        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL, ContractType.E_OPTIONS);
+        logger.info(list);
+        klinesRepository.insert(list);
     }
 
     @Test
@@ -159,7 +172,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "STABLEUSDT";
+        String pair = "WLDUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -227,10 +240,10 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "ETHUSDT";
+    	String pair = "NEOUSDT";
         List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
-        AreaFactory factory = new AreaFactoryImpl_v2(list_1h, list_15m);
+        AreaFactory factory = new AreaFactoryImpl_v3(list_1h, list_15m);
         if(!(factory.isLong() || factory.isShort())) {
         	return;
         }
@@ -370,7 +383,7 @@ public class KlinesServiceTest {
         Date now = new Date();
         now = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_00_00(now));
         String pair = "BTCUSDT";
-        List<Klines> list_4h = klinesService.continuousKlines4H(pair, now, 1500, QUERY_SPLIT.ALL);
+        List<Klines> list_4h = klinesService.continuousKlines4H(pair, now, 1500, QUERY_SPLIT.ALL, ContractType.PERPETUAL);
         Klines klines_last_4h = PriceUtil.getLastKlines(list_4h);
         if(!PriceUtil.verifyKlines(klines_last_4h)) {
             list_4h.remove(klines_last_4h);
@@ -404,7 +417,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testDeltaAndCVD() {
-        String pair = "WETUSDT";
+        String pair = "SUIUSDT";
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,5000);
         PriceUtil.calculateDeltaAndCvd(list);
         for(Klines k : list) {
@@ -441,7 +454,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testCalculateStepPrice() {
-    	String pair = "DOGEUSDT";
+    	String pair = "BIRBUSDT";
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1);
     	if(CollectionUtils.isEmpty(list_15m)) {
     		return;
@@ -450,5 +463,14 @@ public class KlinesServiceTest {
     	StepPriceInfo info = PriceUtil.calculateStepPrice(last.getClosePrice(), last.getDecimalNum());
     	logger.info("{} : {} - {}", pair, info.getHitPrice(), info.getStepPrice());
     	logger.info("{} : {} ~ {} <- {} -> {} ~ {}", pair, info.getNextLowPrice(), info.getLowPrice(), info.getHitPrice(), info.getHighPrice(), info.getNextHighPrice());
+    	
+    	OpenPrice priceLong = new OpenPriceDetails(FibCode.FIB618, info.getHighPriceDoubleValue(), info.getLowPriceDoubleValue(), 
+				info.getHighPriceDoubleValue(), info.getNextHighPriceDoubleValue());
+    	
+    	OpenPrice priceShort = new OpenPriceDetails(FibCode.FIB618, info.getHighPriceDoubleValue(), info.getHighPriceDoubleValue(), 
+				info.getLowPriceDoubleValue(), info.getNextLowPriceDoubleValue());
+    	
+    	logger.info(priceLong);
+    	logger.info(priceShort);
     }
 }

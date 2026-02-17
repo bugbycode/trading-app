@@ -1,5 +1,6 @@
 package com.bugbycode.trading_app;
 
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
@@ -15,8 +16,8 @@ import com.util.PriceUtil;
 public class TestApp {
 
 	public static void main(String[] args) throws ParseException {
-		System.out.println(PriceUtil.calculateLongActivationPrice(100, 3));
-		System.out.println(PriceUtil.calculateShortActivationPrice(100, 3));
+		String pair = "BTC-260220-74000-P";
+		System.out.println(pair.replace("-", "_"));
 	}
 
 }
