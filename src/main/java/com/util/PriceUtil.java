@@ -4001,6 +4001,8 @@ public class PriceUtil {
     		}
     	}
     	
-    	return new StepPriceInfo(new String(current_arr), new String(step_arr), decimalNum);
+    	String stepStr = PriceUtil.formatDoubleDecimal(Double.valueOf(new String(step_arr)) / 2, decimalNum);
+    	
+    	return new StepPriceInfo(new String(current_arr), stepStr, decimalNum);
     }
 }

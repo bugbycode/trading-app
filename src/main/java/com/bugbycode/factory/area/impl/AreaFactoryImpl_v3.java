@@ -69,7 +69,7 @@ public class AreaFactoryImpl_v3 implements AreaFactory {
 		double startPrice = info.getHitPriceDoubleValue();
 		double stepPrice = info.getStepPriceDoubleValue();
 		
-		settingOpenPrice(fibInfo, startPrice, stepPrice);
+		settingOpenPrice(fibInfo, startPrice, stepPrice, fibInfo.getDecimalPoint());
 		
 		QuotationMode mode = fibInfo.getQuotationMode();
 		if(mode == QuotationMode.LONG) {
@@ -108,7 +108,7 @@ public class AreaFactoryImpl_v3 implements AreaFactory {
 		return this.ps == PositionSide.SHORT;
 	}
 
-	private void settingOpenPrice(FibInfo fibInfo, double startPrice, double stepPrice) {
+	private void settingOpenPrice(FibInfo fibInfo, double startPrice, double stepPrice, int decimalPoint) {
 		QuotationMode mode = fibInfo.getQuotationMode();
 		FibCode lastCode = FibCode.FIB1_618;
 		FibCode openCode = fibInfo.getFibCode(startPrice);
@@ -120,13 +120,19 @@ public class AreaFactoryImpl_v3 implements AreaFactory {
 		
 		OpenPrice p = null;
 		if(mode == QuotationMode.LONG) {
-			p = new OpenPriceDetails(openCode, startPrice, startPrice - stepPrice, startPrice + stepPrice * 2, startPrice + stepPrice);
+			p = new OpenPriceDetails(openCode, formatPrice(startPrice, decimalPoint), formatPrice(startPrice - stepPrice, decimalPoint),
+					formatPrice(startPrice + stepPrice * 2, decimalPoint), formatPrice(startPrice + stepPrice, decimalPoint));
 		} else {
-			p = new OpenPriceDetails(openCode, startPrice, startPrice + stepPrice, startPrice - stepPrice * 2, startPrice - stepPrice);
+			p = new OpenPriceDetails(openCode, formatPrice(startPrice, decimalPoint), formatPrice(startPrice + stepPrice, decimalPoint), 
+					formatPrice(startPrice - stepPrice * 2, decimalPoint), formatPrice(startPrice - stepPrice, decimalPoint));
 		}
 		
 		addPrices(p);
 		
-		settingOpenPrice(fibInfo, p.getStopLossLimit(), stepPrice);
+		settingOpenPrice(fibInfo, p.getStopLossLimit(), stepPrice, decimalPoint);
+	}
+	
+	private double formatPrice(double price, int decimalPoint) {
+		return Double.valueOf(PriceUtil.formatDoubleDecimal(price,decimalPoint));
 	}
 }
