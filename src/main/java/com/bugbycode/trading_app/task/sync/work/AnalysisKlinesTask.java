@@ -50,7 +50,7 @@ public class AnalysisKlinesTask implements Runnable{
             
         	OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
         	if(oih == null) {
-        		logger.info("无法查询到{}合约持仓量相关信息.");
+        		logger.info("无法查询到{}合约持仓量相关信息.", pair);
         		return;
         	}
         	

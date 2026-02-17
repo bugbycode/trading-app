@@ -107,6 +107,7 @@ public class OpenInterestHistTaskSync {
 			try {
 				OpenInterestHist dbOih = openInterestHistRepository.findOneBySymbol(info.getUnderlying());
 				if(dbOih == null) {
+					logger.info("{} - {}持仓量信息未入库", info.getUnderlying(), info.getSymbol());
 					continue;
 				}
 				OpenInterestHist oih = new OpenInterestHist();
