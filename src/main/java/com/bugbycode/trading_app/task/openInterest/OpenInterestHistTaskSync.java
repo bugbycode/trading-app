@@ -111,7 +111,7 @@ public class OpenInterestHistTaskSync {
 					continue;
 				}
 				OpenInterestHist oih = new OpenInterestHist();
-				oih.setSymbol(dbOih.getSymbol());
+				oih.setSymbol(info.getSymbol());
 				oih.setSumOpenInterest(dbOih.getSumOpenInterest());
 				oih.setSumOpenInterestValue(dbOih.getSumOpenInterestValue());
 				oih.setTimestamp(dbOih.getTimestamp());
