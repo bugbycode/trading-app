@@ -14,6 +14,6 @@ binance:
     rest: https://fapi.binance.com
     websocketApi: wss://ws-fapi.binance.com/ws-fapi/v1
     eoption_rest: https://eapi.binance.com
-    eoption_websocket_api_market: wss://fstream.binance.com/market/
+    eoption_websocket_api_market: wss://fstream.binance.com/market
 loggin: 
   config: classpath:log4j2.xml
