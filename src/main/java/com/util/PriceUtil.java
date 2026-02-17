@@ -3494,6 +3494,7 @@ public class PriceUtil {
 				//判断是否命中开仓价
 				if(hitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(code))) {
 					hitCodeKlines = k;
+					continue;
 				}
 				//判断是否命中止盈价
 				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(takeProfitCode))) {
