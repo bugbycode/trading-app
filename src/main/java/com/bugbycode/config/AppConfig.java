@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 
 public class AppConfig {
@@ -27,9 +26,6 @@ public class AppConfig {
 	
 	//交易对交易规则
 	public static Map<String,SymbolExchangeInfo> SYMBOL_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, SymbolExchangeInfo>());
-	
-	//期权底层资产信息
-	public static Map<String,EoptionContracts> EOPTION_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, EoptionContracts>());
 	
 	public static String RECAPTCHA_SECRET;
 	
