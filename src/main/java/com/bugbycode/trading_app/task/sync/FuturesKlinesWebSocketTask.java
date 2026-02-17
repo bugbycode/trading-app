@@ -73,7 +73,7 @@ public class FuturesKlinesWebSocketTask {
 		Inerval inerval = Inerval.INERVAL_15M;
 		
 		//欧式期权
-		List<CoinPairSet> e_coinList = new ArrayList<CoinPairSet>();
+		/*List<CoinPairSet> e_coinList = new ArrayList<CoinPairSet>();
 		List<SymbolExchangeInfo> list = binanceExchangeService.eOptionsExchangeInfoSymbol();
 		CoinPairSet e_set = new CoinPairSet(inerval, ContractType.E_OPTIONS);
 		for(SymbolExchangeInfo e_coin : list) {
@@ -91,7 +91,7 @@ public class FuturesKlinesWebSocketTask {
 		for(CoinPairSet e_s : e_coinList) {
 			new PerpetualWebSocketClientEndpoint(e_s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool, ContractType.E_OPTIONS);
 		}
-		
+		*/
 		//欧式期权 END
 		
 		Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();

@@ -101,7 +101,7 @@ public class OpenInterestHistTaskSync {
 				logger.error("同步历史合约持仓量信息时出现异常", e);
 			}
 		}
-		
+		/*
 		List<SymbolExchangeInfo> list = binanceExchangeService.eOptionsExchangeInfoSymbol();
 		for(SymbolExchangeInfo info : list) {
 			try {
@@ -119,6 +119,6 @@ public class OpenInterestHistTaskSync {
 			} catch (Exception e) {
 				logger.error("同步期权历史合约持仓量信息时出现异常", e);
 			}
-		}
+		}*/
 	}
 }

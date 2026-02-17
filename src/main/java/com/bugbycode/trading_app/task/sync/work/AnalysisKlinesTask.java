@@ -153,27 +153,23 @@ public class AnalysisKlinesTask implements Runnable{
             
             //查询4小时级别k线信息 END==========================================================================
             
-            if(contractType == ContractType.PERPETUAL) {//永续合约
-            	//斐波那契回撤分析
-                klinesService.futuresFibMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h_db, klines_list_15m);
-                
-                //盘整区分析
-                //klinesService.consolidationAreaMonitor(klines_list_1h_db, klines_list_15m);
-                
-                //指数均线
-                //klinesService.futuresEmaRiseAndFallMonitor(klines_list_1h_db, klines_list_15m);
-                
-                //价格行为分析
-                klinesService.futuresPriceAction(klines_list_1h_db, klines_list_15m);
-                
-                //量价分析
-                //klinesService.volumeMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h, klines_list_15m);
-            } else if(contractType == ContractType.E_OPTIONS) {//欧式期权
-
-                //期权交易机会监控
-                //klinesService.eoptionMonitor(klines_list_4h_db, klines_list_15m);
-            	logger.info("{} - eoptionMonitor.", pair);
-            }
+          //斐波那契回撤分析
+            klinesService.futuresFibMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h_db, klines_list_15m);
+            
+            //盘整区分析
+            //klinesService.consolidationAreaMonitor(klines_list_1h_db, klines_list_15m);
+            
+            //指数均线
+            //klinesService.futuresEmaRiseAndFallMonitor(klines_list_1h_db, klines_list_15m);
+            
+            //价格行为分析
+            klinesService.futuresPriceAction(klines_list_1h_db, klines_list_15m);
+            
+            //量价分析
+            //klinesService.volumeMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h, klines_list_15m);
+            
+            //期权交易机会监控
+            //klinesService.eoptionMonitor(klines_list_4h_db, klines_list_15m);
             
 
         } catch (Exception e) {
