@@ -74,14 +74,15 @@ public class PerpetualWebSocketClientEndpoint {
     }
     
     private void connectToServer() throws RuntimeException {
+    	String baseUrl = AppConfig.WEBSOCKET_URL;
     	try {
-    		String baseUrl = AppConfig.WEBSOCKET_URL + "/ws/" + coinPairSet.getStreamName();
     		if(contractType == ContractType.E_OPTIONS) {
-    			baseUrl = AppConfig.EOPTIONS_WEBSOCKET_API_URL_MARKET + coinPairSet.getStreamName();
+    			baseUrl = AppConfig.EOPTIONS_WEBSOCKET_API_URL_MARKET;
     		}
-			this.container.connectToServer(this, new URI(baseUrl));
-			logger.debug("开始连接websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName());
+			this.container.connectToServer(this, new URI(baseUrl + "/ws/" + coinPairSet.getStreamName()));
+			logger.debug("开始连接websocket服务：" + baseUrl + "，订阅： " + coinPairSet.getStreamName());
 		} catch (Exception e) {
+			logger.error("订阅 {} 出现异常", baseUrl);
 			throw new RuntimeException(e);
 		}
     }

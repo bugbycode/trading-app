@@ -33,10 +33,17 @@ public class MessageHandlerImpl implements MessageHandler{
 	public void handleMessage(String message, PerpetualWebSocketClientEndpoint client, KlinesService klinesService, 
 			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, WorkTaskPool analysisWorkTaskPool,
 			WorkTaskPool workTaskPool, ContractType contractType) {
+		
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
-		String pair = result.getString("ps");
+		String pair = null;
+		
+		if(contractType == ContractType.E_OPTIONS) {
+			pair = result.getString("s");
+		} else {
+			pair = result.getString("ps");
+		}
 		
 		int decimalNum = new BigDecimal(openPriceStr).scale();
 		
