@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.binance.ContractType;
@@ -93,6 +94,11 @@ public class FuturesKlinesWebSocketTask {
 		}
 		*/
 		//欧式期权 END
+		
+		List<EoptionContracts> ecList = binanceExchangeService.eOptionsExchangeInfo();
+		for(EoptionContracts ec : ecList) {
+			AppConfig.EOPTION_EXCHANGE_INFO.put(ec.getUnderlying(), ec);
+		}
 		
 		Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
 		

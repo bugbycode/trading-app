@@ -1117,6 +1117,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		Klines last = PriceUtil.getLastKlines(list_15m);
 		String pair = last.getPair();
+		//限制非期权交易对
+		if(AppConfig.EOPTION_EXCHANGE_INFO.get(pair) == null) {
+			return;
+		}
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
