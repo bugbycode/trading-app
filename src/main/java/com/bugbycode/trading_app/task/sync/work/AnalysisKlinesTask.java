@@ -169,7 +169,7 @@ public class AnalysisKlinesTask implements Runnable{
             //klinesService.volumeMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h, klines_list_15m);
             
             //期权交易机会监控
-            //klinesService.eoptionMonitor(klines_list_4h_db, klines_list_15m);
+            klinesService.eoptionMonitor(klines_list_4h_db, klines_list_15m);
             
 
         } catch (Exception e) {

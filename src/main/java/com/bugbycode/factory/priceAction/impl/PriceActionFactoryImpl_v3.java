@@ -11,8 +11,8 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
-import com.bugbycode.module.PriceActionInfo;
-import com.bugbycode.module.PriceActionType;
+import com.bugbycode.module.PriceActionInfo_v2;
+import com.bugbycode.module.PriceActionType_v2;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -175,105 +175,72 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 		}
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
-		List<PriceActionInfo> priceInfoList = new ArrayList<PriceActionInfo>();
+		List<PriceActionInfo_v2> priceInfoList = new ArrayList<PriceActionInfo_v2>();
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
-			Klines next = list.get(index - 2);
 			if((mode == QuotationMode.SHORT && current.getMacd() > 0) 
 					|| (mode == QuotationMode.LONG && current.getMacd() < 0)) {
 				break;
 			}
-			PriceActionType type = PriceActionType.DECL_POWER;
-			if(mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v10(current, parent, next)) {
-				if(PriceUtil.isPutInto_v2(current, parent, next) || PriceUtil.isPutInto_v3(current, parent, next)) {
-					type = PriceActionType.DEFAULT;
-					if(current.getBodyLowPriceDoubleValue() < parent.getLowPriceDoubleValue()) {
-						type = PriceActionType.BACK;
-					}
-				} else if(PriceUtil.verifyDecliningPrice_v22(current, parent, next)) {
-					type = PriceActionType.DECL_POWER;
+			if(mode == QuotationMode.LONG) {
+				if(PriceUtil.verifyDecliningPrice_v24(current, parent)) {
+					priceInfoList.add(new PriceActionInfo_v2(current, parent, PriceActionType_v2.LEAD));
 				}
-				priceInfoList.add(new PriceActionInfo(current, parent, next, type));
-			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v10(current, parent, next)) {
-				if(PriceUtil.isBullishSwallowing_v2(current, parent, next) || PriceUtil.isBullishSwallowing_v3(current, parent, next)) {
-					type = PriceActionType.DEFAULT;
-					if(current.getBodyHighPriceDoubleValue() > parent.getHighPriceDoubleValue()) {
-						type = PriceActionType.BACK;
-					}
-				} else if(PriceUtil.verifyPowerful_v22(current, parent, next)) {
-					type = PriceActionType.DECL_POWER;
+				if(PriceUtil.verifyDecliningPrice_v25(current, parent)) {
+					priceInfoList.add(new PriceActionInfo_v2(current, parent, PriceActionType_v2.RISE_OR_FALL));
 				}
-				priceInfoList.add(new PriceActionInfo(current, parent, next, type));
+			} else {
+				if(PriceUtil.verifyPowerful_v24(current, parent)) {
+					priceInfoList.add(new PriceActionInfo_v2(current, parent, PriceActionType_v2.LEAD));
+				}
+				if(PriceUtil.verifyPowerful_v25(current, parent)) {
+					priceInfoList.add(new PriceActionInfo_v2(current, parent, PriceActionType_v2.RISE_OR_FALL));
+				}
 			}
+		}
+
+		Klines fibEnd = end;
+		Klines last = PriceUtil.getLastKlines(list_15m);
+		double stopLossLimit = 0;
+		if(mode == QuotationMode.SHORT) {
+			stopLossLimit = last.getLowPriceDoubleValue();
+		} else {
+			stopLossLimit = last.getHighPriceDoubleValue();
 		}
 		
 		if(!CollectionUtils.isEmpty(priceInfoList)) {
-			Klines fibEnd = null;
-			List<Klines> data = new ArrayList<Klines>();
-			PriceActionInfo info = null;
-			MarketSentiment ms = null;
-			PriceActionType type = PriceActionType.DEFAULT;
-			
-			if(mode == QuotationMode.LONG) {
-				
-				info = PriceUtil.getMaxPriceActionInfo(priceInfoList);
-
-				type = info.getType();
-				data.add(info.getCurrent());
-				data.add(info.getParent());
-				ms = new MarketSentiment(data);
-				
-				double stopLossLimit = ms.getHighPrice();
-				
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice()));
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice(), stopLossLimit));
-				
-				if(type == PriceActionType.DEFAULT || type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getBodyLowPriceDoubleValue()), info.getParent().getBodyLowPriceDoubleValue(), ms.getMaxBodyHighPrice()));
+			Klines current = null;
+			if(mode == QuotationMode.SHORT) {
+				PriceActionInfo_v2 info = PriceUtil.getMinBodyPriceActionInfo_v2(priceInfoList);
+				PriceActionType_v2 type = info.getType();
+				current = info.getCurrent();
+				if(type == PriceActionType_v2.LEAD) {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getClosePriceDoubleValue()), current.getClosePriceDoubleValue(), stopLossLimit));
+				} else {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyLowPriceDoubleValue()), current.getBodyLowPriceDoubleValue(), stopLossLimit));
 				}
-				
-				if(type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getLowPriceDoubleValue()), info.getParent().getLowPriceDoubleValue(), 
-							info.getParent().getBodyLowPriceDoubleValue()));
-				}
-				
-				if(type == PriceActionType.DECL_POWER) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue(), ms.getMaxBodyHighPrice()));
-				}
-				
 			} else {
-				info = PriceUtil.getMinPriceActionInfo(priceInfoList);
-				
-				type = info.getType();
-				data.add(info.getCurrent());
-				data.add(info.getParent());
-				ms = new MarketSentiment(data);
-				
-				double stopLossLimit = ms.getLowPrice();
-				
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice()));
-				addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice(), stopLossLimit));
-				
-				if(type == PriceActionType.DEFAULT || type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getBodyHighPriceDoubleValue()), info.getParent().getBodyHighPriceDoubleValue(), ms.getMinBodyLowPrice()));
+				PriceActionInfo_v2 info = PriceUtil.getMaxBodyPriceActionInfo_v2(priceInfoList);
+				PriceActionType_v2 type = info.getType();
+				current = info.getCurrent();
+				if(type == PriceActionType_v2.LEAD) {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getClosePriceDoubleValue()), current.getClosePriceDoubleValue(), stopLossLimit));
+				} else {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getBodyHighPriceDoubleValue()), current.getBodyHighPriceDoubleValue(), stopLossLimit));
 				}
-				
-				if(type == PriceActionType.BACK) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getParent().getHighPriceDoubleValue()), info.getParent().getHighPriceDoubleValue(), 
-							info.getParent().getBodyHighPriceDoubleValue()));
-				}
-				
-				if(type == PriceActionType.DECL_POWER) {
-					addPrices(new OpenPriceDetails(fibInfo.getFibCode(info.getCurrent().getClosePriceDoubleValue()), info.getCurrent().getClosePriceDoubleValue(), ms.getMinBodyLowPrice()));
-				}
-				
 			}
 			
-			fibEnd = info.getCurrent();
-			if(fibEnd.lt(end)) {
-				fibEnd = end;
+			
+			if(current.gt(end)) {
+				
+				List<Klines> data = PriceUtil.subList(start, end, list);
+				MarketSentiment ms = new MarketSentiment(data);
+				addPrices(this.fibInfo, ms, stopLossLimit);
+				
+				fibEnd = current;
+				
 			}
 			
 			Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
@@ -323,6 +290,17 @@ public class PriceActionFactoryImpl_v3 implements PriceActionFactory{
 			if(!PriceUtil.contains(openPrices, price)) {
 				openPrices.add(price);
 			}
+		}
+	}
+	
+	private void addPrices(FibInfo fibInfo, MarketSentiment ms, double stopLossLimit) {
+		QuotationMode mode = fibInfo.getQuotationMode();
+		if(mode == QuotationMode.SHORT) {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice(), stopLossLimit));
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice(), stopLossLimit));
+		} else {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice(), stopLossLimit));
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice(), stopLossLimit));
 		}
 	}
 }
