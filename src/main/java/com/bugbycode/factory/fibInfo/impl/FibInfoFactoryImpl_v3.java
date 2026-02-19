@@ -235,13 +235,15 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 				if(mode == QuotationMode.LONG) {
 					if(PriceUtil.verifyPowerful_v24(current, parent)) {
 						addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLossLimit));
-					} else if(PriceUtil.verifyPowerful_v25(current, parent)) {
+					}
+					if(PriceUtil.verifyPowerful_v25(current, parent)) {
 						addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), stopLossLimit));
 					}
 				} else {
 					if(PriceUtil.verifyDecliningPrice_v24(current, parent)) {
 						addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLossLimit));
-					} else if(PriceUtil.verifyDecliningPrice_v25(current, parent)) {
+					}
+					if(PriceUtil.verifyDecliningPrice_v25(current, parent)) {
 						addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), stopLossLimit));
 					}
 				}
