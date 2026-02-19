@@ -11,6 +11,8 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
+import com.bugbycode.module.PriceActionInfo_v2;
+import com.bugbycode.module.PriceActionType_v2;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -225,6 +227,9 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list);
 		
 		if(openCode.gte(FibCode.FIB236)) {
+			
+			List<PriceActionInfo_v2> priceActionList = new ArrayList<PriceActionInfo_v2>();
+			
 			for(int index = list.size() - 1;index > 0; index--) {
 				Klines current = list.get(index);
 				Klines parent = list.get(index - 1);
@@ -234,27 +239,49 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 				
 				if(mode == QuotationMode.LONG) {
 					if(PriceUtil.verifyPowerful_v24(current, parent)) {
-						addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLossLimit));
+						priceActionList.add(new PriceActionInfo_v2(current, parent, PriceActionType_v2.LEAD));
 					}
 					if(PriceUtil.verifyPowerful_v25(current, parent)) {
-						addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), stopLossLimit));
+						priceActionList.add(new PriceActionInfo_v2(current, parent, PriceActionType_v2.RISE_OR_FALL));
 					}
 				} else {
 					if(PriceUtil.verifyDecliningPrice_v24(current, parent)) {
-						addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLossLimit));
+						priceActionList.add(new PriceActionInfo_v2(current, parent, PriceActionType_v2.LEAD));
 					}
 					if(PriceUtil.verifyDecliningPrice_v25(current, parent)) {
+						priceActionList.add(new PriceActionInfo_v2(current, parent, PriceActionType_v2.RISE_OR_FALL));
+					}
+				}
+				
+			}
+			//处理价格 start
+			if(!CollectionUtils.isEmpty(priceActionList)) {
+				Klines current = null;
+				if(mode == QuotationMode.LONG) {
+					PriceActionInfo_v2 info = PriceUtil.getMinPriceActionInfo_v2(priceActionList);
+					PriceActionType_v2 type = info.getType();
+					current = info.getCurrent();
+					if(type == PriceActionType_v2.LEAD) {
+						addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLossLimit));
+					} else {
+						addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), stopLossLimit));
+					}
+				} else {
+					PriceActionInfo_v2 info = PriceUtil.getMaxPriceActionInfo_v2(priceActionList);
+					PriceActionType_v2 type = info.getType();
+					current = info.getCurrent();
+					if(type == PriceActionType_v2.LEAD) {
+						addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLossLimit));
+					} else {
 						addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), stopLossLimit));
 					}
 				}
-				if(!CollectionUtils.isEmpty(openPrices)) {
-					List<Klines> data = PriceUtil.subList(fibAfterKline, current, list);
-					ms = new MarketSentiment(data);
-					addPrices(mode, openCode, ms, stopLossLimit);
-					fibEnd = current;
-					break;
-				}
+				List<Klines> data = PriceUtil.subList(fibAfterKline, current, list);
+				ms = new MarketSentiment(data);
+				addPrices(mode, openCode, ms, stopLossLimit);
+				fibEnd = current;
 			}
+			//处理价格 end
 		}
 		
 		List<Klines> fibSubList = PriceUtil.subList(start, end, list);

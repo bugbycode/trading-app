@@ -23,6 +23,7 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.PriceActionInfo;
+import com.bugbycode.module.PriceActionInfo_v2;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ReversalPoint;
 import com.bugbycode.module.SortType;
@@ -4017,6 +4018,32 @@ public class PriceUtil {
     	if(!CollectionUtils.isEmpty(list)) {
     		result = list.get(0);
     		for(PriceActionInfo info : list) {
+    			if(info.getLow().getLowPriceDoubleValue() < result.getLow().getLowPriceDoubleValue()) {
+    				result = info;
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
+    public static PriceActionInfo_v2 getMaxPriceActionInfo_v2(List<PriceActionInfo_v2> list) {
+    	PriceActionInfo_v2 result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		result = list.get(0);
+    		for(PriceActionInfo_v2 info : list) {
+    			if(info.getHigh().getHighPriceDoubleValue() > result.getHigh().getHighPriceDoubleValue()) {
+    				result = info;
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
+    public static PriceActionInfo_v2 getMinPriceActionInfo_v2(List<PriceActionInfo_v2> list) {
+    	PriceActionInfo_v2 result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		result = list.get(0);
+    		for(PriceActionInfo_v2 info : list) {
     			if(info.getLow().getLowPriceDoubleValue() < result.getLow().getLowPriceDoubleValue()) {
     				result = info;
     			}
