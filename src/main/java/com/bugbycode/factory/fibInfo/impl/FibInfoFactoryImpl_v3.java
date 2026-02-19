@@ -258,7 +258,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			if(!CollectionUtils.isEmpty(priceActionList)) {
 				Klines current = null;
 				if(mode == QuotationMode.LONG) {
-					PriceActionInfo_v2 info = PriceUtil.getMinPriceActionInfo_v2(priceActionList);
+					PriceActionInfo_v2 info = PriceUtil.getMinBodyPriceActionInfo_v2(priceActionList);
 					PriceActionType_v2 type = info.getType();
 					current = info.getCurrent();
 					if(type == PriceActionType_v2.LEAD) {
@@ -267,7 +267,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 						addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), stopLossLimit));
 					}
 				} else {
-					PriceActionInfo_v2 info = PriceUtil.getMaxPriceActionInfo_v2(priceActionList);
+					PriceActionInfo_v2 info = PriceUtil.getMaxBodyPriceActionInfo_v2(priceActionList);
 					PriceActionType_v2 type = info.getType();
 					current = info.getCurrent();
 					if(type == PriceActionType_v2.LEAD) {

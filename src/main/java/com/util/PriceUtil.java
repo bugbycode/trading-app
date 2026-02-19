@@ -4052,6 +4052,32 @@ public class PriceUtil {
     	return result;
     }
     
+    public static PriceActionInfo_v2 getMaxBodyPriceActionInfo_v2(List<PriceActionInfo_v2> list) {
+    	PriceActionInfo_v2 result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		result = list.get(0);
+    		for(PriceActionInfo_v2 info : list) {
+    			if(info.getHigh().getBodyHighPriceDoubleValue() > result.getHigh().getBodyHighPriceDoubleValue()) {
+    				result = info;
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
+    public static PriceActionInfo_v2 getMinBodyPriceActionInfo_v2(List<PriceActionInfo_v2> list) {
+    	PriceActionInfo_v2 result = null;
+    	if(!CollectionUtils.isEmpty(list)) {
+    		result = list.get(0);
+    		for(PriceActionInfo_v2 info : list) {
+    			if(info.getLow().getBodyLowPriceDoubleValue() < result.getLow().getBodyLowPriceDoubleValue()) {
+    				result = info;
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
     public static StepPriceInfo calculateStepPrice(String value, int decimalNum) {
     	char[] c_arr = value.toCharArray();
     	char[] step_arr = new char[c_arr.length];
