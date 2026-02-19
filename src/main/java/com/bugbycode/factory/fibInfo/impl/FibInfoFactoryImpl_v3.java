@@ -284,9 +284,11 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			//处理价格 end
 		}
 		
-		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
-		ms = new MarketSentiment(fibSubList);
-		addPrices(this.fibInfo, ms, stopLossLimit);
+		if(openCode.lte(FibCode.FIB1)) {
+			List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+			ms = new MarketSentiment(fibSubList);
+			addPrices(this.fibInfo, ms, stopLossLimit);
+		}
 		
 		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
 		if(fibAfterKline != null) {
