@@ -2036,6 +2036,32 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势 </br></br>
+	 * 
+	 * 当前k线出现上引线且前一根k线为阳线
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v24(Klines current, Klines parent) {
+		return current.isUplead() && parent.isRise();
+	}
+
+	/**
+	 * 判断是否出现颓势 </br></br>
+	 * 
+	 * 当前k线为阴线且前一根k线为阳线
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v25(Klines current, Klines parent) {
+		return current.isFall() && parent.isRise();
+	}
+	
+	/**
 	 * MACD 连续衰竭
 	 * @param current 当前k线
 	 * @param parent 前一根k线
@@ -2269,6 +2295,32 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v23(Klines current, Klines parent) {
 		return current.isRise() && current.getBodyHighPriceDoubleValue() > parent.getHighPriceDoubleValue();
+	}
+	
+	/**
+	 * 判断是否出现强势 </br></br>
+	 * 
+	 * 当前k线出现下引线且前一根k线为阴线
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v24(Klines current, Klines parent) {
+		return current.isDownlead() && parent.isFall();
+	}
+
+	/**
+	 * 判断是否出现强势 </br></br>
+	 * 
+	 * 当前k线为阳线且前一根k线为阴线
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v25(Klines current, Klines parent) {
+		return current.isRise() && parent.isFall();
 	}
 	
 	/**

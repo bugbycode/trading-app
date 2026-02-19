@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -110,8 +111,8 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
 		
-		PriceUtil.calculateEMA_7_25_99(list);
-		PriceUtil.calculateEMA_7_25_99(list_trend);
+		//PriceUtil.calculateEMA_7_25_99(list);
+		//PriceUtil.calculateEMA_7_25_99(list_trend);
 		
 		//PriceUtil.calculateDeltaAndCvd(list);
 		//PriceUtil.calculateDeltaAndCvd(list_trend);
@@ -194,28 +195,74 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			return;
 		}
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
-		if(fibAfterKline != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterKline, this.list_15m));
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
-		}
-		
-		Klines last = PriceUtil.getLastKlines(list_15m);
-		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		FibCode[] codes = FibCode.values();
+		Klines fibEnd = end;
+		Klines last = PriceUtil.getLastKlines(list_15m);
+		double stopLossLimit = 0;
+		if(mode == QuotationMode.LONG) {
+			stopLossLimit = last.getLowPriceDoubleValue();
+		} else {
+			stopLossLimit = last.getHighPriceDoubleValue();
+		}
 		
-		for(FibCode code : codes) {
-			if(code == FibCode.FIB66) {
-				continue;
+		
+		Klines fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+		}
+
+		FibCode openCode = FibCode.FIB0;
+		MarketSentiment ms = new MarketSentiment(fibAfterKlines);
+		if(ms.isNotEmpty()) {
+			if(mode == QuotationMode.LONG) {
+				openCode = fibInfo.getFibCode(ms.getLowPrice());
+			} else {
+				openCode = fibInfo.getFibCode(ms.getHighPrice());
 			}
-			double stopLossLimit = mode == QuotationMode.LONG ? last.getLowPriceDoubleValue() : last.getHighPriceDoubleValue();
-			double codePrice = fibInfo.getFibValue(code);
-			if((mode == QuotationMode.LONG && stopLossLimit <= codePrice) 
-					|| (mode == QuotationMode.SHORT && stopLossLimit >= codePrice)) {
-				addPrices(new OpenPriceDetails(code, codePrice, stopLossLimit));
+		}
+		
+		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list);
+		
+		if(openCode.gte(FibCode.FIB236)) {
+			for(int index = list.size() - 1;index > 0; index--) {
+				Klines current = list.get(index);
+				Klines parent = list.get(index - 1);
+				if(current.lte(end)) {
+					break;
+				}
+				
+				if(mode == QuotationMode.LONG) {
+					if(PriceUtil.verifyPowerful_v24(current, parent)) {
+						addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLossLimit));
+					} else if(PriceUtil.verifyPowerful_v25(current, parent)) {
+						addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), stopLossLimit));
+					}
+				} else {
+					if(PriceUtil.verifyDecliningPrice_v24(current, parent)) {
+						addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLossLimit));
+					} else if(PriceUtil.verifyDecliningPrice_v25(current, parent)) {
+						addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), stopLossLimit));
+					}
+				}
+				if(!CollectionUtils.isEmpty(openPrices)) {
+					List<Klines> data = PriceUtil.subList(fibAfterKline, current, list);
+					ms = new MarketSentiment(data);
+					addPrices(mode, openCode, ms, stopLossLimit);
+					fibEnd = current;
+					break;
+				}
 			}
+		}
+		
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		ms = new MarketSentiment(fibSubList);
+		addPrices(this.fibInfo, ms, stopLossLimit);
+		
+		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -238,24 +285,45 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			openPrices.add(price);
+		}
+	}
+	
+	private void addPrices(QuotationMode mode, FibCode openCode, MarketSentiment ms, double stopLossLimit) {
+		if(mode == QuotationMode.LONG) {
+			addPrices(new OpenPriceDetails(openCode, ms.getMinBodyLowPrice(), stopLossLimit));
+			addPrices(new OpenPriceDetails(openCode, ms.getLowPrice(), stopLossLimit));
+		} else {
+			addPrices(new OpenPriceDetails(openCode, ms.getMaxBodyHighPrice(), stopLossLimit));
+			addPrices(new OpenPriceDetails(openCode, ms.getHighPrice(), stopLossLimit));
+		}
+	}
+	
+	private void addPrices(FibInfo fibInfo, MarketSentiment ms, double stopLossLimit) {
+		QuotationMode mode = fibInfo.getQuotationMode();
+		if(mode == QuotationMode.LONG) {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice(), stopLossLimit));
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice(), stopLossLimit));
+		} else {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice(), stopLossLimit));
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice(), stopLossLimit));
 		}
 	}
 	
