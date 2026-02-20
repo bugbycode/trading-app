@@ -1486,7 +1486,7 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 
 					//开仓订阅提醒
-					String subject = String.format("%s看涨期权买入机会%s(%s)[%s]做多机会 %s", 
+					String subject = String.format("%s看涨期权%s(%s)[%s]买入机会 %s", 
 							pair, 
 							code.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
@@ -1539,7 +1539,7 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					//开仓订阅提醒
-					String subject = String.format("%s看跌期权买入机会%s(%s)[%s]做多机会 %s", 
+					String subject = String.format("%s看跌期权%s(%s)[%s]买入机会 %s", 
 							pair, 
 							code.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
