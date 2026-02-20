@@ -1122,11 +1122,15 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
-		logger.debug("execute {} eoptionMonitor." , pair);
+		logger.info("execute {} eoptionMonitor." , pair);
 		
-		PriceActionFactory factory = new PriceActionFactoryImpl_v3(list_4h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v3(list_4h, list_4h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
+		
+		if(!(factory.isLong() || factory.isShort())) {
+			return;
+		}
 		
 		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
@@ -1137,6 +1141,7 @@ public class KlinesServiceImpl implements KlinesService {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			openShort_eOption(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
 		}
+		
 	}
 	
 	@Override
@@ -1447,12 +1452,17 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void openLong_eOption(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterLowKlines,
 			List<Klines> klinesList_hit) {
+		
 		if(fibInfo == null) {
 			return;
 		}
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
+		
+		//收盘价格
+		//double closePrice = hitKline.getClosePriceDoubleValue();
+		//double currentPrice = closePrice;
 		
 		for(int index = 0;index < openPrices.size(); index++) {
 		
@@ -1461,18 +1471,19 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					//&& !PriceUtil.isTradedPriceAction(price, fibInfo)
+					//&& !PriceUtil.isTraded(price, fibInfo)
+					//&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
 					) {
-			
+				
 				//
-				List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
 					
 					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
 					}
-					
+
 					//开仓订阅提醒
 					String subject = String.format("%s看涨期权买入机会 %s", pair, DateFormatUtil.format(new Date()));
 					
@@ -1488,12 +1499,16 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void openShort_eOption(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterHighKlines,
 			List<Klines> klinesList_hit) {
+		
 		if(fibInfo == null) {
 			return;
 		}
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
+		//收盘价格
+		//double closePrice = hitKline.getClosePriceDoubleValue();
+		//double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
 		for(int index = 0;index < openPrices.size(); index++) {
@@ -1503,11 +1518,12 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					//&& !PriceUtil.isTradedPriceAction(price, fibInfo)
+					//&& !PriceUtil.isTraded(price, fibInfo)
+					//&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
 					) {
 			
 				//
-				List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
+				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
 					
