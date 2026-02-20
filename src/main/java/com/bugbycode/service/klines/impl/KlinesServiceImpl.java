@@ -1476,7 +1476,7 @@ public class KlinesServiceImpl implements KlinesService {
 					) {
 				
 				//
-				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
+				List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
 					
@@ -1523,7 +1523,7 @@ public class KlinesServiceImpl implements KlinesService {
 					) {
 			
 				//
-				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
+				List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
 					
