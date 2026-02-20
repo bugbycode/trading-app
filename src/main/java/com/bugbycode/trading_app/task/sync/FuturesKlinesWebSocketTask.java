@@ -70,6 +70,7 @@ public class FuturesKlinesWebSocketTask {
 		
 		AppConfig.SYNC_15M_KLINES_RECORD.clear();
 		AppConfig.SYNC_15M_KLINES_FINISH.clear();
+		AppConfig.EOPTION_EXCHANGE_INFO.clear();
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
