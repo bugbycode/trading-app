@@ -63,14 +63,14 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(PositionSide.DEFAULT);
 		}
 	}
 	
 	@Override
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && end.getDea() > 0) {
 			result = true;
 		}
 		return result;
@@ -79,7 +79,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	@Override
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && end.getDea() < 0) {
 			result = true;
 		}
 		return result;
@@ -100,7 +100,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		return openPrices;
 	}
 	
-	private void init() {
+	private void init(PositionSide ps_mode) {
 		if(CollectionUtils.isEmpty(list) || list.size() < 99 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -120,10 +120,15 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		//PriceUtil.calculateDeltaAndCvd(list_trend);
 		//PriceUtil.calculateDeltaAndCvd(list_15m);
 		
-		this.openPrices.clear();
-		this.fibAfterKlines.clear();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
 		
-		PositionSide ps = getPositionSide();
+		PositionSide ps = PositionSide.DEFAULT;
+		if(ps_mode == PositionSide.DEFAULT) {
+			ps = getPositionSide();
+		} else {
+			ps = ps_mode;
+		}
 		
 		Klines third = null;
 		Klines second = null;
@@ -302,6 +307,17 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
 		
+		if(ps_mode != PositionSide.DEFAULT || ms.isEmpty()) {
+			return;
+		}
+		
+		if(openCode.gt(FibCode.FIB1_272)) {
+			if(mode == QuotationMode.LONG) {
+				this.init(PositionSide.SHORT);
+			} else {
+				this.init(PositionSide.LONG);
+			}
+		}
 	}
 	
 	private PositionSide getPositionSide() {
