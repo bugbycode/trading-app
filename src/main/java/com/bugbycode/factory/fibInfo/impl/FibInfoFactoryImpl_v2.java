@@ -68,7 +68,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 	@Override
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && end.getDea() > 0) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && end.getEma25() > end.getEma99()) {
 			result = true;
 		}
 		return result;
@@ -77,7 +77,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 	@Override
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && end.getDea() < 0) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && end.getEma25() < end.getEma99()) {
 			result = true;
 		}
 		return result;
@@ -111,8 +111,8 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
 		
-		//PriceUtil.calculateEMA_7_25_99(list);
-		//PriceUtil.calculateEMA_7_25_99(list_trend);
+		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateEMA_7_25_99(list_trend);
 		
 		//PriceUtil.calculateDeltaAndCvd(list);
 		//PriceUtil.calculateDeltaAndCvd(list_trend);
@@ -260,19 +260,19 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() < 0;
+		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() > 0;
+		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
