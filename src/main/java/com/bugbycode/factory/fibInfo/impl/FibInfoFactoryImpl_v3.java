@@ -23,7 +23,7 @@ import com.util.PriceComparator;
 import com.util.PriceUtil;
 
 /**
- * 斐波那契回指标撤接口实现类（短线交易）
+ * 斐波那契回指标撤接口实现类（期权交易）
  */
 public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 

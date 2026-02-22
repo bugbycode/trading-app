@@ -200,77 +200,18 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			return;
 		}
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, list_15m);
-		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
-		}
-		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
+
+		Klines last = PriceUtil.getLastKlines(list_15m);
+		double stopLoss = mode == QuotationMode.LONG ? last.getLowPriceDoubleValue() : last.getHighPriceDoubleValue();
 		
-		FibCode openCode = FibCode.FIB0;
-		double hitPrice = 0;
-		double bodyPrice = 0;
-		double necklinePrice = 0;
-		
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			if(current.gt(end)) {
+		FibCode[] codes = FibCode.values();
+		for(FibCode code : codes) {
+			if(code == FibCode.FIB66 || code == FibCode.FIB0) {
 				continue;
 			}
-			
-			if(mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v23(current, parent)) {
-				hitPrice = current.getLowPriceDoubleValue();
-				bodyPrice = current.getBodyLowPriceDoubleValue();
-				necklinePrice = parent.getHighPriceDoubleValue();
-			} else if(mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v23(current, parent)){
-				hitPrice = current.getHighPriceDoubleValue();
-				bodyPrice = current.getBodyHighPriceDoubleValue();
-				necklinePrice = parent.getLowPriceDoubleValue();
-			}
-			
-			FibCode hitCode = fibInfo.getFibCode(hitPrice);
-			
-			if(hitCode.lte(openCode) || hitCode.gt(FibCode.FIB1)) {
-				continue;
-			} 
-			
-			openCode = hitCode;
-			
-			double stopLossLimit = fibInfo.getFibValue(getParentFibCode(openCode));
-			
-			addPrices(new OpenPriceDetails(openCode, necklinePrice, hitPrice));//颈线
-			
-			addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossLimit));//最低/高价
-			addPrices(new OpenPriceDetails(openCode, bodyPrice, stopLossLimit));//实体最低/高价
-			
-			if(current.lte(start)) {
-				break;
-			}
+			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code), stopLoss));
 		}
-		
-		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
-		MarketSentiment ms = new MarketSentiment(fibSubList);
-		 
-		if(mode == QuotationMode.LONG) {
-			hitPrice = ms.getLowPrice();
-			bodyPrice = ms.getMinBodyLowPrice();
-		} else {
-			hitPrice = ms.getHighPrice();
-			bodyPrice = ms.getMaxBodyHighPrice();
-		}
-		
-		openCode = FibCode.FIB1;
-		double stopLossLimit = fibInfo.getFibValue(getParentFibCode(openCode));
-		
-		//1
-		addPrices(new OpenPriceDetails(openCode, bodyPrice, stopLossLimit));
-		addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossLimit));
-		
-		//1.272
-		openCode = FibCode.FIB1_272;
-		addPrices(new OpenPriceDetails(openCode, fibInfo.getFibValue(openCode), fibInfo.getFibValue(getParentFibCode(openCode))));
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
@@ -278,7 +219,13 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
 		
-		ms = new MarketSentiment(fibAfterKlines);
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
+		}
+		
+		MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 		
 		if(ps_mode != PositionSide.DEFAULT || ms.isEmpty()) {
 			return;
@@ -334,22 +281,6 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		}
 	}
 	
-	private FibCode getParentFibCode(FibCode code) {
-		FibCode parent = FibCode.FIB4_618;
-		FibCode[] codes = FibCode.values();
-		for(int index = codes.length - 1; index > 0; index--) {
-			FibCode current = codes[index];
-			if(code == current) {
-				parent = codes[index - 1];
-				if(current == FibCode.FIB618) {
-					parent = FibCode.FIB786;
-				}
-				break;
-			}
-		}
-		return parent;
-	}
-
 	public Klines getStart() {
 		return start;
 	}
