@@ -43,7 +43,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	
 	private List<OpenPrice> openPrices;
 	
-	private FibCode limitCode = FibCode.FIB0;
+	private FibCode limitCode = FibCode.FIB1_272;
 	
 	/**
 	 * 
