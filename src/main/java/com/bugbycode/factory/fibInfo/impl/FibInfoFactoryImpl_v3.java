@@ -43,6 +43,8 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 	
 	private List<OpenPrice> openPrices;
 	
+	private FibCode limitCode = FibCode.FIB0;
+	
 	/**
 	 * 
 	 * @param list 斐波那契回撤指标参考的K线信息
@@ -55,6 +57,32 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		this.list_trend = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
+		}
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+			this.init(PositionSide.DEFAULT);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param list 斐波那契回撤指标参考的K线信息
+	 * @param list_trend 行情走势参考的K线信息
+	 * @param list_15m 十五分钟级别k线信息
+	 * @param limitCode 
+	 */
+	public FibInfoFactoryImpl_v3(List<Klines> list, List<Klines> list_trend, List<Klines> list_15m, FibCode limitCode) {
+		this.list = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
+		this.limitCode = limitCode;
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
 		}
@@ -311,7 +339,7 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			return;
 		}
 		
-		if(openCode.gt(FibCode.FIB1_272)) {
+		if(limitCode.gt(FibCode.FIB0) && openCode.gt(limitCode)) {
 			if(mode == QuotationMode.LONG) {
 				this.init(PositionSide.SHORT);
 			} else {
