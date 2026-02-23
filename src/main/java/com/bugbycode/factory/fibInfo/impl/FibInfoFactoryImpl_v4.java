@@ -206,8 +206,8 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 			if(code == FibCode.FIB0 || code == FibCode.FIB66) {
 				continue;
 			}
-			if(((mode == QuotationMode.LONG && last.getEma25() < last.getEma99())
-					|| (mode == QuotationMode.SHORT && last.getEma25() > last.getEma99())) && code.lte(FibCode.FIB5)) {
+			if(((mode == QuotationMode.LONG && last.getDea() < 0)
+					|| (mode == QuotationMode.SHORT && last.getDea() > 0)) && code.lte(FibCode.FIB5)) {
 				continue;
 			}
 			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code), stopLoss));
@@ -246,11 +246,11 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > k.getEma99() && k.getEma99() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() < k.getEma99() && k.getEma99() > 0 && k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
