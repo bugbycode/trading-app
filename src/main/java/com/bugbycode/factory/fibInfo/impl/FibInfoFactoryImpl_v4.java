@@ -207,7 +207,7 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 				continue;
 			}
 			if(((mode == QuotationMode.LONG && last.getDea() < 0)
-					|| (mode == QuotationMode.SHORT && last.getDea() > 0)) && code.lte(FibCode.FIB5)) {
+					|| (mode == QuotationMode.SHORT && last.getDea() > 0)) && code.lte(FibCode.FIB382)) {
 				continue;
 			}
 			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code), stopLoss));
