@@ -632,6 +632,75 @@ public class FibInfo {
 	}
 	
 	/**
+	 * 根据价格寻找所处的回撤点位 v2
+	 * @param price
+	 * @return
+	 */
+	public FibCode getFibCode_v2(double price) {
+		FibCode code = FibCode.FIB0;
+		QuotationMode mode = this.getQuotationMode();
+		if(mode == QuotationMode.LONG) {
+			if(price <= this.getFibValue(FibCode.FIB4_618)) {// 4.618
+				code = FibCode.FIB4_618;
+			} else if(price > this.getFibValue(FibCode.FIB4_618) && price <= this.getFibValue(FibCode.FIB3_618)) {// 4.618 ~ 3.618
+				code = FibCode.FIB3_618;
+			} else if(price > this.getFibValue(FibCode.FIB3_618) && price <= this.getFibValue(FibCode.FIB2_618)) {// 3.618 ~ 2.618
+				code = FibCode.FIB2_618;
+			} else if(price > this.getFibValue(FibCode.FIB2_618) && price <= this.getFibValue(FibCode.FIB2)) {// 2.618 ~ 2
+				code = FibCode.FIB2;
+			} else if(price > this.getFibValue(FibCode.FIB2) && price <= this.getFibValue(FibCode.FIB1_618)) {// 2 ~ 1.618
+				code = FibCode.FIB1_618;
+			} else if(price > this.getFibValue(FibCode.FIB1_618) && price <= this.getFibValue(FibCode.FIB1_272)) {// 1.618 ~ 1.272
+				code = FibCode.FIB1_272;
+			} else if(price > this.getFibValue(FibCode.FIB1_272) && price <= this.getFibValue(FibCode.FIB1)) {// 1.272 ~ 1
+				code = FibCode.FIB1;
+			} else if(price > this.getFibValue(FibCode.FIB1) && price <= this.getFibValue(FibCode.FIB786)) {// 1 ~ 0.786
+				code = FibCode.FIB786;
+			} else if(price > this.getFibValue(FibCode.FIB786) && price <= this.getFibValue(FibCode.FIB618)) {// 0.786 ~ 0.618
+				code = FibCode.FIB618;
+			} else if(price > this.getFibValue(FibCode.FIB618) && price <= this.getFibValue(FibCode.FIB5)) {// 0.618 ~ 0.5
+				code = FibCode.FIB5;
+			} else if(price > this.getFibValue(FibCode.FIB5) && price <= this.getFibValue(FibCode.FIB382)) {// 0.5 ~ 0.382
+				code = FibCode.FIB382;
+			} else if(price > this.getFibValue(FibCode.FIB382) && price <= this.getFibValue(FibCode.FIB236)) {// 0.382 ~ 0.236
+				code = FibCode.FIB236;
+			} else if(price > this.getFibValue(FibCode.FIB236) && price < this.getFibValue(FibCode.FIB0)) {// 0.236 ~ 0
+				code = FibCode.FIB236;
+			}
+		} else {
+			if(price >= this.getFibValue(FibCode.FIB4_618)) {// 4.618
+				code = FibCode.FIB4_618;
+			} else if(price < this.getFibValue(FibCode.FIB4_618) && price >= this.getFibValue(FibCode.FIB3_618)) {// 4.618 ~ 3.618
+				code = FibCode.FIB3_618;
+			} else if(price < this.getFibValue(FibCode.FIB3_618) && price >= this.getFibValue(FibCode.FIB2_618)) {// 3.618 ~ 2.618
+				code = FibCode.FIB2_618;
+			} else if(price < this.getFibValue(FibCode.FIB2_618) && price >= this.getFibValue(FibCode.FIB2)) {// 2.618 ~ 2
+				code = FibCode.FIB2;
+			} else if(price < this.getFibValue(FibCode.FIB2) && price >= this.getFibValue(FibCode.FIB1_618)) {// 2 ~ 1.618
+				code = FibCode.FIB1_618;
+			} else if(price < this.getFibValue(FibCode.FIB1_618) && price >= this.getFibValue(FibCode.FIB1_272)) {// 1.618 ~ 1.272
+				code = FibCode.FIB1_272;
+			} else if(price < this.getFibValue(FibCode.FIB1_272) && price >= this.getFibValue(FibCode.FIB1)) {// 1.272 ~ 1
+				code = FibCode.FIB1;
+			} else if(price < this.getFibValue(FibCode.FIB1) && price >= this.getFibValue(FibCode.FIB786)) {// 1 ~ 0.786
+				code = FibCode.FIB786;
+			} else if(price < this.getFibValue(FibCode.FIB786) && price >= this.getFibValue(FibCode.FIB618)) {// 0.786 ~ 0.618
+				code = FibCode.FIB618;
+			} else if(price < this.getFibValue(FibCode.FIB618) && price >= this.getFibValue(FibCode.FIB5)) {// 0.618 ~ 0.5
+				code = FibCode.FIB5;
+			} else if(price < this.getFibValue(FibCode.FIB5) && price >= this.getFibValue(FibCode.FIB382)) {// 0.5 ~ 0.382
+				code = FibCode.FIB382;
+			} else if(price < this.getFibValue(FibCode.FIB382) && price >= this.getFibValue(FibCode.FIB236)) {// 0.382 ~ 0.236
+				code = FibCode.FIB236;
+			} else if(price < this.getFibValue(FibCode.FIB236) && price > this.getFibValue(FibCode.FIB0)) {// 0.236 ~ 0
+				code = FibCode.FIB236;
+			}
+		}
+		
+		return code;
+	}
+	
+	/**
 	 * 获取开仓点位
 	 * @param hitCode
 	 * @return
