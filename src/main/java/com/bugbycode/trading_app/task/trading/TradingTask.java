@@ -3,8 +3,11 @@ package com.bugbycode.trading_app.task.trading;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.binance.AutoTradeType;
+import com.bugbycode.module.binance.ContractType;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.service.klines.KlinesService;
@@ -62,6 +65,12 @@ public class TradingTask implements Runnable {
 	@Override
 	public void run() {
 		try {
+			
+			SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+			if(info != null && info.getContractType() == ContractType.TRADIFI_PERPETUAL) {//不交易传统金融交易对
+				return;
+			}
+			
 			klinesService.marketPlace(pair, ps, stopLossDoubleValue, takeProfitDoubleValue, openPrice, fibInfo, autoTradeType, decimalNum);
 		} catch (Exception e) {
 			logger.error("执行自动交易任务时出现异常", e);
