@@ -26,7 +26,6 @@ import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v3;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
@@ -1110,7 +1109,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void eoptionMonitor(List<Klines> list_4h, List<Klines> list_15m) {
+	public void eoptionMonitor(List<Klines> list, List<Klines> list_15m) {
 		
 		if(CollectionUtils.isEmpty(list_15m)) {
 			return;
@@ -1125,13 +1124,9 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v3(list_4h, list_4h, list_15m);
+		PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
-		
-		if(!(factory.isLong() || factory.isShort())) {
-			return;
-		}
 		
 		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 		
@@ -1461,22 +1456,19 @@ public class KlinesServiceImpl implements KlinesService {
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
 		
-		//收盘价格
-		//double closePrice = hitKline.getClosePriceDoubleValue();
-		//double currentPrice = closePrice;
-		
 		for(int index = 0;index < openPrices.size(); index++) {
 		
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
-			FibCode code = openPrice.getCode();
 			
-			if(PriceUtil.isBreachLong(hitKline, price)
+			FibCode code = openPrice.getCode();//当前斐波那契点位
+			
+			if(//PriceUtil.isLong_v3(price, klinesList_hit)
+					PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					//&& !PriceUtil.isTraded(price, fibInfo)
-					//&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
+					//&& !PriceUtil.isTradedPriceAction(price, fibInfo)
 					) {
-				
+			
 				//
 				List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
 				
@@ -1513,23 +1505,23 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
-		//收盘价格
-		//double closePrice = hitKline.getClosePriceDoubleValue();
-		//double currentPrice = closePrice;
 		String pair = hitKline.getPair();
+		
+		//FibCode[] codes = FibCode.values();
 		
 		for(int index = 0;index < openPrices.size(); index++) {
 			
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
-			FibCode code = openPrice.getCode();
 			
-			if(PriceUtil.isBreachShort(hitKline, price)
+			FibCode code = openPrice.getCode();//当前斐波那契点位
+			
+			if(//PriceUtil.isShort_v3(price, klinesList_hit)
+					PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					//&& !PriceUtil.isTraded(price, fibInfo)
-					//&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
+					//&& !PriceUtil.isTradedPriceAction(price, fibInfo)
 					) {
-			
+				
 				//
 				List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
 				

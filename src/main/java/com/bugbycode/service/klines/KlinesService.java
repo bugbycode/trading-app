@@ -129,10 +129,10 @@ public interface KlinesService {
 	
 	/**
 	 * 期权交易机会监控
-	 * @param list_4h
+	 * @param list
 	 * @param list_15m
 	 */
-	public void eoptionMonitor(List<Klines> list_4h, List<Klines> list_15m);
+	public void eoptionMonitor(List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 看涨期权买入机会
