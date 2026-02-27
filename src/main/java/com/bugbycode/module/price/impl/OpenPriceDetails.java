@@ -89,13 +89,13 @@ public class OpenPriceDetails implements OpenPrice {
 
 	@Override
 	public double getAreaTakeProfit(double price, OpenPrice openPrice, double profit, double profitLimit, QuotationMode mode) {
-		double pricePercent = PriceUtil.getPercent(price, openPrice.getFirstTakeProfit(), mode);
-		double nextPricePercent = PriceUtil.getPercent(price, openPrice.getSecondTakeProfit(), mode);
+		double pricePercent = PriceUtil.getPercent(price, openPrice.getSecondTakeProfit(), mode);
+		double nextPricePercent = PriceUtil.getPercent(price, openPrice.getFirstTakeProfit(), mode);
 		
-		double takeProfit = openPrice.getFirstTakeProfit();
+		double takeProfit = openPrice.getSecondTakeProfit();
 		
 		if(PriceUtil.checkPercent(pricePercent, nextPricePercent, profit, profitLimit)) {
-			takeProfit = openPrice.getSecondTakeProfit();
+			takeProfit = openPrice.getFirstTakeProfit();
 		}
 		return takeProfit;
 	}
