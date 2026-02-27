@@ -1461,12 +1461,8 @@ public class KlinesServiceImpl implements KlinesService {
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
 			
-			FibCode code = openPrice.getCode();//当前斐波那契点位
-			
-			if(//PriceUtil.isLong_v3(price, klinesList_hit)
-					PriceUtil.isBreachLong(hitKline, price)
+			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					//&& !PriceUtil.isTradedPriceAction(price, fibInfo)
 					) {
 			
 				//
@@ -1479,11 +1475,9 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 
 					//开仓订阅提醒
-					String subject = String.format("%s看涨期权%s(%s)[%s]买入机会 %s", 
+					String subject = String.format("%s看涨期权(%s)买入机会 %s", 
 							pair, 
-							code.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
-							fibInfo.getLevel().getLabel(),
 							DateFormatUtil.format(new Date()));
 					
 					String text = fibInfo.toString();
@@ -1507,19 +1501,13 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		String pair = hitKline.getPair();
 		
-		//FibCode[] codes = FibCode.values();
-		
 		for(int index = 0;index < openPrices.size(); index++) {
 			
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
 			
-			FibCode code = openPrice.getCode();//当前斐波那契点位
-			
-			if(//PriceUtil.isShort_v3(price, klinesList_hit)
-					PriceUtil.isBreachShort(hitKline, price)
+			if(PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					//&& !PriceUtil.isTradedPriceAction(price, fibInfo)
 					) {
 				
 				//
@@ -1532,11 +1520,9 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					//开仓订阅提醒
-					String subject = String.format("%s看跌期权%s(%s)[%s]买入机会 %s", 
+					String subject = String.format("%s看跌期权(%s)买入机会 %s", 
 							pair, 
-							code.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
-							fibInfo.getLevel().getLabel(),
 							DateFormatUtil.format(new Date()));
 					
 					String text = fibInfo.toString();
