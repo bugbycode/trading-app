@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,8 +12,6 @@ import org.springframework.util.CollectionUtils;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
-import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl_v2;
-import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl_v3;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
@@ -43,7 +40,7 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "BCHUSDT";
+        String pair = "ETHUSDT";
         
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         
@@ -53,7 +50,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl_v3(list, list_15m);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
         
         logger.info("init factory finish.");
         

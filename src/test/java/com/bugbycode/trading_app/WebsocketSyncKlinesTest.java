@@ -68,9 +68,9 @@ public class WebsocketSyncKlinesTest {
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
-		Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
+		List<SymbolExchangeInfo> pairs = binanceExchangeService.eOptionsExchangeInfoSymbol();
 		
-		CoinPairSet set = new CoinPairSet(inerval, ContractType.PERPETUAL);
+		CoinPairSet set = new CoinPairSet(inerval, ContractType.E_OPTIONS);
 		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
 		for(SymbolExchangeInfo coin : pairs) {
 			
@@ -79,16 +79,17 @@ public class WebsocketSyncKlinesTest {
 			set.add(coin);
 			if(set.isFull()) {
 				coinList.add(set);
-				set = new CoinPairSet(inerval, ContractType.PERPETUAL);
+				set = new CoinPairSet(inerval, ContractType.E_OPTIONS);
+				break;
 			}
 		}
-		
+		/*
 		if(!set.isEmpty()) {
 			coinList.add(set);
-		}
+		}*/
 		
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool, ContractType.PERPETUAL);
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool, ContractType.E_OPTIONS);
 		}
 		
 		Thread.sleep(60 * 60 * 1000);

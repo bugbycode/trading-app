@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
@@ -22,7 +23,6 @@ import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.FibCode;
@@ -65,8 +65,8 @@ public class KlinesServiceTest {
 		AppConfig.DEBUG = true;
 		System.setProperty("https.proxyHost", "localhost");
 		System.setProperty("https.proxyPort", "50000");
-		binanceExchangeService.exchangeInfo();
-		binanceExchangeService.eOptionsExchangeInfoSymbol();
+		//binanceExchangeService.exchangeInfo();
+		//binanceExchangeService.eOptionsExchangeInfoSymbol();
 	}
 
     @Test
@@ -169,13 +169,30 @@ public class KlinesServiceTest {
             logger.info(k);
         }
     }
+    
+    @Test
+    public void testFibInfoTrade(){
+    	String pair = "SUPERUSDT";
+        //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+    	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
+        klinesService.consolidationAreaMonitor(list_1d, list, list_15m);  
+        try {
+			Thread.sleep(5 * 60 * 1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 
     @Test
     public void testFibInfo(){
-        String pair = "WLDUSDT";
+        String pair = "C98USDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
-        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
         Klines last_15m = PriceUtil.getLastKlines(list_15m);
@@ -184,7 +201,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_4h, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -238,15 +255,37 @@ public class KlinesServiceTest {
         //logger.info(fibInfo.getTakeProfit_v2(FibCode.FIB2));
     }
     
+    
+    @Test
+    public void testOpenEoption(){
+    	
+    	List<EoptionContracts> ecList = binanceExchangeService.eOptionsExchangeInfo();
+		for(EoptionContracts ec : ecList) {
+			AppConfig.EOPTION_EXCHANGE_INFO.put(ec.getUnderlying(), ec);
+		}
+    	
+        String pair = "HUMAUSDT";
+        //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
+        klinesService.eoptionMonitor(list, list_15m);
+    }
+    
+    
     @Test
     public void testAreaFibInfo(){
-    	String pair = "NEOUSDT";
-        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
+    	String pair = "JSTUSDT";
+    	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
-        AreaFactory factory = new AreaFactoryImpl_v3(list_1h, list_15m);
+        AreaFactory factory = new AreaFactoryImpl(list_1d, list, list_15m);
+        
         if(!(factory.isLong() || factory.isShort())) {
         	return;
         }
+        
+        QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
         
         List<Klines> fibAfKlines = factory.getFibAfterKlines();
 
@@ -259,7 +298,7 @@ public class KlinesServiceTest {
         List<OpenPrice> openPrices = factory.getOpenPrices();
         
         for(OpenPrice price : openPrices) {
-        	logger.info("{} -> {} ~ {}, istread: {}", price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), PriceUtil.isTraded(price, factory));
+        	logger.info("{}: {} -> {} ~ {}, istread: {}", mode, price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), PriceUtil.isTraded(price, factory));
         }
     }
 
