@@ -268,7 +268,9 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			double parentLowPrice = parent.getLowPriceDoubleValue();
 			
 			if(mode == QuotationMode.LONG) {
-				//openCode = fibInfo.getFibCode_v2(lowPrice);
+				if(openCode == FibCode.FIB0) {
+					openCode = fibInfo.getFibCode_v2(lowPrice);
+				}
 				if(current.isRise()) {
 					addPrices(new OpenPriceDetails(openCode, bodyHighPrice, stopLoss));
 				}
@@ -278,7 +280,9 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 					addPrices(new OpenPriceDetails(openCode, parentHighPrice, stopLoss));
 				}
 			} else {
-				//openCode = fibInfo.getFibCode_v2(highPrice);
+				if(openCode == FibCode.FIB0) {
+					openCode = fibInfo.getFibCode_v2(highPrice);
+				}
 				if(current.isFall()) {
 					addPrices(new OpenPriceDetails(openCode, bodyLowPrice, stopLoss));
 				}
