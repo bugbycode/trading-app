@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.PriceActionInfo_v2;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
@@ -210,12 +211,16 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			Klines parent = list.get(index - 1);
 			Klines next = list.get(index - 2);
 			
+			if(current.lt(end) && !CollectionUtils.isEmpty(priceInfoList)) {
+				break;
+			}
+			
 			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v10(current, parent, next))
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v10(current, parent, next))) {
 				priceInfoList.add(new PriceActionInfo_v2(current, parent, null));
 			}
 			
-			if(current.lte(start) || (current.lt(end) && !CollectionUtils.isEmpty(priceInfoList))) {
+			if(current.lte(start)) {
 				break;
 			}
 		}
@@ -264,6 +269,23 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 				addPrices(new OpenPriceDetails(openCode, highPrice, stopLoss));
 				if(bodyLowPrice < parentLowPrice) {
 					addPrices(new OpenPriceDetails(openCode, parentLowPrice, stopLoss));
+				}
+			}
+			
+			Klines endAfter = PriceUtil.getAfterKlines(end, list);
+			if(endAfter != null && current.gte(endAfter)) {
+				List<Klines> endAfterKlines = PriceUtil.subList(endAfter, current, list);
+				MarketSentiment ms = new MarketSentiment(endAfterKlines);
+				if(ms.isNotEmpty()) {
+					if(mode == QuotationMode.LONG) {
+						openCode = fibInfo.getFibCode(ms.getLowPrice());
+						addPrices(new OpenPriceDetails(openCode, ms.getMinBodyLowPrice(), stopLoss));
+						addPrices(new OpenPriceDetails(openCode, ms.getLowPrice(), stopLoss));
+					} else {
+						openCode = fibInfo.getFibCode(ms.getHighPrice());
+						addPrices(new OpenPriceDetails(openCode, ms.getMaxBodyHighPrice(), stopLoss));
+						addPrices(new OpenPriceDetails(openCode, ms.getHighPrice(), stopLoss));
+					}
 				}
 			}
 		}
