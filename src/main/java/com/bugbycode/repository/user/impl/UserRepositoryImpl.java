@@ -191,6 +191,15 @@ public class UserRepositoryImpl implements UserRepository {
 				
 				User.class);
 	}
+	
+	@Override
+	public List<User> queryByAutoTrade(AutoTrade autoTrade) {
+		return template.find(
+				
+				Query.query(Criteria.where("autoTrade").is(autoTrade.value())), 
+				
+				User.class);
+	}
 
 	@Override
 	public List<User> queryByDrawTrade(DrawTrade drawTrade) {

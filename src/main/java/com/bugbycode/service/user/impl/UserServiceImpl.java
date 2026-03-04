@@ -108,6 +108,11 @@ public class UserServiceImpl implements UserService{
 	public List<User> queryByAutoTrade(AutoTrade autoTrade,AutoTradeType autoTradeType) {
 		return userRepository.queryByAutoTrade(autoTrade,autoTradeType);
 	}
+	
+	@Override
+	public List<User> queryByAutoTrade(AutoTrade autoTrade) {
+		return userRepository.queryByAutoTrade(autoTrade);
+	}
 
 	@Override
 	public List<User> queryByDrawTrade(DrawTrade drawTrade) {
