@@ -243,35 +243,6 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 				fibEnd = current;
 			}
 			
-			double lowPrice = current.getLowPriceDoubleValue();
-			double highPrice = current.getHighPriceDoubleValue();
-			double bodyLowPrice = current.getBodyLowPriceDoubleValue();
-			double bodyHighPrice = current.getBodyHighPriceDoubleValue();
-			double parentHighPrice = parent.getHighPriceDoubleValue();
-			double parentLowPrice = parent.getLowPriceDoubleValue();
-			
-			if(mode == QuotationMode.LONG) {
-				openCode = fibInfo.getFibCode_v2(lowPrice);
-				if(current.isRise()) {
-					addPrices(new OpenPriceDetails(openCode, bodyHighPrice, stopLoss));
-				}
-				addPrices(new OpenPriceDetails(openCode, bodyLowPrice, stopLoss));
-				addPrices(new OpenPriceDetails(openCode, lowPrice, stopLoss));
-				if(bodyHighPrice > parentHighPrice) {
-					addPrices(new OpenPriceDetails(openCode, parentHighPrice, stopLoss));
-				}
-			} else {
-				openCode = fibInfo.getFibCode_v2(highPrice);
-				if(current.isFall()) {
-					addPrices(new OpenPriceDetails(openCode, bodyLowPrice, stopLoss));
-				}
-				addPrices(new OpenPriceDetails(openCode, bodyHighPrice, stopLoss));
-				addPrices(new OpenPriceDetails(openCode, highPrice, stopLoss));
-				if(bodyLowPrice < parentLowPrice) {
-					addPrices(new OpenPriceDetails(openCode, parentLowPrice, stopLoss));
-				}
-			}
-			
 			Klines endAfter = PriceUtil.getAfterKlines(end, list);
 			if(endAfter != null && current.gte(endAfter)) {
 				List<Klines> endAfterKlines = PriceUtil.subList(endAfter, current, list);
@@ -288,6 +259,36 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 					}
 				}
 			}
+			
+			double lowPrice = current.getLowPriceDoubleValue();
+			double highPrice = current.getHighPriceDoubleValue();
+			double bodyLowPrice = current.getBodyLowPriceDoubleValue();
+			double bodyHighPrice = current.getBodyHighPriceDoubleValue();
+			double parentHighPrice = parent.getHighPriceDoubleValue();
+			double parentLowPrice = parent.getLowPriceDoubleValue();
+			
+			if(mode == QuotationMode.LONG) {
+				//openCode = fibInfo.getFibCode_v2(lowPrice);
+				if(current.isRise()) {
+					addPrices(new OpenPriceDetails(openCode, bodyHighPrice, stopLoss));
+				}
+				addPrices(new OpenPriceDetails(openCode, bodyLowPrice, stopLoss));
+				addPrices(new OpenPriceDetails(openCode, lowPrice, stopLoss));
+				if(bodyHighPrice > parentHighPrice) {
+					addPrices(new OpenPriceDetails(openCode, parentHighPrice, stopLoss));
+				}
+			} else {
+				//openCode = fibInfo.getFibCode_v2(highPrice);
+				if(current.isFall()) {
+					addPrices(new OpenPriceDetails(openCode, bodyLowPrice, stopLoss));
+				}
+				addPrices(new OpenPriceDetails(openCode, bodyHighPrice, stopLoss));
+				addPrices(new OpenPriceDetails(openCode, highPrice, stopLoss));
+				if(bodyLowPrice < parentLowPrice) {
+					addPrices(new OpenPriceDetails(openCode, parentLowPrice, stopLoss));
+				}
+			}
+			
 		}
 		
 		if(mode == QuotationMode.LONG) {
