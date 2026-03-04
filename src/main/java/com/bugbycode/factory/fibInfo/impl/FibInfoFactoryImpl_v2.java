@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -194,20 +195,37 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			return;
 		}
 		
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+		}
+		
 		Klines fibEnd = end;
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		FibCode openCode = FibCode.FIB0;
 		
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			if(current.lte(end)) {
-				break;
+		if(!CollectionUtils.isEmpty(this.fibAfterKlines)) {
+			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
+			if(mode == QuotationMode.LONG) {
+				openCode = fibInfo.getFibCode(ms.getLowPrice());
+			} else {
+				openCode = fibInfo.getFibCode(ms.getHighPrice());
 			}
-			openCode = getBreachCode(current);
-			if(openCode.gte(FibCode.FIB236)) {
-				fibEnd = current;
-				break;
+		}
+		
+		if(openCode.gte(FibCode.FIB236)) {
+			double fibValue = fibInfo.getFibValue(openCode);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				if(current.lte(end)) {
+					break;
+				}
+				if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
+						|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
+					fibEnd = current;
+					break;
+				}
 			}
 		}
 		
@@ -236,7 +254,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
 			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
@@ -275,22 +293,6 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			openPrices.add(price);
 		}
-	}
-	
-	private FibCode getBreachCode(Klines current) {
-		FibCode openCode = FibCode.FIB0;
-		QuotationMode mode = fibInfo.getQuotationMode();
-		FibCode[] codes = FibCode.values();
-		
-		for(FibCode code : codes) {
-			double fibValue = fibInfo.getFibValue(code);
-			if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
-				openCode = code;
-				break;
-			}
-		}
-		return openCode;
 	}
 	
 	public Klines getStart() {
