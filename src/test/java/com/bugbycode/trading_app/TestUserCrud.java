@@ -46,6 +46,12 @@ public class TestUserCrud {
         List<User> userList = userRepository.queryByAutoTrade(AutoTrade.OPEN, AutoTradeType.FIB_RET);
         logger.info(new org.json.JSONArray(userList));
     }
+    
+    @Test
+    public void testQueryByAutoTrade() {
+    	List<User> userList = userRepository.queryByAutoTrade(AutoTrade.CLOSE);
+        logger.info(new org.json.JSONArray(userList));
+    }
 
     @Test
     public void testQuery() {

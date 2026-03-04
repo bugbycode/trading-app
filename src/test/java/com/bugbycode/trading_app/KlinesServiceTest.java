@@ -23,6 +23,8 @@ import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v3;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.FibCode;
@@ -189,9 +191,9 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "C98USDT";
+        String pair = "FILUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
@@ -201,7 +203,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_4h, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl_v3(list, list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
