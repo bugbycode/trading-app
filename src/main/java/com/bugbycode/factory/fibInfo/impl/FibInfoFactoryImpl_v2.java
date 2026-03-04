@@ -232,7 +232,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		double stopLoss = mode == QuotationMode.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
 		
-		if(openCode.gte(FibCode.FIB236)) {
+		if(openCode.gte(FibCode.FIB236) && fibEnd.gt(end)) {
 			double bodyHighPrice = fibEnd.getBodyHighPriceDoubleValue();
 			double bodyLowPrice = fibEnd.getBodyLowPriceDoubleValue();
 			double fibValue = fibInfo.getFibValue(openCode);
