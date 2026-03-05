@@ -195,59 +195,53 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			return;
 		}
 		
-		Klines fibEnd = end;
-		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
-		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list);
-		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list);
-		}
-		
-		if(CollectionUtils.isEmpty(this.fibAfterKlines)) {
-			return;
-		}
-		
-		MarketSentiment ms = new MarketSentiment(fibAfterKlines);
-		
-		FibCode openCode = FibCode.FIB0;
-		
-		if(mode == QuotationMode.LONG) {
-			openCode = fibInfo.getFibCode(ms.getLowPrice());
-		} else {
-			openCode = fibInfo.getFibCode(ms.getHighPrice());
-		}
-		
-		List<Klines> hitKlines = new ArrayList<Klines>();
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			if(current.lte(end)) {
-				break;
-			}
-			if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibInfo.getFibValue(openCode)))
-					|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibInfo.getFibValue(openCode)))) {
-				hitKlines.add(current);
-			}
-		}
-		
-		ms = new MarketSentiment(hitKlines);
 		
 		Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		double stopLoss = mode == QuotationMode.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
 		
-		if(ms.isNotEmpty()) {
-			if(mode == QuotationMode.LONG) {
-				fibEnd = ms.getMinBodyLow();
-				if(fibEnd.isRise()) {
-					addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLoss));
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
+		}
+		
+		FibCode openCode = FibCode.FIB0;
+		
+		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
+			if(ms.isNotEmpty()) {
+				if(mode == QuotationMode.LONG) {
+					openCode = fibInfo.getFibCode(ms.getLowPrice());
+				} else {
+					openCode = fibInfo.getFibCode(ms.getHighPrice());
 				}
-				addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyLowPriceDoubleValue(), stopLoss));
-			} else {
-				fibEnd = ms.getMaxBodyHigh();
-				if(fibEnd.isFall()) {
-					addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLoss));
+			}
+		}
+		
+		double fibValue = fibInfo.getFibValue(openCode);
+		
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
+			if(current.lte(end)) {
+				break;
+			}
+			if(mode == QuotationMode.LONG && !PriceUtil.isBreachLong(next, fibValue) 
+					&& PriceUtil.isBreachLong(parent, fibValue) && current.getClosePriceDoubleValue() >= fibValue) {
+				if(current.isRise()) {
+					addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), stopLoss));
 				}
-				addPrices(new OpenPriceDetails(openCode, fibEnd.getBodyHighPriceDoubleValue(), stopLoss));
+				addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
+				break;
+			} else if(mode == QuotationMode.SHORT && !PriceUtil.isBreachShort(next, fibValue) 
+					&& PriceUtil.isBreachShort(parent, fibValue) && current.getClosePriceDoubleValue() <= fibValue) {
+				if(current.isFall()) {
+					addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), stopLoss));
+				}
+				addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
+				break;
 			}
 		}
 		
@@ -255,12 +249,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
-		}
-		
-		fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
-		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
 		}
 		
 	}
