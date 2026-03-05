@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -196,17 +197,55 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		FibCode openCode = FibCode.FIB236;
-		
 		Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		double stopLoss = mode == QuotationMode.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
 		
-		addPrices(new OpenPriceDetails(openCode, fibInfo.getFibValue(openCode), stopLoss));
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			
+			double price = 0;
+			if(mode == QuotationMode.LONG && 
+					current.getBodyHighPriceDoubleValue() >= parent.getHighPriceDoubleValue()) {
+				price = parent.getHighPriceDoubleValue();
+			} else if(mode == QuotationMode.SHORT && 
+					current.getBodyLowPriceDoubleValue() <= parent.getLowPriceDoubleValue()) {
+				price = parent.getLowPriceDoubleValue();
+			}
+			
+			if(price > 0) {
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(price), price, stopLoss));
+			}
+			
+			if(current.lte(start)) {
+				break;
+			}
+		}
+		
+		List<Klines> fibSubList = PriceUtil.subList(start, end, list);
+		MarketSentiment ms = new MarketSentiment(fibSubList);
+		
+		double bodyHighPrice = ms.getMaxBodyHighPrice();
+		double bodyLowPrice = ms.getMinBodyLowPrice();
+		
+		if(mode == QuotationMode.LONG) {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(bodyLowPrice), bodyLowPrice, stopLoss));
+		} else {
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(bodyHighPrice), bodyHighPrice, stopLoss));
+		}
+		
+		addPrices(new OpenPriceDetails(FibCode.FIB1, fibInfo.getFibValue(FibCode.FIB1), stopLoss));
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
+		}
+		
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
 		}
 		
 	}
