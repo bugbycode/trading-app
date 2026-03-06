@@ -26,7 +26,7 @@ import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v3;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -43,7 +43,6 @@ import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
@@ -290,7 +289,7 @@ public class KlinesServiceImpl implements KlinesService {
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
-					
+					/*
 					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
 						continue;
 					}
@@ -300,7 +299,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 						continue;
-					}
+					}*/
 					
 					//根据交易风格设置盈利限制
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
@@ -385,7 +384,7 @@ public class KlinesServiceImpl implements KlinesService {
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
 						continue;
 					}
-					
+					/*
 					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
 						continue;
 					}
@@ -395,7 +394,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 						continue;
-					}
+					}*/
 					
 					//根据交易风格设置盈利限制
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
@@ -460,7 +459,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(autoTradeType == AutoTradeType.DEFAULT) {
 			userList = userDetailsService.queryByDrawTrade(DrawTrade.OPEN);
 		} else {
-			userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
+			userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN);
 		}
 		
 		for(User u : userList) {
@@ -526,10 +525,10 @@ public class KlinesServiceImpl implements KlinesService {
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							
 							FibCode code = openPrice.getCode();
-							
+							/*
 							if(code.lt(u.getFibLevelType().getLevelCode())) {
 								continue;
-							}
+							}*/
 							
 							takeProfitCode = fibInfo.getTakeProfit_v2(code);
 							
@@ -539,12 +538,12 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 							
 							logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
-							
+							/*
 							//回踩单判断
 							TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 							if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 								continue;
-							}
+							}*/
 							
 							//追踪委托价
 							activationPriceValue = new BigDecimal(
@@ -802,10 +801,10 @@ public class KlinesServiceImpl implements KlinesService {
 						if(autoTradeType == AutoTradeType.FIB_RET) {
 							
 							FibCode code = openPrice.getCode();
-							
+							/*
 							if(code.lt(u.getFibLevelType().getLevelCode())) {
 								continue;
-							}
+							}*/
 
 							takeProfitCode = fibInfo.getTakeProfit_v2(code);
 							
@@ -815,12 +814,12 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 							
 							logger.debug("当前交易风格：{},所处点位：{}，止盈点位：{}", tradeStyle.getMemo(), code.getDescription(), takeProfitCode.getDescription());
-							
+							/*
 							//回踩单判断
 							TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
 							if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 								continue;
-							}
+							}*/
 							
 							//追踪委托价
 							activationPriceValue = new BigDecimal(
@@ -1071,7 +1070,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v3(list_1h, list_4h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_1h, list_4h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
