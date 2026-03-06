@@ -460,7 +460,7 @@ public class KlinesServiceImpl implements KlinesService {
 		if(autoTradeType == AutoTradeType.DEFAULT) {
 			userList = userDetailsService.queryByDrawTrade(DrawTrade.OPEN);
 		} else {
-			userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN);
+			userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
 		}
 		
 		for(User u : userList) {
