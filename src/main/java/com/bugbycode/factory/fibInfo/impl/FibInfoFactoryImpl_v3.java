@@ -204,6 +204,10 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
 			
+			if(current.gt(end)) {
+				continue;
+			}
+			
 			double price = 0;
 			if(mode == QuotationMode.LONG && 
 					current.getBodyHighPriceDoubleValue() >= parent.getHighPriceDoubleValue()) {
