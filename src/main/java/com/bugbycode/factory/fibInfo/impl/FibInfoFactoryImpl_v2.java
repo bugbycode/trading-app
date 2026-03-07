@@ -202,7 +202,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		FibCode[] codes = FibCode.values();
 		
 		for(FibCode code : codes) {
-			if(code.lte(FibCode.FIB382) || code == FibCode.FIB66) {
+			if(code == FibCode.FIB66) {
 				continue;
 			}
 			addPrices(new OpenPriceDetails(code, fibInfo.getFibValue(code), stopLoss));
