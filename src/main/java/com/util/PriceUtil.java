@@ -2065,14 +2065,27 @@ public class PriceUtil {
 	/**
 	 * 判断是否出现颓势 </br></br>
 	 * 
-	 * 前一根k线为阳线且当前k线收盘价小于等于前一根k线最高价
+	 * 前一根k线为阳线且当前k线收盘价小于等于前一根k线最低价
 	 * 
 	 * @param current 当前k线
 	 * @param parent 前一根k线
 	 * @return
 	 */
 	public static boolean verifyDecliningPrice_v26(Klines current, Klines parent) {
-		return parent.isRise() && current.getClosePriceDoubleValue() <= parent.getHighPriceDoubleValue();
+		return parent.isRise() && current.getClosePriceDoubleValue() <= parent.getLowPriceDoubleValue();
+	}
+	
+	/**
+	 * 判断是否出现颓势 </br></br>
+	 * 
+	 * 当前k线收盘价小于等于前一根k线最低价
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDecliningPrice_v27(Klines current, Klines parent) {
+		return current.getClosePriceDoubleValue() <= parent.getLowPriceDoubleValue();
 	}
 	
 	/**
@@ -2340,14 +2353,27 @@ public class PriceUtil {
 	/**
 	 * 判断是否出现强势 </br></br>
 	 * 
-	 * 前一根k线为阴线且当前k线收盘价大于等于前一根k线最低价
+	 * 前一根k线为阴线且当前k线收盘价大于等于前一根k线最高价
 	 * 
 	 * @param current 当前k线
 	 * @param parent 前一根k线
 	 * @return
 	 */
 	public static boolean verifyPowerful_v26(Klines current, Klines parent) {
-		return parent.isFall() && current.getClosePriceDoubleValue() >= parent.getLowPriceDoubleValue();
+		return parent.isFall() && current.getClosePriceDoubleValue() >= parent.getHighPriceDoubleValue();
+	}
+	
+	/**
+	 * 判断是否出现强势 </br></br>
+	 * 
+	 * 当前k线收盘价大于等于前一根k线最高价
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v27(Klines current, Klines parent) {
+		return current.getClosePriceDoubleValue() >= parent.getHighPriceDoubleValue();
 	}
 	
 	/**
