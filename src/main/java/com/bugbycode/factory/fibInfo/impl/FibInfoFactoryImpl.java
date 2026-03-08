@@ -197,9 +197,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list);
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list);
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
@@ -227,9 +227,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(current.lte(end)) {
 				break;
 			}
-			if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
-					|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
-				addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
+			if(mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue)) {
+				addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), stopLoss));
+				break;
+			} else if(mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue)) {
+				addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), stopLoss));
 				break;
 			}
 		}
