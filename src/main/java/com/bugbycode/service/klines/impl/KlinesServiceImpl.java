@@ -272,7 +272,7 @@ public class KlinesServiceImpl implements KlinesService {
 			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
-					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
+					//&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
 					) {
 			
 				//市价做多
@@ -367,7 +367,7 @@ public class KlinesServiceImpl implements KlinesService {
 			if(PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTraded(price, fibInfo)
-					&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
+					//&& fibInfo.verifyOpenPrice(openPrice, currentPrice)
 					) {
 			
 				//市价做空
