@@ -28,6 +28,7 @@ import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
+import com.bugbycode.factory.priceAction.impl.HitCodeFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
 import com.bugbycode.module.FibCode;
@@ -1124,6 +1125,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
+		HitCodeFactory hitCodeFactory = new HitCodeFactory(list, list_15m);
+		
 		PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
@@ -1132,10 +1135,10 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(factory.isLong()) {
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong_eOption(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
+			openLong_eOption(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m, hitCodeFactory.getHitCode());
 		} else if(factory.isShort()) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort_eOption(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
+			openShort_eOption(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m, hitCodeFactory.getHitCode());
 		}
 		
 	}
@@ -1447,7 +1450,7 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void openLong_eOption(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterLowKlines,
-			List<Klines> klinesList_hit) {
+			List<Klines> klinesList_hit, FibCode hitCode) {
 		
 		if(fibInfo == null) {
 			return;
@@ -1475,8 +1478,9 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 
 					//开仓订阅提醒
-					String subject = String.format("%s看涨期权(%s)买入机会 %s", 
+					String subject = String.format("%s看涨期权%s(%s)买入机会 %s", 
 							pair, 
+							hitCode.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
 							DateFormatUtil.format(new Date()));
 					
@@ -1491,7 +1495,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 	@Override
 	public void openShort_eOption(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterHighKlines,
-			List<Klines> klinesList_hit) {
+			List<Klines> klinesList_hit, FibCode hitCode) {
 		
 		if(fibInfo == null) {
 			return;
@@ -1520,8 +1524,9 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					//开仓订阅提醒
-					String subject = String.format("%s看跌期权(%s)买入机会 %s", 
+					String subject = String.format("%s看跌期权%s(%s)买入机会 %s", 
 							pair, 
+							hitCode.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
 							DateFormatUtil.format(new Date()));
 					
