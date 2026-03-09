@@ -1456,6 +1456,11 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		String trendStr = "看涨";
+		if(hitCode.lte(FibCode.FIB5)) {
+			trendStr = "看跌";
+		}
+		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		String pair = hitKline.getPair();
 		
@@ -1478,8 +1483,9 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 
 					//开仓订阅提醒
-					String subject = String.format("%s看涨期权%s(%s)买入机会 %s", 
+					String subject = String.format("%s%s期权%s(%s)买入机会 %s", 
 							pair, 
+							trendStr,
 							hitCode.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
 							DateFormatUtil.format(new Date()));
@@ -1499,6 +1505,11 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		if(fibInfo == null) {
 			return;
+		}
+		
+		String trendStr = "看跌";
+		if(hitCode.lte(FibCode.FIB5)) {
+			trendStr = "看涨";
 		}
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
@@ -1524,8 +1535,9 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					//开仓订阅提醒
-					String subject = String.format("%s看跌期权%s(%s)买入机会 %s", 
+					String subject = String.format("%s%s期权%s(%s)买入机会 %s", 
 							pair, 
+							trendStr,
 							hitCode.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
 							DateFormatUtil.format(new Date()));
