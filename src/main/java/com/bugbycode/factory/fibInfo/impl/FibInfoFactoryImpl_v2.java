@@ -228,8 +228,8 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 				Klines current = this.list_15m.get(index);
 				Klines parent = this.list_15m.get(index - 1);
 				
-				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v17(current, parent))
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v17(current, parent))) {
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v28(current, parent))) {
 					addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
 					break;
 				}

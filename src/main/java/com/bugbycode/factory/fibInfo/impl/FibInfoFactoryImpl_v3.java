@@ -232,8 +232,8 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 				break;
 			}
 			
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v27(current, parent)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v27(current, parent))) {
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent)) 
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v28(current, parent))) {
 				PriceActionInfo_v2 info = new PriceActionInfo_v2(current, parent, null);
 				priceInfoList.add(info);
 			}
@@ -243,28 +243,14 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 			PriceActionInfo_v2 info = null;
 			if(mode == QuotationMode.LONG) {
 				info = PriceUtil.getMinPriceActionInfo_v2(priceInfoList);
-				addPrices(new OpenPriceDetails(openCode, info.getParent().getHighPriceDoubleValue(), stopLoss));
 			} else {
 				info = PriceUtil.getMaxPriceActionInfo_v2(priceInfoList);
-				addPrices(new OpenPriceDetails(openCode, info.getParent().getLowPriceDoubleValue(), stopLoss));
 			}
+			
 			fibEnd = info.getCurrent();
+			
 			addPrices(new OpenPriceDetails(openCode, fibEnd.getClosePriceDoubleValue(), stopLoss));
 			
-			fibAfterKline = PriceUtil.getAfterKlines(end, this.list);
-			Klines fibEndStart = info.getParent();
-			if(fibEndStart.gte(fibAfterKline)) {
-				fibEndStart = fibAfterKline;
-			}
-			List<Klines> fibEndSubList = PriceUtil.subList(fibEndStart, fibEnd, list);
-			ms = new MarketSentiment(fibEndSubList);
-			if(mode == QuotationMode.LONG) {
-				addPrices(new OpenPriceDetails(openCode, ms.getLowPrice(), stopLoss));
-				addPrices(new OpenPriceDetails(openCode, ms.getMinBodyLowPrice(), stopLoss));
-			} else {
-				addPrices(new OpenPriceDetails(openCode, ms.getHighPrice(), stopLoss));
-				addPrices(new OpenPriceDetails(openCode, ms.getMaxBodyHighPrice(), stopLoss));
-			}
 		}
 		
 		if(mode == QuotationMode.LONG) {
