@@ -215,9 +215,9 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		FibCode openCode = FibCode.FIB0;
 		
 		if(mode == QuotationMode.LONG) {
-			openCode = fibInfo.getFibCode_v2(ms.getLowPrice());
+			openCode = fibInfo.getFibCode(ms.getLowPrice());
 		} else {
-			openCode = fibInfo.getFibCode_v2(ms.getHighPrice());
+			openCode = fibInfo.getFibCode(ms.getHighPrice());
 		}
 		
 		List<Klines> data = new ArrayList<Klines>();
