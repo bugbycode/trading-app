@@ -63,7 +63,7 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 						logger.info("{}交易对{}天后交割或下架", symbol, deliveryDay);
 					}*/
 					
-					if((type == ContractType.PERPETUAL || type == ContractType.TRADIFI_PERPETUAL) && status == ContractStatus.TRADING && marginAsset.equals("USDT") && deliveryDay > 30) {
+					if(type == ContractType.PERPETUAL && status == ContractStatus.TRADING && marginAsset.equals("USDT") && deliveryDay > 30) {
 						
 						SymbolExchangeInfo info = new SymbolExchangeInfo();
 						info.setSymbol(symbol);
