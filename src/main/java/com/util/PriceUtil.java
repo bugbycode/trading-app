@@ -147,6 +147,19 @@ public class PriceUtil {
 		return result;
 	}
 	
+	public static Klines getMaxClosePriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getClosePriceDoubleValue() < klinesList.get(index).getClosePriceDoubleValue()) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
 	public static Klines getMaxLowPriceKLine(List<Klines> klinesList) {
 		Klines result = null;
 		if(!CollectionUtils.isEmpty(klinesList)) {
@@ -243,6 +256,19 @@ public class PriceUtil {
 			result = klinesList.get(0);
 			for(int index = 1;index < klinesList.size();index++) {
 				if(Double.valueOf(result.getLowPrice()) > Double.valueOf(klinesList.get(index).getLowPrice())) {
+					result = klinesList.get(index);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static Klines getMinClosePriceKLine(List<Klines> klinesList) {
+		Klines result = null;
+		if(!CollectionUtils.isEmpty(klinesList)) {
+			result = klinesList.get(0);
+			for(int index = 1;index < klinesList.size();index++) {
+				if(result.getClosePriceDoubleValue() > klinesList.get(index).getClosePriceDoubleValue()) {
 					result = klinesList.get(index);
 				}
 			}

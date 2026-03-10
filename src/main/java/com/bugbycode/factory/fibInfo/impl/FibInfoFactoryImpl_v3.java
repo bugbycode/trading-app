@@ -221,26 +221,27 @@ public class FibInfoFactoryImpl_v3 implements FibInfoFactory {
 		}
 		
 		List<Klines> data = new ArrayList<Klines>();
-		for(int index = list_15m.size() - 1; index > 0; index--) {
-			Klines current = this.list_15m.get(index);
-			Klines parent = this.list_15m.get(index - 1);
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = this.list.get(index);
+			Klines parent = this.list.get(index - 1);
+			
+			if(current.lte(end)) {
+				break;
+			}
 			
 			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent))
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v28(current, parent))) {
 				data.add(current);
 			}
 			
-			if(current.lt(fibAfterKline)) {
-				break;
-			}
 		}
 		
 		if(!CollectionUtils.isEmpty(data)) {
 			Klines current = null;
 			if(mode == QuotationMode.LONG) {
-				current = PriceUtil.getMinBodyHighPriceKLine(data);
+				current = PriceUtil.getMinClosePriceKLine(data);
 			} else {
-				current = PriceUtil.getMaxBodyLowPriceKLine(data);
+				current = PriceUtil.getMaxClosePriceKLine(data);
 			}
 			
 			addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
