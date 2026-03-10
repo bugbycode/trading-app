@@ -116,10 +116,12 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		
 		//PriceUtil.calculateDeltaAndCvd(list);
 		//PriceUtil.calculateDeltaAndCvd(list_trend);
-		PriceUtil.calculateDeltaAndCvd(list_15m);
+		//PriceUtil.calculateDeltaAndCvd(list_15m);
 		
-		this.openPrices.clear();
-		this.fibAfterKlines.clear();
+		PriceUtil.calculateAllBBPercentB(list);
+		
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
 		
 		PositionSide ps = getPositionSide();
 		
@@ -195,49 +197,56 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			return;
 		}
 		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
-		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
-		}
-		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		double stopLoss = mode == QuotationMode.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
 		
-		MarketSentiment ms = new MarketSentiment(this.fibAfterKlines);
-		if(ms.isNotEmpty()) {
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibInfo.setFibAfterKlines(this.fibAfterKlines);
+		}
+		
+		if(CollectionUtils.isEmpty(this.fibAfterKlines)) {
+			return;
+		}
+		
+		MarketSentiment ms = new MarketSentiment(fibAfterKlines);
+		
+		FibCode openCode = FibCode.FIB0;
+		
+		if(mode == QuotationMode.LONG) {
+			openCode = fibInfo.getFibCode(ms.getLowPrice());
+		} else {
+			openCode = fibInfo.getFibCode(ms.getHighPrice());
+		}
+		
+		List<Klines> data = new ArrayList<Klines>();
+		for(int index = list_15m.size() - 1; index > 0; index--) {
+			Klines current = this.list_15m.get(index);
+			Klines parent = this.list_15m.get(index - 1);
 			
-			FibCode openCode = FibCode.FIB0;
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v28(current, parent))) {
+				data.add(current);
+			}
 			
+			if(current.lt(fibAfterKline)) {
+				break;
+			}
+		}
+		
+		if(!CollectionUtils.isEmpty(data)) {
+			Klines current = null;
 			if(mode == QuotationMode.LONG) {
-				openCode = this.fibInfo.getFibCode(ms.getLowPrice());
+				current = PriceUtil.getMinBodyHighPriceKLine(data);
 			} else {
-				openCode = this.fibInfo.getFibCode(ms.getHighPrice());
+				current = PriceUtil.getMaxBodyLowPriceKLine(data);
 			}
-			/*
-			int size = this.list_15m.size();
-			Klines current = this.list_15m.get(size - 1);
-			Klines parent = this.list_15m.get(size - 2);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v17(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v17(current, parent))) {
-				addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
-			}*/
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = this.list_15m.get(index);
-				Klines parent = this.list_15m.get(index - 1);
-				
-				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent))
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v28(current, parent))) {
-					addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
-					break;
-				}
-				
-				if(current.lt(fibAfterFlag)) {
-					break;
-				}
-			}
+			
+			addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
+			
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -268,11 +277,11 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getBbPercentB() > 0.5;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getBbPercentB() < 0.5;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -280,7 +289,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			openPrices.add(price);
 		}
 	}
-
+	
 	public Klines getStart() {
 		return start;
 	}
