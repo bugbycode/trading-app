@@ -216,13 +216,27 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			} else {
 				openCode = this.fibInfo.getFibCode(ms.getHighPrice());
 			}
-			
+			/*
 			int size = this.list_15m.size();
 			Klines current = this.list_15m.get(size - 1);
 			Klines parent = this.list_15m.get(size - 2);
 			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v17(current, parent))
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v17(current, parent))) {
 				addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
+			}*/
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = this.list_15m.get(index);
+				Klines parent = this.list_15m.get(index - 1);
+				
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v17(current, parent))
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v17(current, parent))) {
+					addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
+					break;
+				}
+				
+				if(current.lt(fibAfterFlag)) {
+					break;
+				}
 			}
 		}
 		
