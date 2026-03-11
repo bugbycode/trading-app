@@ -13,6 +13,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
@@ -41,6 +42,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private List<OpenPrice> openPrices;
 	
+	private TradeStyle tradeStyle = TradeStyle.CONSERVATIVE;
+	
 	/**
 	 * 
 	 * @param list 斐波那契回撤指标参考的K线信息
@@ -48,6 +51,32 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	 * @param list_15m 十五分钟级别k线信息
 	 */
 	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_trend, List<Klines> list_15m) {
+		this.tradeStyle = TradeStyle.CONSERVATIVE;
+		this.list = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
+		}
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+			this.init();
+		}
+	}
+	
+	/**
+	 * @param tradeStyle 交易风格
+	 * @param list 斐波那契回撤指标参考的K线信息
+	 * @param list_trend 行情走势参考的K线信息
+	 * @param list_15m 十五分钟级别k线信息
+	 */
+	public FibInfoFactoryImpl(TradeStyle tradeStyle, List<Klines> list, List<Klines> list_trend, List<Klines> list_15m) {
+		this.tradeStyle = tradeStyle;
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
@@ -251,11 +280,21 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
 		Klines last = PriceUtil.getLastKlines(list_trend);
-		if(verifyShort(last)) {
-			ps = PositionSide.SHORT;
-		} else if(verifyLong(last)) {
-			ps = PositionSide.LONG;
+		
+		if(this.tradeStyle == TradeStyle.CONSERVATIVE) {
+			if(verifyShort(last)) {
+				ps = PositionSide.SHORT;
+			} else if(verifyLong(last)) {
+				ps = PositionSide.LONG;
+			}
+		} else if(this.tradeStyle == TradeStyle.RADICAL){
+			if(verifyShort_Radical(last)) {
+				ps = PositionSide.SHORT;
+			} else if(verifyLong_Radical(last)) {
+				ps = PositionSide.LONG;
+			}
 		}
+		
 		return ps;
 	}
 	
@@ -265,6 +304,14 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private boolean verifyShort(Klines current) {
 		return current.getDea() < 0;
+	}
+	
+	private boolean verifyLong_Radical(Klines current) {
+		return current.getDea() < 0;
+	}
+	
+	private boolean verifyShort_Radical(Klines current) {
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
