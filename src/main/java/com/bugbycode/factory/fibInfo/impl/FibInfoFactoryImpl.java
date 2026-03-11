@@ -325,7 +325,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) 
 				&& (
-						(tradeStyle == TradeStyle.CONSERVATIVE && price.getCode().gte(FibCode.FIB5)) 
+						(tradeStyle == TradeStyle.CONSERVATIVE && price.getCode().gte(FibCode.FIB618)) 
 						|| (tradeStyle == TradeStyle.RADICAL && price.getCode().gte(FibCode.FIB236))
 					)) {
 			openPrices.add(price);
