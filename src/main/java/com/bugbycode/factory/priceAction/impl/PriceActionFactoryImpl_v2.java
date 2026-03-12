@@ -203,6 +203,10 @@ public class PriceActionFactoryImpl_v2 implements PriceActionFactory{
 			addPrices(new OpenPriceDetails(fibInfo.getFibCode(openValue), openValue, stopLoss));
 		}
 		
+		if(fibEnd.lt(end)) {
+			fibEnd = end;
+		}
+		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
