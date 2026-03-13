@@ -207,7 +207,7 @@ public class PriceActionFactoryImpl_v2 implements PriceActionFactory{
 				fibEnd = end;
 			}
 			
-			List<Klines> subFibEndList = PriceUtil.subList(end, fibEnd, list);
+			List<Klines> subFibEndList = PriceUtil.subList(start, fibEnd, list);
 			
 			if(!CollectionUtils.isEmpty(subFibEndList)) {
 				MarketSentiment ms = new MarketSentiment(subFibEndList);
