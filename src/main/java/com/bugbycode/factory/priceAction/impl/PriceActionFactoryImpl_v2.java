@@ -203,10 +203,6 @@ public class PriceActionFactoryImpl_v2 implements PriceActionFactory{
 			
 			addPrices(new OpenPriceDetails(fibInfo.getFibCode(openValue), openValue, stopLoss));
 			
-			if(fibEnd.lt(end)) {
-				fibEnd = end;
-			}
-			
 			List<Klines> subFibEndList = PriceUtil.subList(start, fibEnd, list);
 			
 			if(!CollectionUtils.isEmpty(subFibEndList)) {
@@ -219,6 +215,11 @@ public class PriceActionFactoryImpl_v2 implements PriceActionFactory{
 					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice(), stopLoss));
 				}
 			}
+			
+			if(fibEnd.lt(end)) {
+				fibEnd = end;
+			}
+			
 		}
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
