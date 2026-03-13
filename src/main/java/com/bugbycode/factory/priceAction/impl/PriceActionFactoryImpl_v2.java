@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -182,8 +183,8 @@ public class PriceActionFactoryImpl_v2 implements PriceActionFactory{
 			if(current.lt(start)) {
 				break;
 			}
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v27(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v27(current, parent))) {
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v28(current, parent))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v28(current, parent))) {
 				data.add(current);
 			}
 		}
@@ -201,10 +202,23 @@ public class PriceActionFactoryImpl_v2 implements PriceActionFactory{
 			double openValue = fibEnd.getClosePriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(fibInfo.getFibCode(openValue), openValue, stopLoss));
-		}
-		
-		if(fibEnd.lt(end)) {
-			fibEnd = end;
+			
+			if(fibEnd.lt(end)) {
+				fibEnd = end;
+			}
+			
+			List<Klines> subFibEndList = PriceUtil.subList(end, fibEnd, list);
+			
+			if(!CollectionUtils.isEmpty(subFibEndList)) {
+				MarketSentiment ms = new MarketSentiment(subFibEndList);
+				if(mode == QuotationMode.LONG) {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMaxBodyHighPrice()), ms.getMaxBodyHighPrice(), stopLoss));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getHighPrice()), ms.getHighPrice(), stopLoss));
+				} else {
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getMinBodyLowPrice()), ms.getMinBodyLowPrice(), stopLoss));
+					addPrices(new OpenPriceDetails(fibInfo.getFibCode(ms.getLowPrice()), ms.getLowPrice(), stopLoss));
+				}
+			}
 		}
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
