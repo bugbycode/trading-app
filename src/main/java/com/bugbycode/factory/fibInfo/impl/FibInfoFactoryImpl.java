@@ -254,7 +254,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		if(size > 1) {
 			
 			Klines current = list_trend.get(size - 1);
-			Klines parent = list_trend.get(size - 1);
+			Klines parent = list_trend.get(size - 2);
 			
 			if(verifyShort(current, parent)) {
 				ps = PositionSide.SHORT;
