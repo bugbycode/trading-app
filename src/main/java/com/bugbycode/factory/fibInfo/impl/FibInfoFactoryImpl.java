@@ -247,24 +247,21 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			openCode = fibInfo.getFibCode(ms.getHighPrice());
 		}
 		
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
-		double stopLoss = mode == QuotationMode.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
-		
 		double fibValue = fibInfo.getFibValue(openCode);
 		
-		for(int index = list_15m.size() - 1; index > 0; index--) {
+		for(int index = list.size() - 1; index > 0; index--) {
 			
-			Klines current = list_15m.get(index);
+			Klines current = list.get(index);
 			
-			if(current.lt(fibAfterKline)) {
+			if(current.lte(end)) {
 				break;
 			}
 			
 			if(mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue)) {
-				addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), stopLoss));
+				addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue()));
 				break;
 			} else if(mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue)) {
-				addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), stopLoss));
+				addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue()));
 				break;
 			}
 		}

@@ -1073,11 +1073,11 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl(TradeStyle.CONSERVATIVE, list_15m, list_15m, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl(TradeStyle.CONSERVATIVE, list_1h, list_1h, list_15m);
 		
 		futuresFibMonitorRun(factory, list_15m);
 		
-		FibInfoFactory factory_radical = new FibInfoFactoryImpl(TradeStyle.RADICAL, list_15m, list_15m, list_15m);
+		FibInfoFactory factory_radical = new FibInfoFactoryImpl(TradeStyle.RADICAL, list_1h, list_1h, list_15m);
 		
 		futuresFibMonitorRun(factory_radical, list_15m);
 		
