@@ -1073,19 +1073,9 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl(TradeStyle.CONSERVATIVE, list_1h, list_1h, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl(list_1h, list_1d, list_15m);
 		
-		futuresFibMonitorRun(factory, list_15m);
-		
-		FibInfoFactory factory_radical = new FibInfoFactoryImpl(TradeStyle.RADICAL, list_1h, list_1h, list_15m);
-		
-		futuresFibMonitorRun(factory_radical, list_15m);
-		
-	}
-	
-	private void futuresFibMonitorRun(FibInfoFactory factory, List<Klines> list_15m) {
-		
-		if(factory == null || !(factory.isLong() || factory.isShort())) {
+		if(!(factory.isLong() || factory.isShort())) {
 			return;
 		}
 		
@@ -1100,6 +1090,7 @@ public class KlinesServiceImpl implements KlinesService {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			openShort_v2(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
 		}
+		
 	}
 	
 	@Override
