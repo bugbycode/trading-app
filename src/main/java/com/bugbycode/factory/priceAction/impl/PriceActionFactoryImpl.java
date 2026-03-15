@@ -10,6 +10,7 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -172,14 +173,31 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		}
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
-		double stopLoss = mode == QuotationMode.LONG ? last_15m.getHighPriceDoubleValue() : last_15m.getLowPriceDoubleValue();
 		
-		FibCode openCode = FibCode.FIB236;
+		List<Klines> data = PriceUtil.subList(start, list);
+		MarketSentiment ms = new MarketSentiment(data);
+		Klines fibEnd = end;
 		
-		addPrices(new OpenPriceDetails(openCode, fibInfo.getFibValue(openCode), stopLoss));
+		if(ms.isNotEmpty()) {
+			
+			if(mode == QuotationMode.LONG) {
+				fibEnd = ms.getMaxBodyLow();
+			} else {
+				fibEnd = ms.getMinBodyHigh();
+			}
+			
+			double stopLoss = mode == QuotationMode.LONG ? fibEnd.getHighPriceDoubleValue() : fibEnd.getLowPriceDoubleValue();
+			double openValue = mode == QuotationMode.LONG ? fibEnd.getBodyLowPriceDoubleValue() : fibEnd.getBodyHighPriceDoubleValue();
+			
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode(openValue), openValue, stopLoss));
+			
+			if(fibEnd.lte(fibEnd)) {
+				fibEnd = end;
+			}
+			
+		}
 		
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(end, this.list_15m);
+		Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 			this.fibInfo.setFibAfterKlines(fibAfterKlines);
@@ -205,19 +223,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() < 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() > 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {

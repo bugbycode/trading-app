@@ -3,7 +3,6 @@ package com.bugbycode.service.klines;
 import java.util.Date;
 import java.util.List;
 
-import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
@@ -141,9 +140,8 @@ public interface KlinesService {
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterLowKlines 回撤之后的最低k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
-	 * @param hitCode 回撤点
 	 */
-	public void openLong_eOption(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit, FibCode hitCode);
+	public void openLong_eOption(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterLowKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 看跌期权买入机会
@@ -151,9 +149,8 @@ public interface KlinesService {
 	 * @param fibInfo 斐波那契回撤参考信息
 	 * @param afterHighKlines 回撤之后的最高k线
 	 * @param klinesList_hit 最近时间段内部分k线信息
-	 * @param hitCode 回撤点
 	 */
-	public void openShort_eOption(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit, FibCode hitCode);
+	public void openShort_eOption(List<OpenPrice> openPrices, FibInfo fibInfo,Klines afterHighKlines,List<Klines> klinesList_hit);
 	
 	/**
 	 * 盘整区监控
