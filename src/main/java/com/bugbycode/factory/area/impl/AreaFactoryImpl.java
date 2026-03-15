@@ -66,7 +66,7 @@ public class AreaFactoryImpl implements AreaFactory {
 			return;
 		}
 		
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		//Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		
 		Klines last = PriceUtil.getLastKlines(list);
 		
@@ -77,7 +77,7 @@ public class AreaFactoryImpl implements AreaFactory {
 		double take = h - l;
 		
 		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
-		double stopLoss = mode == QuotationMode.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
+		double stopLoss = mode == QuotationMode.LONG ? last.getLowPriceDoubleValue() : last.getHighPriceDoubleValue();
 		
 		double firstTakeProfit = 0; 
 		double secondTakeProfit = 0;
