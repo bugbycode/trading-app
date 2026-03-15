@@ -199,9 +199,6 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
-		double stopLoss = mode == QuotationMode.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
-		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
@@ -222,31 +219,14 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			openCode = fibInfo.getFibCode(ms.getHighPrice());
 		}
 		
-		List<Klines> data = new ArrayList<Klines>();
-		for(int index = list_15m.size() - 1; index > 0; index--) {
-			Klines current = this.list_15m.get(index);
-			Klines parent = this.list_15m.get(index - 1);
-			
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v28(current, parent))) {
-				data.add(current);
-			}
-			
-			if(current.lt(fibAfterKline)) {
-				break;
-			}
-		}
-		
-		if(!CollectionUtils.isEmpty(data)) {
-			Klines current = null;
-			if(mode == QuotationMode.LONG) {
-				current = PriceUtil.getMinBodyHighPriceKLine(data);
-			} else {
-				current = PriceUtil.getMaxBodyLowPriceKLine(data);
-			}
-			
-			addPrices(new OpenPriceDetails(openCode, current.getClosePriceDoubleValue(), stopLoss));
-			
+		fibAfterKline = PriceUtil.getAfterKlines(end, this.list);
+		if(fibAfterKline != null) {
+			List<Klines> data = PriceUtil.subList(fibAfterKline, list);
+			ms = new MarketSentiment(data);
+			Klines fibEnd = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
+			double openValue = mode == QuotationMode.LONG ? ms.getMinBodyHighPrice() : ms.getMaxBodyLowPrice();
+			double stopLoss = mode == QuotationMode.LONG ? fibEnd.getLowPriceDoubleValue() : fibEnd.getHighPriceDoubleValue();
+			addPrices(new OpenPriceDetails(openCode, openValue, stopLoss));
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -277,11 +257,11 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getBbPercentB() > 0.5;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getBbPercentB() < 0.5;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
