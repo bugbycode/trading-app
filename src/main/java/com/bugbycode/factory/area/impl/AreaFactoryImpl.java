@@ -60,8 +60,8 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		this.list_trend.sort(new KlinesComparator(SortType.ASC));
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		//PriceUtil.calculateMACD(list);
+		//PriceUtil.calculateMACD(list_trend);
 		
 		this.ps = getPositionSide();
 		
