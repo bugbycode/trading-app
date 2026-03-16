@@ -52,7 +52,7 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private void init() {
 		
-		if(list_trend.size() < 50 || list.size() < 50 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(list_trend.size() < 7 || list.size() < 7 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
@@ -60,93 +60,84 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		this.list_trend.sort(new KlinesComparator(SortType.ASC));
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateEMA_7_25_99(list_trend);
 		
-		this.ps = getPositionSide_v2();
+		this.ps = getPositionSide();
 		
 		if(this.ps == PositionSide.DEFAULT) {
 			return;
 		}
 		
-		//Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		
-		Klines last = PriceUtil.getLastKlines(list);
+		Klines last = null;
+		
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = list.get(index);
+			double ema7 = current.getEma7();
+			if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, ema7))
+					|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, ema7))) {
+				last = current;
+				break;
+			}
+		}
+		
+		if(last == null) {
+			return;
+		}
 		
 		double h = last.getHighPriceDoubleValue();
 		double l = last.getLowPriceDoubleValue();
-		double c = last.getClosePriceDoubleValue();
-		double bl = last.getBodyLowPriceDoubleValue();
+		//double c = last.getClosePriceDoubleValue();
 		double bh = last.getBodyHighPriceDoubleValue();
+		double bl = last.getBodyLowPriceDoubleValue();
 		
 		double take = h - l;
 		
-		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		double stopLoss = mode == QuotationMode.LONG ? last.getLowPriceDoubleValue() : last.getHighPriceDoubleValue();
 		
 		double firstTakeProfit = 0; 
 		double secondTakeProfit = 0;
 		
 		if(isLong()) {
-			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(c + (take / 2), last.getDecimalNum()) );
-			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(c + take, last.getDecimalNum()) );
+			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(bh + (take / 2), last.getDecimalNum()) );
+			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(bh + take, last.getDecimalNum()) );
 			addPrices(new OpenPriceDetails(FibCode.FIB618, bh, stopLoss, firstTakeProfit, secondTakeProfit));
 		} else if(isShort()) {
-			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(c - (take / 2), last.getDecimalNum()) );
-			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(c - take, last.getDecimalNum()) );
+			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(bl - (take / 2), last.getDecimalNum()) );
+			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(bl - take, last.getDecimalNum()) );
 			addPrices(new OpenPriceDetails(FibCode.FIB618, bl, stopLoss, firstTakeProfit, secondTakeProfit));
 		}
-		
-		/*
-		if(firstTakeProfit > 0 && secondTakeProfit > 0) {
-			addPrices(new OpenPriceDetails(FibCode.FIB618, c, stopLoss, firstTakeProfit, secondTakeProfit));
-		}*/
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(last, this.list_15m);
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 		}
 	}
-
-	private PositionSide getPositionSide_v2() {
-		
-		PositionSide ps = PositionSide.DEFAULT;
-		
-		Klines current = PriceUtil.getLastKlines(list_trend);
-		
-		if(current.getDea() > 0) {
-			ps = PositionSide.LONG;
-		} else if(current.getDea() < 0) {
-			ps = PositionSide.SHORT;
-		}
-		
-		return ps;
-	}
 	
-	/*
 	private PositionSide getPositionSide() {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
 		Klines current = PriceUtil.getLastKlines(list_trend);
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		
-		if(verifyLong(current, last_15m)) {
+		if(verifyLong(current)) {
 			ps = PositionSide.LONG;
-		} else if(verifyShort(current, last_15m)) {
+		} else if(verifyShort(current)) {
 			ps = PositionSide.SHORT;
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current, Klines last_15m) {
-		return last_15m.getClosePriceDoubleValue() >= current.getBodyHighPriceDoubleValue();
+	private boolean verifyLong(Klines current) {
+		return current.getClosePriceDoubleValue() >= current.getEma7() && current.getEma7() > 0;
 	}
 	
-	private boolean verifyShort(Klines current, Klines last_15m) {
-		return last_15m.getClosePriceDoubleValue() <= current.getBodyLowPriceDoubleValue();
-	}*/
+	private boolean verifyShort(Klines current) {
+		return current.getClosePriceDoubleValue() <= current.getEma7() && current.getEma7() > 0;
+	}
 
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
