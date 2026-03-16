@@ -76,6 +76,8 @@ public class AreaFactoryImpl implements AreaFactory {
 		double h = last.getHighPriceDoubleValue();
 		double l = last.getLowPriceDoubleValue();
 		double c = last.getClosePriceDoubleValue();
+		double bl = last.getBodyLowPriceDoubleValue();
+		double bh = last.getBodyHighPriceDoubleValue();
 		
 		double take = h - l;
 		
@@ -88,14 +90,17 @@ public class AreaFactoryImpl implements AreaFactory {
 		if(isLong()) {
 			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(c + (take / 2), last.getDecimalNum()) );
 			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(c + take, last.getDecimalNum()) );
+			addPrices(new OpenPriceDetails(FibCode.FIB618, bh, stopLoss, firstTakeProfit, secondTakeProfit));
 		} else if(isShort()) {
 			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(c - (take / 2), last.getDecimalNum()) );
 			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(c - take, last.getDecimalNum()) );
+			addPrices(new OpenPriceDetails(FibCode.FIB618, bl, stopLoss, firstTakeProfit, secondTakeProfit));
 		}
 		
+		/*
 		if(firstTakeProfit > 0 && secondTakeProfit > 0) {
 			addPrices(new OpenPriceDetails(FibCode.FIB618, c, stopLoss, firstTakeProfit, secondTakeProfit));
-		}
+		}*/
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(last, this.list_15m);
 		if(fibAfterFlag != null) {
@@ -107,25 +112,24 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		int index = list_trend.size() - 1;
-		Klines current = list_trend.get(index);
-		Klines parent = list_trend.get(index - 1);
+		Klines current = PriceUtil.getLastKlines(list_trend);
+		Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		
-		if(verifyLong(current, parent)) {
+		if(verifyLong(current, last_15m)) {
 			ps = PositionSide.LONG;
-		} else if(verifyShort(current, parent)) {
+		} else if(verifyShort(current, last_15m)) {
 			ps = PositionSide.SHORT;
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current, Klines parent) {
-		return PriceUtil.verifyPowerful_v14(current, parent);
+	private boolean verifyLong(Klines current, Klines last_15m) {
+		return last_15m.getClosePriceDoubleValue() >= current.getBodyHighPriceDoubleValue();
 	}
 	
-	private boolean verifyShort(Klines current, Klines parent) {
-		return PriceUtil.verifyDecliningPrice_v14(current, parent);
+	private boolean verifyShort(Klines current, Klines last_15m) {
+		return last_15m.getClosePriceDoubleValue() <= current.getBodyLowPriceDoubleValue();
 	}
 
 	private void addPrices(OpenPrice price) {
