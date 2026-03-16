@@ -60,10 +60,10 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		this.list_trend.sort(new KlinesComparator(SortType.ASC));
 		
-		//PriceUtil.calculateMACD(list);
-		//PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list_trend);
 		
-		this.ps = getPositionSide();
+		this.ps = getPositionSide_v2();
 		
 		if(this.ps == PositionSide.DEFAULT) {
 			return;
@@ -107,7 +107,23 @@ public class AreaFactoryImpl implements AreaFactory {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 		}
 	}
+
+	private PositionSide getPositionSide_v2() {
+		
+		PositionSide ps = PositionSide.DEFAULT;
+		
+		Klines current = PriceUtil.getLastKlines(list_trend);
+		
+		if(current.getDea() > 0) {
+			ps = PositionSide.LONG;
+		} else if(current.getDea() < 0) {
+			ps = PositionSide.SHORT;
+		}
+		
+		return ps;
+	}
 	
+	/*
 	private PositionSide getPositionSide() {
 		
 		PositionSide ps = PositionSide.DEFAULT;
@@ -130,7 +146,7 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private boolean verifyShort(Klines current, Klines last_15m) {
 		return last_15m.getClosePriceDoubleValue() <= current.getBodyLowPriceDoubleValue();
-	}
+	}*/
 
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
