@@ -52,7 +52,7 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private void init() {
 		
-		if(list_trend.size() < 2 || list.size() < 2 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(list_trend.size() < 7 || list.size() < 7 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
@@ -60,15 +60,32 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		this.list_trend.sort(new KlinesComparator(SortType.ASC));
 		
+		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateEMA_7_25_99(list_trend);
+		
 		this.ps = getPositionSide();
 		
 		if(this.ps == PositionSide.DEFAULT) {
 			return;
 		}
 		
-		//Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		
-		Klines last = PriceUtil.getLastKlines(list);
+		Klines last = null;
+		
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = list.get(index);
+			double ema7 = current.getEma7();
+			if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, ema7))
+					|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, ema7))) {
+				last = current;
+				break;
+			}
+		}
+		
+		if(last == null) {
+			return;
+		}
 		
 		double h = last.getHighPriceDoubleValue();
 		double l = last.getLowPriceDoubleValue();
@@ -76,7 +93,6 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		double take = h - l;
 		
-		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		double stopLoss = mode == QuotationMode.LONG ? last.getLowPriceDoubleValue() : last.getHighPriceDoubleValue();
 		
 		double firstTakeProfit = 0; 
@@ -104,25 +120,23 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		int index = list_trend.size() - 1;
-		Klines current = list_trend.get(index);
-		Klines parent = list_trend.get(index - 1);
+		Klines current = PriceUtil.getLastKlines(list_trend);
 		
-		if(verifyLong(current, parent)) {
+		if(verifyLong(current)) {
 			ps = PositionSide.LONG;
-		} else if(verifyShort(current, parent)) {
+		} else if(verifyShort(current)) {
 			ps = PositionSide.SHORT;
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current, Klines parent) {
-		return PriceUtil.verifyPowerful_v28(current, parent);
+	private boolean verifyLong(Klines current) {
+		return current.getClosePriceDoubleValue() >= current.getEma7() && current.getEma7() > 0;
 	}
 	
-	private boolean verifyShort(Klines current, Klines parent) {
-		return PriceUtil.verifyDecliningPrice_v28(current, parent);
+	private boolean verifyShort(Klines current) {
+		return current.getClosePriceDoubleValue() <= current.getEma7() && current.getEma7() > 0;
 	}
 
 	private void addPrices(OpenPrice price) {
