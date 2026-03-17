@@ -121,7 +121,7 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		int size = list_trend.size() - 1;
+		int size = list_trend.size();
 		int index = size - 1;
 		Klines current = list_trend.get(index);
 		Klines parent = list_trend.get(index - 1);
