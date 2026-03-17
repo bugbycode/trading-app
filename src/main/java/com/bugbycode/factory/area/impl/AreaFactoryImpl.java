@@ -121,26 +121,23 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		int size = list_trend.size();
-		int index = size - 1;
-		Klines current = list_trend.get(index);
-		Klines parent = list_trend.get(index - 1);
+		Klines current = PriceUtil.getLastKlines(list_trend);
 		
-		if(verifyLong(current, parent)) {
+		if(verifyLong(current)) {
 			ps = PositionSide.LONG;
-		} else if(verifyShort(current, parent)) {
+		} else if(verifyShort(current)) {
 			ps = PositionSide.SHORT;
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current, Klines parent) {
-		return PriceUtil.verifyPowerful_v14(current, parent);
+	private boolean verifyLong(Klines current) {
+		return current.getDea() > 0;
 	}
 	
-	private boolean verifyShort(Klines current, Klines parent) {
-		return PriceUtil.verifyDecliningPrice_v14(current, parent);
+	private boolean verifyShort(Klines current) {
+		return current.getDea() < 0;
 	}
 
 	private void addPrices(OpenPrice price) {
