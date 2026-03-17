@@ -52,7 +52,7 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private void init() {
 		
-		if(list_trend.size() < 7 || list.size() < 7 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(list_trend.size() < 50 || list.size() < 50 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
@@ -60,8 +60,8 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		this.list_trend.sort(new KlinesComparator(SortType.ASC));
 		
-		PriceUtil.calculateEMA_7_25_99(list);
-		PriceUtil.calculateEMA_7_25_99(list_trend);
+		PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.ps = getPositionSide();
 		
@@ -75,9 +75,10 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
-			double ema7 = current.getEma7();
-			if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, ema7))
-					|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, ema7))) {
+			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v10(current, parent, next)) 
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v10(current, parent, next))) {
 				last = current;
 				break;
 			}
@@ -120,23 +121,26 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		PositionSide ps = PositionSide.DEFAULT;
 		
-		Klines current = PriceUtil.getLastKlines(list_trend);
+		int size = list_trend.size() - 1;
+		int index = size - 1;
+		Klines current = list_trend.get(index);
+		Klines parent = list_trend.get(index - 1);
 		
-		if(verifyLong(current)) {
+		if(verifyLong(current, parent)) {
 			ps = PositionSide.LONG;
-		} else if(verifyShort(current)) {
+		} else if(verifyShort(current, parent)) {
 			ps = PositionSide.SHORT;
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current) {
-		return current.getClosePriceDoubleValue() >= current.getEma7() && current.getEma7() > 0;
+	private boolean verifyLong(Klines current, Klines parent) {
+		return PriceUtil.verifyPowerful_v14(current, parent);
 	}
 	
-	private boolean verifyShort(Klines current) {
-		return current.getClosePriceDoubleValue() <= current.getEma7() && current.getEma7() > 0;
+	private boolean verifyShort(Klines current, Klines parent) {
+		return PriceUtil.verifyDecliningPrice_v14(current, parent);
 	}
 
 	private void addPrices(OpenPrice price) {
