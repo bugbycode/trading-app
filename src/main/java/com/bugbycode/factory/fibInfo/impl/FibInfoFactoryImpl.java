@@ -10,7 +10,6 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -99,7 +98,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 50 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 50 || list_trend.size() < 2 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
@@ -109,21 +108,43 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
-		
-		PriceUtil.calculateEMA_7_25_99(list);
-		PriceUtil.calculateEMA_7_25_99(list_trend);
-		
-		//PriceUtil.calculateDeltaAndCvd(list);
-		//PriceUtil.calculateDeltaAndCvd(list_trend);
-		//PriceUtil.calculateDeltaAndCvd(list_15m);
-		
-		//PriceUtil.calculateAllBBPercentB(list);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		
-		PositionSide ps = getPositionSide();
+		Klines last_trend = PriceUtil.getLastKlines(list_trend);
+		
+		double hitPrice = last_trend.getClosePriceDoubleValue();
+		
+		Klines afterKline = PriceUtil.getAfterKlines(last_trend, list);
+		
+		if(afterKline == null) {
+			return;
+		}
+		
+		Klines fibEnd = null;
+
+		PositionSide ps = PositionSide.DEFAULT;
+		
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = list.get(index);
+			if(PriceUtil.isBreachLong(current, hitPrice)) {
+				ps = PositionSide.LONG;
+				fibEnd = current;
+				break;
+			} else if(PriceUtil.isBreachShort(current, hitPrice)) {
+				ps = PositionSide.SHORT;
+				fibEnd = current;
+				break;
+			}
+			if(current.lte(afterKline)) {
+				break;
+			}
+		}
+		
+		if(ps == PositionSide.DEFAULT || fibEnd == null) {
+			return;
+		}
 		
 		Klines third = null;
 		Klines second = null;
@@ -197,44 +218,17 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			return;
 		}
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
-		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
-		}
-		
-		if(CollectionUtils.isEmpty(this.fibAfterKlines)) {
-			return;
-		}
-		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
+
+		double bh = fibEnd.getBodyHighPriceDoubleValue();
+		double bl = fibEnd.getBodyLowPriceDoubleValue();
+		double l = fibEnd.getLowPriceDoubleValue();
+		double h = fibEnd.getHighPriceDoubleValue();
 		
-		MarketSentiment ms = new MarketSentiment(fibAfterKlines);
-		
-		FibCode openCode = FibCode.FIB0;
 		if(mode == QuotationMode.LONG) {
-			openCode = fibInfo.getFibCode(ms.getLowPrice());
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode_v2(hitPrice), bh, l));
 		} else {
-			openCode = fibInfo.getFibCode(ms.getHighPrice());
-		}
-		
-		double fibValue = fibInfo.getFibValue(openCode);
-		
-		for(int index = list.size() - 1; index > 0; index--) {
-			
-			Klines current = list.get(index);
-			
-			if(current.lte(end)) {
-				break;
-			}
-			
-			if(mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue)) {
-				addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue()));
-				break;
-			} else if(mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue)) {
-				addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue()));
-				break;
-			}
+			addPrices(new OpenPriceDetails(fibInfo.getFibCode_v2(hitPrice), bl, h));
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -242,28 +236,17 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		} else {
 			this.openPrices.sort(new PriceComparator(SortType.ASC));
 		}
-		
-	}
-	
-	private PositionSide getPositionSide() {
-		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list_trend);
-		
-		if(verifyShort(last)) {
-			ps = PositionSide.SHORT;
-		} else if(verifyLong(last)) {
-			ps = PositionSide.LONG;
+
+		if(fibEnd.lte(end)) {
+			fibEnd = end;
 		}
 		
-		return ps;
-	}
-	
-	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
-	}
-	
-	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		Klines fibAfterKline = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
+		if(fibAfterKline != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+		}
+		
 	}
 	
 	private boolean verifyHigh(Klines k) {
