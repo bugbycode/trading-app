@@ -122,10 +122,11 @@ public interface KlinesService {
 	
 	/**
 	 * 价格行为监控
-	 * @param list
+	 * @param list_1d
+	 * @param list_1h
 	 * @param list_15m
 	 */
-	public void futuresPriceAction(List<Klines> list, List<Klines> list_15m);
+	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_1h, List<Klines> list_15m);
 	
 	/**
 	 * 期权交易机会监控
