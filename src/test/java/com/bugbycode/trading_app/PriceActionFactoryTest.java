@@ -42,9 +42,10 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "BTCUSDT";
+        String pair = "ZECUSDT";
         
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
         
@@ -52,7 +53,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
+        PriceActionFactory factory = new PriceActionFactoryImpl_v2(list, list_1d, list_15m);
         
         logger.info("init factory finish.");
         
