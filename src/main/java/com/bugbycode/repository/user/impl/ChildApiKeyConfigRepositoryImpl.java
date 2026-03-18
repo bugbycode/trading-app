@@ -41,6 +41,7 @@ public class ChildApiKeyConfigRepositoryImpl implements ChildApiKeyConfigReposit
 		update.set("binanceApiKey", cfg.getBinanceApiKey());
 		update.set("binanceSecretKey", cfg.getBinanceSecretKey());
 		update.set("updateTime", cfg.getUpdateTime());
+		update.set("leverage", cfg.getLeverage());
 		
 		template.updateMulti(Query.query(Criteria.where("id").is(cfg.getId())), update, ChildApiKeyConfig.class);
 	}

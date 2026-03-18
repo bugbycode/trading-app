@@ -20,6 +20,8 @@ public class ChildApiKeyConfig {
 	
 	private String binanceSecretKey;//币安 Secret Key
 	
+	private int leverage = 5;//杠杆倍数
+	
 	private long createTime;//创建时间
 	
 	private long updateTime;//修改时间
@@ -28,12 +30,13 @@ public class ChildApiKeyConfig {
 		
 	}
 
-	public ChildApiKeyConfig(String username, String email, String binanceApiKey, String binanceSecretKey,
+	public ChildApiKeyConfig(String username, String email, String binanceApiKey, String binanceSecretKey,int leverage,
 			long createTime, long updateTime) {
 		this.username = username;
 		this.email = email;
 		this.binanceApiKey = binanceApiKey;
 		this.binanceSecretKey = binanceSecretKey;
+		this.leverage = leverage;
 		this.createTime = createTime;
 		this.updateTime = updateTime;
 	}
@@ -76,6 +79,14 @@ public class ChildApiKeyConfig {
 
 	public void setBinanceSecretKey(String binanceSecretKey) {
 		this.binanceSecretKey = binanceSecretKey;
+	}
+
+	public int getLeverage() {
+		return leverage <= 0 ? 5 : leverage;
+	}
+
+	public void setLeverage(int leverage) {
+		this.leverage = leverage;
 	}
 
 	public long getCreateTime() {
