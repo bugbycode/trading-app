@@ -561,7 +561,7 @@ public class KlinesServiceImpl implements KlinesService {
 						} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 							double profitPrice = openPrice.getSecondTakeProfit();
 							if(tradeStyle == TradeStyle.CONSERVATIVE) {
-								profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
+								profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getProfit(), u.getProfitLimit(), QuotationMode.LONG);
 							}
 							takeProfit = new BigDecimal(
 									PriceUtil.formatDoubleDecimal(profitPrice,decimalNum)
@@ -836,7 +836,7 @@ public class KlinesServiceImpl implements KlinesService {
 						} else if(autoTradeType == AutoTradeType.AREA_INDEX) {
 							double profitPrice = openPrice.getSecondTakeProfit();
 							if(tradeStyle == TradeStyle.CONSERVATIVE) {
-								profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
+								profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getProfit(), u.getProfitLimit(), QuotationMode.SHORT);
 							}
 							takeProfit = new BigDecimal(
 									PriceUtil.formatDoubleDecimal(profitPrice,decimalNum)
