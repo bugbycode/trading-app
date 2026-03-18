@@ -52,44 +52,52 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private void init() {
 		
-		if(list_trend.size() < 50 || list.size() < 50 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(list_trend.size() < 2 || list.size() < 50 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
+		this.ps = PositionSide.DEFAULT;
+		
 		this.list.sort(new KlinesComparator(SortType.ASC));
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		this.list_trend.sort(new KlinesComparator(SortType.ASC));
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		Klines last_trend = PriceUtil.getLastKlines(list_trend);
 		
-		this.ps = getPositionSide();
+		double hitPrice = last_trend.getClosePriceDoubleValue();
 		
-		if(this.ps == PositionSide.DEFAULT) {
+		Klines afterKline = PriceUtil.getAfterKlines(last_trend, list);
+		
+		if(afterKline == null) {
 			return;
 		}
-		
-		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		
 		Klines last = null;
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			Klines next = list.get(index - 2);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v10(current, parent, next)) 
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v10(current, parent, next))) {
+			if(PriceUtil.isBreachLong(current, hitPrice)) {
+				this.ps = PositionSide.LONG;
 				last = current;
+				break;
+			} else if(PriceUtil.isBreachShort(current, hitPrice)) {
+				this.ps = PositionSide.SHORT;
+				last = current;
+				break;
+			}
+			if(current.lte(afterKline)) {
 				break;
 			}
 		}
 		
-		if(last == null) {
+		if(this.ps == PositionSide.DEFAULT || last == null) {
 			return;
 		}
 		
-		double h = last.getHighPriceDoubleValue();
-		double l = last.getLowPriceDoubleValue();
+		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
+		
+		double h = last_trend.getHighPriceDoubleValue();
+		double l = last_trend.getLowPriceDoubleValue();
 		//double c = last.getClosePriceDoubleValue();
 		double bh = last.getBodyHighPriceDoubleValue();
 		double bl = last.getBodyLowPriceDoubleValue();
@@ -117,29 +125,6 @@ public class AreaFactoryImpl implements AreaFactory {
 		}
 	}
 	
-	private PositionSide getPositionSide() {
-		
-		PositionSide ps = PositionSide.DEFAULT;
-		
-		Klines current = PriceUtil.getLastKlines(list_trend);
-		
-		if(verifyLong(current)) {
-			ps = PositionSide.LONG;
-		} else if(verifyShort(current)) {
-			ps = PositionSide.SHORT;
-		}
-		
-		return ps;
-	}
-	
-	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
-	}
-	
-	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
-	}
-
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			openPrices.add(price);
