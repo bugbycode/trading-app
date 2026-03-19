@@ -53,7 +53,7 @@ public class SecurityConfig {
     			.requestMatchers("/shape/**", "/childApiKey/**",
     					"/user/**",
     					"/tradingview/**",
-    					"/bot/**").hasAnyRole("LOGIN")
+    					"/openInterestHist/**").hasAnyRole("LOGIN")
     	        .anyRequest().authenticated()
     	        
     			)
