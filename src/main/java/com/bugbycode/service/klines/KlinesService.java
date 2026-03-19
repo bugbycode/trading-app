@@ -155,11 +155,11 @@ public interface KlinesService {
 	
 	/**
 	 * 盘整区监控
-	 * @param list_1d 日线级别
+	 * @param list_trend 趋势k线
 	 * @param list 回撤使用的k线
 	 * @param list_15m
 	 */
-	public void consolidationAreaMonitor(List<Klines> list_1d, List<Klines> list, List<Klines> list_15m);
+	public void consolidationAreaMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 发送邮件
