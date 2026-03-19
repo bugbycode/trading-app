@@ -1143,7 +1143,7 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void consolidationAreaMonitor(List<Klines> list_1d, List<Klines> list, List<Klines> list_15m) {
-		AreaFactory factory = new AreaFactoryImpl(list_15m, list_1d, list_15m);
+		AreaFactory factory = new AreaFactoryImpl(list, list_1d, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
