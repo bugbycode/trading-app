@@ -55,12 +55,16 @@ public class AreaFactoryImpl implements AreaFactory {
 		if(list_trend.size() < 2 || list.size() < 50 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
-
-		this.ps = PositionSide.DEFAULT;
 		
 		this.list.sort(new KlinesComparator(SortType.ASC));
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		this.list_trend.sort(new KlinesComparator(SortType.ASC));
+		
+		this.ps = getPositionSide();
+		
+		if(this.ps == PositionSide.DEFAULT) {
+			return;
+		}
 		
 		Klines last_trend = PriceUtil.getLastKlines(list_trend);
 		
@@ -73,15 +77,13 @@ public class AreaFactoryImpl implements AreaFactory {
 		}
 		
 		Klines last = null;
+
+		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
-			if(PriceUtil.isBreachLong(current, hitPrice)) {
-				this.ps = PositionSide.LONG;
-				last = current;
-				break;
-			} else if(PriceUtil.isBreachShort(current, hitPrice)) {
-				this.ps = PositionSide.SHORT;
+			if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, hitPrice))
+					|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, hitPrice))) {
 				last = current;
 				break;
 			}
@@ -90,11 +92,9 @@ public class AreaFactoryImpl implements AreaFactory {
 			}
 		}
 		
-		if(this.ps == PositionSide.DEFAULT || last == null) {
+		if(last == null) {
 			return;
 		}
-		
-		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		
 		double h = last_trend.getHighPriceDoubleValue();
 		double l = last_trend.getLowPriceDoubleValue();
@@ -123,6 +123,27 @@ public class AreaFactoryImpl implements AreaFactory {
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 		}
+	}
+	
+	private PositionSide getPositionSide() {
+		PositionSide ps = PositionSide.DEFAULT;
+		int index = list_trend.size() - 1;
+		Klines current = list_trend.get(index);
+		Klines parent = list_trend.get(index - 1);
+		if(verifyLong(current, parent)) {
+			ps = PositionSide.LONG;
+		} else if(verifyShort(current, parent)) {
+			ps = PositionSide.SHORT;
+		}
+		return ps;
+	}
+	
+	private boolean verifyLong(Klines current, Klines parent) {
+		return PriceUtil.verifyPowerful_v28(current, parent);
+	}
+	
+	private boolean verifyShort(Klines current, Klines parent) {
+		return PriceUtil.verifyDecliningPrice_v28(current, parent);
 	}
 	
 	private void addPrices(OpenPrice price) {
