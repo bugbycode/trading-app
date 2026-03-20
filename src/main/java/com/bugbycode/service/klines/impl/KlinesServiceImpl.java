@@ -27,9 +27,8 @@ import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v3;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
-import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl_v2;
+import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
@@ -1092,9 +1091,9 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_1h, List<Klines> list_15m) {
+	public void futuresPriceAction(List<Klines> list_1h, List<Klines> list_15m) {
 		
-		PriceActionFactory factory = new PriceActionFactoryImpl_v2(list_1h, list_1d, list_15m);
+		PriceActionFactory factory = new PriceActionFactoryImpl(list_1h, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
@@ -1125,11 +1124,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v3(list, list, list_15m);
-		
-		if(!(factory.isLong() || factory.isShort())) {
-			return;
-		}
+		PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		

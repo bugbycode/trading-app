@@ -10,7 +10,6 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
@@ -104,34 +103,36 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		Klines second = null;
 		Klines first = null;
 		
-		for(int index = list.size() - 1; index > 0; index--) {
+		for(int index = list.size() - 1; index > 2; index--) {
 			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
 			if(ps == PositionSide.LONG) {// low - high - low
 				if(third == null) {
-					if(verifyLow(current)) {
+					if(verifyLow(current, parent, next)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh(current, parent, next)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow(current)) {
+					if(verifyLow(current, parent, next)) {
 						first = current;
 						break;
 					}
 				}
 			} else if(ps == PositionSide.SHORT) { // high - low - high
 				if(third == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh(current, parent, next)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyLow(current)) {
+					if(verifyLow(current, parent, next)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh(current, parent, next)) {
 						first = current;
 						break;
 					}
@@ -174,27 +175,26 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		List<Klines> data = PriceUtil.subList(start, list);
-		MarketSentiment ms = new MarketSentiment(data);
 		Klines fibEnd = end;
 		
-		if(ms.isNotEmpty()) {
-			
-			if(mode == QuotationMode.LONG) {
-				fibEnd = ms.getMaxBodyLow();
-			} else {
-				fibEnd = ms.getMinBodyHigh();
+		Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		
+		double stopLoss = mode == QuotationMode.LONG ? last_15m.getHighPriceDoubleValue() : last_15m.getLowPriceDoubleValue();
+		
+		for(int index = list.size() - 1; index > 2;index--) {
+			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
+			if((mode == QuotationMode.LONG && verifyHigh(current, parent, next)) 
+					|| (mode == QuotationMode.SHORT && verifyLow(current, parent, next))) {
+				fibEnd = current;
+				addPrices(new OpenPriceDetails(fibInfo.getFibCode(current.getClosePriceDoubleValue()), current.getClosePriceDoubleValue(), stopLoss));
+				break;
 			}
-			
-			double stopLoss = mode == QuotationMode.LONG ? fibEnd.getHighPriceDoubleValue() : fibEnd.getLowPriceDoubleValue();
-			double openValue = mode == QuotationMode.LONG ? fibEnd.getBodyLowPriceDoubleValue() : fibEnd.getBodyHighPriceDoubleValue();
-			
-			addPrices(new OpenPriceDetails(fibInfo.getFibCode(openValue), openValue, stopLoss));
-			
-			if(fibEnd.lte(fibEnd)) {
-				fibEnd = end;
-			}
-			
+		}
+		
+		if(fibEnd.lte(end)) {
+			fibEnd = end;
 		}
 		
 		Klines fibAfterFlag = PriceUtil.getAfterKlines(fibEnd, this.list_15m);
@@ -213,29 +213,31 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list);
-		if(verifyLong(last)) {
+		int index = list.size() - 1;
+		Klines current = list.get(index);
+		Klines parent = list.get(index - 1);
+		if(verifyLong(current, parent)) {
 			ps = PositionSide.LONG;
-		} else if(verifyShort(last)) {
+		} else if(verifyShort(current, parent)) {
 			ps = PositionSide.SHORT;
 		}
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current) {
-		return current.getDea() < 0;
+	private boolean verifyLong(Klines current, Klines parent) {
+		return PriceUtil.verifyPowerful_v28(current, parent);
 	}
 	
-	private boolean verifyShort(Klines current) {
-		return current.getDea() > 0;
+	private boolean verifyShort(Klines current, Klines parent) {
+		return PriceUtil.verifyDecliningPrice_v28(current, parent);
 	}
 	
-	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
+	private boolean verifyHigh(Klines current, Klines parent, Klines next) {
+		return PriceUtil.verifyDecliningPrice_v28(current, parent) && PriceUtil.verifyPowerful_v28(parent, next);
 	}
 	
-	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getDea() < 0;
+	private boolean verifyLow(Klines current, Klines parent, Klines next) {
+		return PriceUtil.verifyPowerful_v28(current, parent) && PriceUtil.verifyDecliningPrice_v28(parent, next);
 	}
 	
 	private void addPrices(OpenPrice price) {
