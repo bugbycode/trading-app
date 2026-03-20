@@ -11,9 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
-import com.bugbycode.factory.priceAction.impl.HitCodeFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
-import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl_v2;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Inerval;
@@ -42,9 +40,9 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "ZECUSDT";
+        String pair = "ETHUSDT";
         
-        List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
@@ -53,7 +51,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl_v2(list, list_1d, list_15m);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
         
         logger.info("init factory finish.");
         

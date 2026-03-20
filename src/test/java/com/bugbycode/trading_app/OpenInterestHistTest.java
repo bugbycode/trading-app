@@ -73,6 +73,7 @@ public class OpenInterestHistTest {
 		List<OpenInterestHist> list = openInterestHistRepository.query();
 		logger.info(list.size());
 		int total = 0;
+		int limit = 0;
 		for(OpenInterestHist oih : list) {
 			long t = oih.getTimestamp();
 			long d = (now - t) / 1000 / 60 / 60 / 24;
@@ -80,10 +81,10 @@ public class OpenInterestHistTest {
 				String pair = oih.getSymbol();
 				logger.info("{}交易对已超过{}天未更新数据", pair, d);
 			}
-			if(oih.getTradeNumber() >= 10) {
+			if(oih.getTradeNumber() >= limit) {
 				logger.info(oih);
 			}
-			if(oih.getTradeNumber() >= 10) {
+			if(oih.getTradeNumber() >= limit) {
 				total++;
 			}
 		}
