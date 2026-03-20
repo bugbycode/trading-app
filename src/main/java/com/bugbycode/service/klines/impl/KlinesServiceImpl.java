@@ -27,8 +27,8 @@ import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v3;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
-import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl_v2;
 import com.bugbycode.module.BreakthroughTradeStatus;
 import com.bugbycode.module.FibCode;
@@ -1125,7 +1125,11 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v3(list, list, list_15m);
+		
+		if(!(factory.isLong() || factory.isShort())) {
+			return;
+		}
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
@@ -1462,6 +1466,8 @@ public class KlinesServiceImpl implements KlinesService {
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
 			
+			FibCode code = openPrice.getCode();//当前斐波那契点位
+			
 			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					) {
@@ -1476,8 +1482,9 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 
 					//开仓订阅提醒
-					String subject = String.format("%s看涨期权(%s)买入机会 %s", 
+					String subject = String.format("%s看涨期权%s(%s)买入机会 %s", 
 							pair, 
+							code.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
 							DateFormatUtil.format(new Date()));
 					
@@ -1507,6 +1514,8 @@ public class KlinesServiceImpl implements KlinesService {
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
 			
+			FibCode code = openPrice.getCode();//当前斐波那契点位
+			
 			if(PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					) {
@@ -1521,8 +1530,9 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					//开仓订阅提醒
-					String subject = String.format("%s看跌期权(%s)买入机会 %s", 
+					String subject = String.format("%s看跌期权%s(%s)买入机会 %s", 
 							pair, 
+							code.getDescription(),
 							PriceUtil.formatDoubleDecimal(price, fibInfo.getDecimalPoint()),
 							DateFormatUtil.format(new Date()));
 					
