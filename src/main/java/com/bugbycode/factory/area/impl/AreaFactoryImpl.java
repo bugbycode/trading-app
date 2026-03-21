@@ -102,7 +102,7 @@ public class AreaFactoryImpl implements AreaFactory {
 		double bh = last.getBodyHighPriceDoubleValue();
 		double bl = last.getBodyLowPriceDoubleValue();
 		
-		double take = h - l;
+		double take = (h - l) * 0.5;
 		
 		Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		double stopLoss = mode == QuotationMode.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
