@@ -169,7 +169,7 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.eoptionMonitor(klines_list_1d, klines_list_15m);
             
             //盘整区分析
-            klinesService.consolidationAreaMonitor(klines_list_4h_db, klines_list_15m, klines_list_15m);
+            klinesService.consolidationAreaMonitor(klines_list_1d, klines_list_1h, klines_list_15m);
             
 
         } catch (Exception e) {
