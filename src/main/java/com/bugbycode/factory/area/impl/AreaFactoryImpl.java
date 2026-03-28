@@ -69,10 +69,12 @@ public class AreaFactoryImpl implements AreaFactory {
 			Klines next = list.get(index - 2);
 			if(verifyLong(current, parent, next)) {
 				
-				if(current.isFall()) {
-					stopLossKlines = parent;
-				} else {
-					stopLossKlines = current;
+				if(list_inInerval == Inerval.INERVAL_15M) {
+					if(current.isFall()) {
+						stopLossKlines = parent;
+					} else {
+						stopLossKlines = current;
+					}
 				}
 				
 				last = current;
@@ -80,12 +82,13 @@ public class AreaFactoryImpl implements AreaFactory {
 				break;
 			} else if(verifyShort(current, parent, next)) {
 				
-				if(current.isRise()) {
-					stopLossKlines = parent;
-				} else {
-					stopLossKlines = current;
+				if(list_inInerval == Inerval.INERVAL_15M) {
+					if(current.isRise()) {
+						stopLossKlines = parent;
+					} else {
+						stopLossKlines = current;
+					}
 				}
-				
 				last = current;
 				this.ps = PositionSide.SHORT;
 				break;
