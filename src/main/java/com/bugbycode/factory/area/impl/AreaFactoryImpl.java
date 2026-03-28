@@ -59,25 +59,35 @@ public class AreaFactoryImpl implements AreaFactory {
 		Klines last = null;
 		
 		Klines stopLossKlines = PriceUtil.getLastKlines(list_15m);
+
+		Klines list_last = PriceUtil.getLastKlines(list);
+		Inerval list_inInerval = list_last.getInervalType();
 		
 		for(int index = list.size() - 1; index > 2; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
 			Klines next = list.get(index - 2);
 			if(verifyLong(current, parent, next)) {
-				if(current.isFall()) {
-					stopLossKlines = parent;
-				} else {
-					stopLossKlines = current;
+				
+				if(list_inInerval == Inerval.INERVAL_15M) {
+					if(current.isFall()) {
+						stopLossKlines = parent;
+					} else {
+						stopLossKlines = current;
+					}
 				}
+				
 				last = current;
 				this.ps = PositionSide.LONG;
 				break;
 			} else if(verifyShort(current, parent, next)) {
-				if(current.isRise()) {
-					stopLossKlines = parent;
-				} else {
-					stopLossKlines = current;
+				
+				if(list_inInerval == Inerval.INERVAL_15M) {
+					if(current.isRise()) {
+						stopLossKlines = parent;
+					} else {
+						stopLossKlines = current;
+					}
 				}
 				last = current;
 				this.ps = PositionSide.SHORT;
@@ -103,9 +113,6 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		double firstTakeProfit = 0; 
 		double secondTakeProfit = 0;
-		
-		Klines list_last = PriceUtil.getLastKlines(list);
-		Inerval list_inInerval = list_last.getInervalType();
 		
 		double price = 0;
 		if(isLong()) {
