@@ -43,6 +43,7 @@ import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
@@ -63,7 +64,7 @@ public class KlinesServiceTest {
     private KlinesRepository klinesRepository;
     
     @Autowired
-    private UserService userDetailsService;
+    private UserRepository userRepository;
 
     @Autowired
     private BinanceExchangeService binanceExchangeService;
@@ -186,7 +187,7 @@ public class KlinesServiceTest {
     	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-        klinesService.consolidationAreaMonitor(list_1d, list, list_15m);  
+        klinesService.consolidationAreaMonitor(list, list_15m);  
         try {
 			Thread.sleep(5 * 60 * 1000);
 		} catch (InterruptedException e) {
@@ -197,10 +198,10 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "SOLUSDT";
+        String pair = "DOGEUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
-        //List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
         Klines last_15m = PriceUtil.getLastKlines(list_15m);
@@ -209,7 +210,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_4h, list_4h, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl_v2(list, list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -283,13 +284,13 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "TAOUSDT";
-    	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
+    	String pair = "SIRENUSDT";
+    	//List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
-        AreaFactory factory = new AreaFactoryImpl(list, list_1d, list_15m);
+        AreaFactory factory = new AreaFactoryImpl(list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -307,7 +308,7 @@ public class KlinesServiceTest {
         
         List<OpenPrice> openPrices = factory.getOpenPrices();
         
-        List<User> userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN);
+        List<User> userList = userRepository.queryAllUser();
         for(User u : userList) {
 
             for(OpenPrice price : openPrices) {
@@ -473,7 +474,7 @@ public class KlinesServiceTest {
     @Test
     public void testDeltaAndCVD() {
         String pair = "ETHUSDT";
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,5000);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,5000);
         PriceUtil.calculateDeltaAndCvd(list);
         for(Klines k : list) {
         	logger.info("{}, {}, {}, {}, {}",k.getPair(), k.getInterval(),DateFormatUtil.format(k.getStartTime()) , k.getDelta(), k.getCvd());
