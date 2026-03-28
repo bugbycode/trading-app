@@ -27,7 +27,6 @@ import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v3;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -1125,11 +1124,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v3(list, list, list_15m);
-		
-		if(!(factory.isLong() || factory.isShort())) {
-			return;
-		}
+		PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
 		
 		FibInfo fibInfo = factory.getFibInfo();
 		
@@ -1146,8 +1141,8 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void consolidationAreaMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
-		AreaFactory factory = new AreaFactoryImpl(list, list_trend, list_15m);
+	public void consolidationAreaMonitor(List<Klines> list, List<Klines> list_15m) {
+		AreaFactory factory = new AreaFactoryImpl(list, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
