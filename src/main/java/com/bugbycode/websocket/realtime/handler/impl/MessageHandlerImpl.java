@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -29,18 +28,12 @@ public class MessageHandlerImpl implements MessageHandler{
 	@Override
 	public void handleMessage(String message, PerpetualWebSocketClientEndpoint client, KlinesService klinesService, 
 			KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, WorkTaskPool analysisWorkTaskPool,
-			WorkTaskPool workTaskPool, ContractType contractType) {
+			WorkTaskPool workTaskPool) {
 		
 		JSONObject result = new JSONObject(message);
 		JSONObject klinesJson = result.getJSONObject("k");
 		String openPriceStr = klinesJson.getString("o");
-		String pair = null;
-		
-		if(contractType == ContractType.E_OPTIONS) {
-			pair = result.getString("s");
-		} else {
-			pair = result.getString("ps");
-		}
+		String pair = result.getString("ps");
 		
 		int decimalNum = new BigDecimal(openPriceStr).scale();
 		
@@ -62,10 +55,10 @@ public class MessageHandlerImpl implements MessageHandler{
 			//15分钟k线分析
 			boolean isEmpty = klinesRepository.isEmpty(kline.getPair(), Inerval.INERVAL_1D);
 			if(isEmpty) {
-				workTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository, contractType));
+				workTaskPool.add(new SyncKlinesTask(kline.getPair(), new Date(), klinesService, klinesRepository));
 			} else {
 				klinesRepository.insert(kline);
-				analysisWorkTaskPool.add(new AnalysisKlinesTask(pair, klinesService, klinesRepository, openInterestHistRepository, contractType));
+				analysisWorkTaskPool.add(new AnalysisKlinesTask(pair, klinesService, klinesRepository, openInterestHistRepository));
 			}
 			/*
 			if(kline.getInervalType() == Inerval.INERVAL_15M) {

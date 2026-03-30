@@ -3,7 +3,6 @@ package com.bugbycode.trading_app.task.sync.work;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
-import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.service.klines.KlinesService;
 import com.util.DateFormatUtil;
@@ -31,15 +30,12 @@ public class SyncKlinesTask implements Runnable{
 
     private KlinesRepository klinesRepository;
     
-    private ContractType contractType;
-
     public SyncKlinesTask(String pair,Date now, KlinesService klinesService,
-        KlinesRepository klinesRepository, ContractType contractType){
+        KlinesRepository klinesRepository){
         this.pair = pair;
         this.now = now;
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
-        this.contractType = contractType;
     }
 
     @Override
@@ -56,7 +52,7 @@ public class SyncKlinesTask implements Runnable{
             //数据库中存储的k线信息
             List<Klines> klines_list_db = klinesRepository.findByPair(pair, Inerval.INERVAL_1D);
             
-            klinesService.checkData(klines_list_db, contractType);
+            klinesService.checkData(klines_list_db);
 
             KlinesUtil ku = new KlinesUtil(klines_list_db);
             Klines lastDayKlines = ku.removeLast();
@@ -69,7 +65,7 @@ public class SyncKlinesTask implements Runnable{
                 long startTime = lastDayKlines == null ? firstDayStartTime.getTime() : lastDayKlines.getEndTime() + 1;
                 
                 List<Klines> klines_list = klinesService.continuousKlines(pair, startTime, lastDayEndTimeDate.getTime(), 
-                                            Inerval.INERVAL_1D, QUERY_SPLIT.NOT_ENDTIME, contractType);
+                                            Inerval.INERVAL_1D, QUERY_SPLIT.NOT_ENDTIME);
                 
                 if(!CollectionUtils.isEmpty(klines_list)){
                     
@@ -83,7 +79,7 @@ public class SyncKlinesTask implements Runnable{
             //十五分钟级别
             List<Klines> klines_list_15m_db = klinesRepository.findByPair(pair, Inerval.INERVAL_15M);
 
-            klinesService.checkData(klines_list_15m_db, contractType);
+            klinesService.checkData(klines_list_15m_db);
 
             KlinesUtil ku_15m = new KlinesUtil(klines_list_15m_db);
             Klines lastKlines_15m = ku_15m.removeLast();
@@ -104,7 +100,7 @@ public class SyncKlinesTask implements Runnable{
 
             //同步15分钟级别k线信息
             List<Klines> klines_list_15m = klinesService.continuousKlines(pair, startTime, endTime_15m.getTime(), 
-                        Inerval.INERVAL_15M, QUERY_SPLIT.NOT_ENDTIME, contractType);
+                        Inerval.INERVAL_15M, QUERY_SPLIT.NOT_ENDTIME);
             if(!CollectionUtils.isEmpty(klines_list_15m)){
                 
                 logger.info("已获取到" + klines_list_15m.size() + "条" + pair + "交易对十五分钟级别k线信息");

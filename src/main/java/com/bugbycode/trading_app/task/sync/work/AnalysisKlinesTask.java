@@ -7,7 +7,6 @@ import org.springframework.util.CollectionUtils;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
-import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
@@ -33,15 +32,12 @@ public class AnalysisKlinesTask implements Runnable{
     
     private OpenInterestHistRepository openInterestHistRepository;
     
-    private ContractType contractType;
-
     public AnalysisKlinesTask(String pair, KlinesService klinesService, KlinesRepository klinesRepository,
-    		OpenInterestHistRepository openInterestHistRepository, ContractType contractType){
+    		OpenInterestHistRepository openInterestHistRepository){
         this.pair = pair;
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
         this.openInterestHistRepository = openInterestHistRepository;
-        this.contractType = contractType;
     }
 
     @Override
@@ -61,7 +57,7 @@ public class AnalysisKlinesTask implements Runnable{
                 return;
             }
             
-            if(!klinesService.checkData(klines_list_15m, contractType)) {
+            if(!klinesService.checkData(klines_list_15m)) {
             	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
             }
             
@@ -87,7 +83,7 @@ public class AnalysisKlinesTask implements Runnable{
             
             klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
             if(!CollectionUtils.isEmpty(klines_list_1h_db)) {
-                klinesService.checkData(klines_list_1h_db, contractType);
+                klinesService.checkData(klines_list_1h_db);
                 klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
             }
             //查询1小时级别k线信息 END ===============================================================================
@@ -117,7 +113,7 @@ public class AnalysisKlinesTask implements Runnable{
                 	
                 	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
                 	//检查数据完整性
-                	klinesService.checkData(klines_list_1d, contractType);
+                	klinesService.checkData(klines_list_1d);
                 	
                 	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
             	}
@@ -130,7 +126,7 @@ public class AnalysisKlinesTask implements Runnable{
             Klines klines_4h = PriceUtil.parse1Hto4H(klines_list_1h_db);
             List<Klines> klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
             if(CollectionUtils.isEmpty(klines_list_4h_db)) {
-            	List<Klines> klines_list_4h = klinesService.continuousKlines4H(pair, new Date(), 1500, QUERY_SPLIT.ALL, contractType);
+            	List<Klines> klines_list_4h = klinesService.continuousKlines4H(pair, new Date(), 1500, QUERY_SPLIT.ALL);
             	Klines klines_last_4h = PriceUtil.getLastKlines(klines_list_4h);
             	if(!PriceUtil.verifyKlines(klines_last_4h)) {
             		if(!CollectionUtils.isEmpty(klines_list_4h)) {
@@ -147,7 +143,7 @@ public class AnalysisKlinesTask implements Runnable{
             
             klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
             
-            if(!klinesService.checkData(klines_list_4h_db, contractType)) {
+            if(!klinesService.checkData(klines_list_4h_db)) {
             	klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
             }
             

@@ -15,7 +15,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
-import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
@@ -74,28 +73,6 @@ public class FuturesKlinesWebSocketTask {
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
-		//欧式期权
-		/*List<CoinPairSet> e_coinList = new ArrayList<CoinPairSet>();
-		List<SymbolExchangeInfo> list = binanceExchangeService.eOptionsExchangeInfoSymbol();
-		CoinPairSet e_set = new CoinPairSet(inerval, ContractType.E_OPTIONS);
-		for(SymbolExchangeInfo e_coin : list) {
-			AppConfig.SYNC_15M_KLINES_RECORD.put(e_coin.getSymbol(), new Date().getTime());
-			e_set.add(e_coin);
-			if(e_set.isFull()) {
-				e_coinList.add(e_set);
-				e_set = new CoinPairSet(inerval, ContractType.E_OPTIONS);
-			}
-		}
-		if(!e_set.isEmpty()) {
-			e_coinList.add(e_set);
-		}
-		
-		for(CoinPairSet e_s : e_coinList) {
-			new PerpetualWebSocketClientEndpoint(e_s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool, ContractType.E_OPTIONS);
-		}
-		*/
-		//欧式期权 END
-		
 		List<EoptionContracts> ecList = binanceExchangeService.eOptionsExchangeInfo();
 		for(EoptionContracts ec : ecList) {
 			AppConfig.EOPTION_EXCHANGE_INFO.put(ec.getUnderlying(), ec);
@@ -103,7 +80,7 @@ public class FuturesKlinesWebSocketTask {
 		
 		Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
 		
-		CoinPairSet set = new CoinPairSet(inerval, ContractType.PERPETUAL);
+		CoinPairSet set = new CoinPairSet(inerval);
 		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
 		for(SymbolExchangeInfo coin : pairs) {
 			
@@ -112,7 +89,7 @@ public class FuturesKlinesWebSocketTask {
 			set.add(coin);
 			if(set.isFull()) {
 				coinList.add(set);
-				set = new CoinPairSet(inerval, ContractType.PERPETUAL);
+				set = new CoinPairSet(inerval);
 			}
 		}
 		
@@ -121,7 +98,7 @@ public class FuturesKlinesWebSocketTask {
 		}
 		
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool, ContractType.PERPETUAL);
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
 		}
 		
 		

@@ -9,7 +9,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.binance.AutoTradeType;
-import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
@@ -23,11 +22,9 @@ public interface KlinesService {
 	 * @param endTime 结束时间戳
 	 * @param interval 时间级别 参考 com.bugbycode.module.Inerval.java
 	 * @param split 用来判断是否读取所有K线 ALL 所有 NOT_ENDTIME 没有返回最后一根K线
-	 * @param contractType 合约类型
 	 * @return
 	 */
-	public List<Klines> continuousKlines(String pair,long startTime,long endTime,Inerval interval,QUERY_SPLIT split, 
-			ContractType contractType);
+	public List<Klines> continuousKlines(String pair,long startTime,long endTime,Inerval interval,QUERY_SPLIT split);
 	
 
 	/**
@@ -36,10 +33,9 @@ public interface KlinesService {
 	 * @param now 时间
 	 * @param limit k线数量
 	 * @param split 用来判断是否读取所有K线 ALL 所有 NOT_ENDTIME 没有返回最后一根K线
-	 * @param contractType 合约类型
 	 * @return
 	 */
-	public List<Klines> continuousKlines1Day(String pair,Date now,int limit,QUERY_SPLIT split, ContractType contractType);
+	public List<Klines> continuousKlines1Day(String pair,Date now,int limit,QUERY_SPLIT split);
 	
 	/**
 	 * 查询5分钟级别K线信息
@@ -47,10 +43,9 @@ public interface KlinesService {
 	 * @param now 时间
 	 * @param limit k线数量
 	 * @param split 用来判断是否读取所有K线 ALL 所有 NOT_ENDTIME 没有返回最后一根K线
-	 * @param contractType 合约类型
 	 * @return
 	 */
-	public List<Klines> continuousKlines5M(String pair,Date now,int limit,QUERY_SPLIT split, ContractType contractType);
+	public List<Klines> continuousKlines5M(String pair,Date now,int limit,QUERY_SPLIT split);
 	
 	/**
 	 * 查询15分钟级别K线信息
@@ -58,10 +53,9 @@ public interface KlinesService {
 	 * @param now 时间
 	 * @param limit k线数量
 	 * @param split 用来判断是否读取所有K线 ALL 所有 NOT_ENDTIME 没有返回最后一根K线
-	 * @param contractType 合约类型
 	 * @return
 	 */
-	public List<Klines> continuousKlines15M(String pair,Date now,int limit,QUERY_SPLIT split, ContractType contractType);
+	public List<Klines> continuousKlines15M(String pair,Date now,int limit,QUERY_SPLIT split);
 	
 	/**
 	 * 查询4小时级别K线信息
@@ -69,10 +63,9 @@ public interface KlinesService {
 	 * @param now 时间
 	 * @param limit k线数量
 	 * @param split 用来判断是否读取所有K线 ALL 所有 NOT_ENDTIME 没有返回最后一根K线
-	 * @param contractType 合约类型
 	 * @return
 	 */
-	public List<Klines> continuousKlines4H(String pair,Date now,int limit,QUERY_SPLIT split, ContractType contractType);
+	public List<Klines> continuousKlines4H(String pair,Date now,int limit,QUERY_SPLIT split);
 	
 	/**
 	 * 合约做多
@@ -228,10 +221,9 @@ public interface KlinesService {
 	/**
      * 校验K线是否出现重复或缺失
      * @param list k线集合
-	 * @param contractType 合约类型
      * @return true 表示没有重复或缺失 false 表示出现重复或缺失k线
      */
-    public boolean checkData(List<Klines> list, ContractType contractType);
+    public boolean checkData(List<Klines> list);
     
     /**
      * 市价交易
@@ -261,7 +253,7 @@ public interface KlinesService {
 	 * @param contractType 合约类型
      * @return 有更新则返回true 否则返回false
      */
-    public boolean verifyUpdateDayKlines(List<Klines> list, ContractType contractType);
+    public boolean verifyUpdateDayKlines(List<Klines> list);
     
     /**
      * 量价分析

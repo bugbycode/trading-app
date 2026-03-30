@@ -16,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.ShapeInfo;
-import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
@@ -80,13 +79,13 @@ public class ShapeTradingTask {
 				}
 				pairSet.add(info);
 			}
-			CoinPairSet set = new CoinPairSet(inerval, ContractType.PERPETUAL);
+			CoinPairSet set = new CoinPairSet(inerval);
 			List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
 			for(SymbolExchangeInfo info : pairSet) {
 				set.add(info);
 				if(set.isFull()) {
 					coinList.add(set);
-					set = new CoinPairSet(inerval, ContractType.PERPETUAL);
+					set = new CoinPairSet(inerval);
 				}
 			}
 			
