@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
-import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.util.CoinPairSet;
@@ -46,7 +45,7 @@ public class BinanceExchangeServiceTest {
     public void testCoinSet() {
     	Set<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
     	for(SymbolExchangeInfo info : symbols) {
-    		CoinPairSet set = new CoinPairSet(Inerval.INERVAL_15M, ContractType.PERPETUAL);
+    		CoinPairSet set = new CoinPairSet(Inerval.INERVAL_15M);
     		set.add(info);
     		logger.info(set.getStreamName());
     	}
@@ -72,7 +71,7 @@ public class BinanceExchangeServiceTest {
     public void testEOptionsExchangeInfoSymbol() {
     	List<SymbolExchangeInfo> list = binanceExchangeService.eOptionsExchangeInfoSymbol();
     	for(SymbolExchangeInfo info : list) {
-    		CoinPairSet set = new CoinPairSet(Inerval.INERVAL_15M, info.getContractType());
+    		CoinPairSet set = new CoinPairSet(Inerval.INERVAL_15M);
     		set.add(info);
     		logger.info("{} - {}", info.getUnderlying(), set.getStreamName());
     	}

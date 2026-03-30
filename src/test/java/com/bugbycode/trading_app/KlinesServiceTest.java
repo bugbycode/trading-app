@@ -36,7 +36,6 @@ import com.bugbycode.module.StepPriceInfo;
 import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
-import com.bugbycode.module.binance.ContractType;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -109,9 +108,9 @@ public class KlinesServiceTest {
         }*/
         
         List<Klines> list_day = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
-        if(klinesService.verifyUpdateDayKlines(list_day, ContractType.PERPETUAL)){
+        if(klinesService.verifyUpdateDayKlines(list_day)){
             list_day = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
-            klinesService.checkData(list_day, ContractType.PERPETUAL);
+            klinesService.checkData(list_day);
         } 
     }
 
@@ -150,14 +149,14 @@ public class KlinesServiceTest {
     @Test
     public void testSyncKlines() throws UnsupportedEncodingException {
         String pair = "XAUUSDT";
-        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL, ContractType.PERPETUAL);
+        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL);
         logger.info(list);
     }
     
     @Test
     public void testSyncKlinesEoptions() throws UnsupportedEncodingException {
         String pair = "BTC-260220-74000-P";
-        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL, ContractType.E_OPTIONS);
+        List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL);
         logger.info(list);
         klinesRepository.insert(list);
     }
@@ -448,7 +447,7 @@ public class KlinesServiceTest {
         Date now = new Date();
         now = DateFormatUtil.parse(DateFormatUtil.format_yyyy_mm_dd_HH_00_00(now));
         String pair = "BTCUSDT";
-        List<Klines> list_4h = klinesService.continuousKlines4H(pair, now, 1500, QUERY_SPLIT.ALL, ContractType.PERPETUAL);
+        List<Klines> list_4h = klinesService.continuousKlines4H(pair, now, 1500, QUERY_SPLIT.ALL);
         Klines klines_last_4h = PriceUtil.getLastKlines(list_4h);
         if(!PriceUtil.verifyKlines(klines_last_4h)) {
             list_4h.remove(klines_last_4h);
