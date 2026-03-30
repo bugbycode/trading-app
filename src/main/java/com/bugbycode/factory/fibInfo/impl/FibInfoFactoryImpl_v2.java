@@ -109,7 +109,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateBollingerBands(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -253,11 +253,11 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() < 0;
+		return current.getLowPriceDoubleValue() <= current.getMiddleBand() && current.getMiddleBand() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() > 0;
+		return current.getHighPriceDoubleValue() >= current.getMiddleBand() && current.getMiddleBand() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {

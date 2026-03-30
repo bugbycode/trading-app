@@ -4092,7 +4092,7 @@ public class PriceUtil {
         }
 
         // 计算布林带
-        for (int i = size - period; i < size; i++) {
+        for (int i = period - 1; i < size; i++) {
             Klines kline = klines.get(i);
             double sum = 0;
             for (int j = i - period + 1; j <= i; j++) {
