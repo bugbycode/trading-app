@@ -43,7 +43,7 @@ public class PriceActionFactoryTest {
         String pair = "ETHUSDT";
         
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
         

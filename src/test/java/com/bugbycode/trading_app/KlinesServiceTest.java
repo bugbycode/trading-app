@@ -197,7 +197,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "LINKUSDT";
+        String pair = "OLUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -261,6 +261,16 @@ public class KlinesServiceTest {
         //logger.info(PriceUtil.isTraded(FibCode.FIB618, fibInfo));
         //logger.info(fibInfo.getNextFibCode(FibCode.FIB2));
         //logger.info(fibInfo.getTakeProfit_v2(FibCode.FIB2));
+    }
+    
+    @Test
+    public void testBollingerBands() {
+    	 String pair = "BTCUSDT";
+         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+         PriceUtil.calculateBollingerBands(list);
+         for(Klines k : list) {
+        	 logger.info(k);
+         }
     }
     
     
