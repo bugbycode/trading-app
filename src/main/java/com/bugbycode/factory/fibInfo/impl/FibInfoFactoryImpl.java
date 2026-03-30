@@ -21,7 +21,7 @@ import com.util.PriceComparator;
 import com.util.PriceUtil;
 
 /**
- * 斐波那契回指标撤接口实现类（趋势交易）
+ * 斐波那契回指标撤接口实现类
  */
 public class FibInfoFactoryImpl implements FibInfoFactory {
 
@@ -108,7 +108,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateBollingerBands(list);
+		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateBollingerBands(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
@@ -261,11 +261,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getLowPriceDoubleValue() > k.getMiddleBand() && k.getMiddleBand() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getHighPriceDoubleValue() < k.getMiddleBand() && k.getMiddleBand() > 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
