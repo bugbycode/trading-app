@@ -21,7 +21,6 @@ import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.FibCode;
@@ -72,7 +71,7 @@ public class KlinesServiceTest {
 		AppConfig.DEBUG = true;
 		System.setProperty("https.proxyHost", "localhost");
 		System.setProperty("https.proxyPort", "50000");
-		//binanceExchangeService.exchangeInfo();
+		binanceExchangeService.exchangeInfo();
 		//binanceExchangeService.eOptionsExchangeInfoSymbol();
 	}
 
@@ -148,7 +147,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testSyncKlines() throws UnsupportedEncodingException {
-        String pair = "XAUUSDT";
+        String pair = "BTCUSDT";
         List<Klines> list = klinesService.continuousKlines15M(pair, new Date(), 1, QUERY_SPLIT.ALL);
         logger.info(list);
     }
@@ -196,7 +195,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "OLUSDT";
+        String pair = "BNBUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -208,7 +207,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl_v2(list, list, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl(list, list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
