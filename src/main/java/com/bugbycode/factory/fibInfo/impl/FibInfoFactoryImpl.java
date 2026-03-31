@@ -203,8 +203,16 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			if(mode == QuotationMode.LONG) {
 				openCode = fibInfo.getFibCode(ms.getLowPrice());
+				double fibValue = fibInfo.getFibValue(openCode);
+				if(fibValue < ms.getLowPrice()) {
+					openCode = FibCode.FIB0;
+				}
 			} else {
 				openCode = fibInfo.getFibCode(ms.getHighPrice());
+				double fibValue = fibInfo.getFibValue(openCode);
+				if(fibValue > ms.getLowPrice()) {
+					openCode = FibCode.FIB0;
+				}
 			}
 			
 			if(openCode == FibCode.FIB0) {
@@ -213,23 +221,27 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 		}
 		
-		double fibValue = fibInfo.getFibValue(openCode);
-		
+		List<Klines> data = new ArrayList<Klines>();
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
 			if(current.lte(end)) {
 				break;
 			}
-			if(mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue)) {
-				addPrices(new OpenPriceDetails(openCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue()));
-				break;
-			} else if(mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue)) {
-				addPrices(new OpenPriceDetails(openCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue()));
-				break;
+			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v31(current, parent, next))
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v31(current, parent, next))) {
+				data.add(current);
 			}
-			
 		}
 		
+		MarketSentiment ms = new MarketSentiment(data);
+		if(ms.isNotEmpty()) {
+			Klines hitKlines = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
+			double hitPrice = mode == QuotationMode.LONG ? hitKlines.getBodyHighPriceDoubleValue() : hitKlines.getBodyLowPriceDoubleValue();
+			double stopLoss = mode == QuotationMode.LONG ? hitKlines.getLowPriceDoubleValue() : hitKlines.getHighPriceDoubleValue();
+			addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss));
+		}
 		
 		if(mode == QuotationMode.LONG) {
 			this.openPrices.sort(new PriceComparator(SortType.DESC));
