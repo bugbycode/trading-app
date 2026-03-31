@@ -178,7 +178,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		for(int index = list.size() - 1; index > 2;index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
-			if((mode == QuotationMode.LONG && PriceUtil.verifyDecliningPrice_v30(current, parent)) 
+			if((mode == QuotationMode.LONG && PriceUtil.verifyDeclining_v30(current, parent)) 
 					|| (mode == QuotationMode.SHORT && PriceUtil.verifyPowerful_v30(current, parent))) {
 				fibEnd = current;
 				double stopLoss = mode == QuotationMode.LONG ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
@@ -225,11 +225,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyHigh(Klines current) {
-		return current.getDea() > 0 && current.getMacd() > 0;
+		return current.getClosePriceDoubleValue() > current.getMiddleBand() && current.getMiddleBand() > 0;
 	}
 	
 	private boolean verifyLow(Klines current) {
-		return current.getDea() < 0 && current.getMacd() < 0;
+		return current.getClosePriceDoubleValue() < current.getMiddleBand() && current.getMiddleBand() > 0;
 	}
 	
 	private void addPrices(OpenPrice price) {

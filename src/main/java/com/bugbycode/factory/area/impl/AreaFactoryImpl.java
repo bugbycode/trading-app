@@ -141,11 +141,11 @@ public class AreaFactoryImpl implements AreaFactory {
 	}
 	
 	private boolean verifyLong(Klines current, Klines parent, Klines next) {
-		return PriceUtil.verifyDecliningPrice_v28(parent, next) && PriceUtil.verifyPowerful_v28(current, parent);
+		return PriceUtil.verifyDeclining_v28(parent, next) && PriceUtil.verifyPowerful_v28(current, parent);
 	}
 	
 	private boolean verifyShort(Klines current, Klines parent, Klines next) {
-		return PriceUtil.verifyPowerful_v28(parent, next) && PriceUtil.verifyDecliningPrice_v28(current, parent);
+		return PriceUtil.verifyPowerful_v28(parent, next) && PriceUtil.verifyDeclining_v28(current, parent);
 	}
 	
 	private void addPrices(OpenPrice price) {

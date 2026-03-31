@@ -1753,7 +1753,7 @@ public class PriceUtil {
 	 * @param list
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice(List<Klines> list) {
+	public static boolean verifyDeclining(List<Klines> list) {
 		
 		int lastIndex = list.size() - 1;
 		Klines k0 = list.get(lastIndex);
@@ -1834,7 +1834,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice(Klines current,Klines parent) {
+	public static boolean verifyDeclining(Klines current,Klines parent) {
 		boolean flag = false;
 		if(isFall_V2(current,parent)) {// 下跌
 			flag = true;
@@ -1854,7 +1854,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v5(Klines current,Klines parent) {
+	public static boolean verifyDeclining_v5(Klines current,Klines parent) {
 		return parent.getEma7() >= parent.getEma99() && current.getEma7() < parent.getEma99();
 	}
 	
@@ -1864,7 +1864,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v6(Klines current,Klines parent) {
+	public static boolean verifyDeclining_v6(Klines current,Klines parent) {
 		return current.isFall() && parent.isRise() && (current.getBbPercentB() >= 1 || parent.getBbPercentB() >= 1);
 	}
 	
@@ -1873,7 +1873,7 @@ public class PriceUtil {
 	 * @param current 当前k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v7(Klines current) {
+	public static boolean verifyDeclining_v7(Klines current) {
 		return  current.isFall() && isBreachShort(current, current.getEma7()) && isBreachShort(current, current.getEma25()) 
 				&& current.getEma7() > current.getEma25() && current.getEma25() > current.getEma99() && current.getEma99() > 0;
 	}
@@ -1885,7 +1885,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v8(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v8(Klines current, Klines parent) {
 		return  current.getMacd() < 0 && parent.getMacd() >= 0;
 	}
 	
@@ -1896,7 +1896,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v17(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v17(Klines current, Klines parent) {
 		return  current.getDelta() < 0 && parent.getDelta() >= 0;
 	}
 	
@@ -1908,7 +1908,7 @@ public class PriceUtil {
 	 * @param next ......
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v10(Klines current, Klines parent, Klines next) {
+	public static boolean verifyDeclining_v10(Klines current, Klines parent, Klines next) {
 		return  parent.getMacd() >= next.getMacd() && current.getMacd() < parent.getMacd();
 	}
 	
@@ -1920,7 +1920,7 @@ public class PriceUtil {
 	 * @param next ......
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v16(Klines current, Klines parent, Klines next) {
+	public static boolean verifyDeclining_v16(Klines current, Klines parent, Klines next) {
 		return  parent.getDif() >= next.getDif() && current.getDif() < parent.getDif();
 	}
 	
@@ -1931,7 +1931,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v9(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v9(Klines current, Klines parent) {
 		double ema99 = current.getEma99();
 		double h = current.getHighPriceDoubleValue();
 		double p_ema99 = parent.getEma99();
@@ -1945,7 +1945,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v11(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v11(Klines current, Klines parent) {
 		return current.getEma7() < current.getEma25() && parent.getEma7() >= parent.getEma25();
 	}
 	
@@ -1957,7 +1957,7 @@ public class PriceUtil {
 	 * @param next ......
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v12(Klines current, Klines parent, Klines next) {
+	public static boolean verifyDeclining_v12(Klines current, Klines parent, Klines next) {
 		return parent.getEma25() >= next.getEma25() && current.getEma25() < parent.getEma25();
 	}
 	
@@ -1968,7 +1968,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v13(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v13(Klines current, Klines parent) {
 		return current.getBbPercentB() < 0.5 && parent.getBbPercentB() >= 0.5;
 	}
 	
@@ -1979,7 +1979,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v14(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v14(Klines current, Klines parent) {
 		return current.getMacd() < parent.getMacd();
 	}
 	
@@ -1990,7 +1990,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v15(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v15(Klines current, Klines parent) {
 		return current.getDea() > 0 && current.getDif() < 0 && parent.getDif() >= 0;
 	}
 	
@@ -2001,7 +2001,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v18(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v18(Klines current, Klines parent) {
 		return current.getDea() < 0 && parent.getDea() >= 0;
 	}
 	
@@ -2011,7 +2011,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v19(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v19(Klines current, Klines parent) {
 		return current.getEma25() < current.getEma99() && parent.getEma25() >= parent.getEma99() && parent.getEma99() > 0;
 	}
 	
@@ -2021,7 +2021,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v20(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v20(Klines current, Klines parent) {
 		return current.getDif() < 0 && parent.getDif() >= 0;
 	}
 	
@@ -2031,7 +2031,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v21(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v21(Klines current, Klines parent) {
 		return (current.isFall() && current.getBodyLowPriceDoubleValue() <= parent.getBodyLowPriceDoubleValue())
 				|| (current.isRise() && current.getBodyHighPriceDoubleValue() < parent.getHighPriceDoubleValue());
 	}
@@ -2043,7 +2043,7 @@ public class PriceUtil {
 	 * @param next ......
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v22(Klines current, Klines parent, Klines next) {
+	public static boolean verifyDeclining_v22(Klines current, Klines parent, Klines next) {
 		boolean result = false;
 		if(next.isRise() && parent.isFall() && current.isRise() && parent.getBodyLowPriceDoubleValue() > next.getBodyLowPriceDoubleValue()  
 				&& current.getBodyHighPriceDoubleValue() < parent.getBodyHighPriceDoubleValue()) {//颓势
@@ -2058,7 +2058,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v23(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v23(Klines current, Klines parent) {
 		return current.isFall() && current.getBodyLowPriceDoubleValue() < parent.getLowPriceDoubleValue();
 	}
 	
@@ -2071,7 +2071,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v24(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v24(Klines current, Klines parent) {
 		return current.isUplead() && parent.isRise();
 	}
 
@@ -2084,7 +2084,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v25(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v25(Klines current, Klines parent) {
 		return current.isFall() && parent.isRise();
 	}
 	
@@ -2097,7 +2097,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v26(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v26(Klines current, Klines parent) {
 		return parent.isRise() && current.getClosePriceDoubleValue() <= parent.getLowPriceDoubleValue();
 	}
 	
@@ -2110,7 +2110,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v27(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v27(Klines current, Klines parent) {
 		return current.getClosePriceDoubleValue() <= parent.getLowPriceDoubleValue();
 	}
 	
@@ -2123,7 +2123,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v28(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v28(Klines current, Klines parent) {
 		return current.getClosePriceDoubleValue() <= parent.getOpenPriceDoubleValue();
 	}
 	
@@ -2136,7 +2136,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v29(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v29(Klines current, Klines parent) {
 		return current.getClosePriceDoubleValue() < current.getEma7() && parent.getClosePriceDoubleValue() >= parent.getEma7();
 	}
 	
@@ -2149,7 +2149,7 @@ public class PriceUtil {
 	 * @param parent 前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v30(Klines current, Klines parent) {
+	public static boolean verifyDeclining_v30(Klines current, Klines parent) {
 		return current.getClosePriceDoubleValue() < current.getMiddleBand() && parent.getClosePriceDoubleValue() >= parent.getMiddleBand();
 	}
 	
@@ -2163,8 +2163,8 @@ public class PriceUtil {
 	 * @param next ......
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v31(Klines current, Klines parent, Klines next) {
-		return parent.getHighPriceDoubleValue() >= next.getHighPriceDoubleValue() && current.getHighPriceDoubleValue() < parent.getHighPriceDoubleValue();
+	public static boolean verifyDeclining_v31(Klines current, Klines parent, Klines next) {
+		return parent.getHighPriceDoubleValue() > next.getHighPriceDoubleValue() && current.getHighPriceDoubleValue() <= parent.getHighPriceDoubleValue();
 	}
 	
 	/**
@@ -2505,7 +2505,7 @@ public class PriceUtil {
 	 * @return
 	 */
 	public static boolean verifyPowerful_v31(Klines current, Klines parent, Klines next) {
-		return parent.getLowPriceDoubleValue() <= next.getLowPriceDoubleValue() && current.getLowPriceDoubleValue() > parent.getLowPriceDoubleValue();
+		return parent.getLowPriceDoubleValue() < next.getLowPriceDoubleValue() && current.getLowPriceDoubleValue() >= parent.getLowPriceDoubleValue();
 	}
 	
 	/**
@@ -2539,7 +2539,7 @@ public class PriceUtil {
 	 * @param k2 前前一根k线
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v2(Klines k0, Klines k1, Klines k2) {
+	public static boolean verifyDeclining_v2(Klines k0, Klines k1, Klines k2) {
 		boolean flag = false;
 		if(k0.isFall() && k1.isRise() && k2.isRise() && k0.getClosePriceDoubleValue() <= k1.getOpenPriceDoubleValue()) {
 			flag = true;
@@ -2552,7 +2552,7 @@ public class PriceUtil {
 	 * @param list
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v3(List<Klines> list) {
+	public static boolean verifyDeclining_v3(List<Klines> list) {
 		
 		int lastIndex = list.size() - 1;
 		Klines k0 = list.get(lastIndex);
@@ -2605,7 +2605,7 @@ public class PriceUtil {
 	 * @param list 价格参考的k线信息
 	 * @return
 	 */
-	public static boolean verifyDecliningPrice_v4(FibInfo fibInfo, List<Klines> list) {
+	public static boolean verifyDeclining_v4(FibInfo fibInfo, List<Klines> list) {
 		boolean result = false;
 		if(!(fibInfo == null || CollectionUtils.isEmpty(list))) {
 			Klines current = getLastKlines(list);

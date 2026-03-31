@@ -230,7 +230,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				break;
 			}
 			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v31(current, parent, next))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDecliningPrice_v31(current, parent, next))) {
+					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v31(current, parent, next))) {
 				data.add(current);
 			}
 		}
