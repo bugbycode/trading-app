@@ -109,7 +109,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateBollingerBands(list_trend);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
