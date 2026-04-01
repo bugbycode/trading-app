@@ -203,16 +203,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			if(mode == QuotationMode.LONG) {
 				openCode = fibInfo.getFibCode(ms.getLowPrice());
-				double fibValue = fibInfo.getFibValue(openCode);
-				if(fibValue < ms.getLowPrice()) {
-					openCode = FibCode.FIB0;
-				}
 			} else {
 				openCode = fibInfo.getFibCode(ms.getHighPrice());
-				double fibValue = fibInfo.getFibValue(openCode);
-				if(fibValue > ms.getLowPrice()) {
-					openCode = FibCode.FIB0;
-				}
 			}
 			
 			if(openCode == FibCode.FIB0) {
