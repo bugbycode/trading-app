@@ -221,8 +221,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(current.lte(end)) {
 				break;
 			}
-			if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v31(current, parent, next))
-					|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v31(current, parent, next))) {
+			if((mode == QuotationMode.LONG && (PriceUtil.verifyPowerful_v31(current, parent, next) || PriceUtil.verifyPowerful_v28(current, parent)))
+					|| (mode == QuotationMode.SHORT && (PriceUtil.verifyDeclining_v31(current, parent, next) || PriceUtil.verifyDeclining_v28(current, parent)))) {
 				data.add(current);
 			}
 		}
