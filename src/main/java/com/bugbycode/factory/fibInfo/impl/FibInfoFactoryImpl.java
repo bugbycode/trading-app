@@ -109,7 +109,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateEMA_7_25_99(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -257,11 +257,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getEma7() < current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getEma7() > current.getEma25() && current.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
