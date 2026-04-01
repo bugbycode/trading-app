@@ -202,9 +202,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			
 			if(mode == QuotationMode.LONG) {
-				openCode = fibInfo.getFibCode(ms.getLowPrice());
+				openCode = fibInfo.getFibCode_v2(ms.getLowPrice());
 			} else {
-				openCode = fibInfo.getFibCode(ms.getHighPrice());
+				openCode = fibInfo.getFibCode_v2(ms.getHighPrice());
 			}
 			
 			if(openCode == FibCode.FIB0) {
