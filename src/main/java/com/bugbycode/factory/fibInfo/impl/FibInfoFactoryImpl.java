@@ -265,11 +265,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getLowPriceDoubleValue() <= current.getMiddleBand() && current.getMiddleBand() > 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getHighPriceDoubleValue() >= current.getMiddleBand() && current.getMiddleBand() > 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
