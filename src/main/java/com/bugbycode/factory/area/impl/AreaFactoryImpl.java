@@ -7,7 +7,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.module.FibCode;
-import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
@@ -23,20 +22,26 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private List<Klines> list_15m;
 	
+	private List<Klines> list_trend;
+	
 	private List<Klines> fibAfterKlines;
 	
 	private PositionSide ps;
 	
 	private List<OpenPrice> openPrices;
 	
-	public AreaFactoryImpl(List<Klines> list, List<Klines> list_15m) {
+	public AreaFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.ps = PositionSide.DEFAULT;
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
+		}
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
 		}
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -47,7 +52,7 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private void init() {
 		
-		if(list.size() < 3 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(CollectionUtils.isEmpty(list_trend) || list.size() < 3 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
@@ -55,37 +60,26 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		this.list.sort(new KlinesComparator(SortType.ASC));
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
+		this.list_trend.sort(new KlinesComparator(SortType.ASC));
+		
+		Klines list_trend_last = PriceUtil.getLastKlines(list_trend);
+		
+		double hitPrice = list_trend_last.getClosePriceDoubleValue();
 		
 		Klines last = null;
 		
-		Klines stopLossKlines = PriceUtil.getLastKlines(list_15m);
+		//Klines stopLossKlines = PriceUtil.getLastKlines(list_15m);
 
-		Klines list_last = PriceUtil.getLastKlines(list);
-		Inerval list_inInerval = list_last.getInervalType();
+		//Klines list_last = PriceUtil.getLastKlines(list);
+		//Inerval list_inInerval = list_last.getInervalType();
 		
 		for(int index = list.size() - 1; index > 2; index--) {
 			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			Klines next = list.get(index - 2);
-			if(verifyLong(current, parent, next)) {
-				
-				if(current.isFall()) {
-					stopLossKlines = parent;
-				} else {
-					stopLossKlines = current;
-				}
-				
+			if(PriceUtil.isBreachLong(current, hitPrice)) {
 				last = current;
 				this.ps = PositionSide.LONG;
 				break;
-			} else if(verifyShort(current, parent, next)) {
-				
-				if(current.isRise()) {
-					stopLossKlines = parent;
-				} else {
-					stopLossKlines = current;
-				}
-				
+			} else if(PriceUtil.isBreachShort(current, hitPrice)) {
 				last = current;
 				this.ps = PositionSide.SHORT;
 				break;
@@ -98,15 +92,15 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		
-		double h = last.getHighPriceDoubleValue();
-		double l = last.getLowPriceDoubleValue();
+		double h = list_trend_last.getHighPriceDoubleValue();
+		double l = list_trend_last.getLowPriceDoubleValue();
 		//double c = last.getClosePriceDoubleValue();
 		double bh = last.getBodyHighPriceDoubleValue();
 		double bl = last.getBodyLowPriceDoubleValue();
 		
-		double take = h - l;
+		double take = (h - l) * 0.9;
 		
-		double stopLoss = mode == QuotationMode.LONG ? stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
+		double stopLoss = mode == QuotationMode.LONG ? last.getLowPriceDoubleValue() : last.getHighPriceDoubleValue();
 		
 		double firstTakeProfit = 0; 
 		double secondTakeProfit = 0;
@@ -115,19 +109,11 @@ public class AreaFactoryImpl implements AreaFactory {
 		if(isLong()) {
 			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(bh + (take / 2), last.getDecimalNum()) );
 			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(bh + take, last.getDecimalNum()) );
-			if(list_inInerval == Inerval.INERVAL_15M) {
-				price = bl;
-			} else {
-				price = bh;
-			}
+			price = bh;
 		} else if(isShort()) {
 			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(bl - (take / 2), last.getDecimalNum()) );
 			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(bl - take, last.getDecimalNum()) );
-			if(list_inInerval == Inerval.INERVAL_15M) {
-				price = bh;
-			} else {
-				price = bl;
-			}
+			price = bl;
 		}
 		
 		if(price > 0) {
@@ -138,14 +124,6 @@ public class AreaFactoryImpl implements AreaFactory {
 		if(fibAfterFlag != null) {
 			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
 		}
-	}
-	
-	private boolean verifyLong(Klines current, Klines parent, Klines next) {
-		return PriceUtil.verifyDeclining_v28(parent, next) && PriceUtil.verifyPowerful_v28(current, parent);
-	}
-	
-	private boolean verifyShort(Klines current, Klines parent, Klines next) {
-		return PriceUtil.verifyPowerful_v28(parent, next) && PriceUtil.verifyDeclining_v28(current, parent);
 	}
 	
 	private void addPrices(OpenPrice price) {
