@@ -97,6 +97,9 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		double h = list_trend_last.getHighPriceDoubleValue();
 		double l = list_trend_last.getLowPriceDoubleValue();
+		double lt_bh = list_trend_last.getBodyHighPriceDoubleValue();
+		double lt_bl = list_trend_last.getBodyLowPriceDoubleValue();
+		
 		//double c = last.getClosePriceDoubleValue();
 		double bh = last.getBodyHighPriceDoubleValue();
 		double bl = last.getBodyLowPriceDoubleValue();
@@ -110,12 +113,12 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		double price = 0;
 		if(isLong()) {
-			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(bh + (take / 2), last.getDecimalNum()) );
-			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(bh + take, last.getDecimalNum()) );
+			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(lt_bh + (take / 2), last.getDecimalNum()) );
+			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(lt_bh + take, last.getDecimalNum()) );
 			price = bh;
 		} else if(isShort()) {
-			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(bl - (take / 2), last.getDecimalNum()) );
-			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(bl - take, last.getDecimalNum()) );
+			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(lt_bl - (take / 2), last.getDecimalNum()) );
+			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(lt_bl - take, last.getDecimalNum()) );
 			price = bl;
 		}
 		
