@@ -68,13 +68,16 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		Klines last = null;
 		
-		//Klines stopLossKlines = PriceUtil.getLastKlines(list_15m);
-
-		//Klines list_last = PriceUtil.getLastKlines(list);
-		//Inerval list_inInerval = list_last.getInervalType();
+		Klines list_trend_last_after = PriceUtil.getAfterKlines(list_trend_last, list);
+		if(list_trend_last_after == null) {
+			return;
+		}
 		
 		for(int index = list.size() - 1; index > 2; index--) {
 			Klines current = list.get(index);
+			if(current.lt(list_trend_last_after)) {
+				break;
+			}
 			if(PriceUtil.isBreachLong(current, hitPrice)) {
 				last = current;
 				this.ps = PositionSide.LONG;
