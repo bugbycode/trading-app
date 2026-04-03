@@ -26,7 +26,6 @@ import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
@@ -1114,7 +1113,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl(list, list, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list, list, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
