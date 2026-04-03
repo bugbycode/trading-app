@@ -211,24 +211,30 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			} else {
 				openCode = fibInfo.getFibCode(ms.getHighPrice());
 			}
+			
+			if(ps_mode == PositionSide.DEFAULT && openCode.lte(FibCode.FIB382)) {
+				openCode = FibCode.FIB0;
+			}
+			
 			if(openCode.gt(FibCode.FIB1)) {
 				openCode = FibCode.FIB1;
 			}
-		}
-		
-		if(openCode.gt(FibCode.FIB0)) {
-			double fibValue = fibInfo.getFibValue(openCode);
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				if(current.lte(end)) {
-					break;
-				}
-				if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
-						|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
-					double stopLoss = mode == QuotationMode.LONG ? current.getLowPriceDoubleValue() : current.getHighPriceDoubleValue();
-					double hitPrice = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
-					addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss));
-					break;
+			
+			if(openCode.gt(FibCode.FIB0)) {
+				double fibValue = fibInfo.getFibValue(openCode);
+				for(int index = list.size() - 1; index > 0; index--) {
+					Klines current = list.get(index);
+					if(current.lte(end)) {
+						break;
+					}
+					if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
+							|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
+						//double stopLoss = mode == QuotationMode.LONG ? current.getLowPriceDoubleValue() : current.getHighPriceDoubleValue();
+						double stopLoss = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
+						double hitPrice = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
+						addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss));
+						break;
+					}
 				}
 			}
 		}
@@ -262,19 +268,19 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getMacd() < 0;
+		return current.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getMacd() > 0;
+		return current.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
