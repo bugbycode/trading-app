@@ -202,37 +202,38 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			
 			if(mode == QuotationMode.LONG) {
-				openCode = fibInfo.getFibCode_v2(ms.getLowPrice());
+				openCode = fibInfo.getFibCode(ms.getLowPrice());
 			} else {
-				openCode = fibInfo.getFibCode_v2(ms.getHighPrice());
+				openCode = fibInfo.getFibCode(ms.getHighPrice());
 			}
 			
 			if(openCode == FibCode.FIB0) {
 				return;
 			}
-			
-		}
-		
-		List<Klines> data = new ArrayList<Klines>();
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
-			Klines next = list.get(index - 2);
-			if(current.lte(end)) {
-				break;
+			double stopLoss = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
+			//获取开仓价
+			Klines fibAfter = PriceUtil.getAfterKlines(end, list);
+			if(fibAfter != null) {
+				List<Klines> fibAferSubList = PriceUtil.subList(fibAfter, list);
+				ms = new MarketSentiment(fibAferSubList);
+				if(ms.isNotEmpty()) {
+					Klines hitKlines = mode == QuotationMode.LONG ? ms.getMinBodyLow() : ms.getMaxBodyHigh();
+					double hitPrice = mode == QuotationMode.LONG ? ms.getMinBodyLowPrice() : ms.getMaxBodyHighPrice();
+					Klines hitKlinesAfter_15m = PriceUtil.getAfterKlines(hitKlines, list_15m);
+					for(int index = list_15m.size() - 1; index > 0; index--) {
+						Klines current = list_15m.get(index);
+						if(current.lt(hitKlinesAfter_15m)) {
+							break;
+						}
+						if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, hitPrice))
+								|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, hitPrice))) {
+							double price = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
+							addPrices(new OpenPriceDetails(openCode, price, stopLoss));
+							break;
+						}
+					}
+				}
 			}
-			if((mode == QuotationMode.LONG && (PriceUtil.verifyPowerful_v31(current, parent, next) || PriceUtil.verifyPowerful_v28(current, parent)))
-					|| (mode == QuotationMode.SHORT && (PriceUtil.verifyDeclining_v31(current, parent, next) || PriceUtil.verifyDeclining_v28(current, parent)))) {
-				data.add(current);
-			}
-		}
-		
-		MarketSentiment ms = new MarketSentiment(data);
-		if(ms.isNotEmpty()) {
-			Klines hitKlines = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
-			double hitPrice = mode == QuotationMode.LONG ? hitKlines.getBodyHighPriceDoubleValue() : hitKlines.getBodyLowPriceDoubleValue();
-			double stopLoss = mode == QuotationMode.LONG ? hitKlines.getLowPriceDoubleValue() : hitKlines.getHighPriceDoubleValue();
-			addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss));
 		}
 		
 		if(mode == QuotationMode.LONG) {
