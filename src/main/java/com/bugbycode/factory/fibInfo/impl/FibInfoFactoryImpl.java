@@ -210,6 +210,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(openCode == FibCode.FIB0) {
 				return;
 			}
+			
 			double stopLoss = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			//获取开仓价
 			Klines fibAfter = PriceUtil.getAfterKlines(end, list);
@@ -258,19 +259,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		return current.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
