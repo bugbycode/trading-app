@@ -222,8 +222,8 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			
 			if(openCode.gt(FibCode.FIB0)) {
 				double fibValue = fibInfo.getFibValue(openCode);
-				for(int index = list.size() - 1; index > 0; index--) {
-					Klines current = list.get(index);
+				for(int index = list_15m.size() - 1; index > 0; index--) {
+					Klines current = list_15m.get(index);
 					if(current.lte(end)) {
 						break;
 					}
