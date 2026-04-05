@@ -28,6 +28,7 @@ import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ReversalPoint;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.StepPriceInfo;
+import com.bugbycode.module.WeekDay;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
 
@@ -1396,6 +1397,36 @@ public class PriceUtil {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * 获取最后一周K线
+	 * @param list 日线级别k线信息
+	 * @return
+	 */
+	public static Klines getLastWeekKlines(List<Klines> list) {
+		List<Klines> data = new ArrayList<Klines>();
+		if(!(CollectionUtils.isEmpty(list) || list.size() < 14)) {
+			boolean startAdd = false;
+			for(int index = list.size() - 1; index >= 0; index--) {
+				Klines k = list.get(index);
+				if(k.getInervalType() != Inerval.INERVAL_1D) {
+					break;
+				}
+				WeekDay weekDay = DateFormatUtil.getWeekDay(k.getStartTime());
+				if(!startAdd) {
+					if(weekDay == WeekDay.MONDAY) {
+						startAdd = true;
+					}
+					continue;
+				}
+				data.add(k);
+				if(weekDay == WeekDay.MONDAY) {
+					break;
+				}
+			}
+		}
+		return parse(data, Inerval.INERVAL_1W);
 	}
 	
 	/**

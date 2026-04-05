@@ -24,6 +24,8 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private List<Klines> list_trend;
 	
+	private Klines list_trend_last;
+	
 	private List<Klines> fibAfterKlines;
 	
 	private PositionSide ps;
@@ -50,9 +52,27 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.init();
 	}
 	
+	public AreaFactoryImpl(Klines list_trend_last, List<Klines> list, List<Klines> list_15m) {
+		this.ps = PositionSide.DEFAULT;
+		this.list = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
+		this.fibAfterKlines = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<OpenPrice>();
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+		}
+		this.list_trend_last = list_trend_last;
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
+		
+		this.init();
+	}
+	
 	private void init() {
 		
-		if(CollectionUtils.isEmpty(list_trend) || list.size() < 3 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(list.size() < 3 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
@@ -60,9 +80,14 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		this.list.sort(new KlinesComparator(SortType.ASC));
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
-		this.list_trend.sort(new KlinesComparator(SortType.ASC));
 		
-		Klines list_trend_last = PriceUtil.getLastKlines(list_trend);
+		if(list_trend_last == null) {
+			if(CollectionUtils.isEmpty(list_trend)){
+				return;
+			}
+			this.list_trend.sort(new KlinesComparator(SortType.ASC));
+			list_trend_last = PriceUtil.getLastKlines(list_trend);
+		}
 		
 		double hitPrice = list_trend_last.getClosePriceDoubleValue();
 		

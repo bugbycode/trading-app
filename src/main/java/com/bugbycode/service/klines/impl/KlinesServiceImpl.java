@@ -1131,7 +1131,15 @@ public class KlinesServiceImpl implements KlinesService {
 			openShort_eOption(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
 		}*/
 		
-		AreaFactory factory = new AreaFactoryImpl(list_trend, list, list_15m);
+		Klines list_trend_last = PriceUtil.getLastWeekKlines(list_trend);
+		
+		AreaFactory factory = null;
+		
+		if(list_trend_last == null) {
+			factory = new AreaFactoryImpl(list_trend, list, list_15m);
+		} else {
+			factory = new AreaFactoryImpl(list_trend_last, list, list_15m);
+		}
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
@@ -1198,7 +1206,15 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void consolidationAreaMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
-		AreaFactory factory = new AreaFactoryImpl(list_trend, list, list_15m);
+		
+		Klines list_trend_last = PriceUtil.getLastWeekKlines(list_trend);
+		
+		AreaFactory factory = null;
+		if(list_trend_last == null) {
+			factory = new AreaFactoryImpl(list_trend, list, list_15m);
+		} else {
+			factory = new AreaFactoryImpl(list_trend_last, list, list_15m);
+		}
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;

@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.bugbycode.module.WeekDay;
+
 public class DateFormatUtil {
 
 	private static final ThreadLocal<SimpleDateFormat> sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -21,6 +23,17 @@ public class DateFormatUtil {
 	
 	public static String format(long time) {
 		return format(new Date(time));
+	}
+	
+	public static int getWeek(long time) {
+		Date date = new Date(time);
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		return c.get(Calendar.DAY_OF_WEEK);
+	}
+	
+	public static WeekDay getWeekDay(long time) {
+		return WeekDay.valueOf(getWeek(time));
 	}
 	
 	public static int getHours(long time) {
