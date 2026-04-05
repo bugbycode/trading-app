@@ -1209,12 +1209,11 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		Klines list_trend_last = PriceUtil.getLastWeekKlines(list_trend);
 		
-		AreaFactory factory = null;
 		if(list_trend_last == null) {
-			factory = new AreaFactoryImpl(list_trend, list, list_15m);
-		} else {
-			factory = new AreaFactoryImpl(list_trend_last, list, list_15m);
+			return;
 		}
+		
+		AreaFactory factory = new AreaFactoryImpl(list_trend_last, list, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;

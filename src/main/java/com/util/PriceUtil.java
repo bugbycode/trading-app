@@ -1406,7 +1406,7 @@ public class PriceUtil {
 	 */
 	public static Klines getLastWeekKlines(List<Klines> list) {
 		List<Klines> data = new ArrayList<Klines>();
-		if(!(CollectionUtils.isEmpty(list) || list.size() < 14)) {
+		if(!(CollectionUtils.isEmpty(list) || list.size() < 10)) {
 			boolean startAdd = false;
 			for(int index = list.size() - 1; index >= 0; index--) {
 				Klines k = list.get(index);
