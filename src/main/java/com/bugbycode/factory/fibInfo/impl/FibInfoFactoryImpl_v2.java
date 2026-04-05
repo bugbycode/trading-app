@@ -212,7 +212,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 				openCode = fibInfo.getFibCode(ms.getHighPrice());
 			}
 			
-			if(ps_mode == PositionSide.DEFAULT && openCode.lte(FibCode.FIB382)) {
+			if(ps_mode == PositionSide.DEFAULT && openCode.lte(FibCode.FIB5)) {
 				openCode = FibCode.FIB0;
 			}
 			
