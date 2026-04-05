@@ -34,6 +34,7 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.StepPriceInfo;
 import com.bugbycode.module.TradeStyle;
+import com.bugbycode.module.WeekDay;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.PriceInfo;
@@ -196,9 +197,9 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "BANKUSDT";
+        String pair = "EDGEUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
@@ -292,13 +293,52 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "SOLUSDT";
+    	String pair = "币安人生USDT";
     	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
         AreaFactory factory = new AreaFactoryImpl(list_1d, list, list_15m);
+        
+        if(!(factory.isLong() || factory.isShort())) {
+        	return;
+        }
+        
+        QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
+        
+        List<Klines> fibAfKlines = factory.getFibAfterKlines();
+
+        if(!CollectionUtils.isEmpty(fibAfKlines)) {
+            for(Klines k : fibAfKlines) {
+                logger.info(k);
+            }
+        }
+        
+        List<OpenPrice> openPrices = factory.getOpenPrices();
+        
+        List<User> userList = userRepository.queryAllUser();
+        for(User u : userList) {
+
+            for(OpenPrice price : openPrices) {
+            	logger.info("{}: {} -> {} ~ {}, istread: {}", mode, price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), PriceUtil.isTraded(price, factory));
+            	logger.info(price.getAreaTakeProfit(last.getClosePriceDoubleValue(), price, u.getProfit(), u.getProfitLimit(), mode));
+            }
+        }
+        
+    }
+    
+    @Test
+    public void testEoptionsFibInfo(){
+    	String pair = "BTCUSDT";
+    	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
+        Klines last = PriceUtil.getLastKlines(list_15m);
+        
+        Klines list_trend_last = PriceUtil.getLastWeekKlines(list_1d);
+        
+        AreaFactory factory = new AreaFactoryImpl(list_trend_last, list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -536,5 +576,16 @@ public class KlinesServiceTest {
     	
     	logger.info(priceLong);
     	logger.info(priceShort);
+    }
+    
+    @Test
+    public void testWeekKlines() {
+    	String pair = "BTCUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 30);
+    	for(Klines k : list) {
+    		logger.info("{} - {}", DateFormatUtil.format(k.getStartTime()), DateFormatUtil.getWeekDay(k.getStartTime()).memo());
+    	}
+    	Klines k_week = PriceUtil.getLastWeekKlines(list);
+    	logger.info(k_week);
     }
 }
