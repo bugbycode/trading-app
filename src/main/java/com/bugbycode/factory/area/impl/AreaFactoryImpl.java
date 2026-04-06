@@ -145,6 +145,15 @@ public class AreaFactoryImpl implements AreaFactory {
 		} else if(isShort()) {
 			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(bl - (take / 2), last.getDecimalNum()) );
 			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(bl - take, last.getDecimalNum()) );
+			
+			if(firstTakeProfit <= 0) {
+				firstTakeProfit = l;
+			}
+			
+			if(secondTakeProfit <= 0) {
+				secondTakeProfit = l;
+			}
+			
 			price = bl;
 		}
 		
