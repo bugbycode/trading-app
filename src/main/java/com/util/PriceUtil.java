@@ -1413,15 +1413,18 @@ public class PriceUtil {
 				if(k.getInervalType() != Inerval.INERVAL_1D) {
 					break;
 				}
-				WeekDay weekDay = DateFormatUtil.getWeekDay(k.getStartTime());
+				WeekDay weekDayEnd = DateFormatUtil.getWeekDay(k.getEndTime());
 				if(!startAdd) {
-					if(weekDay == WeekDay.MONDAY) {
+					if(weekDayEnd == WeekDay.MONDAY) {
 						startAdd = true;
+					} else {
+						continue;
 					}
-					continue;
 				}
 				data.add(k);
-				if(weekDay == WeekDay.MONDAY) {
+				
+				WeekDay weekDayStart = DateFormatUtil.getWeekDay(k.getStartTime());
+				if(weekDayStart == WeekDay.MONDAY) {
 					break;
 				}
 			}

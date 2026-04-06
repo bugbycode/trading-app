@@ -115,7 +115,8 @@ public class AreaFactoryImpl implements AreaFactory {
 		}
 		
 		if(this.ps == PositionSide.DEFAULT || last == null) {
-			return;
+			this.ps = list_trend_last_after.isRise() ? PositionSide.LONG : PositionSide.SHORT;
+			last = list_trend_last_after;
 		}
 		
 		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;

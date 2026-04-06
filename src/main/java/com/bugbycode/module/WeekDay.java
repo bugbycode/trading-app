@@ -2,12 +2,39 @@ package com.bugbycode.module;
 
 public enum WeekDay {
 	
+	/**
+	 * 星期日
+	 */
 	SUNDAY(1, "星期日"), 
+	
+	/**
+	 * 星期一
+	 */
 	MONDAY(2, "星期一") , 
+	
+	/**
+	 * 星期二
+	 */
 	TUESDAY(3, "星期二") , 
+	
+	/**
+	 * 星期三
+	 */
 	WEDNESDAY(4, "星期三") , 
+	
+	/**
+	 * 星期四
+	 */
 	THURSDAY(5, "星期四") , 
+	
+	/**
+	 * 星期五
+	 */
 	FRIDAY(6, "星期五") , 
+	
+	/**
+	 * 星期六
+	 */
 	SATURDAY(7, "星期六");
 	
 	private int value;
