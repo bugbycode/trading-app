@@ -121,16 +121,18 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		QuotationMode mode = (ps == PositionSide.LONG) ? QuotationMode.LONG : QuotationMode.SHORT;
 		
+		
 		double h = list_trend_last.getHighPriceDoubleValue();
 		double l = list_trend_last.getLowPriceDoubleValue();
-		//double lt_bh = list_trend_last.getBodyHighPriceDoubleValue();
-		//double lt_bl = list_trend_last.getBodyLowPriceDoubleValue();
 		
-		//double c = last.getClosePriceDoubleValue();
+		double lt_bh = list_trend_last.getBodyHighPriceDoubleValue();
+		double lt_bl = list_trend_last.getBodyLowPriceDoubleValue();
+		
 		double bh = last.getBodyHighPriceDoubleValue();
 		double bl = last.getBodyLowPriceDoubleValue();
 		
-		double take = (h - l) * 0.786;
+		double take = mode == QuotationMode.LONG ? (h - lt_bl) : (lt_bh - l);
+		take = take * 0.786;
 		
 		double stopLoss = mode == QuotationMode.LONG ? last.getLowPriceDoubleValue() : last.getHighPriceDoubleValue();
 		
