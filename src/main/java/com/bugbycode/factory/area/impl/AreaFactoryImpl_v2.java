@@ -49,7 +49,7 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 	
 	private void init() {
 		
-		if(list.size() < 3 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(list.size() < 50 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
@@ -58,9 +58,28 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 		this.list.sort(new KlinesComparator(SortType.ASC));
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		
-		int index = list.size() - 1;
-		Klines current = list.get(index);
-		Klines parent = list.get(index - 1);
+		PriceUtil.calculateMACD(list);
+		
+		
+		Klines current = null;
+		Klines parent = null;
+		Klines next = null;
+		
+		for(int index = list.size() - 1; index > 3; index--) {
+			current = list.get(index);
+			parent = list.get(index - 1);
+			next = list.get(index - 2);
+			if(PriceUtil.verifyPowerful_v10(current, parent, next)) {
+				this.ps = PositionSide.LONG;
+				break;
+			} else if(PriceUtil.verifyDeclining_v10(current, parent, next)) {
+				this.ps = PositionSide.SHORT;
+				break;
+			}
+			current = null;
+			parent = null;
+			next = null;
+		}
 		
 		if(PriceUtil.verifyPowerful_v28(current, parent)) {
 			this.ps = PositionSide.LONG;
@@ -73,11 +92,6 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 		}
 		
 		QuotationMode mode = ps == PositionSide.LONG ? QuotationMode.LONG : QuotationMode.SHORT;
-		if(mode == QuotationMode.LONG) {
-			
-		} else {
-			
-		}
 		
 		double h = current.getHighPriceDoubleValue();
 		double l = current.getLowPriceDoubleValue();
