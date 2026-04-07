@@ -25,7 +25,6 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
-import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -1099,7 +1098,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void eoptionMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+	public void eoptionMonitor(List<Klines> list, List<Klines> list_15m) {
 		
 		if(CollectionUtils.isEmpty(list_15m)) {
 			return;
@@ -1132,15 +1131,7 @@ public class KlinesServiceImpl implements KlinesService {
 			openShort_eOption(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
 		}*/
 		
-		Klines list_trend_last = PriceUtil.getLastWeekKlines(list_trend);
-		
-		AreaFactory factory = null;
-		
-		if(list_trend_last == null) {
-			factory = new AreaFactoryImpl(list_trend, list, list_15m);
-		} else {
-			factory = new AreaFactoryImpl(list_trend_last, list, list_15m);
-		}
+		AreaFactory factory = new AreaFactoryImpl(list, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
@@ -1206,17 +1197,9 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void consolidationAreaMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+	public void consolidationAreaMonitor(List<Klines> list, List<Klines> list_15m) {
 		
-		/*
-		Klines list_trend_last = PriceUtil.getLastWeekKlines(list_trend);
-		
-		if(list_trend_last == null) {
-			return;
-		}
-		*/
-		
-		AreaFactory factory = new AreaFactoryImpl_v2(list, list_15m);
+		AreaFactory factory = new AreaFactoryImpl(list, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
