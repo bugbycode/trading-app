@@ -96,11 +96,11 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 		if(isLong()) {
 			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(c + (take / 2), current.getDecimalNum()) );
 			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(c + take, current.getDecimalNum()) );
-			stopLoss = current.isRise() ? current.getLowPriceDoubleValue() : parent.getLowPriceDoubleValue();
+			stopLoss = current.isRise() ? current.getLowPriceDoubleValue() : PriceUtil.getMinPrice(current.getLowPriceDoubleValue(), parent.getLowPriceDoubleValue());
 		} else if(isShort()) {
 			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(c - (take / 2), current.getDecimalNum()) );
 			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(c - take, current.getDecimalNum()) );
-			stopLoss = current.isFall() ? current.getHighPriceDoubleValue() : parent.getHighPriceDoubleValue();
+			stopLoss = current.isFall() ? current.getHighPriceDoubleValue() : PriceUtil.getMaxPrice(current.getHighPriceDoubleValue(), parent.getHighPriceDoubleValue());
 			
 			if(firstTakeProfit <= 0) {
 				firstTakeProfit = l;
