@@ -186,7 +186,7 @@ public class KlinesServiceTest {
     	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-        klinesService.consolidationAreaMonitor(list_1d, list, list_15m);  
+        klinesService.consolidationAreaMonitor(list, list_15m);  
         try {
 			Thread.sleep(5 * 60 * 1000);
 		} catch (InterruptedException e) {
@@ -287,19 +287,19 @@ public class KlinesServiceTest {
         //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-        klinesService.eoptionMonitor(list_1d, list, list_15m);
+        klinesService.eoptionMonitor(list, list_15m);
     }
     
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "币安人生USDT";
-    	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
+    	String pair = "UNIUSDT";
+    	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
-        AreaFactory factory = new AreaFactoryImpl(list_1d, list, list_15m);
+        AreaFactory factory = new AreaFactoryImpl(list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -330,7 +330,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testEoptionsFibInfo(){
-    	String pair = "BTCUSDT";
+    	String pair = "ETHUSDT";
     	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
@@ -338,7 +338,7 @@ public class KlinesServiceTest {
         
         Klines list_trend_last = PriceUtil.getLastWeekKlines(list_1d);
         
-        AreaFactory factory = new AreaFactoryImpl(list_trend_last, list, list_15m);
+        AreaFactory factory = new AreaFactoryImpl(list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -580,7 +580,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testWeekKlines() {
-    	String pair = "BTCUSDT";
+    	String pair = "ETHUSDT";
     	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 30);
     	for(Klines k : list) {
     		logger.info("{} - {}", DateFormatUtil.format(k.getStartTime()), DateFormatUtil.getWeekDay(k.getStartTime()).memo());
