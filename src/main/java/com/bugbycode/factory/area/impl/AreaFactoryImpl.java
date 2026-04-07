@@ -17,7 +17,7 @@ import com.util.KlinesComparator;
 import com.util.PriceUtil;
 
 /**
- * 高频交易
+ * 期权交易
  */
 public class AreaFactoryImpl implements AreaFactory {
 
