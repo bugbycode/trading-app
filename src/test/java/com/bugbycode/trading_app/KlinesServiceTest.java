@@ -287,7 +287,7 @@ public class KlinesServiceTest {
         //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-        klinesService.eoptionMonitor(list, list_15m);
+        klinesService.eoptionMonitor(list_1d, list, list_15m);
     }
     
     
