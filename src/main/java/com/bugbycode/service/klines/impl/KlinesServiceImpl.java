@@ -1200,13 +1200,14 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void consolidationAreaMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		
+		/*
 		Klines list_trend_last = PriceUtil.getLastWeekKlines(list_trend);
 		
 		if(list_trend_last == null) {
 			return;
-		}
+		}*/
 		
-		AreaFactory factory = new AreaFactoryImpl_v2(list_trend_last, list, list_15m);
+		AreaFactory factory = new AreaFactoryImpl_v2(list_trend, list, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
