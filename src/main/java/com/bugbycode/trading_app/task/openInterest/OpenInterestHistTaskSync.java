@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -22,7 +23,6 @@ import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
-import com.util.PriceUtil;
 import com.util.StringUtil;
 
 /**
@@ -87,10 +87,20 @@ public class OpenInterestHistTaskSync {
 					oih.setSumOpenInterestValue(json.getString("sumOpenInterestValue"));
 					oih.setTimestamp(json.getLong("timestamp"));
 					
-					List<Klines> list_15m = klinesRepository.findLastKlinesByPair(symbol, Inerval.INERVAL_15M, 1);
-					Klines last = PriceUtil.getLastKlines(list_15m);
-					if(last != null) {
-						oih.setTradeNumber(last.getN() / 15);
+					List<Klines> list_1h = klinesRepository.findLastKlinesByPair(symbol, Inerval.INERVAL_1H, 24);
+					if(!CollectionUtils.isEmpty(list_1h)) {
+						double v_24h = 0;
+						double q_24h = 0;
+						long n_24h = 0;
+						for(Klines k : list_1h) {
+							v_24h += k.getVDoubleValue();
+							q_24h += k.getQDoubleValue();
+							n_24h += k.getN();
+						}
+						long n = n_24h / 24 / 60;
+						oih.setTradeNumber(n);
+						oih.setV_24h(v_24h);
+						oih.setQ_24h(q_24h);
 					}
 					
 					openInterestHistRepository.save(oih);

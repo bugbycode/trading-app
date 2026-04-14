@@ -52,6 +52,8 @@ public class OpenInterestHistRepositoryImpl implements OpenInterestHistRepositor
 				update.set("sumOpenInterestValue", oih.getSumOpenInterestValue());
 				update.set("timestamp", oih.getTimestamp());
 				update.set("tradeNumber", oih.getTradeNumber());
+				update.set("v_24h", oih.getV_24h());
+				update.set("q_24h", oih.getQ_24h());
 				
 				template.updateFirst(Query.query(Criteria.where("symbol").is(symbol)), update, OpenInterestHist.class);
 			}
