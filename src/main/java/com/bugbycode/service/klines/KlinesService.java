@@ -127,7 +127,7 @@ public interface KlinesService {
 	 * @param list
 	 * @param list_15m
 	 */
-	public void eoptionMonitor(List<Klines> list, List<Klines> list_15m);
+	public void eoptionMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 看涨期权买入机会
