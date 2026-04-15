@@ -1113,7 +1113,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list_trend, list, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list, list_trend, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;

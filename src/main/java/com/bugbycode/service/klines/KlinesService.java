@@ -124,6 +124,7 @@ public interface KlinesService {
 	/**
 	 * 期权交易机会监控
 	 * 
+	 * @param list_trend
 	 * @param list
 	 * @param list_15m
 	 */
