@@ -227,6 +227,11 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 				openCode = FibCode.FIB1;
 			}
 			
+			if((parentFib1 == -1 && openCode.lte(FibCode.FIB382))
+					|| (parentFib1 > 0 && openCode.lt(fibInfo.getFibCode_v2(parentFib1)))) {
+				openCode = FibCode.FIB0;
+			}
+			
 			if(openCode.gt(FibCode.FIB0)) {
 				double fibValue = fibInfo.getFibValue(openCode);
 				if(hitParentFib1) {
