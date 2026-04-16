@@ -24,6 +24,7 @@ import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
@@ -1112,7 +1113,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
-		
+		/*
 		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list, list_trend, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
@@ -1129,15 +1130,9 @@ public class KlinesServiceImpl implements KlinesService {
 		} else if(factory.isShort()) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
 			openShort_eOption(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
-		}
-		/*
-		Klines list_trend_last = PriceUtil.getLastWeekKlines(list_trend);
+		}*/
 		
-		if(list_trend_last == null) {
-			return;
-		}
-		
-		AreaFactory factory = new AreaFactoryImpl_v2(list_trend_last, list, list_15m);
+		AreaFactory factory = new AreaFactoryImpl(list, list_15m);
 		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
@@ -1199,7 +1194,7 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 			}
 		}
-		*/
+		
 	}
 	
 	@Override
