@@ -58,7 +58,7 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list.sort(new KlinesComparator(SortType.ASC));
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		
-		PriceUtil.calculateMACD(list);
+		//PriceUtil.calculateMACD(list);
 		
 		
 		Klines current = null;
@@ -69,10 +69,10 @@ public class AreaFactoryImpl implements AreaFactory {
 			current = list.get(index);
 			parent = list.get(index - 1);
 			next = list.get(index - 2);
-			if(PriceUtil.verifyPowerful_v10(current, parent, next)) {
+			if(verifyLong(current, parent, next)) {
 				this.ps = PositionSide.LONG;
 				break;
-			} else if(PriceUtil.verifyDeclining_v10(current, parent, next)) {
+			} else if(verifyShort(current, parent, next)) {
 				this.ps = PositionSide.SHORT;
 				break;
 			}
@@ -131,6 +131,14 @@ public class AreaFactoryImpl implements AreaFactory {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			openPrices.add(price);
 		}
+	}
+	
+	private boolean verifyLong(Klines current, Klines parent, Klines next) {
+		return PriceUtil.verifyDeclining_v28(parent, next) && PriceUtil.verifyPowerful_v28(current, parent);
+	}
+	
+	private boolean verifyShort(Klines current, Klines parent, Klines next) {
+		return PriceUtil.verifyPowerful_v28(parent, next) && PriceUtil.verifyDeclining_v28(current, parent);
 	}
 	
 	@Override
