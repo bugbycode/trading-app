@@ -20,8 +20,10 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.FibCode;
@@ -40,6 +42,7 @@ import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
+import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.user.UserRepository;
@@ -197,10 +200,10 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "EDGEUSDT";
+        String pair = "1000PEPEUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
         Klines last_15m = PriceUtil.getLastKlines(list_15m);
@@ -209,7 +212,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl(list, list, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_trend, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -293,13 +296,13 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "ETHUSDT";
+    	String pair = "ETCUSDT";
     	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
-        AreaFactory factory = new AreaFactoryImpl(list, list_15m);
+        AreaFactory factory = new AreaFactoryImpl_v3(list, list_15m, PositionSide.SHORT);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -332,7 +335,7 @@ public class KlinesServiceTest {
     public void testEoptionsFibInfo(){
     	String pair = "ETHUSDT";
     	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
