@@ -27,7 +27,6 @@ import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -1114,93 +1113,74 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl_v2(list, list_trend, list_15m);
+		AreaFactory[] factories = {
+				new AreaFactoryImpl_v3(list, list_15m, PositionSide.LONG),
+				new AreaFactoryImpl_v3(list, list_15m, PositionSide.SHORT)
+			};
+	
+		for(AreaFactory factory : factories) {
 		
-		if(!(factory.isLong() || factory.isShort())) {
-			return;
-		}
-		
-		FibInfo fibInfo = factory.getFibInfo();
-		
-		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
-		
-		if(factory.isLong()) {
+			if(!(factory.isLong() || factory.isShort())) {
+				continue;
+			}
+			
+			List<Klines> fibAfterKlines = factory.getFibAfterKlines();
 			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong_eOption(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
-		} else if(factory.isShort()) {
 			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort_eOption(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
-		}
-		/*
-		Klines list_trend_last = PriceUtil.getLastWeekKlines(list_trend);
-		
-		if(list_trend_last == null) {
-			return;
-		}
-		
-		AreaFactory factory = new AreaFactoryImpl_v2(list_trend_last, list, list_15m);
-		
-		if(!(factory.isLong() || factory.isShort())) {
-			return;
-		}
-		
-		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
-		Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-		Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-		List<OpenPrice> openPrices = factory.getOpenPrices();
-		
-		for (int index = 0; index < openPrices.size(); index++) {
-			OpenPrice price = openPrices.get(index);
-			if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice()) 
-					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					&& !PriceUtil.isTraded(price, factory)) {
-				
-				List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
-				
-				for(User u : userList) {
+			List<OpenPrice> openPrices = factory.getOpenPrices();
+			
+			for (int index = 0; index < openPrices.size(); index++) {
+				OpenPrice price = openPrices.get(index);
+				if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice()) 
+						&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
+						&& !PriceUtil.isTraded(price, factory)) {
 					
-					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
-						continue;
-					}
-
-					//开仓订阅提醒
-					String subject = String.format("%s看涨期权%s买入机会 %s", 
-							pair, 
-							PriceUtil.formatDoubleDecimal(price.getPrice(), last.getDecimalNum()),
-							DateFormatUtil.format(new Date()));
+					List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
 					
-					String text = price.toString();
-					
-					sendEmail(u, subject, text, u.getUsername());
-				}
-				
-				
-			} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice()) 
-					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					&& !PriceUtil.isTraded(price, factory)) {
-				
-				//
-				List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
-				
-				for(User u : userList) {
-					
-					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
-						continue;
+					for(User u : userList) {
+						
+						if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+							continue;
+						}
+	
+						//开仓订阅提醒
+						String subject = String.format("%s看涨期权%s买入机会 %s", 
+								pair, 
+								PriceUtil.formatDoubleDecimal(price.getPrice(), last.getDecimalNum()),
+								DateFormatUtil.format(new Date()));
+						
+						String text = price.toString();
+						
+						sendEmail(u, subject, text, u.getUsername());
 					}
 					
-					//开仓订阅提醒
-					String subject = String.format("%s看跌期权%s买入机会 %s", 
-							pair, 
-							PriceUtil.formatDoubleDecimal(price.getPrice(), last.getDecimalNum()),
-							DateFormatUtil.format(new Date()));
 					
-					String text = price.toString();
+				} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice()) 
+						&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
+						&& !PriceUtil.isTraded(price, factory)) {
 					
-					sendEmail(u, subject,text, u.getUsername());
+					//
+					List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
+					
+					for(User u : userList) {
+						
+						if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+							continue;
+						}
+						
+						//开仓订阅提醒
+						String subject = String.format("%s看跌期权%s买入机会 %s", 
+								pair, 
+								PriceUtil.formatDoubleDecimal(price.getPrice(), last.getDecimalNum()),
+								DateFormatUtil.format(new Date()));
+						
+						String text = price.toString();
+						
+						sendEmail(u, subject,text, u.getUsername());
+					}
 				}
 			}
 		}
-		*/
 	}
 	
 	@Override
