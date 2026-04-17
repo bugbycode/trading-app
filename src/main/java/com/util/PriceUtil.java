@@ -1548,29 +1548,29 @@ public class PriceUtil {
 	
 	/**
 	 * 计算价格上涨幅度
-	 * @param price1 
-	 * @param price2 
+	 * @param price1 起始价
+	 * @param price2 终点价
 	 * @return
 	 */
 	public static double getRiseFluctuationPercentage(double price1,double price2) {
-		if(price1 > price2) {
-			return (price1 - price2) / price2;
-		} else {
+		if(price2 >= price1) {
 			return (price2 - price1) / price1;
+		} else {
+			return 0;
 		}
 	}
 	
 	/**
 	 * 计算价格下跌幅度
-	 * @param price1 
-	 * @param price2 
+	 * @param price1 起始价
+	 * @param price2 终点价
 	 * @return
 	 */
 	public static double getFallFluctuationPercentage(double price1,double price2) {
-		if(price1 > price2) {
+		if(price2 <= price1) {
 			return (price1 - price2) / price1;
 		} else {
-			return (price2 - price1) / price2;
+			return 0;
 		}
 	}
 	
@@ -3539,9 +3539,9 @@ public class PriceUtil {
 	 */
 	public static double getPercent(double price, double takeProfitPrice, QuotationMode qm) {
 		double pricePercent = 0;
-		if(qm == QuotationMode.LONG) {
+		if(qm == QuotationMode.LONG && price <= takeProfitPrice) {
 			pricePercent = PriceUtil.getRiseFluctuationPercentage(price, takeProfitPrice) * 100;
-		} else {
+		} else if(qm == QuotationMode.SHORT && price >= takeProfitPrice) {
 			pricePercent = PriceUtil.getFallFluctuationPercentage(price, takeProfitPrice) * 100;
 		}
 		return pricePercent;
