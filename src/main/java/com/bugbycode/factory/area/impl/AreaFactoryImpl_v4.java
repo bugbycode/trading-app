@@ -161,7 +161,7 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 	private FibCode getTakeProfitCode(FibInfo fibInfo, QuotationMode user_mode, FibCode hitCode) {
 		FibCode result = hitCode;
 		FibCode[] codes = FibCode.values();
-		if((fibInfo.isLong() && user_mode == QuotationMode.LONG) || (fibInfo.isShort() || user_mode == QuotationMode.SHORT)) {
+		if((fibInfo.isLong() && user_mode == QuotationMode.LONG) || (fibInfo.isShort() && user_mode == QuotationMode.SHORT)) {
 			for(int index = codes.length - 1; index >= 0; index--) {
 				FibCode code = codes[index];
 				if(code == FibCode.FIB0) {
