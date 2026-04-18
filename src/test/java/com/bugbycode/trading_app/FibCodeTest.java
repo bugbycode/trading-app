@@ -12,8 +12,8 @@ public class FibCodeTest {
 		
 		FibCode[] codes = FibCode.values();
 		
-		for(int offset = 0;offset < codes.length;offset++) {
-			
+		//for(int offset = 0;offset < codes.length;offset++) {
+		for(int offset = codes.length - 1; offset >= 0; offset--) {	
 			FibCode code = codes[offset];
 			System.out.println(code.getValue() + " => " + fibInfo.getNextFibCode(code).getValue() + " ~ " + fibInfo.getTakeProfit_v2(code).getValue());
 		}

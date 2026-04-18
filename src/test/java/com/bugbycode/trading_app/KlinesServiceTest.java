@@ -21,6 +21,7 @@ import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl_v4;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
@@ -185,11 +186,11 @@ public class KlinesServiceTest {
     public void testFibInfoTrade(){
     	String pair = "SUPERUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        //List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
     	List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-        klinesService.consolidationAreaMonitor(list_1d, list, list_15m);  
+        klinesService.consolidationAreaMonitor(list_1d, list_4h, list, list_15m);  
         try {
 			Thread.sleep(5 * 60 * 1000);
 		} catch (InterruptedException e) {
@@ -296,13 +297,13 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "ETCUSDT";
+    	String pair = "SOONUSDT";
     	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
-        AreaFactory factory = new AreaFactoryImpl_v3(list, list_15m, PositionSide.SHORT);
+        AreaFactory factory = new AreaFactoryImpl_v4(list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
