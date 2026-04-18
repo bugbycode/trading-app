@@ -25,6 +25,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl_v4;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -1184,11 +1185,12 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void consolidationAreaMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+	public void consolidationAreaMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		AreaFactory[] factories = {
-					new AreaFactoryImpl_v3(list, list_15m, PositionSide.LONG),
-					new AreaFactoryImpl_v3(list, list_15m, PositionSide.SHORT)
+					//new AreaFactoryImpl_v3(list, list_15m, PositionSide.LONG),
+					//new AreaFactoryImpl_v3(list, list_15m, PositionSide.SHORT)
+					new AreaFactoryImpl_v4(list_4h, list_15m)
 				};
 		
 		for(AreaFactory factory : factories) {

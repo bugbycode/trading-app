@@ -28,7 +28,6 @@ public enum FibCode {
 	
 	FIB1(1,"1", true),
 	FIB786(0.786,"0.786", true),
-	FIB66(0.66,"0.66", true),
 	FIB618(0.618,"0.618", true),
 	FIB5(0.5,"0.5", true),
 	FIB382(0.382,"0.382", true),
