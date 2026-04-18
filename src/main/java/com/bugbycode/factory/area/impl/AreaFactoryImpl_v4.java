@@ -101,7 +101,7 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 	}
 	
 	private void addPrices(OpenPrice price) {
-		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
+		if(!PriceUtil.contains(openPrices, price)) {
 			openPrices.add(price);
 		}
 	}
