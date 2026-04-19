@@ -281,6 +281,10 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
+						continue;
+					}
+					
 					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
 						continue;
 					}
@@ -373,6 +377,10 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
 						continue;
 					}
 					
@@ -476,6 +484,11 @@ public class KlinesServiceImpl implements KlinesService {
 			if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
 				continue;
 			}
+			
+			if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
+				continue;
+			}
+			
 			//计算预计盈利百分比
 			double profitPercent = 0;
 			
@@ -1230,6 +1243,10 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
+						if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
+							continue;
+						}
+						
 						//根据交易风格设置盈利限制
 						TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 						
@@ -1274,6 +1291,10 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+							continue;
+						}
+						
+						if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
 							continue;
 						}
 						
@@ -1356,6 +1377,10 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
 						continue;
 					}
 					
@@ -1451,6 +1476,10 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
 						continue;
 					}
 					
