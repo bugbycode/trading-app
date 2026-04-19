@@ -124,11 +124,12 @@ public interface KlinesService {
 	/**
 	 * 期权交易机会监控
 	 * 
-	 * @param list_trend
-	 * @param list
-	 * @param list_15m
+	 * @param list_1d 日线级别
+	 * @param list_4h 4小时级别
+	 * @param list_1h 1小时级别
+	 * @param list_15m 十五分钟级别
 	 */
-	public void eoptionMonitor(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m);
+	public void eoptionMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m);
 	
 	/**
 	 * 看涨期权买入机会

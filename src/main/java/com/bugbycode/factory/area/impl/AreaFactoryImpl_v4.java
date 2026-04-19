@@ -12,9 +12,11 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
+import com.util.KlinesComparator;
 import com.util.PriceUtil;
 
 /**
@@ -24,6 +26,8 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 
 	private List<Klines> list;
 	
+	private List<Klines> list_hit;
+	
 	private List<Klines> list_15m;
 	
 	private List<Klines> fibAfterKlines;
@@ -32,14 +36,18 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 	
 	private List<OpenPrice> openPrices;
 	
-	public AreaFactoryImpl_v4(List<Klines> list, List<Klines> list_15m) {
+	public AreaFactoryImpl_v4(List<Klines> list, List<Klines> list_hit, List<Klines> list_15m) {
 		this.ps = PositionSide.DEFAULT;
 		this.list = new ArrayList<Klines>();
+		this.list_hit = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
+		}
+		if(!CollectionUtils.isEmpty(list_hit)) {
+			this.list_hit.addAll(list_hit);
 		}
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -50,9 +58,14 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 	
 	private void init() {
 		
-		if(list.size() < 99 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(list.size() < 99 || CollectionUtils.isEmpty(this.list_hit) || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
+		
+		KlinesComparator kc = new KlinesComparator(SortType.ASC);
+		this.list.sort(kc);
+		this.list_hit.sort(kc);
+		this.list_15m.sort(kc);
 
 		FibInfoFactory factory = new FibInfoFactoryImpl_v4(list, list, list_15m);
 		if(!(factory.isLong() || factory.isShort())) {
@@ -71,8 +84,8 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 		Klines last = null;
 		double takeProfitValue = 0;
 		
-		for(int index = list_15m.size() - 1; index > 0; index--) {
-			Klines current = list_15m.get(index);
+		for(int index = list_hit.size() - 1; index > 0; index--) {
+			Klines current = list_hit.get(index);
 			if((hitCode = getIsBreachFibCode(fibInfo, QuotationMode.LONG, current)) != null) {
 				last = current;
 				this.ps = PositionSide.LONG;
