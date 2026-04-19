@@ -16,8 +16,8 @@ import com.util.PriceUtil;
 public class TestApp {
 
 	public static void main(String[] args) throws ParseException {
-		String pair = "BTC-260220-74000-P";
-		System.out.println(pair.replace("-", "_"));
+		
+		System.out.println(Integer.MAX_VALUE);
 	}
 
 }
