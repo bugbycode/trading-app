@@ -107,6 +107,10 @@ public class User implements UserDetails {
 	
 	private long tradeNumberMonitor = 60; //每分钟成交笔数限制（用来过滤不活跃的交易对）行情监控
 	
+	private int tradeNumberIndex = 100;//市场活跃度排名索引，值越小热度越高 自动交易
+	
+	private int tradeNumberIndexMonitor = 100;//市场活跃度排名索引，值越小热度越高 行情监控
+	
 	private int breakthroughTrade = 0; //是否交易突破单 价格行为交易使用 0：否 1：是
 	
 	private int breakthroughMonitor = 0; //是否监控突破行为 价格行为监控使用 0：否 1：是
@@ -401,6 +405,7 @@ public class User implements UserDetails {
 		this.setMonitorPolicyType(user.getMonitorPolicyType());
 		this.setMonitorfibLevel(user.getMonitorfibLevel());
 		this.setEoptionsStatus(user.getEoptionsStatus());
+		this.setTradeNumberIndexMonitor(user.getTradeNumberIndexMonitor());
 	}
 
 	public String getSmtpUser2() {
@@ -489,6 +494,22 @@ public class User implements UserDetails {
 
 	public void setTradeNumberMonitor(long tradeNumberMonitor) {
 		this.tradeNumberMonitor = tradeNumberMonitor;
+	}
+
+	public int getTradeNumberIndex() {
+		return tradeNumberIndex;
+	}
+
+	public void setTradeNumberIndex(int tradeNumberIndex) {
+		this.tradeNumberIndex = tradeNumberIndex;
+	}
+
+	public int getTradeNumberIndexMonitor() {
+		return tradeNumberIndexMonitor;
+	}
+
+	public void setTradeNumberIndexMonitor(int tradeNumberIndexMonitor) {
+		this.tradeNumberIndexMonitor = tradeNumberIndexMonitor;
 	}
 
 	public int getBreakthroughTrade() {
