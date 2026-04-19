@@ -71,4 +71,18 @@ public class OpenInterestHistRepositoryImpl implements OpenInterestHistRepositor
 		}
 	}
 
+	@Override
+	public void updateTradeNumberIndex(String symbol, int tradeNumberIndex) {
+		try {
+			
+			Update update = new Update();
+			
+			update.set("tradeNumberIndex", tradeNumberIndex);
+			
+			template.updateFirst(Query.query(Criteria.where("symbol").is(symbol)), update, OpenInterestHist.class);
+			
+		} catch (Exception e) {
+			logger.error("根据ID修改市场活跃度排名索引时出现异常", e);
+		}
+	}
 }

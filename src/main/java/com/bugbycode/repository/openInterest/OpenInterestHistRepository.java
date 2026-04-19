@@ -33,4 +33,11 @@ public interface OpenInterestHistRepository {
 	 * @param id
 	 */
 	public void remove(String id);
+	
+	/**
+	 * 根据交易对修改市场活跃度排名索引
+	 * @param symbol 交易对
+	 * @param tradeNumberIndex 市场活跃度排名索引，值越小热度越高
+	 */
+	public void updateTradeNumberIndex(String symbol, int tradeNumberIndex);
 }

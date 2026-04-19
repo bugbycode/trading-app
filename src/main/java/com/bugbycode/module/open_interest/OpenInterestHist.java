@@ -26,6 +26,8 @@ public class OpenInterestHist {
 	
 	private double q_24h;//24小时成交额
 	
+	private int tradeNumberIndex = 0;//市场活跃度排名索引，值越小热度越高
+	
 	public OpenInterestHist() {
 		
 	}
@@ -106,11 +108,19 @@ public class OpenInterestHist {
 		this.q_24h = q_24h;
 	}
 
+	public int getTradeNumberIndex() {
+		return tradeNumberIndex;
+	}
+
+	public void setTradeNumberIndex(int tradeNumberIndex) {
+		this.tradeNumberIndex = tradeNumberIndex;
+	}
+
 	@Override
 	public String toString() {
 		return "交易对：" + this.getSymbol() + ", 持仓总数量：" + sumOpenInterest
 				+ ", 持仓总价值：" + sumOpenInterestValue + ", 更新时间：" + DateFormatUtil.format(timestamp) + ", 每分钟成交笔数：" + tradeNumber
-				+ ", 24小时成交量：" + v_24h + ", 24小时成交额：" + q_24h;
+				+ ", 24小时成交量：" + v_24h + ", 24小时成交额：" + q_24h + ", 热度排名索引：" + tradeNumberIndex;
 	}
 	
 	

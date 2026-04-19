@@ -111,6 +111,13 @@ public class OpenInterestHistTaskSync {
 				logger.error("同步历史合约持仓量信息时出现异常", e);
 			}
 		}
+		
+		List<OpenInterestHist> list = openInterestHistRepository.query();
+		for(int index = 0; index < list.size(); index++) {
+			String symbol = list.get(index).getSymbol();
+			openInterestHistRepository.updateTradeNumberIndex(symbol, index);
+		}
+		
 		/*
 		List<SymbolExchangeInfo> list = binanceExchangeService.eOptionsExchangeInfoSymbol();
 		for(SymbolExchangeInfo info : list) {
