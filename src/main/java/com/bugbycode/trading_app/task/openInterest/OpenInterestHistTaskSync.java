@@ -120,7 +120,7 @@ public class OpenInterestHistTaskSync {
 			long t = oih.getTimestamp();
 			long d = (now - t) / 1000 / 60 / 60 / 24;
 			if(d > 30) {
-				openInterestHistRepository.updateTradeNumberIndex(symbol, -1);
+				openInterestHistRepository.updateTradeNumberIndex(symbol, Integer.MAX_VALUE);
 			} else {
 				openInterestHistRepository.updateTradeNumberIndex(symbol, index);
 			}
