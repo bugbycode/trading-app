@@ -1,5 +1,6 @@
 package com.bugbycode.trading_app.task.openInterest;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -111,11 +112,18 @@ public class OpenInterestHistTaskSync {
 				logger.error("同步历史合约持仓量信息时出现异常", e);
 			}
 		}
-		
+		long now = new Date().getTime();
 		List<OpenInterestHist> list = openInterestHistRepository.query();
 		for(int index = 0; index < list.size(); index++) {
-			String symbol = list.get(index).getSymbol();
-			openInterestHistRepository.updateTradeNumberIndex(symbol, index);
+			OpenInterestHist oih = list.get(index);
+			String symbol = oih.getSymbol();
+			long t = oih.getTimestamp();
+			long d = (now - t) / 1000 / 60 / 60 / 24;
+			if(d > 30) {
+				openInterestHistRepository.updateTradeNumberIndex(symbol, -1);
+			} else {
+				openInterestHistRepository.updateTradeNumberIndex(symbol, index);
+			}
 		}
 		
 		/*
