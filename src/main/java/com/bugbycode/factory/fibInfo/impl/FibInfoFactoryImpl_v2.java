@@ -316,4 +316,8 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		return end;
 	}
 	
+	@Override
+	public FibCode getHitCode() {
+		return null;
+	}
 }

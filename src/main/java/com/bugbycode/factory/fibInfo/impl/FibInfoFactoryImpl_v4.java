@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
@@ -260,4 +261,7 @@ public class FibInfoFactoryImpl_v4 implements FibInfoFactory {
 		return end;
 	}
 	
+	public FibCode getHitCode() {
+		return null;
+	}
 }

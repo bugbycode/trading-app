@@ -3,6 +3,7 @@ package com.bugbycode.service.klines.impl;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -1071,25 +1072,40 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
+
+		List<FibInfoFactory> factoryList = new ArrayList<FibInfoFactory>();
 		
-		FibInfoFactory factory = new FibInfoFactoryImpl(list_15m, list_15m, list_15m);
+		FibInfoFactory fc = new FibInfoFactoryImpl(list_15m, list_15m, list_15m);
 		
-		if(!(factory.isLong() || factory.isShort())) {
-			return;
+		factoryList.add(fc);
+		
+		if(fc.getHitCode().gte(FibCode.FIB1_272)) {
+			
+			PositionSide ps_mode = fc.isLong() ? PositionSide.SHORT : PositionSide.LONG;
+			
+			factoryList.add(new FibInfoFactoryImpl(list_4h, list_1h, list_15m, ps_mode));
+			
 		}
 		
-		FibInfo fibInfo = factory.getFibInfo();
-		
-		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
-		
-		if(factory.isLong()) {
-			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong_v2(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
-		} else if(factory.isShort()) {
-			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort_v2(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
+		for(FibInfoFactory factory : factoryList) {
+			
+			if(!(factory.isLong() || factory.isShort())) {
+				return;
+			}
+			
+			FibInfo fibInfo = factory.getFibInfo();
+			
+			List<Klines> fibAfterKlines = factory.getFibAfterKlines();
+			
+			if(factory.isLong()) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+				openLong_v2(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
+			} else if(factory.isShort()) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+				openShort_v2(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
+			}
+			
 		}
-		
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package com.bugbycode.factory.fibInfo;
 
 import java.util.List;
 
+import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.price.OpenPrice;
@@ -44,4 +45,6 @@ public interface FibInfoFactory {
 	public Klines getStart();
 	
 	public Klines getEnd();
+	
+	public FibCode getHitCode();
 }

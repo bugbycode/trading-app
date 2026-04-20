@@ -4334,4 +4334,28 @@ public class PriceUtil {
     	
     	return new StepPriceInfo(new String(current_arr), stepStr, decimalNum);
     }
+    
+    public OpenPrice getMaxFibCodeOpenPrice(List<OpenPrice> openPrices) {
+    	OpenPrice result = null;
+    	if(!CollectionUtils.isEmpty(openPrices)) {
+    		for(OpenPrice p : openPrices) {
+    			if(result == null || result.getCode().lt(p.getCode())) {
+    				result = p;
+    			}
+    		}
+    	}
+    	return result;
+    }
+    
+    public OpenPrice getMinFibCodeOpenPrice(List<OpenPrice> openPrices) {
+    	OpenPrice result = null;
+    	if(!CollectionUtils.isEmpty(openPrices)) {
+    		for(OpenPrice p : openPrices) {
+    			if(result == null || result.getCode().gt(p.getCode())) {
+    				result = p;
+    			}
+    		}
+    	}
+    	return result;
+    }
 }

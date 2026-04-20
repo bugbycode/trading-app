@@ -41,6 +41,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private List<OpenPrice> openPrices;
 	
+	private FibCode hitCode = FibCode.FIB0;
+	
 	/**
 	 * 
 	 * @param list 斐波那契回撤指标参考的K线信息
@@ -61,7 +63,32 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(PositionSide.DEFAULT);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param list 斐波那契回撤指标参考的K线信息
+	 * @param list_trend 行情走势参考的K线信息
+	 * @param list_15m 十五分钟级别k线信息
+	 * @param ps_mode
+	 */
+	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_trend, List<Klines> list_15m, PositionSide ps_mode) {
+		this.list = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
+		}
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+			this.init(ps_mode);
 		}
 	}
 	
@@ -98,7 +125,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return openPrices;
 	}
 	
-	private void init() {
+	private void init(PositionSide ps_mode) {
 		if(CollectionUtils.isEmpty(list) || list.size() < 50 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -109,13 +136,16 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateEMA_7_25_99(list);
-		PriceUtil.calculateEMA_7_25_99(list_trend);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 
-		PositionSide ps = getPositionSide();
+		PositionSide ps = ps_mode;
+		
+		if(ps_mode == PositionSide.DEFAULT) {
+			ps = getPositionSide();
+		}
 		
 		Klines third = null;
 		Klines second = null;
@@ -208,6 +238,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				openCode = fibInfo.getFibCode(ms.getHighPrice());
 			}
 			
+			if(ps_mode == PositionSide.DEFAULT && openCode.lte(FibCode.FIB382)) {
+				openCode = FibCode.FIB0;
+			}
+			
 			if(openCode.gt(FibCode.FIB0)) {
 				double fibValue = fibInfo.getFibValue(openCode);
 				for(int index = list.size() - 1; index > 0; index--) {
@@ -224,6 +258,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 					}
 				}
 			}
+			
+			hitCode = openCode;
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -248,19 +284,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -277,4 +313,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return end;
 	}
 	
+	public FibCode getHitCode() {
+		return hitCode;
+	}
 }
