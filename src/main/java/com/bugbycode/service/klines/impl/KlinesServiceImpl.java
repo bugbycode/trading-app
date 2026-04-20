@@ -1143,7 +1143,7 @@ public class KlinesServiceImpl implements KlinesService {
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
 		AreaFactory[] factories = {
-				new AreaFactoryImpl_v4(list_4h, list_4h, list_15m)
+				new AreaFactoryImpl_v4(list_4h, list_1h, list_15m)
 			};
 	
 		for(AreaFactory factory : factories) {
