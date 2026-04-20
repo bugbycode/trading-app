@@ -1083,7 +1083,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			PositionSide ps_mode = fc.isLong() ? PositionSide.SHORT : PositionSide.LONG;
 			
-			factoryList.add(new FibInfoFactoryImpl(list_4h, list_1h, list_15m, ps_mode));
+			factoryList.add(new FibInfoFactoryImpl(list_15m, list_15m, list_15m, ps_mode));
 			
 		}
 		
