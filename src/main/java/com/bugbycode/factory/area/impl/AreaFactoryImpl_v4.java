@@ -83,6 +83,10 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 		FibCode takeProfitCode = null;
 		Klines last = null;
 		double takeProfitValue = 0;
+		double hitCodeValue = 0;
+		double d = 0;
+		double firstTakeProfit = 0;
+		double secondTakeProfit = 0;
 		
 		for(int index = list_hit.size() - 1; index > 0; index--) {
 			Klines current = list_hit.get(index);
@@ -91,14 +95,22 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 				this.ps = PositionSide.LONG;
 				takeProfitCode = getTakeProfitCode(fibInfo, QuotationMode.LONG, hitCode);
 				takeProfitValue = fibInfo.getFibValue(takeProfitCode);
-				addPrices(new OpenPriceDetails(hitCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue(), takeProfitValue, takeProfitValue));
+				hitCodeValue = fibInfo.getFibValue(hitCode);
+				d = takeProfitValue - hitCodeValue;
+				firstTakeProfit = hitCodeValue + PriceUtil.formatDoubleDecimalValue(d * 0.618, current.getDecimalNum());
+				secondTakeProfit = hitCodeValue + PriceUtil.formatDoubleDecimalValue(d * 0.786, current.getDecimalNum());
+				addPrices(new OpenPriceDetails(hitCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue(), firstTakeProfit, secondTakeProfit));
 				break;
 			} else if((hitCode = getIsBreachFibCode(fibInfo, QuotationMode.SHORT, current)) != null) {
 				last = current;
 				this.ps = PositionSide.SHORT;
 				takeProfitCode = getTakeProfitCode(fibInfo, QuotationMode.SHORT, hitCode);
 				takeProfitValue = fibInfo.getFibValue(takeProfitCode);
-				addPrices(new OpenPriceDetails(hitCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue(), takeProfitValue, takeProfitValue));
+				hitCodeValue = fibInfo.getFibValue(hitCode);
+				d = hitCodeValue - takeProfitValue;
+				firstTakeProfit = hitCodeValue - PriceUtil.formatDoubleDecimalValue(d * 0.618, current.getDecimalNum());
+				secondTakeProfit = hitCodeValue - PriceUtil.formatDoubleDecimalValue(d * 0.786, current.getDecimalNum());
+				addPrices(new OpenPriceDetails(hitCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue(), firstTakeProfit, secondTakeProfit));
 				break;
 			}
 			

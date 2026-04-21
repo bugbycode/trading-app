@@ -368,6 +368,10 @@ public class PriceUtil {
 		return bigDecimal.toPlainString();
 	}
 	
+	public static double formatDoubleDecimalValue(double number,int decimalPoint) {
+		return Double.valueOf(formatDoubleDecimal(number, decimalPoint));
+	}
+	
 	/**
 	 * 获取涨跌幅百分比
 	 * @param klinesList
