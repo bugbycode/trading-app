@@ -97,8 +97,8 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 				takeProfitValue = fibInfo.getFibValue(takeProfitCode);
 				hitCodeValue = fibInfo.getFibValue(hitCode);
 				d = takeProfitValue - hitCodeValue;
-				firstTakeProfit = hitCodeValue + PriceUtil.formatDoubleDecimalValue(d * 0.618, current.getDecimalNum());
-				secondTakeProfit = hitCodeValue + PriceUtil.formatDoubleDecimalValue(d * 0.786, current.getDecimalNum());
+				firstTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue + d * 0.618, current.getDecimalNum());
+				secondTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue + d * 0.786, current.getDecimalNum());
 				addPrices(new OpenPriceDetails(hitCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue(), firstTakeProfit, secondTakeProfit));
 				break;
 			} else if((hitCode = getIsBreachFibCode(fibInfo, QuotationMode.SHORT, current)) != null) {
@@ -108,8 +108,8 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 				takeProfitValue = fibInfo.getFibValue(takeProfitCode);
 				hitCodeValue = fibInfo.getFibValue(hitCode);
 				d = hitCodeValue - takeProfitValue;
-				firstTakeProfit = hitCodeValue - PriceUtil.formatDoubleDecimalValue(d * 0.618, current.getDecimalNum());
-				secondTakeProfit = hitCodeValue - PriceUtil.formatDoubleDecimalValue(d * 0.786, current.getDecimalNum());
+				firstTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue - d * 0.618, current.getDecimalNum());
+				secondTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue - d * 0.786, current.getDecimalNum());
 				addPrices(new OpenPriceDetails(hitCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue(), firstTakeProfit, secondTakeProfit));
 				break;
 			}
