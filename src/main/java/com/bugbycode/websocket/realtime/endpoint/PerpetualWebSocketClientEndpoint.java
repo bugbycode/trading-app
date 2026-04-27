@@ -26,7 +26,7 @@ import jakarta.websocket.WebSocketContainer;
 
 
 /**
- * 永续合约实时行情推送websocket客户端
+ * 永续合约实时行情推送websocket客户端（实时k线行情）
  */
 @ClientEndpoint
 public class PerpetualWebSocketClientEndpoint {
@@ -70,7 +70,7 @@ public class PerpetualWebSocketClientEndpoint {
     }
     
     private void connectToServer() throws RuntimeException {
-    	String baseUrl = AppConfig.WEBSOCKET_URL;
+    	String baseUrl = AppConfig.WEBSOCKET_URL + "/market";
     	try {
 			this.container.connectToServer(this, new URI(baseUrl + "/ws/" + coinPairSet.getStreamName()));
 			logger.debug("开始连接websocket服务：" + baseUrl + "，订阅： " + coinPairSet.getStreamName());

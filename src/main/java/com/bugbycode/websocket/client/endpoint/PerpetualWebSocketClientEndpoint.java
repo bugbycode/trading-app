@@ -22,7 +22,7 @@ import jakarta.websocket.WebSocketContainer;
 
 
 /**
- * 永续合约实时行情推送websocket客户端
+ * 永续合约实时行情推送websocket客户端（绘图交易）
  */
 @ClientEndpoint
 public class PerpetualWebSocketClientEndpoint {
@@ -51,7 +51,7 @@ public class PerpetualWebSocketClientEndpoint {
     		if(this.messageHandler == null) {
     			throw new RuntimeException("MessageHandler is null.");
     		}
-			this.container.connectToServer(this, new URI(AppConfig.WEBSOCKET_URL + "/ws/" + coinPairSet.getStreamName()));
+			this.container.connectToServer(this, new URI(AppConfig.WEBSOCKET_URL + "/market/ws/" + coinPairSet.getStreamName()));
 			logger.debug("开始连接websocket服务：" + AppConfig.WEBSOCKET_URL + "，订阅： " + coinPairSet.getStreamName());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
