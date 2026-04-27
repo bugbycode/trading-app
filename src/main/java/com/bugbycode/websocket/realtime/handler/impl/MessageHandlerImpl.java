@@ -51,8 +51,10 @@ public class MessageHandlerImpl implements MessageHandler{
 			finish = client.isFinish(kline);
 			if(finish) {
 				kline = client.getLastKlinesInfo(pair);
-				logger.info(kline);
-				logger.info("{}交易对K线实时同步异常，已自动标记结束订阅");
+				if(kline != null) {
+					logger.info(kline);
+				}
+				logger.info("{}交易对K线实时同步异常，已自动标记结束订阅", pair);
 			}
 		}
 		

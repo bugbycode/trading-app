@@ -155,9 +155,7 @@ public class PerpetualWebSocketClientEndpoint {
 		if(klines.getStartTime() <= connTime) {
 			this.klinesMap.put(pair, klines);
 		} else if(klines.getStartTime() > connTime) {
-			if(this.coinPairSet.addFinishPair(pair)) {
-				result = true;
-			}
+			result = true;
 		}
 		return result;
 	}

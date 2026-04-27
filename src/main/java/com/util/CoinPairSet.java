@@ -82,6 +82,10 @@ public class CoinPairSet extends HashSet<SymbolExchangeInfo> {
 		return this.finishPair.add(pair);
 	}
 	
+	public boolean containsFinish(String pair) {
+		return this.finishPair.contains(pair);
+	}
+	
 	public boolean isFinish() {
 		return this.finishPair.size() == this.size();
 	}
