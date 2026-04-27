@@ -60,55 +60,10 @@ public class MessageHandlerImpl implements MessageHandler{
 				klinesRepository.insert(kline);
 				analysisWorkTaskPool.add(new AnalysisKlinesTask(pair, klinesService, klinesRepository, openInterestHistRepository));
 			}
-			/*
-			if(kline.getInervalType() == Inerval.INERVAL_15M) {
-				//移除批次
-				AppConfig.SYNC_15M_KLINES_RECORD.remove(pair);
-				//添加同步完成的交易对
-				AppConfig.SYNC_15M_KLINES_FINISH.add(pair);
-			}*/
 		};
 		
 		if(client.isFinish()) {
 			client.close();
-			/*synchronized (AppConfig.SYNC_15M_KLINES_FINISH) {
-				
-				//全部同步完成时执行
-				if(!AppConfig.SYNC_15M_KLINES_FINISH.isEmpty() && AppConfig.SYNC_15M_KLINES_RECORD.isEmpty() && kline.getInervalType() == Inerval.INERVAL_15M) {
-					
-					try {
-						
-						LinkedList<String> pairs_linked = new LinkedList<String>();
-						
-						List<OpenInterestHist> list = openInterestHistRepository.query();
-						
-						for(OpenInterestHist oih : list) {
-							
-							if(AppConfig.SYNC_15M_KLINES_FINISH.contains(oih.getSymbol())) {
-								
-								pairs_linked.addLast(oih.getSymbol());
-								
-							}
-						}
-						
-						int linked_size = pairs_linked.size();
-						
-						while(!pairs_linked.isEmpty()) {
-							
-							analysisWorkTaskPool.add(new AnalysisKlinesTask(pairs_linked.removeFirst(), klinesService, klinesRepository, contractType));
-							
-						}
-						
-						logger.debug("总共同步了15分钟级别{}种交易对k线信息", linked_size);
-					
-					} catch (Exception e) {
-						logger.error("处理同步k线结果时出现异常", e);
-					} finally {
-						AppConfig.SYNC_15M_KLINES_FINISH.clear();
-					}
-				}
-				
-			}*/
 		}
 	}
 	
