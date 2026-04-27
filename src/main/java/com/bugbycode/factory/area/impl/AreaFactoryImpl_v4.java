@@ -154,7 +154,7 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 	private FibCode getIsBreachFibCode(FibInfo fibInfo, QuotationMode user_mode, Klines current) {
 		FibCode result = null;
 		FibCode[] codes = FibCode.values();
-		if((fibInfo.isLong() && user_mode == QuotationMode.LONG) || (fibInfo.isShort() || user_mode == QuotationMode.SHORT)) {
+		if((fibInfo.isLong() && user_mode == QuotationMode.LONG) || (fibInfo.isShort() && user_mode == QuotationMode.SHORT)) {
 			for(int index = codes.length - 1; index >= 0; index--) {
 				FibCode code = codes[index];
 				if(code == FibCode.FIB0) {
