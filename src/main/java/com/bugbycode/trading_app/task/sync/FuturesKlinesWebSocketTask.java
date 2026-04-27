@@ -73,9 +73,13 @@ public class FuturesKlinesWebSocketTask {
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
-		List<EoptionContracts> ecList = binanceExchangeService.eOptionsExchangeInfo();
-		for(EoptionContracts ec : ecList) {
-			AppConfig.EOPTION_EXCHANGE_INFO.put(ec.getUnderlying(), ec);
+		try {
+			List<EoptionContracts> ecList = binanceExchangeService.eOptionsExchangeInfo();
+			for(EoptionContracts ec : ecList) {
+				AppConfig.EOPTION_EXCHANGE_INFO.put(ec.getUnderlying(), ec);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 		
 		Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
