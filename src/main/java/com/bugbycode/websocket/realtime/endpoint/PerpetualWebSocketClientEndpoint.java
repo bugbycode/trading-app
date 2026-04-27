@@ -117,6 +117,10 @@ public class PerpetualWebSocketClientEndpoint {
 			e.printStackTrace();
 		}
     }
+    
+    public boolean isOpen() {
+    	return this.session != null && this.session.isOpen();
+    }
 
 	public CoinPairSet getCoinPairSet() {
 		return coinPairSet;
