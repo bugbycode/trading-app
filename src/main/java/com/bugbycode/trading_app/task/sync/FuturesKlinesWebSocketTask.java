@@ -56,9 +56,9 @@ public class FuturesKlinesWebSocketTask {
 	private OpenInterestHistRepository openInterestHistRepository;
 	
 	/**
-	 * 14分47秒开始执行 每15分钟执行一次
+	 * 14分37秒开始执行 每15分钟执行一次
 	 */
-	@Scheduled(cron = "47 14/15 * * * ?")
+	@Scheduled(cron = "37 14/15 * * * ?")
 	public void runWebsocketClient() {
 		
 		if(AppConfig.DEBUG) {
@@ -69,12 +69,12 @@ public class FuturesKlinesWebSocketTask {
 		
 		AppConfig.SYNC_15M_KLINES_RECORD.clear();
 		AppConfig.SYNC_15M_KLINES_FINISH.clear();
-		AppConfig.EOPTION_EXCHANGE_INFO.clear();
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
 		try {
 			List<EoptionContracts> ecList = binanceExchangeService.eOptionsExchangeInfo();
+			AppConfig.EOPTION_EXCHANGE_INFO.clear();
 			for(EoptionContracts ec : ecList) {
 				AppConfig.EOPTION_EXCHANGE_INFO.put(ec.getUnderlying(), ec);
 			}
