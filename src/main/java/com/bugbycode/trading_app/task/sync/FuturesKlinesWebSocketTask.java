@@ -67,19 +67,6 @@ public class FuturesKlinesWebSocketTask {
 		
 		logger.debug("FuturesKlinesWebSocketTask start.");
 		
-		try {
-			for(PerpetualWebSocketClientEndpoint c : AppConfig.SYNC_KLINES_CLIENTS) {
-				if(c.isOpen()) {
-					c.close();
-					logger.info("{}订阅已关闭", c.getStreamName());
-				}
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
-		
-		AppConfig.SYNC_KLINES_CLIENTS.clear();
-		
 		AppConfig.SYNC_15M_KLINES_RECORD.clear();
 		AppConfig.SYNC_15M_KLINES_FINISH.clear();
 		
@@ -115,8 +102,7 @@ public class FuturesKlinesWebSocketTask {
 		}
 		
 		for(CoinPairSet s : coinList) {
-			PerpetualWebSocketClientEndpoint client = new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
-			AppConfig.SYNC_KLINES_CLIENTS.add(client);
+			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
 		}
 		
 		
