@@ -2,11 +2,15 @@ package com.bugbycode.websocket.realtime.endpoint;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.Klines;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -51,6 +55,10 @@ public class PerpetualWebSocketClientEndpoint {
     
     private OpenInterestHistRepository openInterestHistRepository;
     
+    private Map<String, Klines> klinesMap;
+    
+    private long connTime = 0l;
+    
     public PerpetualWebSocketClientEndpoint(CoinPairSet coinPairSet,MessageHandler messageHandler, 
     		KlinesService klinesService, KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, 
     		WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool) {
@@ -62,6 +70,8 @@ public class PerpetualWebSocketClientEndpoint {
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
         this.openInterestHistRepository = openInterestHistRepository;
+        this.klinesMap = new HashMap<String,Klines>();
+        this.connTime = new Date().getTime();
         try {
             this.connectToServer();
         } catch (Exception e) {
@@ -113,6 +123,7 @@ public class PerpetualWebSocketClientEndpoint {
     		if(this.session != null && this.session.isOpen()) {
     			this.session.close();
         	}
+    		this.klinesMap.clear();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -136,5 +147,22 @@ public class PerpetualWebSocketClientEndpoint {
 	
 	public boolean isFinish() {
 		return this.coinPairSet.isFinish();
+	}
+	
+	public boolean isFinish(Klines klines) {
+		boolean result = false;
+		String pair = klines.getPair();
+		if(klines.getStartTime() <= connTime) {
+			this.klinesMap.put(pair, klines);
+		} else if(klines.getStartTime() > connTime) {
+			if(this.coinPairSet.addFinishPair(pair)) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	public Klines getLastKlinesInfo(String pair) {
+		return this.klinesMap.get(pair);
 	}
 }
