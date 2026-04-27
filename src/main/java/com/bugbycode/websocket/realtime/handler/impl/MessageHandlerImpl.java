@@ -47,31 +47,17 @@ public class MessageHandlerImpl implements MessageHandler{
 				klinesJson.getString("q"), klinesJson.getString("V"), klinesJson.getString("Q"));
 		
 		boolean finish = klinesJson.getBoolean("x");
-		if(!finish) {
-			finish = client.isFinish(kline);
-			if(finish) {
-				kline = client.getLastKlinesInfo(pair);
-				if(kline != null) {
-					logger.info(kline);
-				}
-				logger.info("{}交易对K线实时同步异常，已自动标记结束订阅", pair);
-			}
-		}
 		
 		if(finish && client.putFinishPair(pair)) {
 			
-			if(kline != null) {
-				logger.debug(kline);
-			}
+			logger.debug(kline);
 			
 			//15分钟k线分析
 			boolean isEmpty = klinesRepository.isEmpty(pair, Inerval.INERVAL_1D);
 			if(isEmpty) {
 				workTaskPool.add(new SyncKlinesTask(pair, new Date(), klinesService, klinesRepository));
 			} else {
-				if(kline != null) {
-					klinesRepository.insert(kline);
-				}
+				klinesRepository.insert(kline);
 				analysisWorkTaskPool.add(new AnalysisKlinesTask(pair, klinesService, klinesRepository, openInterestHistRepository));
 			}
 		};
