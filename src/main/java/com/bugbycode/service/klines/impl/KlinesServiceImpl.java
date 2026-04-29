@@ -26,6 +26,7 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v4;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl_v5;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -1143,7 +1144,7 @@ public class KlinesServiceImpl implements KlinesService {
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
 		AreaFactory[] factories = {
-				new AreaFactoryImpl_v4(list_1d, list_1h, list_15m)
+				new AreaFactoryImpl_v5(list_1d, list_1h, list_15m)
 			};
 	
 		for(AreaFactory factory : factories) {
