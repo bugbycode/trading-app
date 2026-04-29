@@ -3,6 +3,7 @@ package com.bugbycode.trading_app;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,7 @@ import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v4;
+import com.bugbycode.factory.area.impl.AreaFactoryImpl_v5;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
@@ -41,6 +43,7 @@ import com.bugbycode.module.WeekDay;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.PriceInfo;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
@@ -50,6 +53,7 @@ import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
+import com.util.CoinPairSet;
 import com.util.ConsolidationAreaFibUtil;
 import com.util.DateFormatUtil;
 import com.util.EmaFibUtil;
@@ -297,13 +301,14 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "ETHUSDT";
+    	String pair = "BTCUSDT";
     	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
+        List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
-        AreaFactory factory = new AreaFactoryImpl_v4(list, list, list_15m);
+        AreaFactory factory = new AreaFactoryImpl_v5(list, list_hit, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -591,5 +596,31 @@ public class KlinesServiceTest {
     	}
     	Klines k_week = PriceUtil.getLastWeekKlines(list);
     	logger.info(k_week);
+    }
+    
+    @Test
+    public void testCoinSet() {
+    	
+    	Inerval inerval = Inerval.INERVAL_15M;
+    	Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
+		
+		CoinPairSet set = new CoinPairSet(inerval);
+		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
+		for(SymbolExchangeInfo coin : pairs) {
+			
+			//AppConfig.SYNC_15M_KLINES_RECORD.put(coin.getSymbol(), new Date().getTime());
+			
+			set.add(coin);
+			if(set.isFull()) {
+				coinList.add(set);
+				set = new CoinPairSet(inerval);
+			}
+		}
+		
+		if(!set.isEmpty()) {
+			coinList.add(set);
+		}
+		logger.info(pairs.size());
+		logger.info(coinList.size());
     }
 }
