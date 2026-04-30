@@ -260,7 +260,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					&& !PriceUtil.isTrade(currentPrice, openPrice.getSecondTakeProfit(), fibInfo.getFibAfterKlines())
+					&& !PriceUtil.isTrade(price, openPrice.getSecondTakeProfit(), fibInfo.getFibAfterKlines())
 					) {
 			
 				//市价做多
@@ -355,7 +355,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			if(PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					&& !PriceUtil.isTrade(currentPrice, openPrice.getSecondTakeProfit(), fibInfo.getFibAfterKlines())
+					&& !PriceUtil.isTrade(price, openPrice.getSecondTakeProfit(), fibInfo.getFibAfterKlines())
 					) {
 			
 				//市价做空
@@ -977,7 +977,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 		List<FibInfoFactory> factoryList = new ArrayList<FibInfoFactory>();
 		
-		FibInfoFactory fc = new FibInfoFactoryImpl(list_15m, list_15m, list_15m);
+		FibInfoFactory fc = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
 		
 		factoryList.add(fc);
 		
@@ -985,7 +985,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			PositionSide ps_mode = fc.isLong() ? PositionSide.SHORT : PositionSide.LONG;
 			
-			factoryList.add(new FibInfoFactoryImpl(list_15m, list_15m, list_15m, ps_mode));
+			factoryList.add(new FibInfoFactoryImpl(list_1h, list_1h, list_15m, ps_mode));
 			
 		}
 		

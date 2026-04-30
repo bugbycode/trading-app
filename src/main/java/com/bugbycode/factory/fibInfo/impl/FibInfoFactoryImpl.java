@@ -13,6 +13,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
@@ -243,6 +244,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			if(openCode.gt(FibCode.FIB0)) {
+				double d = 0;
+				double firstTakeProfit = 0;
+				double secondTakeProfit = 0;
 				double fibValue = fibInfo.getFibValue(openCode);
 				for(int index = list.size() - 1; index > 0; index--) {
 					Klines current = list.get(index);
@@ -253,7 +257,18 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 							|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
 						double stopLoss = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 						double hitPrice = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
-						addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss));
+						FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
+						double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
+						d = mode == QuotationMode.LONG ? takeProfitValue - fibValue : fibValue - takeProfitValue;
+						if(mode == QuotationMode.LONG) {
+							firstTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue + d * 0.618, current.getDecimalNum());
+							secondTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue + d * 0.786, current.getDecimalNum());
+						} else {
+							firstTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue - d * 0.618, current.getDecimalNum());
+							secondTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue - d * 0.786, current.getDecimalNum());
+						}
+						//addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss));
+						addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 						break;
 					}
 				}
