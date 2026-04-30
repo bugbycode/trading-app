@@ -13,6 +13,7 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
@@ -99,7 +100,7 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 				d = takeProfitValue - hitCodeValue;
 				firstTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue + d * 0.618, current.getDecimalNum());
 				secondTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue + d * 0.786, current.getDecimalNum());
-				addPrices(new OpenPriceDetails(hitCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue(), firstTakeProfit, secondTakeProfit));
+				addPrices(new OpenPriceDetails(hitCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue(), firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
 				break;
 			} else if((hitCode = getIsBreachFibCode(fibInfo, QuotationMode.SHORT, current)) != null) {
 				last = current;
@@ -110,7 +111,7 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 				d = hitCodeValue - takeProfitValue;
 				firstTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue - d * 0.618, current.getDecimalNum());
 				secondTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue - d * 0.786, current.getDecimalNum());
-				addPrices(new OpenPriceDetails(hitCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue(), firstTakeProfit, secondTakeProfit));
+				addPrices(new OpenPriceDetails(hitCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue(), firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
 				break;
 			}
 			
