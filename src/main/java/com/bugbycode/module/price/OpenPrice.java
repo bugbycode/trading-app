@@ -1,7 +1,9 @@
 package com.bugbycode.module.price;
 
 import com.bugbycode.module.FibCode;
+import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.binance.AutoTradeType;
 
 /**
  * 开仓价
@@ -48,4 +50,16 @@ public interface OpenPrice {
 	 * @return
 	 */
 	public double getAreaTakeProfit(double price, OpenPrice openPrice, double profit, double profitLimit, QuotationMode mode);
+	
+	/**
+	 * 获取回撤信息
+	 * @return
+	 */
+	public FibInfo getFibInfo();
+	
+	/**
+	 * 参考指标
+	 * @return
+	 */
+	public AutoTradeType getAutoTradeType();
 }

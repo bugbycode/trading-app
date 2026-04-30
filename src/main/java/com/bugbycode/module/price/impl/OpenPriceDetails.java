@@ -1,7 +1,9 @@
 package com.bugbycode.module.price.impl;
 
 import com.bugbycode.module.FibCode;
+import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.util.PriceUtil;
 
@@ -16,6 +18,10 @@ public class OpenPriceDetails implements OpenPrice {
 	private double firstTakeProfit;//第一止盈点
 	
 	private double secondTakeProfit;//第二止盈点
+	
+	private FibInfo fibInfo;
+	
+	private AutoTradeType autoTradeType = AutoTradeType.DEFAULT;
 	
 	/**
 	 * 开仓价格信息
@@ -55,6 +61,47 @@ public class OpenPriceDetails implements OpenPrice {
 		this.stopLossLimit = stopLossLimit;
 		this.firstTakeProfit = firstTakeProfit;
 		this.secondTakeProfit = secondTakeProfit;
+	}
+	
+	/**
+	 * 开仓价格信息
+	 * @param code 所处的回撤点
+	 * @param price 开仓价
+	 * @param stopLoss 最佳止损点
+	 * @param firstTakeProfit 第一止盈点
+	 * @param secondTakeProfit 第二止盈点
+	 * @param autoTradeType 参考指标
+	 */
+	public OpenPriceDetails(FibCode code, double price, double stopLossLimit,
+			double firstTakeProfit, double secondTakeProfit, AutoTradeType autoTradeType) {
+		this.code = code;
+		this.price = price;
+		this.stopLossLimit = stopLossLimit;
+		this.firstTakeProfit = firstTakeProfit;
+		this.secondTakeProfit = secondTakeProfit;
+		this.autoTradeType = autoTradeType;
+	}
+	
+	/**
+	 * 开仓价格信息
+	 * @param code 所处的回撤点
+	 * @param price 开仓价
+	 * @param stopLoss 最佳止损点
+	 * @param firstTakeProfit 第一止盈点
+	 * @param secondTakeProfit 第二止盈点
+	 * @param autoTradeType 参考指标
+	 * @param fibInfo 回撤信息
+	 */
+	public OpenPriceDetails(FibCode code, double price, double stopLossLimit,
+			double firstTakeProfit, double secondTakeProfit, AutoTradeType autoTradeType,
+			FibInfo fibInfo) {
+		this.code = code;
+		this.price = price;
+		this.stopLossLimit = stopLossLimit;
+		this.firstTakeProfit = firstTakeProfit;
+		this.secondTakeProfit = secondTakeProfit;
+		this.autoTradeType = autoTradeType;
+		this.fibInfo = fibInfo;
 	}
 
 	@Override
@@ -98,5 +145,15 @@ public class OpenPriceDetails implements OpenPrice {
 			takeProfit = openPrice.getFirstTakeProfit();
 		}
 		return takeProfit;
+	}
+
+	@Override
+	public FibInfo getFibInfo() {
+		return fibInfo;
+	}
+
+	@Override
+	public AutoTradeType getAutoTradeType() {
+		return autoTradeType;
 	}
 }

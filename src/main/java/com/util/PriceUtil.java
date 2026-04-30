@@ -3751,6 +3751,43 @@ public class PriceUtil {
 	
 	/**
 	 * 判断开仓点是否交易过
+	 * @param price 开仓价
+	 * @param takeProfitPrice 止盈价
+	 * @param fibAfterKlines 参考k线
+	 * @return
+	 */
+	public static boolean isTrade(double price, double takeProfitPrice, List<Klines> fibAfterKlines) {
+		
+		boolean result = false;
+		
+		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
+			fibAfterKlines.sort(new KlinesComparator(SortType.ASC));
+			Klines hitCodeKlines = null;
+			Klines hitTakeProfitCodeKlines = null;
+			for(int index = 0; index < fibAfterKlines.size(); index++) {
+				Klines k = fibAfterKlines.get(index);
+				//判断是否命中开仓价
+				if(hitCodeKlines == null && hitPrice(k, price)) {
+					hitCodeKlines = k;
+					continue;
+				}
+				//判断是否命中止盈价
+				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, takeProfitPrice)) {
+					hitTakeProfitCodeKlines = k;
+				}
+				
+				if(!(hitCodeKlines == null || hitTakeProfitCodeKlines == null)) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 判断开仓点是否交易过
 	 * @param code 开仓点
 	 * @param fibInfo 回撤信息
 	 * @return

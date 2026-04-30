@@ -8,7 +8,6 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.ShapeInfo;
-import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
@@ -234,15 +233,10 @@ public interface KlinesService {
      * 市价交易
      * @param pair 交易对
      * @param ps 持仓方向 LONG / SHORT 
-     * @param stopLossDoubleValue 止损价 fibInfo为null时使用
-     * @param takeProfitDoubleValue 止盈价 fibInfo为null时使用
      * @param openPrice 开仓价
-     * @param fibInfo 斐波那契回撤点位信息
-     * @param autoTradeType 自动交易参考指标
      * @param decimalNum 价格小数点个数
      */
-    public void marketPlace(String pair,PositionSide ps, double stopLossDoubleValue, double takeProfitDoubleValue, OpenPrice openPrice, 
-    		FibInfo fibInfo, AutoTradeType autoTradeType, int decimalNum);
+    public void marketPlace(String pair,PositionSide ps, OpenPrice openPrice, int decimalNum);
     
     /**
      * 获取最新k线收盘价
