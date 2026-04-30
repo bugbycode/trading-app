@@ -3751,6 +3751,32 @@ public class PriceUtil {
 	
 	/**
 	 * 判断开仓点是否交易过
+	 * @param code 开仓点
+	 * @param takeProfitPrice 止盈价
+	 * @param fibInfo 回撤信息
+	 * @return
+	 */
+	public static boolean isTrade(FibCode code, double takeProfitPrice, FibInfo fibInfo) {
+		return isTrade(fibInfo.getFibValue(code), takeProfitPrice, fibInfo.getFibAfterKlines());
+	}
+	
+	/**
+	 * 判断开仓点是否交易过
+	 * @param openPrice 开仓价信息
+	 * @return
+	 */
+	public static boolean isTrade(OpenPrice openPrice) {
+		boolean result = false;
+		FibCode code = openPrice.getCode();
+		FibInfo fibInfo = openPrice.getFibInfo();
+		if(fibInfo != null) {
+			result = isTrade(fibInfo.getFibValue(code), openPrice.getSecondTakeProfit(), fibInfo.getFibAfterKlines());
+		}
+		return result;
+	}
+	
+	/**
+	 * 判断开仓点是否交易过
 	 * @param price 开仓价
 	 * @param takeProfitPrice 止盈价
 	 * @param fibAfterKlines 参考k线
@@ -3794,37 +3820,12 @@ public class PriceUtil {
 	 */
 	public static boolean isTraded(FibCode code,FibInfo fibInfo) {
 		
-		boolean result = false;
-		
 		List<Klines> fibAfterKlines = fibInfo.getFibAfterKlines();
 		
 		//止盈点
 		FibCode takeProfitCode = fibInfo.getTakeProfit_v1(code);
 		
-		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
-			fibAfterKlines.sort(new KlinesComparator(SortType.ASC));
-			Klines hitCodeKlines = null;
-			Klines hitTakeProfitCodeKlines = null;
-			for(int index = 0; index < fibAfterKlines.size(); index++) {
-				Klines k = fibAfterKlines.get(index);
-				//判断是否命中开仓价
-				if(hitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(code))) {
-					hitCodeKlines = k;
-					continue;
-				}
-				//判断是否命中止盈价
-				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, fibInfo.getFibValue(takeProfitCode))) {
-					hitTakeProfitCodeKlines = k;
-				}
-				
-				if(!(hitCodeKlines == null || hitTakeProfitCodeKlines == null)) {
-					result = true;
-					break;
-				}
-			}
-		}
-		
-		return result;
+		return isTrade(fibInfo.getFibValue(code), fibInfo.getFibValue(takeProfitCode), fibAfterKlines);
 	}
 	
 	/**
