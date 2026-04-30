@@ -443,6 +443,11 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		if(openPrice.getFirstTakeProfit() <= 0 || openPrice.getSecondTakeProfit() <= 0) {
+			logger.info(pair + "止盈价未初始化");
+			return;
+		}
+		
 		FibInfo fibInfo = openPrice.getFibInfo();
 		AutoTradeType autoTradeType = openPrice.getAutoTradeType();
 		
