@@ -26,6 +26,8 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl_v4;
+import com.bugbycode.factory.eoption.EoptionFactory;
+import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -1044,11 +1046,11 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		AreaFactory[] factories = {
-				new AreaFactoryImpl_v4(list_1d, list_1h, list_15m)
+		EoptionFactory[] factories = {
+				new EoptionFactoryImpl(list_4h, list_15m)
 			};
 	
-		for(AreaFactory factory : factories) {
+		for(EoptionFactory factory : factories) {
 		
 			if(!(factory.isLong() || factory.isShort())) {
 				continue;
@@ -1063,7 +1065,8 @@ public class KlinesServiceImpl implements KlinesService {
 				OpenPrice price = openPrices.get(index);
 				if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice()) 
 						&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-						&& !PriceUtil.isTraded(price, factory)) {
+						//&& !PriceUtil.isTraded(price, factory)
+						) {
 					
 					List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
 					
@@ -1087,7 +1090,8 @@ public class KlinesServiceImpl implements KlinesService {
 					
 				} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice()) 
 						&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-						&& !PriceUtil.isTraded(price, factory)) {
+						//&& !PriceUtil.isTraded(price, factory)
+						) {
 					
 					//
 					List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
