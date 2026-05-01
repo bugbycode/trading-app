@@ -244,33 +244,46 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			if(openCode.gt(FibCode.FIB0)) {
-				double d = 0;
-				double firstTakeProfit = 0;
-				double secondTakeProfit = 0;
-				double fibValue = fibInfo.getFibValue(openCode);
-				for(int index = list.size() - 1; index > 0; index--) {
+				
+				List<Klines> data = new ArrayList<Klines>();
+				for(int index = list.size() - 1; index > 1; index--) {
 					Klines current = list.get(index);
+					Klines parent = list.get(index - 1);
+					Klines next = list.get(index - 2);
 					if(current.lte(end)) {
 						break;
 					}
-					if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
-							|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
-						double stopLoss = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
-						double hitPrice = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
-						FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
-						double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
-						d = mode == QuotationMode.LONG ? takeProfitValue - fibValue : fibValue - takeProfitValue;
-						if(mode == QuotationMode.LONG) {
-							firstTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue + d * 0.618, current.getDecimalNum());
-							secondTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue + d * 0.786, current.getDecimalNum());
-						} else {
-							firstTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue - d * 0.618, current.getDecimalNum());
-							secondTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue - d * 0.786, current.getDecimalNum());
-						}
-						//addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss));
-						addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
-						break;
+					if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v32(current, parent, next))
+							|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v32(current, parent, next))) {
+						data.add(current);
 					}
+				}
+				
+				if(!CollectionUtils.isEmpty(data)) {
+					
+					double firstTakeProfit = 0;
+					double secondTakeProfit = 0;
+					double fibValue = fibInfo.getFibValue(openCode);
+					
+					Klines hitKlines = mode == QuotationMode.LONG ? PriceUtil.getMinClosePriceKLine(data) : PriceUtil.getMaxClosePriceKLine(data);
+					double stopLoss = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
+					
+					int decimalNum = fibInfo.getDecimalPoint();
+					double hitPrice = hitKlines.getClosePriceDoubleValue();
+					
+					FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
+					
+					double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
+					double d = mode == QuotationMode.LONG ? takeProfitValue - fibValue : fibValue - takeProfitValue;
+					
+					if(mode == QuotationMode.LONG) {
+						firstTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue + d * 0.618, decimalNum);
+						secondTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue + d * 0.786, decimalNum);
+					} else {
+						firstTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue - d * 0.618, decimalNum);
+						secondTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue - d * 0.786, decimalNum);
+					}
+					addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 				}
 			}
 			

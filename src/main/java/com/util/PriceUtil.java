@@ -2208,6 +2208,20 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势 </br></br>
+	 * 
+	 * 1、前两根k线高点上升，2、当前k线收盘价小于前一根k线最高价
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyDeclining_v32(Klines current, Klines parent, Klines next) {
+		return parent.getHighPriceDoubleValue() >= next.getHighPriceDoubleValue() && current.getClosePriceDoubleValue() < parent.getHighPriceDoubleValue();
+	}
+	
+	/**
 	 * MACD 连续衰竭
 	 * @param current 当前k线
 	 * @param parent 前一根k线
@@ -2548,6 +2562,20 @@ public class PriceUtil {
 	 */
 	public static boolean verifyPowerful_v31(Klines current, Klines parent, Klines next) {
 		return parent.getLowPriceDoubleValue() < next.getLowPriceDoubleValue() && current.getLowPriceDoubleValue() >= parent.getLowPriceDoubleValue();
+	}
+	
+	/**
+	 * 判断是否出现强势 </br></br>
+	 * 
+	 * 1、前两根k线低点降低，2、当前k线收盘价大于前一根k线最低价
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyPowerful_v32(Klines current, Klines parent, Klines next) {
+		return parent.getLowPriceDoubleValue() <= next.getLowPriceDoubleValue() && current.getClosePriceDoubleValue() > parent.getLowPriceDoubleValue();
 	}
 	
 	/**
