@@ -7,7 +7,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v4;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
@@ -68,7 +68,13 @@ public class AreaFactoryImpl_v4 implements AreaFactory {
 		this.list_hit.sort(kc);
 		this.list_15m.sort(kc);
 
-		FibInfoFactory factory = new FibInfoFactoryImpl_v4(list, list, list_15m);
+		FibInfoFactory factory = new FibInfoFactoryImpl(list, list, list_15m);
+		
+		if(factory.getHitCode().gte(FibCode.FIB3_618)) {
+			PositionSide ps_mode = factory.isLong() ? PositionSide.SHORT : PositionSide.LONG;
+			factory = new FibInfoFactoryImpl(list, list_hit, list_15m, ps_mode);
+		}
+		
 		if(!(factory.isLong() || factory.isShort())) {
 			return;
 		}
