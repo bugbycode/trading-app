@@ -261,28 +261,21 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				
 				if(!CollectionUtils.isEmpty(data)) {
 					
-					double firstTakeProfit = 0;
-					double secondTakeProfit = 0;
-					double fibValue = fibInfo.getFibValue(openCode);
-					
 					Klines hitKlines = mode == QuotationMode.LONG ? PriceUtil.getMinClosePriceKLine(data) : PriceUtil.getMaxClosePriceKLine(data);
 					double stopLoss = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 					
 					int decimalNum = fibInfo.getDecimalPoint();
 					double hitPrice = hitKlines.getClosePriceDoubleValue();
-					
+
 					FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
-					
 					double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
-					double d = mode == QuotationMode.LONG ? takeProfitValue - fibValue : fibValue - takeProfitValue;
+					double fibValue = fibInfo.getFibValue(openCode);
 					
-					if(mode == QuotationMode.LONG) {
-						firstTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue + d * 0.618, decimalNum);
-						secondTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue + d * 0.786, decimalNum);
-					} else {
-						firstTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue - d * 0.618, decimalNum);
-						secondTakeProfit = PriceUtil.formatDoubleDecimalValue(fibValue - d * 0.786, decimalNum);
-					}
+					FibInfo childFibInfo = new FibInfo(takeProfitValue, fibValue, decimalNum, FibLevel.LEVEL_1);
+					
+					double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
+					double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
+					
 					addPrices(new OpenPriceDetails(openCode, hitPrice, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 				}
 			}
