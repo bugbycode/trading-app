@@ -3,7 +3,6 @@ package com.bugbycode.service.klines.impl;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +28,7 @@ import com.bugbycode.factory.area.impl.AreaFactoryImpl_v4;
 import com.bugbycode.factory.eoption.EoptionFactory;
 import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -976,22 +975,27 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
-
-		List<FibInfoFactory> factoryList = new ArrayList<FibInfoFactory>();
+		
+		/*
+		List<FibInfoFactory> factorys = new ArrayList<FibInfoFactory>();
 		
 		FibInfoFactory fc = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
 		
-		factoryList.add(fc);
+		factorys.add(fc);
 		
 		if(fc.getHitCode().gte(FibCode.FIB1_272)) {
 			
 			PositionSide ps_mode = fc.isLong() ? PositionSide.SHORT : PositionSide.LONG;
 			
-			factoryList.add(new FibInfoFactoryImpl(list_1h, list_1h, list_15m, ps_mode));
+			factorys.add(new FibInfoFactoryImpl(list_1h, list_1h, list_15m, ps_mode));
 			
-		}
+		}*/
 		
-		for(FibInfoFactory factory : factoryList) {
+		FibInfoFactory[] factorys = {
+				new FibInfoFactoryImpl_v2(list_15m, list_15m, list_15m)
+		};
+		
+		for(FibInfoFactory factory : factorys) {
 			
 			if(!(factory.isLong() || factory.isShort())) {
 				return;
