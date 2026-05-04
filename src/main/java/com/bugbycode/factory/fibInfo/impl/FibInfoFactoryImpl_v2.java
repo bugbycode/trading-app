@@ -200,8 +200,8 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
 			
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
-			double stopLossValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
-			FibCode openCode = fibInfo.getFibCode(stopLossValue);
+			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
+			FibCode openCode = fibInfo.getFibCode(openCodeValue);
 			
 			if(openCode.gt(FibCode.FIB0)) {
 				double fibValue = fibInfo.getFibValue(openCode);
@@ -213,7 +213,7 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 					if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
 							|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
 						double hitPrice = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
-						
+						double stopLossValue = mode == QuotationMode.LONG ? current.getLowPriceDoubleValue() : current.getHighPriceDoubleValue();
 						FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
 						double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
 						
