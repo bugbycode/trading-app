@@ -7,8 +7,9 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.module.FibCode;
+import com.bugbycode.module.FibInfo;
+import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -49,7 +50,7 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private void init() {
 		
-		if(list.size() < 50 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(list.size() < 3 || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
@@ -58,73 +59,57 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list.sort(new KlinesComparator(SortType.ASC));
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		
-		//PriceUtil.calculateMACD(list);
-		
-		
+		double startPrice = 0;
+		double endPrice = 0;
+		int decimalPoint = 2;
 		Klines current = null;
 		Klines parent = null;
 		Klines next = null;
 		
-		for(int index = list.size() - 1; index > 3; index--) {
+		for(int index = list.size() - 1; index > 1; index--) {
 			current = list.get(index);
 			parent = list.get(index - 1);
 			next = list.get(index - 2);
+			decimalPoint = current.getDecimalNum();
 			if(verifyLong(current, parent, next)) {
 				this.ps = PositionSide.LONG;
+				startPrice = current.getClosePriceDoubleValue();
+				if(current.isFall()) {
+					endPrice = parent.getLowPriceDoubleValue();
+				} else {
+					endPrice = current.getLowPriceDoubleValue();
+				}
 				break;
 			} else if(verifyShort(current, parent, next)) {
 				this.ps = PositionSide.SHORT;
+				startPrice = current.getClosePriceDoubleValue();
+				if(current.isRise()) {
+					endPrice = parent.getHighPriceDoubleValue();
+				} else {
+					endPrice = current.getHighPriceDoubleValue();
+				}
 				break;
 			}
-			current = null;
-			parent = null;
-			next = null;
 		}
 		
 		if(ps == PositionSide.DEFAULT) {
 			return;
 		}
 		
-		QuotationMode mode = ps == PositionSide.LONG ? QuotationMode.LONG : QuotationMode.SHORT;
+		FibInfo fibInfo = new FibInfo(startPrice, endPrice, decimalPoint, FibLevel.LEVEL_0);
 		
-		double h = current.getHighPriceDoubleValue();
-		double l = current.getLowPriceDoubleValue();
-		double c = current.getClosePriceDoubleValue();
-		
-		double lt_bh = current.getBodyHighPriceDoubleValue();
-		double lt_bl = current.getBodyLowPriceDoubleValue();
-		
-		double take = mode == QuotationMode.LONG ? (h - lt_bl) : (lt_bh - l);
-		take = take * 0.886;
-		
-		double firstTakeProfit = 0; 
-		double secondTakeProfit = 0;
-		double stopLoss = 0; 
-		
-		if(isLong()) {
-			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(c + (take / 2), current.getDecimalNum()) );
-			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(c + take, current.getDecimalNum()) );
-			stopLoss = current.isRise() ? current.getLowPriceDoubleValue() : PriceUtil.getMinPrice(current.getLowPriceDoubleValue(), parent.getLowPriceDoubleValue());
-		} else if(isShort()) {
-			firstTakeProfit =Double.valueOf( PriceUtil.formatDoubleDecimal(c - (take / 2), current.getDecimalNum()) );
-			secondTakeProfit = Double.valueOf( PriceUtil.formatDoubleDecimal(c - take, current.getDecimalNum()) );
-			stopLoss = current.isFall() ? current.getHighPriceDoubleValue() : PriceUtil.getMaxPrice(current.getHighPriceDoubleValue(), parent.getHighPriceDoubleValue());
-			
-			if(firstTakeProfit <= 0) {
-				firstTakeProfit = l;
-			}
-			
-			if(secondTakeProfit <= 0) {
-				secondTakeProfit = l;
-			}
-		}
+		double firstTakeProfit = fibInfo.getFibValue(FibCode.FIB1_618); 
+		double secondTakeProfit = fibInfo.getFibValue(FibCode.FIB2);
+		double stopLoss = fibInfo.getFibValue(FibCode.FIB0); 
+		double c = fibInfo.getFibValue(FibCode.FIB1);
 		
 		addPrices(new OpenPriceDetails(FibCode.FIB618, c, stopLoss, firstTakeProfit, secondTakeProfit));
-		/*
-		Klines fibAfterFlag = PriceUtil.getAfterKlines(current, this.list_15m);
-		if(fibAfterFlag != null) {
-			this.fibAfterKlines.addAll(PriceUtil.subList(fibAfterFlag, this.list_15m));
-		}*/
+		
+		Klines fibAfter = PriceUtil.getAfterKlines(current, list_15m);
+		if(fibAfter != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfter, list_15m);
+		}
+		
 	}
 	
 	private void addPrices(OpenPrice price) {
