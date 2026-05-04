@@ -11,6 +11,7 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
@@ -100,10 +101,10 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		double firstTakeProfit = fibInfo.getFibValue(FibCode.FIB1_618); 
 		double secondTakeProfit = fibInfo.getFibValue(FibCode.FIB2);
-		double stopLoss = fibInfo.getFibValue(FibCode.FIB0); 
+		double stopLoss = fibInfo.getFibValue(FibCode.FIB5); 
 		double c = fibInfo.getFibValue(FibCode.FIB1);
 		
-		addPrices(new OpenPriceDetails(FibCode.FIB618, c, stopLoss, firstTakeProfit, secondTakeProfit));
+		addPrices(new OpenPriceDetails(FibCode.FIB618, c, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
 		
 		Klines fibAfter = PriceUtil.getAfterKlines(current, list_15m);
 		if(fibAfter != null) {
