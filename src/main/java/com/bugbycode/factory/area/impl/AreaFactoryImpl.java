@@ -101,7 +101,7 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		double firstTakeProfit = fibInfo.getFibValue(FibCode.FIB1_618); 
 		double secondTakeProfit = fibInfo.getFibValue(FibCode.FIB2);
-		double stopLoss = fibInfo.getFibValue(FibCode.FIB5); 
+		double stopLoss = fibInfo.getFibValue(FibCode.FIB618); 
 		double c = fibInfo.getFibValue(FibCode.FIB1);
 		
 		addPrices(new OpenPriceDetails(FibCode.FIB618, c, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
