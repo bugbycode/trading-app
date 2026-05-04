@@ -8,9 +8,9 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.scheduling.annotation.EnableScheduling;
-//import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.config.AppConfig;
@@ -28,8 +28,8 @@ import com.util.CoinPairSet;
 /**
  * 绘图交易计划任务
  */
-//@Configuration
-//@EnableScheduling
+@Configuration
+@EnableScheduling
 public class ShapeTradingTask {
 	
 	private final Logger logger = LogManager.getLogger(ShapeTradingTask.class);
@@ -54,7 +54,7 @@ public class ShapeTradingTask {
 	 * 
 	 * @throws Exception
 	 */
-	//@Scheduled(cron = "45 4/5 * * * ?")
+	@Scheduled(cron = "45 4/5 * * * ?")
 	public void executeShapeTask() {
 		
 		if(AppConfig.DEBUG) {
