@@ -51,7 +51,7 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private void init() {
 		
-		if(list.size() < 3 || CollectionUtils.isEmpty(this.list_15m)) {
+		if(CollectionUtils.isEmpty(list) || CollectionUtils.isEmpty(this.list_15m)) {
 			return;
 		}
 
@@ -60,53 +60,74 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list.sort(new KlinesComparator(SortType.ASC));
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		
-		double startPrice = 0;
-		double endPrice = 0;
-		int decimalPoint = 2;
-		Klines current = null;
-		Klines parent = null;
-		Klines next = null;
+		Klines last = PriceUtil.getLastKlines(list);
+		double o = last.getOpenPriceDoubleValue();
+		double c = last.getClosePriceDoubleValue();
+		double l = last.getLowPriceDoubleValue();
+		double h = last.getHighPriceDoubleValue();
 		
-		for(int index = list.size() - 1; index > 1; index--) {
-			current = list.get(index);
-			parent = list.get(index - 1);
-			next = list.get(index - 2);
-			decimalPoint = current.getDecimalNum();
-			if(verifyLong(current, parent, next)) {
+		double startPrice = c;
+		double endPrice = o; 
+		
+		if(last.isRise()) {
+			endPrice = l;
+		} else {
+			endPrice = h;
+		}
+
+		int decimalPoint = last.getDecimalNum();
+		
+		FibInfo fibInfo = new FibInfo(startPrice, endPrice, decimalPoint, FibLevel.LEVEL_0);
+		
+		Klines last_after = PriceUtil.getAfterKlines(last, list_15m);
+		if(last_after == null) {
+			return;
+		}
+		
+		Klines hit_k = null;
+		for(int index = list_15m.size() - 1; index >= 0; index--) {
+			Klines current = list_15m.get(index);
+			if(PriceUtil.isBreachLong(current, c)) {
 				this.ps = PositionSide.LONG;
-				startPrice = current.getClosePriceDoubleValue();
-				if(current.isFall()) {
-					endPrice = parent.getLowPriceDoubleValue();
-				} else {
-					endPrice = current.getLowPriceDoubleValue();
-				}
+				hit_k = current;
 				break;
-			} else if(verifyShort(current, parent, next)) {
+			} else if(PriceUtil.isBreachShort(current, c)) {
 				this.ps = PositionSide.SHORT;
-				startPrice = current.getClosePriceDoubleValue();
-				if(current.isRise()) {
-					endPrice = parent.getHighPriceDoubleValue();
-				} else {
-					endPrice = current.getHighPriceDoubleValue();
-				}
+				hit_k = current;
+				break;
+			}
+			if(current.lte(last_after)) {
 				break;
 			}
 		}
 		
-		if(ps == PositionSide.DEFAULT) {
-			return;
+		if(this.ps == PositionSide.DEFAULT || hit_k == null) {
+			hit_k = last_after;
+			if(hit_k.isRise()) {
+				this.ps = PositionSide.LONG;
+			} else {
+				this.ps = PositionSide.SHORT;
+			}
 		}
-		
-		FibInfo fibInfo = new FibInfo(startPrice, endPrice, decimalPoint, FibLevel.LEVEL_0);
 		
 		double firstTakeProfit = fibInfo.getFibValue(FibCode.FIB1_618); 
 		double secondTakeProfit = fibInfo.getFibValue(FibCode.FIB2);
-		double stopLoss = fibInfo.getFibValue(FibCode.FIB618); 
-		double c = fibInfo.getFibValue(FibCode.FIB1);
 		
-		addPrices(new OpenPriceDetails(FibCode.FIB618, c, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
+		double stopLoss = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue(); 
+		double op = isLong() ? hit_k.getBodyHighPriceDoubleValue() : hit_k.getBodyLowPriceDoubleValue();
 		
-		Klines fibAfter = PriceUtil.getAfterKlines(current, list_15m);
+		if((isLong() && fibInfo.isLong()) || (isShort() && fibInfo.isShort())) {
+			firstTakeProfit = fibInfo.getFibValue(FibCode.FIB618);
+			secondTakeProfit = fibInfo.getFibValue(FibCode.FIB5);
+		}
+		
+		FibInfo childFibInfo = new FibInfo(secondTakeProfit, c, decimalPoint);
+		firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
+		secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
+		
+		addPrices(new OpenPriceDetails(FibCode.FIB1, op, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
+		
+		Klines fibAfter = PriceUtil.getAfterKlines(hit_k, list_15m);
 		if(fibAfter != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfter, list_15m);
 		}
@@ -117,14 +138,6 @@ public class AreaFactoryImpl implements AreaFactory {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			openPrices.add(price);
 		}
-	}
-	
-	private boolean verifyLong(Klines current, Klines parent, Klines next) {
-		return PriceUtil.verifyDeclining_v28(parent, next) && PriceUtil.verifyPowerful_v28(current, parent);
-	}
-	
-	private boolean verifyShort(Klines current, Klines parent, Klines next) {
-		return PriceUtil.verifyPowerful_v28(parent, next) && PriceUtil.verifyDeclining_v28(current, parent);
 	}
 	
 	@Override

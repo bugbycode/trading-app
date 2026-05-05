@@ -371,6 +371,19 @@ public class FibInfo {
 	 * @param fib1 斐波那契回撤起始价
 	 * @param fib0 斐波那契回撤结束价
 	 * @param decimalPoint
+	 */
+	public FibInfo(double fib1,double fib0,int decimalPoint) {
+		this.startPrice = fib1;
+		this.endPrice = fib0;
+		this.decimalPoint = decimalPoint;
+		this.level = FibLevel.LEVEL_0;
+	}
+	
+	/**
+	 * 
+	 * @param fib1 斐波那契回撤起始价
+	 * @param fib0 斐波那契回撤结束价
+	 * @param decimalPoint
 	 * @param level 斐波那契回撤级别 lv1 lv2 lv3 ……
 	 */
 	public FibInfo(double fib1,double fib0,int decimalPoint,FibLevel level) {
