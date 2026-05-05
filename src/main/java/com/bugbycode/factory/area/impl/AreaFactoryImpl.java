@@ -125,6 +125,10 @@ public class AreaFactoryImpl implements AreaFactory {
 		firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
 		secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
 		
+		if(firstTakeProfit <= 0 || secondTakeProfit <= 0) {
+			return;
+		}
+		
 		addPrices(new OpenPriceDetails(FibCode.FIB1, op, stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
 		
 		Klines fibAfter = PriceUtil.getAfterKlines(hit_k, list_15m);
