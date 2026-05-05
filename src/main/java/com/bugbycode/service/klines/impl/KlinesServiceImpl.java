@@ -28,7 +28,7 @@ import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.eoption.EoptionFactory;
 import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.BreakthroughTradeStatus;
@@ -992,7 +992,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}*/
 		
 		FibInfoFactory[] factorys = {
-				new FibInfoFactoryImpl_v2(list_15m, list_15m, list_15m)
+				new FibInfoFactoryImpl(list_15m, list_15m, list_15m)
 		};
 		
 		for(FibInfoFactory factory : factorys) {
