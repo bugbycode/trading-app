@@ -204,29 +204,23 @@ public class FibInfoFactoryImpl_v2 implements FibInfoFactory {
 			FibCode openCode = fibInfo.getFibCode(openCodeValue);
 			
 			if(openCode.gt(FibCode.FIB0)) {
+				
 				double fibValue = fibInfo.getFibValue(openCode);
-				for(int index = list.size() - 1; index > 0; index--) {
-					Klines current = list.get(index);
-					if(current.lte(end)) {
-						break;
-					}
-					if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
-							|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
-						double hitPrice = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
-						double stopLossValue = mode == QuotationMode.LONG ? current.getLowPriceDoubleValue() : current.getHighPriceDoubleValue();
-						FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
-						double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
-						
-						FibInfo childFibInfo = new FibInfo(takeProfitValue, fibValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-						
-						double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
-						double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
-						
-						addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
-						
-						break;
-					}
-				}
+				
+				FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
+				double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
+				
+				FibInfo childFibInfo = new FibInfo(takeProfitValue, fibValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
+				
+				double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
+				double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
+				
+				FibInfo stopLossFibInfo = new FibInfo(fibValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
+
+				double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+				
+				addPrices(new OpenPriceDetails(openCode, fibValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
+
 			}
 		}
 		
