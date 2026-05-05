@@ -20,12 +20,9 @@ import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
-import com.bugbycode.factory.area.impl.AreaFactoryImpl_v2;
-import com.bugbycode.factory.area.impl.AreaFactoryImpl_v3;
-import com.bugbycode.factory.area.impl.AreaFactoryImpl_v4;
-import com.bugbycode.factory.area.impl.AreaFactoryImpl_v5;
+import com.bugbycode.factory.eoption.EoptionFactory;
+import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
@@ -205,7 +202,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "1000PEPEUSDT";
+        String pair = "PENDLEUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
@@ -217,7 +214,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_trend, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl_v2(list, list_trend, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -260,8 +257,10 @@ public class KlinesServiceTest {
             //logger.info(FibCode.FIB382.lte(fibInfo.getEndCode()));
             List<OpenPrice> openPrices = factory.getOpenPrices();
             for(OpenPrice price : openPrices) {
-                logger.info("{} - {} ~ {}, istrade: {}, verifyOpenPrice: {}", price, fibInfo.getNextFibCode(price.getCode()), fibInfo.getTakeProfit_v2(price.getCode()), 
-                		PriceUtil.isTraded(price.getCode(), fibInfo), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
+                //logger.info("{} - {} ~ {}, istrade: {}, verifyOpenPrice: {}", price, fibInfo.getNextFibCode(price.getCode()), fibInfo.getTakeProfit_v2(price.getCode()), 
+                //		PriceUtil.isTraded(price.getCode(), fibInfo), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
+                logger.info("{} - {} ~ {}, istrade: {}, verifyOpenPrice: {}", price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), 
+                		PriceUtil.isTrade(price), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
             }
 
             //logger.info(fibInfo.getFibCode(factory.getOpenPrices().get(0)));
@@ -301,14 +300,14 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "BTCUSDT";
+    	String pair = "ETHUSDT";
     	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
-        List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
+        //List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
-        AreaFactory factory = new AreaFactoryImpl_v5(list, list_hit, list_15m);
+        AreaFactory factory = new AreaFactoryImpl(list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -339,7 +338,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testEoptionsFibInfo(){
-    	String pair = "ETHUSDT";
+    	String pair = "BTCUSDT";
     	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
@@ -347,7 +346,7 @@ public class KlinesServiceTest {
         
         //Klines list_trend_last = PriceUtil.getLastWeekKlines(list_1d);
         
-        AreaFactory factory = new AreaFactoryImpl(list, list_15m);
+        EoptionFactory factory = new EoptionFactoryImpl(list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -369,7 +368,7 @@ public class KlinesServiceTest {
         for(User u : userList) {
 
             for(OpenPrice price : openPrices) {
-            	logger.info("{}: {} -> {} ~ {}, istread: {}", mode, price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), PriceUtil.isTraded(price, factory));
+            	logger.info("{}: {} -> {} ~ {}", mode, price, price.getFirstTakeProfit(), price.getSecondTakeProfit());
             	logger.info(price.getAreaTakeProfit(last.getClosePriceDoubleValue(), price, u.getProfit(), u.getProfitLimit(), mode));
             }
         }

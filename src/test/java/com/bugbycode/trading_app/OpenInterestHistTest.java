@@ -74,7 +74,7 @@ public class OpenInterestHistTest {
 		logger.info(list.size());
 		int total = 0;
 		int limit = 60;
-		int tradeNumberIndex = 120;
+		int tradeNumberIndex = 10;
 		
 		for(OpenInterestHist oih : list) {
 			long t = oih.getTimestamp();
