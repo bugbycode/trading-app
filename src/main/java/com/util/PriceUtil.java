@@ -3798,7 +3798,7 @@ public class PriceUtil {
 		FibCode code = openPrice.getCode();
 		FibInfo fibInfo = openPrice.getFibInfo();
 		if(fibInfo != null) {
-			result = isTrade(fibInfo.getFibValue(code), openPrice.getSecondTakeProfit(), fibInfo.getFibAfterKlines());
+			result = isTrade(fibInfo.getFibValue(code), openPrice.getFirstTakeProfit(), fibInfo.getFibAfterKlines());
 		}
 		return result;
 	}
