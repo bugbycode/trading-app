@@ -338,21 +338,23 @@ public class KlinesServiceTest {
     
     @Test
     public void testEoptionsFibInfo(){
-    	String pair = "BTCUSDT";
-    	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
-        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
+    	String pair = "ETHUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
         //Klines list_trend_last = PriceUtil.getLastWeekKlines(list_1d);
         
-        EoptionFactory factory = new EoptionFactoryImpl(list, list_15m);
+        EoptionFactory factory = new EoptionFactoryImpl(list, list_hit, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
         }
         
-        QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
+        FibInfo fibInfo = factory.getFibInfo();
+        
+        QuotationMode mode = fibInfo.getQuotationMode();
         
         List<Klines> fibAfKlines = factory.getFibAfterKlines();
 
@@ -361,6 +363,8 @@ public class KlinesServiceTest {
                 logger.info(k);
             }
         }
+        
+        logger.info(fibInfo);
         
         List<OpenPrice> openPrices = factory.getOpenPrices();
         
