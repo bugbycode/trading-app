@@ -992,7 +992,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}*/
 		
 		FibInfoFactory[] factorys = {
-				new FibInfoFactoryImpl(list_15m, list_15m, list_15m)
+				new FibInfoFactoryImpl(list_1h, list_1h, list_15m)
 		};
 		
 		for(FibInfoFactory factory : factorys) {
