@@ -25,7 +25,14 @@ public enum AutoTradeType {
 	/**
 	 * 画线交易
 	 */
-	DEFAULT(4, "画线交易");
+	DEFAULT(4, "画线交易"),
+	
+	/**
+	 * 期权交易
+	 */
+	EOPTION(5, "期权交易");
+	
+	
 
 	private int value;
 	
