@@ -206,6 +206,9 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			
 			if(openCode.gt(FibCode.FIB0)) {
 				Klines list_hit_start = PriceUtil.getAfterKlines(end, list_hit);
+				if(list_hit_start == null) {
+					return;
+				}
 				for(int index = list_hit.size() - 1; index >= 0; index--) {
 					Klines current = list_hit.get(index);
 					if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
