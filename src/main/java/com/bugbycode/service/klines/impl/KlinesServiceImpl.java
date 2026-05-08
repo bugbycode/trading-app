@@ -984,23 +984,8 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
-		/*
-		List<FibInfoFactory> factorys = new ArrayList<FibInfoFactory>();
-		
-		FibInfoFactory fc = new FibInfoFactoryImpl(list_1h, list_1h, list_15m);
-		
-		factorys.add(fc);
-		
-		if(fc.getHitCode().gte(FibCode.FIB1_272)) {
-			
-			PositionSide ps_mode = fc.isLong() ? PositionSide.SHORT : PositionSide.LONG;
-			
-			factorys.add(new FibInfoFactoryImpl(list_1h, list_1h, list_15m, ps_mode));
-			
-		}*/
-		
 		FibInfoFactory[] factorys = {
-				new FibInfoFactoryImpl(list_1h, list_4h, list_15m)
+				new FibInfoFactoryImpl(list_1h, list_1h, list_15m)
 		};
 		
 		for(FibInfoFactory factory : factorys) {
