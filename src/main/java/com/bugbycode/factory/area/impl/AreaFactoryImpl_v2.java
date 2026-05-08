@@ -109,7 +109,10 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 					firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
 				}
 				
-				addPrices(new OpenPriceDetails(hitCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue(), firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
+				FibInfo stopLossFibInfo = new FibInfo(hitCodeValue, takeProfitValue, decimalPoint);
+				double stopLoss = PriceUtil.getMaxPrice(current.getLowPriceDoubleValue(), stopLossFibInfo.getFibValue(FibCode.FIB1_272));
+				
+				addPrices(new OpenPriceDetails(hitCode, current.getBodyHighPriceDoubleValue(), stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
 				break;
 			} else if((hitCode = getIsBreachFibCode(fibInfo, QuotationMode.SHORT, current)) != null) {
 				last = current;
@@ -126,7 +129,10 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 					firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
 				}
 				
-				addPrices(new OpenPriceDetails(hitCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue(), firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
+				FibInfo stopLossFibInfo = new FibInfo(hitCodeValue, takeProfitValue, decimalPoint);
+				double stopLoss = PriceUtil.getMinPrice(current.getHighPriceDoubleValue(), stopLossFibInfo.getFibValue(FibCode.FIB1_272));
+				
+				addPrices(new OpenPriceDetails(hitCode, current.getBodyLowPriceDoubleValue(), stopLoss, firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
 				break;
 			}
 			
