@@ -11,7 +11,6 @@ import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
-import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -19,7 +18,6 @@ import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
-import com.util.PriceComparator;
 import com.util.PriceUtil;
 
 /**
@@ -88,9 +86,11 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 		Klines last = null;
 		double takeProfitValue = 0;
 		double hitCodeValue = 0;
-		double d = 0;
+		
 		double firstTakeProfit = 0;
 		double secondTakeProfit = 0;
+		
+		int decimalPoint = fibInfo.getDecimalPoint();
 		
 		for(int index = list_hit.size() - 1; index > 0; index--) {
 			Klines current = list_hit.get(index);
@@ -100,9 +100,15 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 				takeProfitCode = getTakeProfitCode(fibInfo, QuotationMode.LONG, hitCode);
 				takeProfitValue = fibInfo.getFibValue(takeProfitCode);
 				hitCodeValue = fibInfo.getFibValue(hitCode);
-				d = takeProfitValue - hitCodeValue;
-				firstTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue + d * 0.618, current.getDecimalNum());
-				secondTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue + d * 0.786, current.getDecimalNum());
+				
+				FibInfo childFibInfo = new FibInfo(takeProfitValue, hitCodeValue, decimalPoint);
+				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB1);
+				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB1);
+				
+				if(takeProfitCode == FibCode.FIB0 || takeProfitCode == FibCode.FIB1) {
+					firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
+				}
+				
 				addPrices(new OpenPriceDetails(hitCode, current.getBodyHighPriceDoubleValue(), current.getLowPriceDoubleValue(), firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
 				break;
 			} else if((hitCode = getIsBreachFibCode(fibInfo, QuotationMode.SHORT, current)) != null) {
@@ -111,9 +117,15 @@ public class AreaFactoryImpl_v2 implements AreaFactory {
 				takeProfitCode = getTakeProfitCode(fibInfo, QuotationMode.SHORT, hitCode);
 				takeProfitValue = fibInfo.getFibValue(takeProfitCode);
 				hitCodeValue = fibInfo.getFibValue(hitCode);
-				d = hitCodeValue - takeProfitValue;
-				firstTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue - d * 0.618, current.getDecimalNum());
-				secondTakeProfit = PriceUtil.formatDoubleDecimalValue(hitCodeValue - d * 0.786, current.getDecimalNum());
+				
+				FibInfo childFibInfo = new FibInfo(takeProfitValue, hitCodeValue, decimalPoint);
+				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB1);
+				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB1);
+				
+				if(takeProfitCode == FibCode.FIB0 || takeProfitCode == FibCode.FIB1) {
+					firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
+				}
+				
 				addPrices(new OpenPriceDetails(hitCode, current.getBodyLowPriceDoubleValue(), current.getHighPriceDoubleValue(), firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX));
 				break;
 			}
@@ -231,8 +243,6 @@ class AreaFibInfoFactory implements FibInfoFactory {
 	
 	private Klines end = null;
 	
-	private List<OpenPrice> openPrices;
-	
 	/**
 	 * 
 	 * @param list 斐波那契回撤指标参考的K线信息
@@ -243,7 +253,6 @@ class AreaFibInfoFactory implements FibInfoFactory {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
-		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -287,7 +296,7 @@ class AreaFibInfoFactory implements FibInfoFactory {
 
 	@Override
 	public List<OpenPrice> getOpenPrices() {
-		return openPrices;
+		return null;
 	}
 	
 	private void init() {
@@ -303,7 +312,6 @@ class AreaFibInfoFactory implements FibInfoFactory {
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
 		
-		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 
 		PositionSide ps = getPositionSide();
@@ -376,51 +384,6 @@ class AreaFibInfoFactory implements FibInfoFactory {
 			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
 		}
 		
-		if(this.fibInfo == null) {
-			return;
-		}
-		
-		QuotationMode mode = this.fibInfo.getQuotationMode();
-		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
-		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
-		}
-		
-		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
-			
-			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
-			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
-			FibCode openCode = fibInfo.getFibCode(openCodeValue);
-			
-			if(openCode.gt(FibCode.FIB0)) {
-				
-				double fibValue = fibInfo.getFibValue(openCode);
-				
-				FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
-				double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
-				
-				FibInfo childFibInfo = new FibInfo(takeProfitValue, fibValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-				
-				double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
-				double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
-				
-				FibInfo stopLossFibInfo = new FibInfo(fibValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-
-				double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-				
-				addPrices(new OpenPriceDetails(openCode, fibValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
-
-			}
-		}
-		
-		if(mode == QuotationMode.LONG) {
-			this.openPrices.sort(new PriceComparator(SortType.DESC));
-		} else {
-			this.openPrices.sort(new PriceComparator(SortType.ASC));
-		}
-		
 	}
 	
 	private PositionSide getPositionSide() {
@@ -450,12 +413,6 @@ class AreaFibInfoFactory implements FibInfoFactory {
 	
 	private boolean verifyLow(Klines k) {
 		return k.getDea() < 0 && k.getMacd() < 0;
-	}
-	
-	private void addPrices(OpenPrice price) {
-		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
-			openPrices.add(price);
-		}
 	}
 	
 	public Klines getStart() {
