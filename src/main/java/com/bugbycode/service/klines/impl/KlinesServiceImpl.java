@@ -521,6 +521,10 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
+					if(priceInfo.getPriceDoubleValue() >= openPrice.getFirstTakeProfit()) {
+						continue;
+					}
+					
 					//计算追踪止损触发价
 					BigDecimal activationPriceValue = new BigDecimal(
 							PriceUtil.formatDoubleDecimal(PriceUtil.calculateLongActivationPrice(priceInfo.getPriceDoubleValue(), activationPriceRatio), decimalNum)
@@ -741,6 +745,10 @@ public class KlinesServiceImpl implements KlinesService {
 				try {
 
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
+					
+					if(priceInfo.getPriceDoubleValue() <= openPrice.getFirstTakeProfit()) {
+						continue;
+					}
 					
 					//计算追踪止损触发价
 					BigDecimal activationPriceValue = new BigDecimal(
