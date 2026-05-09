@@ -1345,7 +1345,7 @@ public class KlinesServiceImpl implements KlinesService {
 					String subject = String.format(subjectFormatStr, pair, fibInfo.getFibValue(FibCode.FIB1), PriceUtil.formatDoubleDecimal(profitPercent, 2),
 							DateFormatUtil.format(new Date()));
 					
-					String text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
+					String text = StringUtil.formatLongMessage(pair, currentPrice, openPrice.getStopLossLimit(), 
 							profitPrice, fibInfo.getDecimalPoint());
 					
 					text += "\r\n\r\n" + fibInfo.toString();
@@ -1444,7 +1444,7 @@ public class KlinesServiceImpl implements KlinesService {
 							DateFormatUtil.format(new Date()));
 					
 					String text = StringUtil.formatShortMessage(pair, currentPrice, profitPrice, 
-							PriceUtil.rectificationCutLossShortPrice_v3(currentPrice, u.getCutLoss()), fibInfo.getDecimalPoint());
+							openPrice.getStopLossLimit(), fibInfo.getDecimalPoint());
 					
 					text += "\r\n\r\n" + fibInfo.toString();
 					

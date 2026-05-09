@@ -145,7 +145,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			if(PriceUtil.isBreachLong(current, openCodeValue)) {
 				this.ps = PositionSide.LONG;
 				if(factory.isShort()) {
-					takeProfitCode = FibCode.FIB1_618;
+					takeProfitCode = FibCode.FIB2;
 				}
 				openPriceValue = current.getBodyHighPriceDoubleValue();
 				stopLossValue = current.getLowPriceDoubleValue();
@@ -153,7 +153,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			} else if(PriceUtil.isBreachShort(current, openCodeValue)) {
 				this.ps = PositionSide.SHORT;
 				if(factory.isLong()) {
-					takeProfitCode = FibCode.FIB1_618;
+					takeProfitCode = FibCode.FIB2;
 				}
 				openPriceValue = current.getBodyLowPriceDoubleValue();
 				stopLossValue = current.getHighPriceDoubleValue();
