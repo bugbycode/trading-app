@@ -14,8 +14,10 @@ import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
+import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.util.PriceUtil;
@@ -43,7 +45,7 @@ public class PriceActionFactoryTest {
         String pair = "ETHUSDT";
         
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
         
@@ -51,11 +53,15 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list, list, list_15m, FibLevel.LEVEL_1);
         
         logger.info("init factory finish.");
         
         if(!(factory.isLong() || factory.isShort())) {
+
+            FibInfo fibInfo = factory.getFibInfo();
+            logger.info(fibInfo);
+            
             return;
         }
         
@@ -68,18 +74,18 @@ public class PriceActionFactoryTest {
                 logger.info(k);
             }
         }
-
-        FibInfo fibInfo = factory.getFibInfo();
+        
         List<OpenPrice> openPrices = factory.getOpenPrices();
 
         logger.info(factory.getFibInfo());
+        
+        QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
 
         for(OpenPrice price : openPrices) {
-            FibCode code = fibInfo.getFibCode(price.getPrice());
-            FibCode profiCodeNext = fibInfo.getPriceActionTakeProfit_nextCode(code);
-            FibCode profitCode = fibInfo.getPriceActionTakeProfit_v1(code);
-            logger.info("{} -> {}({}) ~ {}({}), isTreade:{}", price, profiCodeNext, fibInfo.getFibValue(profiCodeNext), profitCode, fibInfo.getFibValue(profitCode), 
-                PriceUtil.isTradedPriceAction(price.getPrice(), fibInfo));
+            //FibCode code = fibInfo.getFibCode(price.getPrice());
+            //FibCode profiCodeNext = fibInfo.getPriceActionTakeProfit_nextCode(code);
+            //FibCode profitCode = fibInfo.getPriceActionTakeProfit_v1(code);
+            logger.info("{}: {}, isTreade:{}", mode, price, PriceUtil.isTrade(price));
         }
         //logger.info(factory.verifyOpen(list_15m));
         //logger.info(factory.getFibAfterKlines());
