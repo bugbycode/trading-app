@@ -1012,19 +1012,32 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresPriceAction(List<Klines> list_1h, List<Klines> list_15m) {
 		
-		PriceActionFactory factory = new PriceActionFactoryImpl(list_1h, list_15m);
+		PriceActionFactory[] factorys = {
+				new PriceActionFactoryImpl(list_15m, list_15m, list_15m, FibLevel.LEVEL_1),
+				new PriceActionFactoryImpl(list_15m, list_15m, list_15m, FibLevel.LEVEL_2),
+				new PriceActionFactoryImpl(list_15m, list_15m, list_15m, FibLevel.LEVEL_3)
+		};
 		
-		FibInfo fibInfo = factory.getFibInfo();
-		
-		List<Klines> fibAfterKlines = factory.getFibAfterKlines();
-		
-		if(factory.isLong()) {
-			Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
-			openLong_priceAction(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
-		} else if(factory.isShort()) {
-			Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
-			openShort_priceAction(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
+		for(PriceActionFactory factory : factorys) {
+			
+			if(!(factory.isLong() || factory.isShort())) {
+				continue;
+			}
+
+			FibInfo fibInfo = factory.getFibInfo();
+			
+			List<Klines> fibAfterKlines = factory.getFibAfterKlines();
+			
+			if(factory.isLong()) {
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+				openLong_priceAction(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
+			} else if(factory.isShort()) {
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+				openShort_priceAction(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
+			}
+			
 		}
+		
 	}
 	
 	@Override
