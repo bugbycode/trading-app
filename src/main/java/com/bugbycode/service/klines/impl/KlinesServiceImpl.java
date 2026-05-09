@@ -1010,7 +1010,7 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresPriceAction(List<Klines> list_1h, List<Klines> list_15m) {
+	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
 				new PriceActionFactoryImpl(list_15m, list_15m, list_15m, FibLevel.LEVEL_1),
@@ -1286,12 +1286,11 @@ public class KlinesServiceImpl implements KlinesService {
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
 			
-			FibCode code = openPrice.getCode();//当前斐波那契点位
+			//FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			if(//PriceUtil.isLong_v3(price, klinesList_hit)
-					PriceUtil.isBreachLong(hitKline, price)
+			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-					&& !PriceUtil.isTradedPriceAction(price, fibInfo)
+					&& !PriceUtil.isTrade(openPrice)
 					) {
 			
 				//市价做多
@@ -1316,35 +1315,34 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//是否监控突破交易
 					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughMonitor());
-					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
+					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && openPrice.getFibInfo().isShort()) {
 						continue;
 					}
 					
 					//根据交易风格设置盈利限制
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					
-					FibCode closePpositionCode = fibInfo.getPriceActionTakeProfit_v1(code);//止盈点位
-					
+					//止盈价
+					double profitPrice = openPrice.getSecondTakeProfit();
 					//保守的交易风格
 					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						closePpositionCode = fibInfo.getPriceActionTakeProfit(code, currentPrice, u.getMonitorProfit(), u.getProfitLimit());
+						profitPrice = openPrice.getAreaTakeProfit(currentPrice, openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
 					}
 					
 					//计算预计盈利百分比
-					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, profitPrice) * 100;
 					
 					if(profitPercent < u.getMonitorProfit()) {
 						continue;
 					}
 					
-					//止盈价
-					double profitPrice = fibInfo.getFibValue(closePpositionCode);
-
+					String subjectFormatStr = "%s永续合约假跌破前低(%s)价格行为(PNL:%s%%) %s";
+					if(fibInfo.isShort()) {
+						subjectFormatStr = "%s永续合约突破前高(%s)价格行为(PNL:%s%%) %s";
+					}
+					
 					//开仓订阅提醒
-					String subject = String.format("%s永续合约%s(%s)[%s]强势价格行为(PNL:%s%%) %s", pair, code.getDescription(),
-							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-							fibInfo.getLevel().getLabel(),
-							PriceUtil.formatDoubleDecimal(profitPercent, 2),
+					String subject = String.format(subjectFormatStr, pair, fibInfo.getFibValue(FibCode.FIB1), PriceUtil.formatDoubleDecimal(profitPercent, 2),
 							DateFormatUtil.format(new Date()));
 					
 					String text = StringUtil.formatLongMessage(pair, currentPrice, PriceUtil.rectificationCutLossLongPrice_v3(currentPrice, u.getCutLoss()), 
@@ -1385,12 +1383,12 @@ public class KlinesServiceImpl implements KlinesService {
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
 			
-			FibCode code = openPrice.getCode();//当前斐波那契点位
+			//FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			if(//PriceUtil.isShort_v3(price, klinesList_hit)
 					PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-					&& !PriceUtil.isTradedPriceAction(price, fibInfo)
+					&& !PriceUtil.isTrade(openPrice)
 					) {
 			
 				//市价做空
@@ -1415,34 +1413,34 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//是否监控突破交易
 					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughMonitor());
-					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
+					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && openPrice.getFibInfo().isLong()) {
 						continue;
 					}
 					
 					//根据交易风格设置盈利限制
 					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
 					
-					FibCode closePpositionCode = fibInfo.getPriceActionTakeProfit_v1(code);//止盈点位
+					//止盈价
+					double profitPrice = openPrice.getSecondTakeProfit();
 					
 					//保守的交易风格
 					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						closePpositionCode = fibInfo.getPriceActionTakeProfit(code, currentPrice, u.getMonitorProfit(), u.getProfitLimit());
+						profitPrice = openPrice.getAreaTakeProfit(currentPrice, openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
 					}
 					
 					//计算预计盈利百分比
-					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, fibInfo.getFibValue(closePpositionCode)) * 100;
+					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, profitPrice) * 100;
 					
 					if(profitPercent < u.getMonitorProfit()) {
 						continue;
 					}
 					
-					//止盈价
-					double profitPrice = fibInfo.getFibValue(closePpositionCode);
+					String subjectFormatStr = "%s永续合约假突破前高(%s)价格行为(PNL:%s%%) %s";
+					if(fibInfo.isLong()) {
+						subjectFormatStr = "%s永续合约跌破前低(%s)价格行为(PNL:%s%%) %s";
+					}
 					
-					String subject = String.format("%s永续合约%s(%s)[%s]颓势价格行为(PNL:%s%%) %s", pair, code.getDescription(),
-							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
-							fibInfo.getLevel().getLabel(),
-							PriceUtil.formatDoubleDecimal(profitPercent, 2),
+					String subject = String.format(subjectFormatStr, pair, fibInfo.getFibValue(FibCode.FIB1), PriceUtil.formatDoubleDecimal(profitPercent, 2),
 							DateFormatUtil.format(new Date()));
 					
 					String text = StringUtil.formatShortMessage(pair, currentPrice, profitPrice, 
