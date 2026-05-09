@@ -110,7 +110,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			this.end = factory.getEnd();
 			
 			List<Klines> list_lv3 = PriceUtil.subList(this.start, this.end, list);
-			factory = new PriceActionFibInfoFactory(list_lv3, list_lv3, list_15m);
+			factory = new PriceActionFibInfoFactory(list_lv3, list_lv3, list_15m, factory.isLong() ? PositionSide.SHORT : PositionSide.LONG);
 			this.fibInfo = factory.getFibInfo();
 
 			if(!(factory.isLong() || factory.isShort())) {
