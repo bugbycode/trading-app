@@ -154,7 +154,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -207,6 +206,12 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.PRICE_ACTION, fibInfo));
+			
+			fibAfterKline = PriceUtil.getAfterKlines(openKlines, list_15m);
+			if(fibAfterKline != null) {
+				this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+				this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			}
 		}
 	}
 	
