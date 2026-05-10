@@ -111,7 +111,7 @@ public class User implements UserDetails {
 	
 	private int tradeNumberIndexMonitor = 100;//市场活跃度排名索引，值越小热度越高 行情监控
 	
-	private int breakthroughTrade = 0; //是否交易突破单 价格行为交易使用 0：否 1：是
+	private int breakthroughTrade = 0; //是否交易突破单 价格行为交易使用 0：否 1：是 （已弃用）
 	
 	private int breakthroughMonitor = 0; //是否监控突破行为 价格行为监控使用 0：否 1：是
 	

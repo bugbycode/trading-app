@@ -31,7 +31,6 @@ import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
-import com.bugbycode.module.BreakthroughTradeStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -467,7 +466,7 @@ public class KlinesServiceImpl implements KlinesService {
 			String dateStr = DateFormatUtil.format(new Date());
 			RecvTradeStatus recvTradeStatus = RecvTradeStatus.valueOf(u.getRecvTrade());
 			TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-			BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughTrade());
+			//BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughTrade());
 			double callbackRate = u.getCallbackRate();
 			double activationPriceRatio = u.getActivationPriceRatio();
 			CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
@@ -476,7 +475,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 			FibCode code = openPrice.getCode();
 			
-			if(autoTradeType == AutoTradeType.FIB_RET) {
+			if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
 				
 				if(code.lt(u.getFibLevelType().getLevelCode())) {//回撤限制
 					continue;
@@ -487,12 +486,12 @@ public class KlinesServiceImpl implements KlinesService {
 				if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 					continue;
 				}
-			} else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
+			} /* else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
 				//突破交易控制
 				if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
 					continue;
 				}
-			}
+			}*/
 			
 			//筛选策略限制
 			if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
@@ -1310,10 +1309,21 @@ public class KlinesServiceImpl implements KlinesService {
 					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
 						continue;
 					}
-					
+					/*
 					//是否监控突破交易
 					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughMonitor());
 					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && openPrice.getFibInfo().isShort()) {
+						continue;
+					}*/
+					
+					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
+						continue;
+					}
+					
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 						continue;
 					}
 					
@@ -1406,10 +1416,21 @@ public class KlinesServiceImpl implements KlinesService {
 					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
 						continue;
 					}
-					
+					/*
 					//是否监控突破交易
 					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughMonitor());
 					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && openPrice.getFibInfo().isLong()) {
+						continue;
+					}*/
+					
+					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
+						continue;
+					}
+
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 						continue;
 					}
 					
