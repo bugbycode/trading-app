@@ -187,8 +187,10 @@ public class FibInfo {
 			takeProfit = FibCode.FIB0;
 		}*/
 		
-		if(code.gte(FibCode.FIB1_618)) { // 4.618 ~ 1.618 - 1
+		if(code.gte(FibCode.FIB2)) { // 4.618 ~ 2 - 1
 			takeProfit = FibCode.FIB1;
+		} else if(code == FibCode.FIB1_618) { // 1.618 - 0.786
+			takeProfit = FibCode.FIB786;
 		} else if(code == FibCode.FIB1_272) { // 1.272 - 0.618
 			takeProfit = FibCode.FIB618;
 		} else if(code == FibCode.FIB1) { // 1 -> 0.5
