@@ -1013,9 +1013,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
-				new PriceActionFactoryImpl(list_1h, list_15m, list_15m, FibLevel.LEVEL_1),
-				new PriceActionFactoryImpl(list_1h, list_15m, list_15m, FibLevel.LEVEL_2),
-				new PriceActionFactoryImpl(list_1h, list_15m, list_15m, FibLevel.LEVEL_3)
+				new PriceActionFactoryImpl(list_1h, list_1h, list_15m)
 		};
 		
 		for(PriceActionFactory factory : factorys) {
@@ -1286,7 +1284,7 @@ public class KlinesServiceImpl implements KlinesService {
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
 			
-			//FibCode code = openPrice.getCode();//当前斐波那契点位
+			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
@@ -1336,13 +1334,11 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					String subjectFormatStr = "%s永续合约假跌破前低(%s)价格行为(PNL:%s%%) %s";
-					if(fibInfo.isShort()) {
-						subjectFormatStr = "%s永续合约突破前高(%s)价格行为(PNL:%s%%) %s";
-					}
-					
 					//开仓订阅提醒
-					String subject = String.format(subjectFormatStr, pair, fibInfo.getFibValue(FibCode.FIB1), PriceUtil.formatDoubleDecimal(profitPercent, 2),
+					String subject = String.format("%s永续合约%s(%s)[%s]强势价格行为(PNL:%s%%) %s", pair, code.getDescription(),
+							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+							fibInfo.getLevel().getLabel(),
+							PriceUtil.formatDoubleDecimal(profitPercent, 2),
 							DateFormatUtil.format(new Date()));
 					
 					String text = StringUtil.formatLongMessage(pair, currentPrice, openPrice.getStopLossLimit(), 
@@ -1383,7 +1379,7 @@ public class KlinesServiceImpl implements KlinesService {
 			OpenPrice openPrice = openPrices.get(index);
 			double price = openPrice.getPrice();
 			
-			//FibCode code = openPrice.getCode();//当前斐波那契点位
+			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			if(//PriceUtil.isShort_v3(price, klinesList_hit)
 					PriceUtil.isBreachShort(hitKline, price)
@@ -1435,12 +1431,10 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					String subjectFormatStr = "%s永续合约假突破前高(%s)价格行为(PNL:%s%%) %s";
-					if(fibInfo.isLong()) {
-						subjectFormatStr = "%s永续合约跌破前低(%s)价格行为(PNL:%s%%) %s";
-					}
-					
-					String subject = String.format(subjectFormatStr, pair, fibInfo.getFibValue(FibCode.FIB1), PriceUtil.formatDoubleDecimal(profitPercent, 2),
+					String subject = String.format("%s永续合约%s(%s)[%s]颓势价格行为(PNL:%s%%) %s", pair, code.getDescription(),
+							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+							fibInfo.getLevel().getLabel(),
+							PriceUtil.formatDoubleDecimal(profitPercent, 2),
 							DateFormatUtil.format(new Date()));
 					
 					String text = StringUtil.formatShortMessage(pair, currentPrice, profitPrice, 
