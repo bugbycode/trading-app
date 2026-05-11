@@ -160,6 +160,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
+			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode(openCodeValue);
 			
 			if(openCode == FibCode.FIB0) {
@@ -190,19 +191,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			Klines openKlines = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
 			
-			double fibValue = fibInfo.getFibValue(openCode);
+			//次级回撤 用来计算止盈点位
+			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 			
-			FibCode takeProfitCode = fibInfo.getTakeProfit_v2(openCode);
-			double takeProfitValue = fibInfo.getFibValue(takeProfitCode);
+			double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
+			double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
 			
-			FibInfo childFibInfo = new FibInfo(takeProfitValue, fibValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-			
-			double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
-			double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
 			double openPriceValue = openKlines.getOpenPriceDoubleValue();
-			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-
 			double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.PRICE_ACTION, fibInfo));
