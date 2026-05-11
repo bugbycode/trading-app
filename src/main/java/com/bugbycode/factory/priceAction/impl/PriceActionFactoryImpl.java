@@ -203,11 +203,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.PRICE_ACTION, fibInfo));
 			
+			this.fibAfterKlines = new ArrayList<Klines>();
+			
+			/*
 			fibAfterKline = PriceUtil.getAfterKlines(openKlines, list_15m);
 			if(fibAfterKline != null) {
 				this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
 				this.fibInfo.setFibAfterKlines(fibAfterKlines);
-			}
+			}*/
 		}
 	}
 	
