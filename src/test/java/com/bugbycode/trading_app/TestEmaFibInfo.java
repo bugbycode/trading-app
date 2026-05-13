@@ -54,7 +54,7 @@ public class TestEmaFibInfo {
     
     @Test
     public void testExchangePair() {
-    	Set<SymbolExchangeInfo> set = binanceExchangeService.exchangeInfo();
+    	List<SymbolExchangeInfo> set = binanceExchangeService.exchangeInfo();
     	logger.info(set);
     }
 }

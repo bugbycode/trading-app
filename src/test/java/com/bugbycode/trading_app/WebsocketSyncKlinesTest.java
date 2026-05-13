@@ -62,9 +62,6 @@ public class WebsocketSyncKlinesTest {
 	@Test
 	public void testSync() throws UnsupportedEncodingException, InterruptedException {
 		
-		AppConfig.SYNC_15M_KLINES_RECORD.clear();
-		AppConfig.SYNC_15M_KLINES_FINISH.clear();
-		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
 		List<SymbolExchangeInfo> pairs = binanceExchangeService.eOptionsExchangeInfoSymbol();
@@ -72,8 +69,6 @@ public class WebsocketSyncKlinesTest {
 		CoinPairSet set = new CoinPairSet(inerval);
 		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
 		for(SymbolExchangeInfo coin : pairs) {
-			
-			AppConfig.SYNC_15M_KLINES_RECORD.put(coin.getSymbol(), new Date().getTime());
 			
 			set.add(coin);
 			if(set.isFull()) {
@@ -88,7 +83,7 @@ public class WebsocketSyncKlinesTest {
 		}*/
 		
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
+			//new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
 		}
 		
 		Thread.sleep(60 * 60 * 1000);

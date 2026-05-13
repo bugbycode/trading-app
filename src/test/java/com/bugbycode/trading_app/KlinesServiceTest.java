@@ -37,6 +37,7 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.StepPriceInfo;
 import com.bugbycode.module.TradeStyle;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.WeekDay;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -203,10 +204,10 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "PENDLEUSDT";
+        String pair = "ETHUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
-        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
         Klines last_15m = PriceUtil.getLastKlines(list_15m);
@@ -215,7 +216,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_trend, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_trend, list_15m, TradeTrend.FOLLOW);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -606,7 +607,7 @@ public class KlinesServiceTest {
     public void testCoinSet() {
     	
     	Inerval inerval = Inerval.INERVAL_15M;
-    	Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
+    	List<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
 		
 		CoinPairSet set = new CoinPairSet(inerval);
 		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();

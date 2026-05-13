@@ -34,7 +34,7 @@ public class BinanceExchangeServiceTest {
     
     @Test
     public void testExchangeInfo() {
-    	Set<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
+    	List<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
     	for(SymbolExchangeInfo info : symbols) {
     		logger.info("{} - {} - {}" , info.getSymbol(), info.getBaseAsset(), info.getMarginAsset());
     	}
@@ -43,7 +43,7 @@ public class BinanceExchangeServiceTest {
     
     @Test
     public void testCoinSet() {
-    	Set<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
+    	List<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
     	for(SymbolExchangeInfo info : symbols) {
     		CoinPairSet set = new CoinPairSet(Inerval.INERVAL_15M);
     		set.add(info);
@@ -61,7 +61,7 @@ public class BinanceExchangeServiceTest {
     
     @Test
     public void testDecimalNum() {
-    	Set<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
+    	List<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfo();
     	for(SymbolExchangeInfo info : symbols) {
     		logger.info("{} - {}" , info.getSymbol(), info.getTickSize());
     	}
