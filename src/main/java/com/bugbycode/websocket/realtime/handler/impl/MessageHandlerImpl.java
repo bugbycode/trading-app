@@ -2,6 +2,7 @@ package com.bugbycode.websocket.realtime.handler.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
+import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -64,6 +67,26 @@ public class MessageHandlerImpl implements MessageHandler{
 		
 		if(client.isFinish()) {
 			client.close();
+			List<PerpetualWebSocketClientEndpoint> clients = AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.get(client.getExec_time());
+			boolean sync_finish = true;
+			for(PerpetualWebSocketClientEndpoint c : clients) {
+				if(!c.isFinish()) {
+					sync_finish = false;
+				}
+			}
+			if(sync_finish) {
+				logger.info("已同步的交易对：");
+				List<OpenInterestHist> oihList = openInterestHistRepository.query();
+				for(OpenInterestHist oih : oihList) {
+					SymbolExchangeInfo info = client.getSymbolExchangeInfo(oih.getSymbol());
+					if(info == null) {
+						continue;
+					}
+					logger.info(info.getSymbol());
+				}
+				logger.info("K线订阅批次{}已同步完成.", client.getExec_time());
+				AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.remove(client.getExec_time());
+			}
 		}
 	}
 	

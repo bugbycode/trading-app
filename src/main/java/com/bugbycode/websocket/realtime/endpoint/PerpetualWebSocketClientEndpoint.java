@@ -2,11 +2,13 @@ package com.bugbycode.websocket.realtime.endpoint;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.service.klines.KlinesService;
@@ -51,10 +53,16 @@ public class PerpetualWebSocketClientEndpoint {
     
     private OpenInterestHistRepository openInterestHistRepository;
     
-    public PerpetualWebSocketClientEndpoint(CoinPairSet coinPairSet,MessageHandler messageHandler, 
-    		KlinesService klinesService, KlinesRepository klinesRepository, OpenInterestHistRepository openInterestHistRepository, 
-    		WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool) {
+    private final long exec_time;
+    
+    private Map<String,SymbolExchangeInfo> symbol_exchange_info_map;
+    
+    public PerpetualWebSocketClientEndpoint(long exec_time, CoinPairSet coinPairSet,Map<String,SymbolExchangeInfo> symbol_exchange_info_map,
+    		MessageHandler messageHandler, KlinesService klinesService, KlinesRepository klinesRepository, 
+    		OpenInterestHistRepository openInterestHistRepository, WorkTaskPool analysisWorkTaskPool, WorkTaskPool workTaskPool) {
+    	this.exec_time = exec_time;
     	this.coinPairSet = coinPairSet;
+    	this.symbol_exchange_info_map = symbol_exchange_info_map;
     	this.messageHandler = messageHandler;
         this.container = ContainerProvider.getWebSocketContainer();
         this.analysisWorkTaskPool = analysisWorkTaskPool;
@@ -62,14 +70,14 @@ public class PerpetualWebSocketClientEndpoint {
         this.klinesService = klinesService;
         this.klinesRepository = klinesRepository;
         this.openInterestHistRepository = openInterestHistRepository;
-        try {
+        /*try {
             this.connectToServer();
         } catch (Exception e) {
 			logger.error(e.getLocalizedMessage(), e);
-		}
+		}*/
     }
     
-    private void connectToServer() throws RuntimeException {
+    public void connectToServer() throws RuntimeException {
     	String baseUrl = AppConfig.WEBSOCKET_URL + "/market";
     	try {
 			this.container.connectToServer(this, new URI(baseUrl + "/ws/" + coinPairSet.getStreamName()));
@@ -138,4 +146,11 @@ public class PerpetualWebSocketClientEndpoint {
 		return this.coinPairSet.isFinish();
 	}
 	
+	public long getExec_time() {
+		return this.exec_time;
+	}
+	
+	public SymbolExchangeInfo getSymbolExchangeInfo(String symbol) {
+		return this.symbol_exchange_info_map.get(symbol);
+	}
 }

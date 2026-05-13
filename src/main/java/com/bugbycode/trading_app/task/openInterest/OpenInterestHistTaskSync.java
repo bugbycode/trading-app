@@ -2,7 +2,6 @@ package com.bugbycode.trading_app.task.openInterest;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,7 +58,7 @@ public class OpenInterestHistTaskSync {
 			return;
 		}
 		
-		Set<SymbolExchangeInfo> symbolSet = binanceExchangeService.exchangeInfo();
+		List<SymbolExchangeInfo> symbolSet = binanceExchangeService.exchangeInfo();
 		
 		for(SymbolExchangeInfo info : symbolSet) {
 			

@@ -1,7 +1,7 @@
 package com.bugbycode.trading_app.task.operations;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,7 +59,7 @@ public class OperationsTask {
 			long before_15m_time = DateFormatUtil.getStartTimeBySetMinute(now, - Inerval.INERVAL_15M.getNumber() * total).getTime();
 			long before_1h_time = DateFormatUtil.getStartTimeBySetHour(now, - Inerval.INERVAL_1H.getNumber() * total).getTime();
 			long before_4h_time = DateFormatUtil.getStartTimeBySetHour(now, - Inerval.INERVAL_4H.getNumber() * 4 * total).getTime();
-			Set<SymbolExchangeInfo> pairSet = binanceExchangeService.exchangeInfo();
+			List<SymbolExchangeInfo> pairSet = binanceExchangeService.exchangeInfo();
 			
 			for(SymbolExchangeInfo info : pairSet) {
 				String pair = info.getSymbol();

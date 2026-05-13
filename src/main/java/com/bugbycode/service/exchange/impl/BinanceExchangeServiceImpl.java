@@ -2,9 +2,7 @@ package com.bugbycode.service.exchange.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,9 +28,9 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 	private RestTemplate restTemplate;
 	
 	@Override
-	public Set<SymbolExchangeInfo> exchangeInfo() {
+	public List<SymbolExchangeInfo> exchangeInfo() {
 		long now = new Date().getTime();
-		Set<SymbolExchangeInfo> pairs = new HashSet<SymbolExchangeInfo>();
+		List<SymbolExchangeInfo> pairs = new ArrayList<SymbolExchangeInfo>();
 		//
 		String resultStr = restTemplate.getForObject(AppConfig.REST_BASE_URL + "/fapi/v1/exchangeInfo", String.class);
 		JSONObject result = new JSONObject(resultStr);

@@ -2,8 +2,9 @@ package com.bugbycode.trading_app.task.sync;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,8 +68,7 @@ public class FuturesKlinesWebSocketTask {
 		
 		logger.debug("FuturesKlinesWebSocketTask start.");
 		
-		AppConfig.SYNC_15M_KLINES_RECORD.clear();
-		AppConfig.SYNC_15M_KLINES_FINISH.clear();
+		long exec_time = new Date().getTime();
 		
 		Inerval inerval = Inerval.INERVAL_15M;
 		
@@ -82,29 +82,44 @@ public class FuturesKlinesWebSocketTask {
 			logger.error(e.getMessage(), e);
 		}
 		
-		Set<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
+		List<SymbolExchangeInfo> pairs = binanceExchangeService.exchangeInfo();
+		
+		Map<String,SymbolExchangeInfo> symbol_exchange_info_map = new HashMap<String,SymbolExchangeInfo>();
 		
 		CoinPairSet set = new CoinPairSet(inerval);
 		List<CoinPairSet> coinList = new ArrayList<CoinPairSet>();
 		for(SymbolExchangeInfo coin : pairs) {
-			
-			AppConfig.SYNC_15M_KLINES_RECORD.put(coin.getSymbol(), new Date().getTime());
 			
 			set.add(coin);
 			if(set.isFull()) {
 				coinList.add(set);
 				set = new CoinPairSet(inerval);
 			}
+			
+			symbol_exchange_info_map.put(coin.getSymbol(), coin);
 		}
 		
 		if(!set.isEmpty()) {
 			coinList.add(set);
 		}
 		
+		List<PerpetualWebSocketClientEndpoint> clients = new ArrayList<PerpetualWebSocketClientEndpoint>();
 		for(CoinPairSet s : coinList) {
-			new PerpetualWebSocketClientEndpoint(s, messageHandler, klinesService, klinesRepository, openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
+			PerpetualWebSocketClientEndpoint client = new PerpetualWebSocketClientEndpoint(exec_time, s, symbol_exchange_info_map, messageHandler, klinesService, klinesRepository, 
+					openInterestHistRepository, analysisWorkTaskPool, workTaskPool);
+			clients.add(client);
 		}
 		
+		AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.put(exec_time, clients);
+		
+		//开始连接websocket订阅k线
+		for(PerpetualWebSocketClientEndpoint c : clients) {
+			try {
+				c.connectToServer();
+	        } catch (Exception e) {
+				logger.error(e.getLocalizedMessage(), e);
+			}
+		}
 		
 		logger.debug("FuturesKlinesWebSocketTask end.");
 	}
