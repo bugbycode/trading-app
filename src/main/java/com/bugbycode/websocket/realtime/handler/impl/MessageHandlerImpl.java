@@ -51,7 +51,7 @@ public class MessageHandlerImpl implements MessageHandler{
 		
 		boolean finish = klinesJson.getBoolean("x");
 		
-		if(finish && client.putFinishPair(pair)) {
+		if(finish) {
 			
 			logger.debug(kline);
 			
@@ -63,29 +63,33 @@ public class MessageHandlerImpl implements MessageHandler{
 				klinesRepository.insert(kline);
 				analysisWorkTaskPool.add(new AnalysisKlinesTask(pair, klinesService, klinesRepository, openInterestHistRepository));
 			}
+			
+			client.putFinishPair(pair);
 		};
 		
 		if(client.isFinish()) {
 			client.close();
-			List<PerpetualWebSocketClientEndpoint> clients = AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.get(client.getExec_time());
-			boolean sync_finish = true;
-			for(PerpetualWebSocketClientEndpoint c : clients) {
-				if(!c.isFinish()) {
-					sync_finish = false;
-				}
-			}
-			if(sync_finish) {
-				logger.info("已同步的交易对：");
-				List<OpenInterestHist> oihList = openInterestHistRepository.query();
-				for(OpenInterestHist oih : oihList) {
-					SymbolExchangeInfo info = client.getSymbolExchangeInfo(oih.getSymbol());
-					if(info == null) {
-						continue;
+			synchronized (AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT) {
+				List<PerpetualWebSocketClientEndpoint> clients = AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.get(client.getExec_time());
+				boolean sync_finish = true;
+				for(PerpetualWebSocketClientEndpoint c : clients) {
+					if(!c.isFinish()) {
+						sync_finish = false;
 					}
-					logger.info(info.getSymbol());
 				}
-				logger.info("K线订阅批次{}已同步完成.", client.getExec_time());
-				AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.remove(client.getExec_time());
+				if(sync_finish) {
+					logger.info("已同步的交易对：");
+					List<OpenInterestHist> oihList = openInterestHistRepository.query();
+					for(OpenInterestHist oih : oihList) {
+						SymbolExchangeInfo info = client.getSymbolExchangeInfo(oih.getSymbol());
+						if(info == null) {
+							continue;
+						}
+						logger.info(info.getSymbol());
+					}
+					logger.info("K线订阅批次{}已同步完成.", client.getExec_time());
+					AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.remove(client.getExec_time());
+				}
 			}
 		}
 	}
