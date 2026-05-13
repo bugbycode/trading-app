@@ -55,14 +55,16 @@ public class MessageHandlerImpl implements MessageHandler{
 			
 			logger.debug(kline);
 			
+			klinesRepository.insert(kline);
+			
 			//15分钟k线分析
-			boolean isEmpty = klinesRepository.isEmpty(pair, Inerval.INERVAL_1D);
+			/*boolean isEmpty = klinesRepository.isEmpty(pair, Inerval.INERVAL_1D);
 			if(isEmpty) {
 				workTaskPool.add(new SyncKlinesTask(pair, new Date(), klinesService, klinesRepository));
 			} else {
 				klinesRepository.insert(kline);
 				analysisWorkTaskPool.add(new AnalysisKlinesTask(pair, klinesService, klinesRepository, openInterestHistRepository));
-			}
+			}*/
 			
 			client.putFinishPair(pair);
 		};
@@ -78,16 +80,29 @@ public class MessageHandlerImpl implements MessageHandler{
 					}
 				}
 				if(sync_finish) {
-					logger.info("已同步的交易对：");
+					logger.debug("已同步的交易对：");
 					List<OpenInterestHist> oihList = openInterestHistRepository.query();
 					for(OpenInterestHist oih : oihList) {
 						SymbolExchangeInfo info = client.getSymbolExchangeInfo(oih.getSymbol());
 						if(info == null) {
 							continue;
 						}
-						logger.info(info.getSymbol());
+						
+						String symbol = info.getSymbol();
+						
+						logger.debug(symbol);
+						
+						boolean isEmpty = klinesRepository.isEmpty(symbol, Inerval.INERVAL_1D);
+						
+						if(isEmpty) {
+							workTaskPool.add(new SyncKlinesTask(symbol, new Date(), klinesService, klinesRepository));
+						} else {
+							analysisWorkTaskPool.add(new AnalysisKlinesTask(symbol, klinesService, klinesRepository, openInterestHistRepository));
+						}
 					}
-					logger.info("K线订阅批次{}已同步完成.", client.getExec_time());
+					
+					logger.debug("K线订阅批次{}已同步完成.", client.getExec_time());
+					
 					AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.remove(client.getExec_time());
 				}
 			}
