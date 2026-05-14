@@ -224,7 +224,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			//this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -237,50 +237,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(openCode.gt(FibCode.FIB0)) {
 				
 				//开仓点
-				
-				List<Klines> data = new ArrayList<Klines>();
-				for(int index = list.size() - 1; index >= 0; index--) {
-					Klines current = list.get(index);
-					if(current.lte(end)) {
-						break;
-					}
-					if((mode == QuotationMode.LONG && current.isFall()) 
-							|| (mode == QuotationMode.SHORT && current.isRise())) {
-						data.add(current);
-					}
-				}
-				
-				ms = new MarketSentiment(data);
-				if(ms.isEmpty()) {
-					return;
-				}
-				
-				Klines openKlines = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
-				
-				//次级回撤 用来计算止盈点位
-				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-				
-				//默认顺势交易止盈点位
-				double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
-				double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
-				//逆势交易止盈点位
-				if(tradeTrend == TradeTrend.AGAINST) {
-					firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
-					secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
-				}
-				
-				double openPriceValue = openKlines.getOpenPriceDoubleValue();
-				FibInfo stopLossFibInfo = new FibInfo(openPriceValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-				double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-				
-				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
-				
-				this.fibAfterKlines = new ArrayList<Klines>();
-				
-				/*
-				
 				double fibValue = fibInfo.getFibValue(openCode);
-				
+				/*
 				//次级回撤 用来计算止盈点位
 				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 				
@@ -299,6 +257,41 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				
 				addPrices(new OpenPriceDetails(openCode, fibValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 				*/
+				if(fibAfterKline == null) {
+					return;
+				}
+				
+				for(int index = list_15m.size() - 1; index >= 0; index--) {
+					Klines current = list_15m.get(index);
+					if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
+							|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
+						//次级回撤 用来计算止盈点位
+						FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
+						
+						//默认顺势交易止盈点位
+						double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
+						double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
+						//逆势交易止盈点位
+						if(tradeTrend == TradeTrend.AGAINST) {
+							firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
+							secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
+						}
+						
+						//用来计算止损价的回撤信息
+						FibInfo stopLossFibInfo = new FibInfo(fibValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
+						double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+						
+						double hitPrice = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
+						
+						addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
+						break;
+					}
+					if(current.lte(fibAfterKline)) {
+						break;
+					}
+				}
+				
+				this.fibAfterKlines = new ArrayList<Klines>();
 			}
 		}
 		
