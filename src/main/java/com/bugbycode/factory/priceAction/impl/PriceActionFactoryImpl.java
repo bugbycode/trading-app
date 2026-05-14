@@ -198,6 +198,12 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
 			
 			double openPriceValue = openKlines.getOpenPriceDoubleValue();
+			FibCode openPriceValueHitCode = childFibInfo.getFibCode(openPriceValue);
+			if(openPriceValueHitCode.lt(FibCode.FIB382)) {
+				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
+				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
+			}
+			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 			double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
