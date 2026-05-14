@@ -199,7 +199,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = openKlines.getOpenPriceDoubleValue();
 			FibCode openPriceValueHitCode = childFibInfo.getFibCode(openPriceValue);
-			if(openPriceValueHitCode.lt(FibCode.FIB382)) {
+			if(openPriceValueHitCode.lte(FibCode.FIB236)) {
 				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
 				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
 			}
