@@ -236,59 +236,54 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			if(openCode.gt(FibCode.FIB0)) {
 				
-				//开仓点
-				double fibValue = fibInfo.getFibValue(openCode);
-				/*
 				//次级回撤 用来计算止盈点位
-				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
+				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 				
 				//默认顺势交易止盈点位
 				double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
 				double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
-				//逆势交易止盈点位
-				if(tradeTrend == TradeTrend.AGAINST) {
-					firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
+				
+				//顺势交易开仓点
+				if(tradeTrend == TradeTrend.FOLLOW && openCode.gte(FibCode.FIB5) && openCode.lte(FibCode.FIB1)) {
+					//开仓点
+					double fibValue = fibInfo.getFibValue(openCode);
+					
+					//用来计算止损价的回撤信息
+					FibInfo stopLossFibInfo = new FibInfo(fibValue, secondTakeProfit, fibInfo.getDecimalPoint());
+					double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+					
+					addPrices(new OpenPriceDetails(openCode, fibValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
+					
+				} else if(tradeTrend == TradeTrend.AGAINST || (tradeTrend == TradeTrend.FOLLOW && openCode.gte(FibCode.FIB1_272))) { //逆势交易开仓点
+					
+					//逆势交易止盈点位
+					firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
 					secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
-				}
-				
-				//用来计算止损价的回撤信息
-				FibInfo stopLossFibInfo = new FibInfo(fibValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-				double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-				
-				addPrices(new OpenPriceDetails(openCode, fibValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
-				*/
-				if(fibAfterKline == null) {
-					return;
-				}
-				
-				for(int index = list_15m.size() - 1; index >= 0; index--) {
-					Klines current = list_15m.get(index);
-					if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, fibValue))
-							|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, fibValue))) {
-						//次级回撤 用来计算止盈点位
-						FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-						
-						//默认顺势交易止盈点位
-						double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
-						double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
-						//逆势交易止盈点位
-						if(tradeTrend == TradeTrend.AGAINST) {
-							firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
-							secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
+					
+					List<Klines> data = new ArrayList<Klines>();
+					for(int index = list.size() - 1; index >= 0; index--) {
+						Klines current = list.get(index);
+						if(current.lte(end)) {
+							break;
 						}
-						
-						//用来计算止损价的回撤信息
-						FibInfo stopLossFibInfo = new FibInfo(fibValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
-						double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-						
-						double hitPrice = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
-						
-						addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
-						break;
+						if((mode == QuotationMode.LONG && current.isFall()) 
+								|| (mode == QuotationMode.SHORT && current.isRise())) {
+							data.add(current);
+						}
 					}
-					if(current.lte(fibAfterKline)) {
-						break;
+					
+					ms = new MarketSentiment(data);
+					if(ms.isEmpty()) {
+						return;
 					}
+					
+					Klines openKlines = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
+					double openPriceValue = openKlines.getOpenPriceDoubleValue();
+					
+					FibInfo stopLossFibInfo = new FibInfo(openPriceValue, secondTakeProfit, fibInfo.getDecimalPoint());
+					double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+					
+					addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 				}
 				
 				this.fibAfterKlines = new ArrayList<Klines>();
@@ -333,11 +328,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
