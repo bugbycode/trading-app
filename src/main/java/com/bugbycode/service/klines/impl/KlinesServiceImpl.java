@@ -478,8 +478,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			//订单备份 当出现异常时作为邮件发送
 			String orderBackTitle = String.format("%s永续合约下单信息 %s", pair, dateStr);
-			String orderBackBody = String.format("开仓价: %s, 止损价: %s, 第一止盈价: %s, 第二止盈价: %s", 
-					openPrice.getPrice(), openPrice.getStopLossLimit(), openPrice.getFirstTakeProfit(), openPrice.getSecondTakeProfit());
+			String orderBackBody = String.format("方向: %s, 开仓价: %s, 止损价: %s, 第一止盈价: %s, 第二止盈价: %s", 
+					ps.getMemo(), openPrice.getPrice(), openPrice.getStopLossLimit(), openPrice.getFirstTakeProfit(), openPrice.getSecondTakeProfit());
 			
 			if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
 				
