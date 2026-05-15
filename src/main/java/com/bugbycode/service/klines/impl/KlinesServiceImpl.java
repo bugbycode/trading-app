@@ -449,6 +449,8 @@ public class KlinesServiceImpl implements KlinesService {
 			return;
 		}
 		
+		double stopLossLimit = openPrice.getStopLossLimit();
+		
 		FibInfo fibInfo = openPrice.getFibInfo();
 		AutoTradeType autoTradeType = openPrice.getAutoTradeType();
 		
@@ -479,7 +481,7 @@ public class KlinesServiceImpl implements KlinesService {
 			//订单备份 当出现异常时作为邮件发送
 			String orderBackTitle = String.format("%s永续合约下单信息 %s", pair, dateStr);
 			String orderBackBody = String.format("方向: %s, 开仓价: %s, 止损价: %s, 第一止盈价: %s, 第二止盈价: %s", 
-					ps.getMemo(), openPrice.getPrice(), openPrice.getStopLossLimit(), openPrice.getFirstTakeProfit(), openPrice.getSecondTakeProfit());
+					ps.getMemo(), openPrice.getPrice(), stopLossLimit, openPrice.getFirstTakeProfit(), openPrice.getSecondTakeProfit());
 			
 			if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
 				
@@ -536,7 +538,7 @@ public class KlinesServiceImpl implements KlinesService {
 							);
 					
 					if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
-						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getStopLossLimit(), decimalNum));
+						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getFirstTakeProfit() , decimalNum));
 						
 						//计算预计盈利百分比
@@ -601,6 +603,10 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 					}
+					
+					//计算最佳止损点
+					FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
+					stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 					
 					//最少下单数量
 					String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
@@ -692,9 +698,9 @@ public class KlinesServiceImpl implements KlinesService {
 						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 					}
 					
-					if(openPrice != null && openPrice.getStopLossLimit() > 0) {
+					if(openPrice != null && stopLossLimit > 0) {
 						priceInfo = binanceWebsocketTradeService.getPrice(pair);
-						double stopLossLimit = openPrice.getStopLossLimit();
+						//double stopLossLimit = openPrice.getStopLossLimit();
 						if(priceInfo.getPriceDoubleValue() <= stopLossLimit) {
 							continue;
 						}
@@ -764,7 +770,7 @@ public class KlinesServiceImpl implements KlinesService {
 							);
 					
 					if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
-						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getStopLossLimit(), decimalNum));
+						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getFirstTakeProfit() , decimalNum));
 						
 						//计算预计盈利百分比
@@ -831,6 +837,10 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 					}
+					
+					//计算最佳止损点
+					FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
+					stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 
 					//最少下单数量
 					String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
@@ -923,9 +933,9 @@ public class KlinesServiceImpl implements KlinesService {
 						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 					}
 					
-					if(openPrice != null && openPrice.getStopLossLimit() > 0) {
+					if(openPrice != null && stopLossLimit > 0) {
 						priceInfo = binanceWebsocketTradeService.getPrice(pair);
-						double stopLossLimit = openPrice.getStopLossLimit();
+						//double stopLossLimit = openPrice.getStopLossLimit();
 						if(priceInfo.getPriceDoubleValue() >= stopLossLimit) {
 							continue;
 						}
