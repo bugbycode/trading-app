@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
@@ -72,13 +73,20 @@ public class MessageHandlerImpl implements MessageHandler{
 		if(client.isFinish()) {
 			client.close();
 			synchronized (AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT) {
+				
 				List<PerpetualWebSocketClientEndpoint> clients = AppConfig.SYNC_FINISH_WEBSOCKET_CLIENT.get(client.getExec_time());
+				
+				if(CollectionUtils.isEmpty(clients)) {
+					return;
+				}
+
 				boolean sync_finish = true;
 				for(PerpetualWebSocketClientEndpoint c : clients) {
 					if(!c.isFinish()) {
 						sync_finish = false;
 					}
 				}
+				
 				if(sync_finish) {
 					logger.debug("已同步的交易对：");
 					List<OpenInterestHist> oihList = openInterestHistRepository.query();
