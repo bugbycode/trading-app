@@ -4428,4 +4428,34 @@ public class PriceUtil {
     	}
     	return result;
     }
+    
+    /**
+     * 盈亏比
+     * @param stopLossPrice 止损价
+     * @param openPrice 开仓价
+     * @param takeProfitPrice 止盈价
+     * @return
+     */
+    public static double calculateRisk(double stopLossPrice, double openPrice, double takeProfitPrice) {
+    	if(takeProfitPrice >= openPrice) {
+    		return (takeProfitPrice - openPrice) / (openPrice - stopLossPrice);
+    	} else {
+    		return (openPrice - takeProfitPrice) / (stopLossPrice - openPrice);
+    	}
+    }
+    
+    public static boolean verifyRisk(double risk) {
+    	return risk >= (FibCode.FIB1.getValue() / (FibCode.FIB1_272.getValue() - FibCode.FIB1.getValue()));
+    }
+    
+    /**
+     * 校验持仓风险
+     * @param stopLossPrice 止损价
+     * @param openPrice 开仓价
+     * @param takeProfitPrice 止盈价
+     * @return
+     */
+    public static boolean verifyRisk(double stopLossPrice, double openPrice, double takeProfitPrice) {
+    	return verifyRisk(calculateRisk(stopLossPrice, openPrice, takeProfitPrice));
+    }
 }

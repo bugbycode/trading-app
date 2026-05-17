@@ -604,9 +604,11 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 					}
 					
-					//计算最佳止损点
-					FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
-					stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue())) {
+						//计算最佳止损点
+						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
+						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+					}
 					
 					//最少下单数量
 					String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
@@ -838,9 +840,11 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 					}
 					
-					//计算最佳止损点
-					FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
-					stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue())) {
+						//计算最佳止损点
+						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
+						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+					}
 
 					//最少下单数量
 					String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
