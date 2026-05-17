@@ -201,11 +201,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
 			if(hitCode == FibCode.FIB0) {
-				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB236);
+				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
 				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
 			} else if(hitCode == FibCode.FIB236) {
-				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
+				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
 				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
+			} else if(hitCode == FibCode.FIB382) {
+				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
+				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
 			}
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
