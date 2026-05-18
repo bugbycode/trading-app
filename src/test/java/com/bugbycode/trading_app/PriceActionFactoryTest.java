@@ -44,7 +44,7 @@ public class PriceActionFactoryTest {
 		
         String pair = "UNIUSDT";
         
-        //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        List<Klines> list_4H = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
@@ -53,7 +53,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list, list, list_15m);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list_4H, list, list, list_15m);
         
         logger.info("init factory finish.");
         
