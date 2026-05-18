@@ -4445,7 +4445,7 @@ public class PriceUtil {
     }
     
     public static boolean verifyRisk(double risk) {
-    	return risk >= (FibCode.FIB1.getValue() / (FibCode.FIB1_272.getValue() - FibCode.FIB1.getValue()));
+    	return risk >= (FibCode.FIB1.getValue() / (FibCode.FIB2.getValue() - FibCode.FIB1.getValue()));
     }
     
     /**

@@ -607,7 +607,7 @@ public class KlinesServiceImpl implements KlinesService {
 					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue())) {
 						//计算最佳止损点
 						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
-						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB2);
 					}
 					
 					//最少下单数量
@@ -843,7 +843,7 @@ public class KlinesServiceImpl implements KlinesService {
 					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue())) {
 						//计算最佳止损点
 						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
-						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB2);
 					}
 
 					//最少下单数量
