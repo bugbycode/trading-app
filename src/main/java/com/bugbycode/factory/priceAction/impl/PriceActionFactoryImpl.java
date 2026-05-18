@@ -27,6 +27,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<Klines> list;
 	
+	private List<Klines> list_trend;
+	
 	List<Klines> list_hit;
 	
 	private List<Klines> fibAfterKlines;
@@ -41,12 +43,16 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<OpenPrice> openPrices;
 	
-	public PriceActionFactoryImpl(List<Klines> list, List<Klines> list_hit, List<Klines> list_15m) {
+	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_hit, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
 		this.list_hit = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
+		}
 		if(!CollectionUtils.isEmpty(list_hit)) {
 			this.list_hit.addAll(list_hit);
 		}
@@ -60,17 +66,18 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private void init() {
-		if(list.size() < 50 || CollectionUtils.isEmpty(list_hit) || CollectionUtils.isEmpty(list_15m)) {
+		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_hit) || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
+		this.list_trend.sort(kc);
 		this.list_hit.sort(kc);
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -194,15 +201,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			//次级回撤 用来计算止盈点位
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 			
-			double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
-			double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
+			double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
+			double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB786);
 			
 			double openPriceValue = openKlines.getOpenPriceDoubleValue();
 			
 			FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
 			if(hitCode == FibCode.FIB0) {
-				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
-				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
+				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
+				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
 			} else if(hitCode == FibCode.FIB236) {
 				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
 				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
@@ -229,7 +236,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list);
+		Klines last = PriceUtil.getLastKlines(list_trend);
 		
 		if(verifyShort(last)) {
 			ps = PositionSide.SHORT;
@@ -241,11 +248,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() < 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() > 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
