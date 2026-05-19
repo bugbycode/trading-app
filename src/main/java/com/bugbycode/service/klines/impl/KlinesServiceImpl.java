@@ -26,6 +26,8 @@ import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
+import com.bugbycode.factory.eoption.EoptionFactory;
+import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -1075,11 +1077,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
-		/*
-		EoptionFactory[] factories = {
-				new EoptionFactoryImpl(list_1d, list_1h, list_15m)
-			};
-		*/
+		
 		
 		Klines lastWeek = PriceUtil.getLastWeekKlines(list_1d);
 		if(lastWeek == null) {
@@ -1089,11 +1087,11 @@ public class KlinesServiceImpl implements KlinesService {
 		List<Klines> weekList = new ArrayList<>();
 		weekList.add(lastWeek);
 		
-		AreaFactory[] factories = {
-				new AreaFactoryImpl(weekList, list_1h, list_15m)
-		};
+		EoptionFactory[] factories = {
+				new EoptionFactoryImpl(weekList, list_1h, list_15m)
+			};
 		
-		for(AreaFactory factory : factories) {
+		for(EoptionFactory factory : factories) {
 		
 			if(!(factory.isLong() || factory.isShort())) {
 				continue;
