@@ -67,6 +67,7 @@ public class AreaFactoryImpl implements AreaFactory {
 		this.list_15m.sort(new KlinesComparator(SortType.ASC));
 		
 		Klines last = PriceUtil.getLastKlines(list);
+		double c = last.getClosePriceDoubleValue();
 		double l = last.getLowPriceDoubleValue();
 		double h = last.getHighPriceDoubleValue();
 		
@@ -78,31 +79,18 @@ public class AreaFactoryImpl implements AreaFactory {
 		FibInfo fibInfo = null;
 		int decimalPoint = last_after.getDecimalNum();
 		FibCode openCode = FibCode.FIB1;
-		FibCode takeProfitCode = FibCode.FIB1;
 		
 		Klines hit = null;
 		
 		for(int index = list_hit.size() - 1; index >= 0; index--) {
 			Klines current = list_hit.get(index);
-			if(PriceUtil.isBreachLong(current, h)) {//高点突破
+			if(PriceUtil.isBreachLong(current, c)) {//做多
+				hit = current;
 				this.ps = PositionSide.LONG;
-				fibInfo = new FibInfo(h, l, decimalPoint);
-				hit = current;
 				break;
-			} else if(PriceUtil.isBreachShort(current, h)) {//高点假突破
-				fibInfo = new FibInfo(h, l, decimalPoint);
+			} else if(PriceUtil.isBreachShort(current, c)) {//做空
+				hit = current;
 				this.ps = PositionSide.SHORT;
-				hit = current;
-				break;
-			} else if(PriceUtil.isBreachLong(current, l)) {//低点假跌破
-				fibInfo = new FibInfo(l, h, decimalPoint);
-				this.ps = PositionSide.LONG;
-				hit = current;
-				break;
-			} else if(PriceUtil.isBreachShort(current, l)) {//低点跌破
-				fibInfo = new FibInfo(l, h, decimalPoint);
-				this.ps = PositionSide.SHORT;
-				hit = current;
 				break;
 			}
 			if(current.lte(last_after)) {
@@ -110,12 +98,24 @@ public class AreaFactoryImpl implements AreaFactory {
 			}
 		}
 		
-		if(ps == PositionSide.DEFAULT || fibInfo == null || hit == null) {
-			return;
+		if(ps == PositionSide.DEFAULT || hit == null) {
+			hit = last_after;
+			if(last_after.isRise()) {
+				this.ps = PositionSide.LONG;
+			} else {
+				this.ps = PositionSide.SHORT;
+			}
+		}
+		
+		if(last.isRise()) {
+			fibInfo = new FibInfo(c, l, decimalPoint);
+		} else {
+			fibInfo = new FibInfo(c, h, decimalPoint);
 		}
 		
 		double hitPrice = isLong() ? hit.getBodyHighPriceDoubleValue() : hit.getBodyLowPriceDoubleValue();
 		
+		FibCode takeProfitCode = FibCode.FIB1;
 		if((isLong() && fibInfo.isLong()) || (isShort() && fibInfo.isShort())) {
 			takeProfitCode = FibCode.FIB5;
 		} else {
@@ -133,7 +133,10 @@ public class AreaFactoryImpl implements AreaFactory {
 			stopLossLimit = PriceUtil.getMinPrice(stopLossLimit, stopLossFibInfo.getFibValue(FibCode.FIB1_272));
 		}
 		
-		addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.AREA_INDEX, fibInfo));
+		FibInfo takeProfitFibInfo = new FibInfo(takeProfitCodeValue, fib1Value, decimalPoint);
+		double takeProfitValue = takeProfitFibInfo.getFibValue(FibCode.FIB786);
+		
+		addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossLimit, takeProfitValue, takeProfitValue, AutoTradeType.AREA_INDEX, fibInfo));
 	}
 	
 	private void addPrices(OpenPrice price) {
