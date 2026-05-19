@@ -137,6 +137,11 @@ public class AreaFactoryImpl implements AreaFactory {
 		double takeProfitValue = takeProfitFibInfo.getFibValue(FibCode.FIB786);
 		
 		addPrices(new OpenPriceDetails(openCode, hitPrice, stopLossLimit, takeProfitValue, takeProfitValue, AutoTradeType.AREA_INDEX, fibInfo));
+		
+		Klines fibAfter = PriceUtil.getAfterKlines(hit, list_15m);
+		if(fibAfter != null) {
+			this.fibAfterKlines = PriceUtil.subList(fibAfter, list_15m);
+		}
 	}
 	
 	private void addPrices(OpenPrice price) {
