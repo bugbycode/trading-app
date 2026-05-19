@@ -43,7 +43,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private List<OpenPrice> openPrices;
 	
-	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
+	private TradeTrend tradeTrend = TradeTrend.AGAINST;
 	
 	/**
 	 * 
@@ -57,33 +57,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_trend = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
-		this.tradeTrend = TradeTrend.FOLLOW;
-		if(!CollectionUtils.isEmpty(list_15m)) {
-			this.list_15m.addAll(list_15m);
-		}
-		if(!CollectionUtils.isEmpty(list_trend)) {
-			this.list_trend.addAll(list_trend);
-		}
-		if(!CollectionUtils.isEmpty(list)) {
-			this.list.addAll(list);
-			this.init();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param list 斐波那契回撤指标参考的K线信息
-	 * @param list_trend 行情走势参考的K线信息
-	 * @param list_15m 十五分钟级别k线信息
-	 * @param tradeTrend 交易趋势 FOLLOW/AGAINST
-	 */
-	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_trend, List<Klines> list_15m, TradeTrend tradeTrend) {
-		this.list = new ArrayList<Klines>();
-		this.list_15m = new ArrayList<Klines>();
-		this.list_trend = new ArrayList<Klines>();
-		this.openPrices = new ArrayList<OpenPrice>();
-		this.fibAfterKlines = new ArrayList<Klines>();
-		this.tradeTrend = tradeTrend;
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
 		}
@@ -133,6 +106,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		if(CollectionUtils.isEmpty(list) || list.size() < 50 || list_trend.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
+		
+		this.tradeTrend = TradeTrend.AGAINST;
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
@@ -221,6 +196,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
+		Klines list_trend_last = PriceUtil.getLastKlines(list_trend);
+		if((isLong() && list_trend_last.getDea() > 0) || (isShort() && list_trend_last.getDea() < 0)) {
+			this.tradeTrend = TradeTrend.FOLLOW;
+		}
+		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
@@ -234,8 +214,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode(openCodeValue);
 			
-			if(openCode.lt(FibCode.FIB5) && tradeTrend == TradeTrend.FOLLOW) {
-				openCode = FibCode.FIB0;
+			if(this.tradeTrend == TradeTrend.AGAINST && openCode.lt(FibCode.FIB618)) {//逆势行情至少回撤0.618
+				openCode = FibCode.FIB618;
+			} else if(openCode == FibCode.FIB1_272) { // 1.272 回撤点可看作1.0回撤点
+				openCode = FibCode.FIB1;
 			}
 			
 			if(openCode.gt(FibCode.FIB0)) {
@@ -243,8 +225,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				//次级回撤 用来计算止盈点位
 				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 				
-				//默认顺势交易止盈点位
-				double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
+				//默认止盈点位
+				double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
 				double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
 				
 				//开仓点
@@ -280,27 +262,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() > 0;
-		} else {
-			return k.getDea() < 0;
-		}
+		return k.getMacd() < 0; 
 	}
 	
 	private boolean verifyShort(Klines k) {
-		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() < 0;
-		} else {
-			return k.getDea() > 0;
-		}
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
