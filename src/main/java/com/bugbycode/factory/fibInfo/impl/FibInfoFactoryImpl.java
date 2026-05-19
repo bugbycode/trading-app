@@ -225,9 +225,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				//次级回撤 用来计算止盈点位
 				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 				
+				FibCode takeProfitCode = FibCode.FIB5;
+				
 				//默认止盈点位
-				double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
-				double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
+				double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
+				double secondTakeProfit = childFibInfo.getFibValue(takeProfitCode);
 				
 				//开仓点
 				double fibValue = fibInfo.getFibValue(openCode);
