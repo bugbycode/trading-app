@@ -218,15 +218,29 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			//次级回撤 用来计算止盈点位
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 			
-			double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
-			double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
+			double openPriceValue = openKlines.getOpenPriceDoubleValue();
+			FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
 			
-			if(tradeTrend == TradeTrend.AGAINST) {
-				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
-				secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
+			FibCode takeProfitCode = FibCode.FIB5;
+			
+			if(tradeTrend == TradeTrend.FOLLOW) {
+				if(hitCode.lte(FibCode.FIB236)) {// 0 ~ 0.236 - 0.5
+					takeProfitCode = FibCode.FIB5;
+				} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.618
+					takeProfitCode = FibCode.FIB618;
+				}
+			} else {
+				if(hitCode == FibCode.FIB0) {// 0 - 0.382
+					takeProfitCode = FibCode.FIB382;
+				} else if(hitCode == FibCode.FIB236) {// 0.236 - 0.5
+					takeProfitCode = FibCode.FIB5;
+				}
 			}
 			
-			double openPriceValue = openKlines.getOpenPriceDoubleValue();
+			double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
+			double secondTakeProfit = childFibInfo.getFibValue(takeProfitCode);
+			
+			
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, secondTakeProfit, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 			double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
@@ -235,12 +249,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 			
-			/*
-			fibAfterKline = PriceUtil.getAfterKlines(openKlines, list_15m);
-			if(fibAfterKline != null) {
-				this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-				this.fibInfo.setFibAfterKlines(fibAfterKlines);
-			}*/
 		}
 	}
 	
