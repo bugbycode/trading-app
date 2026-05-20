@@ -219,7 +219,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
 			
 			double firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
-			double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB618);
+			double secondTakeProfit = childFibInfo.getFibValue(FibCode.FIB5);
 			
 			if(tradeTrend == TradeTrend.AGAINST) {
 				firstTakeProfit = childFibInfo.getFibValue(FibCode.FIB382);
