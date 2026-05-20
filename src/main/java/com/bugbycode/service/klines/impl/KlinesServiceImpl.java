@@ -46,6 +46,7 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -1037,7 +1038,8 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
-				new PriceActionFactoryImpl(list_4h, list_1h, list_1h, list_15m)
+				new PriceActionFactoryImpl(list_1h, list_1h, list_1h, list_15m, TradeTrend.FOLLOW),
+				new PriceActionFactoryImpl(list_1h, list_1h, list_1h, list_15m, TradeTrend.AGAINST)
 		};
 		
 		for(PriceActionFactory factory : factorys) {
