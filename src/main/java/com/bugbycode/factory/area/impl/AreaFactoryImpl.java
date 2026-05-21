@@ -85,13 +85,19 @@ public class AreaFactoryImpl implements AreaFactory {
 		double endPrice = isLong() ? l : h;
 		
 		FibInfo fibInfo = new FibInfo(startPrice, endPrice, decimalPoint);
-		
-		FibCode firstTakeProfitCode = FibCode.FIB2;
-		FibCode secondTakeProfitCode = FibCode.FIB2_618;
-		
+
 		double fib1Value = fibInfo.getFibValue(FibCode.FIB1);
-		double firstTakeProfit = fibInfo.getFibValue(firstTakeProfitCode);
-		double secondTakeProfit = fibInfo.getFibValue(secondTakeProfitCode);
+		
+		FibCode takeProfitCode = FibCode.FIB2_618;
+		double takeProfitCodeValue = fibInfo.getFibValue(takeProfitCode);
+		
+		FibInfo takeProfitFibInfo = new FibInfo(takeProfitCodeValue, fib1Value, decimalPoint);
+		
+		FibCode firstTakeProfitCode = FibCode.FIB618;
+		FibCode secondTakeProfitCode = FibCode.FIB786;
+		
+		double firstTakeProfit = takeProfitFibInfo.getFibValue(firstTakeProfitCode);
+		double secondTakeProfit = takeProfitFibInfo.getFibValue(secondTakeProfitCode);
 		
 		FibInfo stopLossFibInfo = new FibInfo(fib1Value, firstTakeProfit, decimalPoint);
 		double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
