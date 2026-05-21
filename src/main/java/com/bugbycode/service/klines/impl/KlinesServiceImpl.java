@@ -1039,7 +1039,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		PriceActionFactory[] factorys = {
 				new PriceActionFactoryImpl(list_1h, list_1h, list_1h, list_15m, TradeTrend.FOLLOW),
-				//new PriceActionFactoryImpl(list_1h, list_1h, list_1h, list_15m, TradeTrend.AGAINST)
+				new PriceActionFactoryImpl(list_4h, list_4h, list_4h, list_15m, TradeTrend.FOLLOW)
 		};
 		
 		for(PriceActionFactory factory : factorys) {
