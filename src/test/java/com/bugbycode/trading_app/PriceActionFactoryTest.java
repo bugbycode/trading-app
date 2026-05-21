@@ -18,6 +18,7 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.util.PriceUtil;
@@ -44,7 +45,7 @@ public class PriceActionFactoryTest {
 		
         String pair = "UNIUSDT";
         
-        List<Klines> list_4H = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,1500);
+        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
@@ -53,7 +54,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list_4H, list, list, list_15m);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list, list_15m, TradeTrend.AGAINST);
         
         logger.info("init factory finish.");
         
