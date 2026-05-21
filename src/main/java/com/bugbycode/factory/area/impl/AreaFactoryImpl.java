@@ -88,7 +88,7 @@ public class AreaFactoryImpl implements AreaFactory {
 
 		double fib1Value = fibInfo.getFibValue(FibCode.FIB1);
 		
-		FibCode takeProfitCode = FibCode.FIB2_618;
+		FibCode takeProfitCode = FibCode.FIB2;
 		double takeProfitCodeValue = fibInfo.getFibValue(takeProfitCode);
 		
 		FibInfo takeProfitFibInfo = new FibInfo(takeProfitCodeValue, fib1Value, decimalPoint);
