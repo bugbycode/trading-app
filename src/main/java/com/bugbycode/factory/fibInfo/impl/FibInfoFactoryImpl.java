@@ -195,7 +195,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			//this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -251,6 +251,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 				
 				addPrices(new OpenPriceDetails(openCode, fibValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
+				
+				this.fibAfterKlines = new ArrayList<Klines>();
 			}
 		}
 		
