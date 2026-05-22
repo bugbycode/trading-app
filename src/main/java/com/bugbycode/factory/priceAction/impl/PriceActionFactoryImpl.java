@@ -202,18 +202,30 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				return;
 			}
 			
-			Klines openKlines = null;
+			Klines fibAfterHit = PriceUtil.getAfterKlines(end, list_hit);
+			if(fibAfterHit == null) {
+				return;
+			}
+			
+			List<Klines> data = new ArrayList<Klines>();
 			for(int index = list_hit.size() - 1; index >= 0; index--) {
 				Klines current = list_hit.get(index);
-				if((mode == QuotationMode.LONG && current.isFall()) || (mode == QuotationMode.SHORT && current.isRise())) {
-					openKlines = current;
+				if((mode == QuotationMode.LONG && current.isFall()) 
+						|| (mode == QuotationMode.SHORT && current.isRise())) {
+					data.add(current);
+				}
+				if(current.lte(fibAfterHit)) {
 					break;
 				}
 			}
 			
-			if(openKlines == null) {
+			ms = new MarketSentiment(data);
+			
+			if(ms.isEmpty()) {
 				return;
 			}
+			
+			Klines openKlines = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
 			
 			//次级回撤 用来计算止盈点位
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint(), FibLevel.LEVEL_1);
