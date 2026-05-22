@@ -13,7 +13,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -42,8 +41,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
-	
-	private TradeTrend tradeTrend = TradeTrend.AGAINST;
 	
 	/**
 	 * 
@@ -107,15 +104,14 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			return;
 		}
 		
-		this.tradeTrend = TradeTrend.AGAINST;
-		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateEMA_7_25_99(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -196,11 +192,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines list_trend_last = PriceUtil.getLastKlines(list_trend);
-		if((isLong() && list_trend_last.getDea() > 0) || (isShort() && list_trend_last.getDea() < 0)) {
-			this.tradeTrend = TradeTrend.FOLLOW;
-		}
-		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
@@ -214,13 +205,33 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode(openCodeValue);
 			
-			if(this.tradeTrend == TradeTrend.AGAINST && openCode.lt(FibCode.FIB618)) {//逆势行情至少回撤0.618
-				openCode = FibCode.FIB618;
-			} else if(openCode == FibCode.FIB1_272) { // 1.272 回撤点可看作1.0回撤点
-				openCode = FibCode.FIB1;
-			}
-			
 			if(openCode.gt(FibCode.FIB0)) {
+				
+				//计算开仓价
+				Klines fibAfterHit = PriceUtil.getAfterKlines(end, list);
+				if(fibAfterHit == null) {
+					return;
+				}
+				
+				List<Klines> data = new ArrayList<Klines>();
+				for(int index = list.size() - 1; index >= 0; index--) {
+					Klines current = list.get(index);
+					if((mode == QuotationMode.LONG && current.isFall()) 
+							|| (mode == QuotationMode.SHORT && current.isRise())) {
+						data.add(current);
+					}
+					if(current.lte(fibAfterHit)) {
+						break;
+					}
+				}
+				
+				ms = new MarketSentiment(data);
+				
+				if(ms.isEmpty()) {
+					return;
+				}
+				
+				Klines openKlines = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
 				
 				//次级回撤 用来计算止盈点位
 				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
@@ -232,7 +243,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				double secondTakeProfit = childFibInfo.getFibValue(takeProfitCode);
 				
 				//开仓点
-				double fibValue = fibInfo.getFibValue(openCode);
+				//double fibValue = fibInfo.getFibValue(openCode);
+				double fibValue = openKlines.getOpenPriceDoubleValue();
 				
 				//用来计算止损价的回撤信息
 				FibInfo stopLossFibInfo = new FibInfo(fibValue, secondTakeProfit, fibInfo.getDecimalPoint());
@@ -264,19 +276,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0; 
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0; 
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0; 
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
