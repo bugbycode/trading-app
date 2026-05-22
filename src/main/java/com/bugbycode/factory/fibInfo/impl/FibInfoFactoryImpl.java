@@ -208,14 +208,14 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(openCode.gt(FibCode.FIB0)) {
 				
 				//计算开仓价
-				Klines fibAfterHit = PriceUtil.getAfterKlines(end, list);
+				Klines fibAfterHit = PriceUtil.getAfterKlines(end, list_15m);
 				if(fibAfterHit == null) {
 					return;
 				}
 				
 				List<Klines> data = new ArrayList<Klines>();
-				for(int index = list.size() - 1; index >= 0; index--) {
-					Klines current = list.get(index);
+				for(int index = list_15m.size() - 1; index >= 0; index--) {
+					Klines current = list_15m.get(index);
 					if((mode == QuotationMode.LONG && current.isFall()) 
 							|| (mode == QuotationMode.SHORT && current.isRise())) {
 						data.add(current);
