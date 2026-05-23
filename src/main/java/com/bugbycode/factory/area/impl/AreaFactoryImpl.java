@@ -34,7 +34,7 @@ public class AreaFactoryImpl implements AreaFactory {
 	
 	private List<FibInfo> fibInfoList;
 	
-	public AreaFactoryImpl(List<Klines> list, List<Klines> list_15m, PositionSide ps) {
+	public AreaFactoryImpl(List<Klines> list, List<Klines> list_15m) {
 		this.ps = PositionSide.DEFAULT;
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
