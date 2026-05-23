@@ -236,7 +236,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			FibCode takeProfitCode = FibCode.FIB618;
 			
 			if(tradeTrend == TradeTrend.FOLLOW) {
-				if(hitCode.lte(FibCode.FIB236)) {// 0 ~ 0.236 - 0.618
+				if(hitCode == FibCode.FIB0) {// 0 - 0.5
+					takeProfitCode = FibCode.FIB5;
+				} else if(hitCode == FibCode.FIB236) { // 0.236 - 0.618
 					takeProfitCode = FibCode.FIB618;
 				} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.786
 					takeProfitCode = FibCode.FIB786;
