@@ -233,13 +233,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double openPriceValue = openKlines.getOpenPriceDoubleValue();
 			FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
 			
-			FibCode takeProfitCode = FibCode.FIB5;
+			FibCode takeProfitCode = FibCode.FIB618;
 			
 			if(tradeTrend == TradeTrend.FOLLOW) {
-				if(hitCode.lte(FibCode.FIB236)) {// 0 ~ 0.236 - 0.5
-					takeProfitCode = FibCode.FIB5;
-				} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.618
+				if(hitCode.lte(FibCode.FIB236)) {// 0 ~ 0.236 - 0.618
 					takeProfitCode = FibCode.FIB618;
+				} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.786
+					takeProfitCode = FibCode.FIB786;
 				} else if(hitCode == FibCode.FIB5) { //0.5 - 0.786
 					takeProfitCode = FibCode.FIB786;
 				}
