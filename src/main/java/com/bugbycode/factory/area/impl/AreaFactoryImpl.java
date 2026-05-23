@@ -166,6 +166,11 @@ public class AreaFactoryImpl implements AreaFactory {
 			double fib1Value = fibInfo.getFibValue(FibCode.FIB1);
 			FibCode takeProfitCode = FibCode.FIB5;
 			List<Klines> fibAfterList = fibInfo.getFibAfterKlines();
+			
+			if(CollectionUtils.isEmpty(fibAfterList)) {
+				continue;
+			}
+			
 			Klines hitKlines = null;
 			for(int index = fibAfterList.size() - 1; index >= 0; index--) {
 				Klines current = fibAfterList.get(index);
