@@ -110,8 +110,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateEMA_7_25_99(list);
-		PriceUtil.calculateEMA_7_25_99(list_trend);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -207,57 +206,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			if(openCode.gt(FibCode.FIB0)) {
 				
-				//计算开仓价
-				Klines fibAfterHit = PriceUtil.getAfterKlines(end, list);
-				if(fibAfterHit == null) {
-					return;
-				}
-				
-				List<Klines> data = new ArrayList<Klines>();
-				for(int index = list.size() - 1; index >= 0; index--) {
-					Klines current = list.get(index);
-					if((mode == QuotationMode.LONG && current.isFall()) 
-							|| (mode == QuotationMode.SHORT && current.isRise())) {
-						data.add(current);
-					}
-					if(current.lte(fibAfterHit)) {
-						break;
-					}
-				}
-				
-				ms = new MarketSentiment(data);
-				
-				if(ms.isEmpty()) {
-					return;
-				}
-				
-				Klines openKlines = mode == QuotationMode.LONG ? ms.getMinBodyHigh() : ms.getMaxBodyLow();
-
 				//开仓点
-				//double fibValue = fibInfo.getFibValue(openCode);
-				double fibValue = openKlines.getOpenPriceDoubleValue();
+				double fibValue = fibInfo.getFibValue(openCode);
 				
 				//次级回撤 用来计算止盈点位
 				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 				
 				FibCode takeProfitCode = FibCode.FIB5;
-				
-				FibCode hitCode = childFibInfo.getFibCode(fibValue);
-				
-				if(hitCode == FibCode.FIB0) {
-					takeProfitCode = FibCode.FIB382;
-				} else if(hitCode == FibCode.FIB236) {
-					takeProfitCode = FibCode.FIB5;
-				} else if(hitCode == FibCode.FIB382) {
-					takeProfitCode = FibCode.FIB618;
-				} else if(hitCode == FibCode.FIB5) {
-					takeProfitCode = FibCode.FIB786;
-				}
-				
-				/*
-				if(openCode.gte(FibCode.FIB2)) {
-					takeProfitCode = FibCode.FIB382;
-				}*/
 				
 				//默认止盈点位
 				double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
@@ -295,19 +250,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0; 
+		return k.getDea() < 0; 
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
