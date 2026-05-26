@@ -194,7 +194,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			//this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -224,7 +224,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				
 				addPrices(new OpenPriceDetails(openCode, fibValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 				
-				this.fibAfterKlines = new ArrayList<Klines>();
+				//this.fibAfterKlines = new ArrayList<Klines>();
 			}
 		}
 		
@@ -250,19 +250,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0; 
+		return k.getMacd() < 0; 
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
