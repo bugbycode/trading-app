@@ -30,8 +30,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<Klines> list_trend;
 	
-	List<Klines> list_hit;
-	
 	private List<Klines> fibAfterKlines;
 	
 	private FibInfo fibInfo;
@@ -46,19 +44,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
 	
-	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_hit, List<Klines> list_15m) {
+	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.tradeTrend = TradeTrend.FOLLOW;
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
-		this.list_hit = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
-		}
-		if(!CollectionUtils.isEmpty(list_hit)) {
-			this.list_hit.addAll(list_hit);
 		}
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -69,20 +63,16 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		}
 	}
 	
-	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_hit, List<Klines> list_15m,
+	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m,
 			TradeTrend tradeTrend) {
 		this.tradeTrend = tradeTrend;
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
-		this.list_hit = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
-		}
-		if(!CollectionUtils.isEmpty(list_hit)) {
-			this.list_hit.addAll(list_hit);
 		}
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -94,14 +84,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private void init() {
-		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_hit) || CollectionUtils.isEmpty(list_15m)) {
+		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		this.list_trend.sort(kc);
-		this.list_hit.sort(kc);
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
@@ -202,12 +191,16 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				return;
 			}
 			
-			Klines fibAfterHit = PriceUtil.getAfterKlines(end, list_hit);
+			Klines fibAfterHit = PriceUtil.getAfterKlines(end, list);
+			if((mode == QuotationMode.LONG && end.isFall()) || (mode == QuotationMode.SHORT && end.isRise())) {
+				fibAfterHit = end;
+			}
+			
 			if(fibAfterHit == null) {
 				return;
 			}
 			
-			List<Klines> data = PriceUtil.subList(fibAfterHit, list_hit);
+			List<Klines> data = PriceUtil.subList(fibAfterHit, list);
 			
 			ms = new MarketSentiment(data);
 			
