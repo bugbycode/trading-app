@@ -246,7 +246,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 				
 				
-				FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
+				FibCode hitCode = childFibInfo.getFibCode(hitValue);
 				
 				FibCode takeProfitCode = FibCode.FIB618;
 				
