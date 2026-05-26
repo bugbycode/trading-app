@@ -224,50 +224,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				return;
 			}
 			
+			Klines hit_current = null;
+			
 			for(int index = list_15m.size() - 1; index > 0; index--) {
 				Klines current = list_15m.get(index);
 				if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, hitValue)) 
 						|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, hitValue))) {
 					
-					double openPriceValue = mode == QuotationMode.LONG ? current.getBodyHighPriceDoubleValue() : current.getBodyLowPriceDoubleValue();
-					
-					//次级回撤 用来计算止盈点位
-					FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
-					
-					
-					FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
-					
-					FibCode takeProfitCode = FibCode.FIB618;
-					
-					if(tradeTrend == TradeTrend.FOLLOW) {
-						if(hitCode == FibCode.FIB0) {// 0 - 0.5
-							takeProfitCode = FibCode.FIB5;
-						} else if(hitCode == FibCode.FIB236) { // 0.236 - 0.618
-							takeProfitCode = FibCode.FIB618;
-						} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.786
-							takeProfitCode = FibCode.FIB786;
-						} else if(hitCode == FibCode.FIB5) { //0.5 - 0.786
-							takeProfitCode = FibCode.FIB786;
-						}
-					} else {
-						if(hitCode == FibCode.FIB0) {// 0 - 0.382
-							takeProfitCode = FibCode.FIB382;
-						} else if(hitCode == FibCode.FIB236) {// 0.236 - 0.5
-							takeProfitCode = FibCode.FIB5;
-						} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.618
-							takeProfitCode = FibCode.FIB618;
-						}
-					}
-					
-					double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
-					double secondTakeProfit = childFibInfo.getFibValue(takeProfitCode);
-					
-					
-					
-					FibInfo stopLossFibInfo = new FibInfo(hitValue, secondTakeProfit, fibInfo.getDecimalPoint());
-					double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-					
-					addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.PRICE_ACTION, fibInfo));
+					hit_current = current;
 					
 					break;
 				}
@@ -276,7 +240,54 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				}
 			}
 			
+			if(hit_current == null) {
+				if((mode == QuotationMode.LONG && openKlinesAfter.isRise()) || (mode == QuotationMode.SHORT && openKlinesAfter.isFall())) {
+					hit_current = openKlinesAfter;
+				}
+			}
 			
+			if(hit_current != null) {
+				double openPriceValue = mode == QuotationMode.LONG ? hit_current.getBodyHighPriceDoubleValue() : hit_current.getBodyLowPriceDoubleValue();
+				
+				//次级回撤 用来计算止盈点位
+				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+				
+				
+				FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
+				
+				FibCode takeProfitCode = FibCode.FIB618;
+				
+				if(tradeTrend == TradeTrend.FOLLOW) {
+					if(hitCode == FibCode.FIB0) {// 0 - 0.5
+						takeProfitCode = FibCode.FIB5;
+					} else if(hitCode == FibCode.FIB236) { // 0.236 - 0.618
+						takeProfitCode = FibCode.FIB618;
+					} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.786
+						takeProfitCode = FibCode.FIB786;
+					} else if(hitCode == FibCode.FIB5) { //0.5 - 0.786
+						takeProfitCode = FibCode.FIB786;
+					}
+				} else {
+					if(hitCode == FibCode.FIB0) {// 0 - 0.382
+						takeProfitCode = FibCode.FIB382;
+					} else if(hitCode == FibCode.FIB236) {// 0.236 - 0.5
+						takeProfitCode = FibCode.FIB5;
+					} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.618
+						takeProfitCode = FibCode.FIB618;
+					}
+				}
+				
+				double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
+				double secondTakeProfit = childFibInfo.getFibValue(takeProfitCode);
+				
+				
+				
+				FibInfo stopLossFibInfo = new FibInfo(hitValue, secondTakeProfit, fibInfo.getDecimalPoint());
+				double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+				
+				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.PRICE_ACTION, fibInfo));
+				
+			}
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 			
