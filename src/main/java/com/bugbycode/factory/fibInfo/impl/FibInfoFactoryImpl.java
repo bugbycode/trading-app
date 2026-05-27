@@ -202,7 +202,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
-			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
+			FibCode openCode = fibInfo.getFibCode(openCodeValue);
 			
 			if(openCode == FibCode.FIB0) {
 				return;
@@ -267,9 +267,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				
 				FibCode takeProfitCode = FibCode.FIB5;
 				
-				if(hitCode == FibCode.FIB0) {// 0 - 0.5
-					takeProfitCode = FibCode.FIB5;
-				} else if(hitCode == FibCode.FIB236) { // 0.236 - 0.618
+				if(hitCode == FibCode.FIB0) {// 0 - 0.382
+					takeProfitCode = FibCode.FIB382;
+				} else if(hitCode == FibCode.FIB236) { // 0.236 - 0.5
 					takeProfitCode = FibCode.FIB618;
 				} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.618
 					takeProfitCode = FibCode.FIB618;
