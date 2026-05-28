@@ -110,7 +110,7 @@ public class AreaFactoryImpl implements AreaFactory {
 		
 		int decimalNum = hit_k.getDecimalNum();
 		double openPriceValue = isLong() ? hit_k.getBodyHighPriceDoubleValue() : hit_k.getBodyLowPriceDoubleValue();
-		FibInfo fibInfo = new FibInfo(openPriceValue, endPriceValue, decimalNum);
+		FibInfo fibInfo = new FibInfo(c, endPriceValue, decimalNum);
 		
 		FibCode takeProfitCode = FibCode.FIB1_618;
 		if((isLong() && fibInfo.isLong()) || (isShort() && fibInfo.isShort())) {
