@@ -1165,7 +1165,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void consolidationAreaMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		AreaFactory[] factories = {
-					new AreaFactoryImpl(list_15m, list_15m)
+					new AreaFactoryImpl(list_1d, list_15m, list_15m)
 				};
 		
 		for(AreaFactory factory : factories) {
