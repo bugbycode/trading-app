@@ -301,14 +301,14 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "ETHUSDT";
+    	String pair = "FIGHTUSDT";
     	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-        //List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+        List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
-        AreaFactory factory = new AreaFactoryImpl(list, list_15m);
+        AreaFactory factory = new AreaFactoryImpl(list, list_hit, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -330,6 +330,7 @@ public class KlinesServiceTest {
         for(User u : userList) {
 
             for(OpenPrice price : openPrices) {
+            	logger.info(price.getFibInfo());
             	logger.info("{}: {} -> {} ~ {}, istread: {}", mode, price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), PriceUtil.isTraded(price, factory));
             	logger.info(price.getAreaTakeProfit(last.getClosePriceDoubleValue(), price, u.getProfit(), u.getProfitLimit(), mode));
             	logger.info("risk: {}", PriceUtil.calculateRisk(price.getStopLossLimit(), price.getPrice(), price.getFirstTakeProfit()));
