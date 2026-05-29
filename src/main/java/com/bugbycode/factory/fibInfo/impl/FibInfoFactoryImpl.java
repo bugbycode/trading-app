@@ -194,7 +194,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			//this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -208,16 +208,18 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			Klines fibAfterHit = PriceUtil.getAfterKlines(end, list);
-			if((mode == QuotationMode.LONG && end.isFall()) || (mode == QuotationMode.SHORT && end.isRise())) {
-				fibAfterHit = end;
-			}
+			List<Klines> data = new ArrayList<Klines>();
 			
-			if(fibAfterHit == null) {
-				return;
+			for(int index = list.size() - 1; index >= 0; index--) {
+				Klines current = list.get(index);
+				if(current.lte(end)) {
+					break;
+				}
+				if((mode == QuotationMode.LONG && current.isFall()) 
+						|| (mode == QuotationMode.SHORT && current.isRise())) {
+					data.add(current);
+				}
 			}
-			
-			List<Klines> data = PriceUtil.subList(fibAfterHit, list);
 			
 			ms = new MarketSentiment(data);
 			
@@ -225,71 +227,25 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			Klines openKlines = mode == QuotationMode.LONG ? ms.getMinBodyLow() : ms.getMaxBodyHigh();
-			double hitValue = mode == QuotationMode.LONG ? ms.getMinBodyLowPrice() : ms.getMaxBodyHighPrice();
+			double openPriceValue = mode == QuotationMode.LONG ? ms.getMinBodyHighPrice() : ms.getMaxBodyLowPrice();
 			
-			Klines openKlinesAfter = PriceUtil.getAfterKlines(openKlines, list_15m);
+			//次级回撤 用来计算止盈点位
+			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			if(openKlinesAfter == null) {
-				return;
+			FibCode takeProfitCode = FibCode.FIB382;
+			FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
+			if(hitCode.gte(FibCode.FIB236)) {
+				takeProfitCode = FibCode.FIB5;
 			}
 			
-			Klines hit_current = null;
+			double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
+			double secondTakeProfit = childFibInfo.getFibValue(takeProfitCode);
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
-				if((mode == QuotationMode.LONG && PriceUtil.isBreachLong(current, hitValue)) 
-						|| (mode == QuotationMode.SHORT && PriceUtil.isBreachShort(current, hitValue))) {
-					
-					hit_current = current;
-					
-					break;
-				}
-				if(current.lte(openKlinesAfter)) {
-					break;
-				}
-			}
+			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, secondTakeProfit, fibInfo.getDecimalPoint());
+			double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
-			if(hit_current == null) {
-				if((mode == QuotationMode.LONG && openKlinesAfter.isRise()) || (mode == QuotationMode.SHORT && openKlinesAfter.isFall())) {
-					hit_current = openKlinesAfter;
-				}
-			}
+			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 			
-			if(hit_current != null) {
-				double openPriceValue = mode == QuotationMode.LONG ? hit_current.getBodyHighPriceDoubleValue() : hit_current.getBodyLowPriceDoubleValue();
-				
-				//次级回撤 用来计算止盈点位
-				FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
-				
-				
-				FibCode hitCode = childFibInfo.getFibCode(hitValue);
-				
-				FibCode takeProfitCode = FibCode.FIB5;
-				
-				if(hitCode == FibCode.FIB0) {// 0 - 0.5
-					takeProfitCode = FibCode.FIB5;
-				} else if(hitCode == FibCode.FIB236) { // 0.236 - 0.5
-					takeProfitCode = FibCode.FIB5;
-				} else if(hitCode == FibCode.FIB382) {// 0.382 - 0.618
-					takeProfitCode = FibCode.FIB618;
-				} else if(hitCode == FibCode.FIB5) { //0.5 - 0.786
-					takeProfitCode = FibCode.FIB786;
-				}
-				
-				double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
-				double secondTakeProfit = childFibInfo.getFibValue(takeProfitCode);
-				
-				
-				
-				FibInfo stopLossFibInfo = new FibInfo(hitValue, secondTakeProfit, fibInfo.getDecimalPoint());
-				double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-				
-				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
-				
-			}
-			
-			this.fibAfterKlines = new ArrayList<Klines>();
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -314,19 +270,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0; 
+		return k.getDea() < 0; 
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0; 
+		return k.getDea() > 0; 
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
