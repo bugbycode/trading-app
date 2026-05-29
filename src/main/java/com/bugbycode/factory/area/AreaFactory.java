@@ -2,7 +2,6 @@ package com.bugbycode.factory.area;
 
 import java.util.List;
 
-import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.price.OpenPrice;
 
@@ -26,8 +25,5 @@ public interface AreaFactory {
 	public boolean isLong();
 	
 	public boolean isShort();
-	
-	//盘整区回撤信息
-	public List<FibInfo> getFibInfoList();
 	
 }
