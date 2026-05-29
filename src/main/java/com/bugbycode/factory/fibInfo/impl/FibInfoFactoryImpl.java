@@ -215,9 +215,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			FibCode takeProfitCode = FibCode.FIB5;
 			
-			if(openCode.lte(FibCode.FIB382)) {
+			if(openCode == FibCode.FIB236) {
 				takeProfitCode = FibCode.FIB786;
-			} else if(openCode == FibCode.FIB5 || openCode == FibCode.FIB618) {
+			} else if(openCode == FibCode.FIB382 || openCode == FibCode.FIB5) {
 				takeProfitCode = FibCode.FIB618;
 			}
 			
