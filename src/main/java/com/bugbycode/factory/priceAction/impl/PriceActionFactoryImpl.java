@@ -22,7 +22,7 @@ import com.util.PriceComparator;
 import com.util.PriceUtil;
 
 /**
- * 斐波那契回指标撤接口实现类
+ * 价格行为指标接口实现类
  */
 public class PriceActionFactoryImpl implements PriceActionFactory {
 
