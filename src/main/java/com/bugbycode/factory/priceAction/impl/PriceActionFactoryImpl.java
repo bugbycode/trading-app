@@ -244,7 +244,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory {
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, secondTakeProfit, fibInfo.getDecimalPoint());
 			double stopLossValue = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
-			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
+			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.PRICE_ACTION, fibInfo));
 			
 		}
 		
