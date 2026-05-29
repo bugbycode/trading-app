@@ -194,7 +194,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			//this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -208,34 +208,17 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			List<Klines> data = new ArrayList<Klines>();
-			
-			for(int index = list.size() - 1; index >= 0; index--) {
-				Klines current = list.get(index);
-				if(current.lte(end)) {
-					break;
-				}
-				if((mode == QuotationMode.LONG && current.isFall()) 
-						|| (mode == QuotationMode.SHORT && current.isRise())) {
-					data.add(current);
-				}
-			}
-			
-			ms = new MarketSentiment(data);
-			
-			if(ms.isEmpty()) {
-				return;
-			}
-			
-			double openPriceValue = mode == QuotationMode.LONG ? ms.getMinBodyHighPrice() : ms.getMaxBodyLowPrice();
+			double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			//次级回撤 用来计算止盈点位
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB382;
-			FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
-			if(hitCode.gte(FibCode.FIB236)) {
-				takeProfitCode = FibCode.FIB5;
+			FibCode takeProfitCode = FibCode.FIB5;
+			
+			if(openCode.lte(FibCode.FIB382)) {
+				takeProfitCode = FibCode.FIB786;
+			} else if(openCode == FibCode.FIB5 || openCode == FibCode.FIB618) {
+				takeProfitCode = FibCode.FIB618;
 			}
 			
 			double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
@@ -246,6 +229,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 			
+			this.fibAfterKlines = new ArrayList<Klines>();
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -270,11 +254,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() < 0; 
+		return k.getDea() > 0; 
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() > 0; 
+		return k.getDea() < 0; 
 	}
 	
 	private boolean verifyHigh(Klines k) {
