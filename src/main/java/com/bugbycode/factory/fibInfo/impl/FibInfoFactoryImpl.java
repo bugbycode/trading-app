@@ -213,12 +213,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			//次级回撤 用来计算止盈点位
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB5;
+			FibCode takeProfitCode = FibCode.FIB618;
 			
-			if(openCode == FibCode.FIB236) {
-				takeProfitCode = FibCode.FIB786;
-			} else if(openCode == FibCode.FIB382 || openCode == FibCode.FIB5) {
-				takeProfitCode = FibCode.FIB618;
+			if(openCode.gte(FibCode.FIB786)) {
+				takeProfitCode = FibCode.FIB5;
 			}
 			
 			double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
@@ -262,11 +260,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
