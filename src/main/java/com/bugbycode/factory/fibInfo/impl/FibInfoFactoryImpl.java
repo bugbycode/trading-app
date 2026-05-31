@@ -194,7 +194,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			//this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -215,8 +215,20 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			FibCode takeProfitCode = FibCode.FIB618;
 			
-			if(openCode.gte(FibCode.FIB786)) {
+			if(openCode.lte(FibCode.FIB618)) {
+				takeProfitCode = FibCode.FIB618;
+			} else if(openCode == FibCode.FIB786 || openCode == FibCode.FIB1) {
 				takeProfitCode = FibCode.FIB5;
+			} else if(openCode == FibCode.FIB1_272) {
+				takeProfitCode = FibCode.FIB236;
+			} else if(openCode == FibCode.FIB1_618) {
+				takeProfitCode = FibCode.FIB382;
+			} else if(openCode == FibCode.FIB2) {
+				takeProfitCode = FibCode.FIB5;
+			} else if(openCode == FibCode.FIB2_618 || openCode == FibCode.FIB3_618) {
+				takeProfitCode = FibCode.FIB618;
+			} else if(openCode == FibCode.FIB4_618) {
+				takeProfitCode = FibCode.FIB786;
 			}
 			
 			double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
@@ -227,7 +239,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossValue, firstTakeProfit, secondTakeProfit, AutoTradeType.FIB_RET, fibInfo));
 			
-			this.fibAfterKlines = new ArrayList<Klines>();
 		}
 		
 		if(mode == QuotationMode.LONG) {
@@ -252,19 +263,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0; 
-	}
-	
-	private boolean verifyShort(Klines k) {
 		return k.getDea() < 0; 
 	}
 	
+	private boolean verifyShort(Klines k) {
+		return k.getDea() > 0; 
+	}
+	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -281,8 +292,4 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return end;
 	}
 	
-	@Override
-	public FibCode getHitCode() {
-		return null;
-	}
 }
