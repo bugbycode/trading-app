@@ -13,6 +13,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -41,12 +42,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<OpenPrice> openPrices;
 	
+	private TradeTrend tradeTrend = TradeTrend.AGAINST;
+	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+		this.tradeTrend = TradeTrend.AGAINST;
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
 		}
@@ -149,6 +153,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			return;
 		}
 		
+		this.tradeTrend = getTradeTrend();
+		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
@@ -226,14 +232,26 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				
 				FibCode takeProfitCode = FibCode.FIB382;
 				
-				if(hitCode == FibCode.FIB0) {
-					takeProfitCode = FibCode.FIB382;
-				} else if(hitCode == FibCode.FIB236) {
-					takeProfitCode = FibCode.FIB5;
-				} else if(hitCode == FibCode.FIB382) {
-					takeProfitCode = FibCode.FIB618;
-				} else if(hitCode == FibCode.FIB5) {
-					takeProfitCode = FibCode.FIB786;
+				if(tradeTrend == TradeTrend.AGAINST) {
+					if(hitCode == FibCode.FIB0) {
+						takeProfitCode = FibCode.FIB382;
+					} else if(hitCode == FibCode.FIB236) {
+						takeProfitCode = FibCode.FIB5;
+					} else if(hitCode == FibCode.FIB382) {
+						takeProfitCode = FibCode.FIB618;
+					} else if(hitCode == FibCode.FIB5) {
+						takeProfitCode = FibCode.FIB786;
+					}
+				} else {
+					if(hitCode == FibCode.FIB0) {
+						takeProfitCode = FibCode.FIB5;
+					} else if(hitCode == FibCode.FIB236) {
+						takeProfitCode = FibCode.FIB618;
+					} else if(hitCode == FibCode.FIB382) {
+						takeProfitCode = FibCode.FIB786;
+					} else if(hitCode == FibCode.FIB5) {
+						takeProfitCode = FibCode.FIB786;
+					}
 				}
 				
 				double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
@@ -251,6 +269,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			this.fibAfterKlines = new ArrayList<Klines>();
 			
 		}
+	}
+	
+	private TradeTrend getTradeTrend() {
+		TradeTrend tradeTrend = TradeTrend.AGAINST;
+		Klines last = PriceUtil.getLastKlines(list);
+		if((isLong() && last.getDea() >= 0) || (isShort() && last.getDea() <= 0)) {
+			tradeTrend = TradeTrend.FOLLOW;
+		}
+		return tradeTrend;
 	}
 	
 	private PositionSide getPositionSide() {
