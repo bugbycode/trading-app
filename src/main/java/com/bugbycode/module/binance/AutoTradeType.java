@@ -30,9 +30,15 @@ public enum AutoTradeType {
 	/**
 	 * 期权交易
 	 */
-	EOPTION(5, "期权交易");
+	EOPTION(5, "期权交易"),
 	
 	
+	/**
+	 * 墙头草
+	 */
+	FENCE_SITTER(6, "墙头草")
+	
+	;
 
 	private int value;
 	
