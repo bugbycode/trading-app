@@ -74,7 +74,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		double stopLossLimit = this.ps == PositionSide.LONG ? stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
 		
 		FibInfo stopLossFibInfo = new FibInfo(priceValue, takeProfitPrice, current.getDecimalNum());
-		double sf_limit = stopLossFibInfo.getFibValue(1.414);
+		double sf_limit = stopLossFibInfo.getFibValue(FibCode.FIB1_618);
 		if(this.ps == PositionSide.LONG) {
 			stopLossLimit = PriceUtil.getMaxPrice(stopLossLimit, sf_limit);
 		} else if(this.ps == PositionSide.SHORT) {
