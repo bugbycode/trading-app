@@ -22,6 +22,8 @@ import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.eoption.EoptionFactory;
 import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
+import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
+import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -199,6 +201,23 @@ public class KlinesServiceTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    }
+    
+    @Test
+    public void testFenceSitter(){
+    	String pair = "PLAYUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
+    	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m);
+    	if(!(factory.isLong() || factory.isShort())) {
+    		return;
+    	}
+    	
+    	QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
+    	
+    	OpenPrice price = factory.getOpenPrice();
+    	
+    	logger.info("{} - {}", mode, price);
     }
 
     @Test
