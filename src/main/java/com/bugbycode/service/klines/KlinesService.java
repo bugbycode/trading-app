@@ -122,9 +122,10 @@ public interface KlinesService {
 	
 	/**
 	 * 墙头草策略监控
+	 * @param list
 	 * @param list_15m
 	 */
-	public void futuresFenceSitter(List<Klines> list_15m);
+	public void futuresFenceSitter(List<Klines> list, List<Klines> list_15m);
 	
 	/**
 	 * 期权交易机会监控

@@ -27,14 +27,6 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	
 	private PositionSide ps = PositionSide.DEFAULT;
 	
-	public FenceSitterFactoryImpl(List<Klines> list) {
-		this.list = new ArrayList<Klines>();
-		if(!CollectionUtils.isEmpty(list)) {
-			this.list.addAll(list);
-		}
-		this.init();
-	}
-	
 	public FenceSitterFactoryImpl(List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
@@ -111,6 +103,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		}
 		
 		this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, takeProfitPrice, takeProfitPrice, AutoTradeType.FENCE_SITTER);
+		
 	}
 
 	@Override
