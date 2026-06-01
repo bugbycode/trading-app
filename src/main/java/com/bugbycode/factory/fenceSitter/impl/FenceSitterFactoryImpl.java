@@ -45,7 +45,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		
 		for(int index = list.size() - 1; index >= 0; index--) {
 			current = list.get(index);
-			parent = list.get(index);
+			parent = list.get(index - 1);
 			if(PriceUtil.verifyPowerful_v28(current, parent)) {
 				this.ps = PositionSide.LONG;
 				break;
