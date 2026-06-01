@@ -71,6 +71,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		double stopLossLimit = this.ps == PositionSide.LONG ? stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
 		
 		this.openPrice = new OpenPriceDetails(FibCode.FIB618, priceValue, stopLossLimit, takeProfitPrice, takeProfitPrice, AutoTradeType.FENCE_SITTER);
+		this.openPrice.setResetStopLoss(false);
 	}
 
 	@Override
