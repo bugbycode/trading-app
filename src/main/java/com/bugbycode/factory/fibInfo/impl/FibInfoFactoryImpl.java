@@ -213,8 +213,14 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			//次级回撤 用来计算止盈点位
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB618;
+			FibCode takeProfitCode = FibCode.FIB786;
 			
+			FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
+			if(hitCode == FibCode.FIB0) {
+				takeProfitCode = FibCode.FIB618;
+			}
+			
+			/*
 			if(openCode.lte(FibCode.FIB618)) {
 				takeProfitCode = FibCode.FIB618;
 			} else if(openCode == FibCode.FIB786 || openCode == FibCode.FIB1) {
@@ -229,7 +235,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				takeProfitCode = FibCode.FIB618;
 			} else if(openCode == FibCode.FIB4_618) {
 				takeProfitCode = FibCode.FIB786;
-			}
+			}*/
 			
 			double firstTakeProfit = childFibInfo.getFibValue(takeProfitCode);
 			double secondTakeProfit = childFibInfo.getFibValue(takeProfitCode);
@@ -263,11 +269,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() < 0; 
+		return k.getDea() > 0; 
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() > 0; 
+		return k.getDea() < 0; 
 	}
 	
 	private boolean verifyHigh(Klines k) {
