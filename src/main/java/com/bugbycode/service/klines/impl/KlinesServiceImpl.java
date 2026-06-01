@@ -1079,9 +1079,9 @@ public class KlinesServiceImpl implements KlinesService {
     	
     	OpenPrice price = factory.getOpenPrice();
     	
-    	if(factory.isLong()) {
+    	if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice())) {
     		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
-    	} else if(factory.isShort()) {
+    	} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice())) {
     		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, decimalNum));
     	}
 	}
