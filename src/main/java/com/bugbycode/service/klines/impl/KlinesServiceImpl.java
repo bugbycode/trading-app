@@ -28,6 +28,8 @@ import com.bugbycode.factory.area.AreaFactory;
 import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.eoption.EoptionFactory;
 import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
+import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
+import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -604,7 +606,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 					}
 					
-					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue())) {
+					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue()) && openPrice.isResetStopLoss()) {
 						//计算最佳止损点
 						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
 						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB2);
@@ -840,7 +842,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 					}
 					
-					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue())) {
+					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue()) && openPrice.isResetStopLoss()) {
 						//计算最佳止损点
 						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
 						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB2);
@@ -1060,6 +1062,28 @@ public class KlinesServiceImpl implements KlinesService {
 			
 		}
 		
+	}
+	
+	@Override
+	public void futuresFenceSitter(List<Klines> list_15m) {
+		
+		FenceSitterFactory factory = new FenceSitterFactoryImpl(list_15m);
+    	
+		if(!(factory.isLong() || factory.isShort())) {
+    		return;
+    	}
+    	
+    	Klines last = PriceUtil.getLastKlines(list_15m);
+    	String pair = last.getPair();
+    	int decimalNum = last.getDecimalNum();
+    	
+    	OpenPrice price = factory.getOpenPrice();
+    	
+    	if(factory.isLong()) {
+    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
+    	} else if(factory.isShort()) {
+    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, decimalNum));
+    	}
 	}
 	
 	@Override

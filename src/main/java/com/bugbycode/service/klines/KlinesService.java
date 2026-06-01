@@ -121,6 +121,12 @@ public interface KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m);
 	
 	/**
+	 * 墙头草策略监控
+	 * @param list_15m
+	 */
+	public void futuresFenceSitter(List<Klines> list_15m);
+	
+	/**
 	 * 期权交易机会监控
 	 * 
 	 * @param list_1d 日线级别

@@ -23,6 +23,8 @@ public class OpenPriceDetails implements OpenPrice {
 	
 	private AutoTradeType autoTradeType = AutoTradeType.DEFAULT;
 	
+	private boolean resetStopLoss = true;
+	
 	/**
 	 * 开仓价格信息
 	 * @param code 所处的回撤点
@@ -155,5 +157,13 @@ public class OpenPriceDetails implements OpenPrice {
 	@Override
 	public AutoTradeType getAutoTradeType() {
 		return autoTradeType;
+	}
+
+	public boolean isResetStopLoss() {
+		return resetStopLoss;
+	}
+
+	public void setResetStopLoss(boolean resetStopLoss) {
+		this.resetStopLoss = resetStopLoss;
 	}
 }

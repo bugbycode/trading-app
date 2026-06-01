@@ -62,4 +62,6 @@ public interface OpenPrice {
 	 * @return
 	 */
 	public AutoTradeType getAutoTradeType();
+	
+	public boolean isResetStopLoss();
 }
