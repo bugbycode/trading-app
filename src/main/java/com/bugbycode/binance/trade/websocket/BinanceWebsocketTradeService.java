@@ -122,4 +122,13 @@ public interface BinanceWebsocketTradeService {
 	 * @return
 	 */
 	public List<PositionInfo> getPositionInfo(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide side);
+	
+	/**
+	 * 关闭持仓  (USER_DATA)
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param info 持仓信息
+	 * @return
+	 */
+	public Result<BinanceOrderInfo, RuntimeException> closePositionInfo(String binanceApiKey, String binanceSecretKey, PositionInfo info);
 }
