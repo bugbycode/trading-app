@@ -296,7 +296,7 @@ public class TestTradeRestApi {
     
     @Test
     public void testPositionRisk_v3() {
-    	String symbol = "DOTUSDT";
+    	String symbol = "";
     	List<PositionInfo> list = binanceRestTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, symbol);
     	logger.info(list);
     }

@@ -40,6 +40,7 @@ import com.bugbycode.module.trading.Type;
 import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
+import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.util.PriceUtil;
 
 @SpringBootTest
@@ -278,16 +279,67 @@ public class WebsocketAPITest {
     
     @Test
     public void testPositionRisk_v3() {
-    	String pair = "FILUSDT";
+    	String pair = "";
     	List<PositionInfo> list = binanceWebsocketTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, pair);
     	logger.info(list);
     }
-
+    
     @Test
     public void testGetPositionInfo() {
-    	String symbol = "FILUSDT";
-    	List<PositionInfo> list = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, symbol, PositionSide.SHORT);
+    	String symbol = "LTCUSDT";
+    	List<PositionInfo> list = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, symbol, PositionSide.LONG);
     	logger.info(list);
+    }
+    
+    @Test
+    public void testClosePosition() {
+    	String pair = "SOLUSDT";
+    	List<PositionInfo> list = binanceWebsocketTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, pair);
+    	logger.info(list);
+    	for(PositionInfo info : list) {
+    		/*
+    		PositionSide ps = PositionSide.valueOf(info.getPositionSide());
+    		Side side = ps == PositionSide.LONG ? Side.SELL : Side.BUY;
+    		BigDecimal quantity = new BigDecimal(info.getPositionAmt());
+    		if(quantity.compareTo(new BigDecimal(0)) == -1) {
+    			quantity = quantity.multiply(new BigDecimal(-1));
+    		}
+    		//平仓
+    		binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, info.getSymbol(), side, ps, Type.MARKET, null, quantity, null, null, null, null, null, null, null);
+    		*/
+    		com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, info);
+    		RuntimeException ex = rs.getErr();
+    		if(ex != null) {
+    			logger.error(ex.getMessage(), ex);
+    		} else {
+    			logger.info("{}仓位已平仓", info.getSymbol());
+    		}
+    	}
+    }
+    
+    @Test
+    public void testCloseAllPosition() {
+    	List<PositionInfo> positionList = binanceRestTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, null);
+    	for(PositionInfo info : positionList) {
+    		com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, info);
+			RuntimeException ex = rs.getErr();
+			if(ex == null) {
+				logger.info("{}仓位已平仓", info.getSymbol());
+			} else {
+				String title = "平仓" + info.getSymbol() + "仓位时出现异常";
+				String message = ex.getMessage();
+				if(ex instanceof OrderPlaceException) {
+					title = ((OrderPlaceException)ex).getTitle();
+				}
+				logger.info(message);
+				//emailWorkTaskPool.add(new SendMailTask(u, title + " " + dateStr, message, tradeUserEmail, userRepository));
+			}
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
     }
     
 	@AfterEach
