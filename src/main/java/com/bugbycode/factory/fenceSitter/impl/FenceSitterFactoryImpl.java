@@ -23,66 +23,91 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	
 	private List<Klines> list;
 	
+	private List<Klines> list_hit;
+	
+	private List<Klines> list_15m;
+	
 	private PositionSide ps = PositionSide.DEFAULT;
 	
-	public FenceSitterFactoryImpl(List<Klines> list) {
+	public FenceSitterFactoryImpl(List<Klines> list, List<Klines> list_hit, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
+		this.list_hit = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
+		}
+		if(!CollectionUtils.isEmpty(list_hit)) {
+			this.list_hit.addAll(list_hit);
+		}
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
 		}
 		this.init();
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 2) {
+		if(CollectionUtils.isEmpty(list) || CollectionUtils.isEmpty(list_hit) || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
+		this.list_hit.sort(kc);
+		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateAllBBPercentB(list);
+		Klines last = PriceUtil.getLastKlines(list);
+		Klines last_after_hit = PriceUtil.getAfterKlines(last, list_hit);
 		
-		Klines current = null;
-		Klines parent = null;
+		if(last_after_hit == null) {
+			return;
+		}
 		
-		for(int index = list.size() - 1; index >= 0; index--) {
-			current = list.get(index);
-			parent = list.get(index - 1);
-			if(PriceUtil.verifyPowerful_v28(current, parent)) {
+		double hitPrice = last.getClosePriceDoubleValue();
+		
+		Klines hitK = null;
+		
+		for(int index = list_hit.size() - 1; index >= 0; index--) {
+			Klines current = list_hit.get(index);
+			if(PriceUtil.isBreachLong(current, hitPrice)) {
 				this.ps = PositionSide.LONG;
+				hitK = current;
 				break;
-			} else if(PriceUtil.verifyDeclining_v28(current, parent)) {
+			} else if(PriceUtil.isBreachShort(current, hitPrice)) {
 				this.ps = PositionSide.SHORT;
+				hitK = current;
+				break;
+			}
+			if(current.lte(last_after_hit)) {
 				break;
 			}
 		}
 		
-		if(this.ps == PositionSide.DEFAULT) {
-			return;
+		if(hitK == null || this.ps == PositionSide.DEFAULT) {
+			hitK = last_after_hit;
+			if(hitK.isRise()) {
+				this.ps = PositionSide.LONG;
+			} else {
+				this.ps = PositionSide.SHORT;
+			}
 		}
 		
-		double priceValue = current.getClosePriceDoubleValue();
-		double bodyLen = current.getBodyHighPriceDoubleValue() - current.getBodyLowPriceDoubleValue();
-		double takeProfitPrice = PriceUtil.formatDoubleDecimalValue(this.ps == PositionSide.LONG ? priceValue + bodyLen : priceValue - bodyLen, current.getDecimalNum());
-		Klines stopLossKlines = current;
-		if(this.ps == PositionSide.LONG && current.isFall()) {
-			stopLossKlines = parent;
-		} else if(this.ps == PositionSide.SHORT && current.isRise()) {
-			stopLossKlines = parent;
-		}
-		double stopLossLimit = this.ps == PositionSide.LONG ? stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
-		
-		FibInfo stopLossFibInfo = new FibInfo(priceValue, takeProfitPrice, current.getDecimalNum());
-		double sf_limit = stopLossFibInfo.getFibValue(FibCode.FIB1_618);
-		if(this.ps == PositionSide.LONG) {
-			stopLossLimit = PriceUtil.getMaxPrice(stopLossLimit, sf_limit);
-		} else if(this.ps == PositionSide.SHORT) {
-			stopLossLimit = PriceUtil.getMinPrice(stopLossLimit, sf_limit);
-		}
-		
-		this.openPrice = new OpenPriceDetails(FibCode.FIB618, priceValue, stopLossLimit, takeProfitPrice, takeProfitPrice, AutoTradeType.FENCE_SITTER);
-		this.openPrice.setResetStopLoss(false);
+		int decimalNum = last.getDecimalNum();
+		double bodyLen = last.getBodyHighPriceDoubleValue() - last.getBodyLowPriceDoubleValue();
+		double takeProfitPrice = this.ps == PositionSide.LONG ? hitPrice + bodyLen : hitPrice - bodyLen;
+			   takeProfitPrice = PriceUtil.formatDoubleDecimalValue(takeProfitPrice, decimalNum);
+			   
+	    double stopLossLimit = this.ps == PositionSide.LONG ? hitK.getLowPriceDoubleValue() : hitK.getHighPriceDoubleValue();
+	    FibInfo stopLossFibInfo = new FibInfo(hitPrice, takeProfitPrice, decimalNum);
+	    double sf_limit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+	    if(this.ps == PositionSide.LONG) {
+	    	stopLossLimit = PriceUtil.getMaxPrice(stopLossLimit, sf_limit);
+	    } else {
+	    	stopLossLimit = PriceUtil.getMinPrice(stopLossLimit, sf_limit);
+	    }
+	    
+	    double openPriceValue = this.ps == PositionSide.LONG ? hitK.getBodyHighPriceDoubleValue() : hitK.getBodyLowPriceDoubleValue();
+	    
+	    this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, takeProfitPrice, takeProfitPrice, AutoTradeType.FENCE_SITTER);
 	}
 
 	@Override
