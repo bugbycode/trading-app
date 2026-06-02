@@ -92,7 +92,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		}
 		
 		int decimalNum = last.getDecimalNum();
-		double bodyLen = last.getBodyHighPriceDoubleValue() - last.getBodyLowPriceDoubleValue();
+		double bodyLen = last.isRise() ? last.getHighPriceDoubleValue() - last.getOpenPriceDoubleValue() : last.getOpenPriceDoubleValue() - last.getLowPriceDoubleValue();
 		double takeProfitPrice = this.ps == PositionSide.LONG ? hitPrice + bodyLen : hitPrice - bodyLen;
 			   takeProfitPrice = PriceUtil.formatDoubleDecimalValue(takeProfitPrice, decimalNum);
 			   
