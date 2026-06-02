@@ -756,6 +756,9 @@ public class FibInfo {
 				continue;
 			}
 			if(code.getValue() > 1) {
+				if(code.gt(FibCode.FIB4_618)) {
+					continue;
+				}
 				if(extensionBuffer.length() > 0) {
 					extensionBuffer.append(", ");
 				}
