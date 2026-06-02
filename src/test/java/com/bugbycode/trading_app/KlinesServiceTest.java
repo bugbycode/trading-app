@@ -205,10 +205,10 @@ public class KlinesServiceTest {
     
     @Test
     public void testFenceSitter(){
-    	String pair = "LABUSDT";
-    	//List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 1500);
+    	String pair = "BTCUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list_15m);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m, list_15m);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -222,7 +222,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "LABUSDT";
+        String pair = "ETHUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -320,7 +320,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testAreaFibInfo(){
-    	String pair = "BATUSDT";
+    	String pair = "BTCUSDT";
     	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H,500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         //List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
@@ -500,7 +500,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testConsolidationAreaFib() {
-        String pair = "JASMYUSDT";
+        String pair = "BTCUSDT";
         List<Klines> list_h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,5000);
         
