@@ -7,7 +7,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
 import com.bugbycode.module.FibCode;
-import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -72,7 +71,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			stopLossKlines = parent;
 		}
 		double stopLossLimit = this.ps == PositionSide.LONG ? stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
-		
+		/*
 		FibInfo stopLossFibInfo = new FibInfo(priceValue, takeProfitPrice, current.getDecimalNum());
 		double sf_limit = stopLossFibInfo.getFibValue(FibCode.FIB1_618);
 		if(this.ps == PositionSide.LONG) {
@@ -80,9 +79,9 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		} else if(this.ps == PositionSide.SHORT) {
 			stopLossLimit = PriceUtil.getMinPrice(stopLossLimit, sf_limit);
 		}
-		
+		*/
 		this.openPrice = new OpenPriceDetails(FibCode.FIB618, priceValue, stopLossLimit, takeProfitPrice, takeProfitPrice, AutoTradeType.FENCE_SITTER);
-		//this.openPrice.setResetStopLoss(false);
+		this.openPrice.setResetStopLoss(false);
 	}
 
 	@Override
