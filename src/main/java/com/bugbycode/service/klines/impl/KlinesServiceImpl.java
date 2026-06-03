@@ -81,6 +81,7 @@ import com.util.PairPolicyUtil;
 import com.util.PriceUtil;
 import com.util.StraightLineUtil;
 import com.util.StringUtil;
+import com.util.WeightUtil;
 
 import jakarta.annotation.Resource;
 
@@ -681,6 +682,7 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
+					WeightUtil.verifyWeight(30);
 					logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
 					if(!dualSidePosition) {
 						logger.debug("开始修改持仓模式为双向持仓");
@@ -918,6 +920,7 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
+					WeightUtil.verifyWeight(30);
 					logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
 					if(!dualSidePosition) {
 						logger.debug("开始修改持仓模式为双向持仓");

@@ -25,7 +25,7 @@ import com.bugbycode.module.trading.Type;
 public interface BinanceRestTradeService {
 
 	/**
-	 * 更改持仓模式(TRADE)
+	 * 更改持仓模式(TRADE) 请求权重 1
 	 * 
 	 * @param binanceApiKey 
 	 * @param binanceSecretKey
@@ -35,7 +35,7 @@ public interface BinanceRestTradeService {
 	public Result dualSidePosition(String binanceApiKey,String binanceSecretKey,boolean dualSidePosition);
 	
 	/**
-	 * 查询持仓模式(USER_DATA) 查询用户目前在 所有symbol 合约上的持仓模式：双向持仓或单向持仓。
+	 * 查询持仓模式(USER_DATA) 请求权重 30 查询用户目前在 所有symbol 合约上的持仓模式：双向持仓或单向持仓。
 	 * 
 	 * @param binanceApiKey 
 	 * @param binanceSecretKey
@@ -44,7 +44,7 @@ public interface BinanceRestTradeService {
 	public boolean dualSidePosition(String binanceApiKey,String binanceSecretKey);
 	
 	/**
-	 * 调整开仓杠杆 (TRADE) 调整用户在指定symbol合约的开仓杠杆。
+	 * 调整开仓杠杆 (TRADE) 请求权重 1 调整用户在指定symbol合约的开仓杠杆。
 	 * 
 	 * @param binanceApiKey 
 	 * @param binanceSecretKey
@@ -55,7 +55,7 @@ public interface BinanceRestTradeService {
 	public Leverage leverage(String binanceApiKey,String binanceSecretKey,String symbol,int leverage);
 	
 	/**
-	 * 变换逐全仓模式 (TRADE)
+	 * 变换逐全仓模式 (TRADE) 请求权重 1
 	 * 
 	 * @param binanceApiKey 
 	 * @param binanceSecretKey
@@ -66,7 +66,7 @@ public interface BinanceRestTradeService {
 	public Result marginType(String binanceApiKey,String binanceSecretKey,String symbol,MarginType marginType);
 	
 	/**
-	 * 查看当前全部挂单 (USER_DATA)
+	 * 查看当前全部挂单 (USER_DATA) 请求权重 带symbol 1 不带 40 请小心使用不带symbol参数的调用
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
 	 * @param symbol 交易对 不带symbol参数，会返回所有交易对的挂单
@@ -75,7 +75,7 @@ public interface BinanceRestTradeService {
 	public List<BinanceOrderInfo> openOrders(String binanceApiKey,String binanceSecretKey,String symbol);
 	
 	/**
-	 * 查询当前挂单 (USER_DATA)
+	 * 查询当前挂单 (USER_DATA) 请求权重 1
 	 * 
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
@@ -87,7 +87,7 @@ public interface BinanceRestTradeService {
 	public BinanceOrderInfo openOrder(String binanceApiKey,String binanceSecretKey,String symbol,long orderId,String origClientOrderId);
 	
 	/**
-	 * 查询所有订单(包括历史订单) (USER_DATA) </br></br>
+	 * 查询所有订单(包括历史订单) (USER_DATA) 请求权重 5 </br></br>
 	 * 
 	 * 请注意，如果订单满足如下条件，不会被查询到：</br>
 		1、订单的最终状态为 CANCELED 或者 EXPIRED 并且 订单没有任何的成交记录 并且 订单生成时间 + 3天 < 当前时间</br>
@@ -106,7 +106,7 @@ public interface BinanceRestTradeService {
 			long startTime,long endTime,int limit);
 	
 	/**
-	 * 查询订单 (USER_DATA) </br></br>
+	 * 查询订单 (USER_DATA) 请求权重 1 </br></br>
 	 * 查询订单状态</br></br>
 		请注意，如果订单满足如下条件，不会被查询到：</br>
 		1、订单的最终状态为 CANCELED 或者 EXPIRED 并且 订单没有任何的成交记录 并且 订单生成时间 + 3天 < 当前时间</br>
@@ -126,7 +126,7 @@ public interface BinanceRestTradeService {
 			String origClientOrderId);
 	
 	/**
-	 * 下单 (TRADE)
+	 * 下单 (TRADE) 请求权重 1
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
 	 * @param symbol 交易对
@@ -178,14 +178,14 @@ public interface BinanceRestTradeService {
 	public BinanceOrderInfo orderDelete(String binanceApiKey,String binanceSecretKey,String symbol,long orderId,String origClientOrderId);
 	
 	/**
-	 * 账户余额V3 (USER_DATA)
+	 * 账户余额V3 (USER_DATA) 请求权重 5
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
 	 */
 	public List<Balance> balance_v3(String binanceApiKey,String binanceSecretKey);
 	
 	/**
-	 * 交易对配置 (USER_DATA) 查询交易对上的基础配置
+	 * 交易对配置 (USER_DATA)  请求权重 5 查询交易对上的基础配置
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
 	 * @param symbol
@@ -194,7 +194,7 @@ public interface BinanceRestTradeService {
 	public List<SymbolConfig> getSymbolConfig(String binanceApiKey,String binanceSecretKey,String symbol);
 	
 	/**
-	 * 交易对配置 (USER_DATA) 查询交易对上的基础配置
+	 * 交易对配置 (USER_DATA)  请求权重 5 查询交易对上的基础配置
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
 	 * @param symbol
@@ -235,7 +235,7 @@ public interface BinanceRestTradeService {
 	public int allCountOpenAlgoOrders(String binanceApiKey, String binanceSecretKey);
 	
 	/**
-	 * 用户持仓风险V3 (USER_DATA) </br></br> 
+	 * 用户持仓风险V3 (USER_DATA) 请求权重 5 </br></br> 
 	 * <b>接口描述：</b> 查询持仓风险，仅返回有持仓或挂单的交易对
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
@@ -245,7 +245,7 @@ public interface BinanceRestTradeService {
 	public List<PositionInfo> positionRisk_v3(String binanceApiKey, String binanceSecretKey, String symbol);
 	
 	/**
-	 * 根据交易对和持仓方向获取持仓信息  (USER_DATA)
+	 * 根据交易对和持仓方向获取持仓信息  (USER_DATA)  请求权重 5
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
 	 * @param symbol 交易对
@@ -255,7 +255,7 @@ public interface BinanceRestTradeService {
 	public List<PositionInfo> getPositionInfo(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide side);
 	
 	/**
-	 * 获取仓位数量
+	 * 获取仓位数量  请求权重 5
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
 	 * @return
@@ -263,7 +263,7 @@ public interface BinanceRestTradeService {
 	public int countPosition(String binanceApiKey, String binanceSecretKey);
 	
 	/**
-	 * 杠杆分层标准 (USER_DATA)
+	 * 杠杆分层标准 (USER_DATA) 请求权重 1
 	 * 
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
@@ -273,7 +273,7 @@ public interface BinanceRestTradeService {
 	public List<LeverageBracketInfo> getLeverageBracketInfo(String binanceApiKey, String binanceSecretKey, String symbol);
 	
 	/**
-	 * 用户手续费率 (USER_DATA)
+	 * 用户手续费率 (USER_DATA) 请求权重 20
 	 * 
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
