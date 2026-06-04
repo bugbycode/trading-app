@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
+import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
@@ -1106,5 +1107,36 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		} else {
 			throw new RuntimeException("获取" + symbol + "用户手续费率时出现异常，status: " + status);
 		}
+	}
+	
+	@Override
+	public List<FundingInfo> fundingInfo() {
+		List<FundingInfo> list = new ArrayList<FundingInfo>();
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		String url = AppConfig.REST_BASE_URL + "/fapi/v1/fundingInfo";
+		ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
+		if(status == HttpStatus.OK) {
+			JSONArray arr = new JSONArray(result.getBody());
+			arr.forEach(o -> {
+				JSONObject jsonObj = (JSONObject)o;
+				list.add(FundingInfo.parse(jsonObj));
+			});
+		} else {
+			logger.error("获取资金费率时出现异常，status: {}", status);
+		}
+		for(FundingInfo fi : list) {
+			AppConfig.FUNDING_INFO.put(fi.getSymbol(), fi);
+		}
+		return list;
+	}
+	
+	public FundingInfo fundingInfo(String symbol) {
+		FundingInfo info = AppConfig.FUNDING_INFO.get(symbol);
+		if(info == null) {
+			throw new RuntimeException("无法获取" + symbol + "资金费率信息");
+		}
+		return info;
 	}
 }

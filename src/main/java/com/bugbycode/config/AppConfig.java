@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bugbycode.binance.module.eoptions.EoptionContracts;
+import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoint;
 
@@ -24,6 +25,8 @@ public class AppConfig {
 	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
 	
 	public static final int BINANCE_REST_API_WEIGHT = 31;
+	
+	public static Map<String,FundingInfo> FUNDING_INFO = Collections.synchronizedMap(new HashMap<String,FundingInfo>());
 	
 	//交易对交易规则
 	public static Map<String,SymbolExchangeInfo> SYMBOL_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, SymbolExchangeInfo>());

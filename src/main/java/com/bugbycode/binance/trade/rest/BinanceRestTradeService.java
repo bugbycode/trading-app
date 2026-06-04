@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
+import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.module.binance.Balance;
@@ -281,4 +282,21 @@ public interface BinanceRestTradeService {
 	 * @return
 	 */
 	public CommissionRate getCommissionRate(String binanceApiKey, String binanceSecretKey, String symbol);
+	
+	/**
+	 * 查询资金费率信息 </br>
+	 * 
+	 * 查询资金费率信息，接口仅返回FundingRateCap/FundingRateFloor/fundingIntervalHours等被特殊调整过的交易对，没调整过的不返回。
+	 * 
+	 * @return
+	 */
+	public List<FundingInfo> fundingInfo();
+	
+	/**
+	 * 查询资金费率信息
+	 * @param symbol 交易对
+	 * @return
+	 */
+	public FundingInfo fundingInfo(String symbol);
+	
 }
