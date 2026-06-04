@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.bugbycode.binance.module.eoptions.EoptionContracts;
+import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
@@ -56,6 +57,9 @@ public class FuturesKlinesWebSocketTask {
 	@Autowired
 	private OpenInterestHistRepository openInterestHistRepository;
 	
+	@Autowired
+    private BinanceRestTradeService binanceRestTradeService;
+	
 	/**
 	 * 14分37秒开始执行 每15分钟执行一次
 	 */
@@ -67,6 +71,12 @@ public class FuturesKlinesWebSocketTask {
 		}
 		
 		logger.debug("FuturesKlinesWebSocketTask start.");
+		
+		try {
+			binanceRestTradeService.fundingInfo();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
 		
 		long exec_time = new Date().getTime();
 		

@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
+import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
@@ -431,6 +432,12 @@ public class KlinesServiceImpl implements KlinesService {
 
 	@Override
 	public void marketPlace(String pair, PositionSide ps, OpenPrice openPrice, int decimalNum) {
+		
+		FundingInfo fundingInfo = binanceRestTradeService.fundingInfo(pair);
+		if(fundingInfo.getFundingIntervalHours() == 1) {
+			logger.info("{}资金费率间隔为{}小时，价格可能出现较大波动，默认不做交易", pair, fundingInfo.getFundingIntervalHours());
+			return;
+		}
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
