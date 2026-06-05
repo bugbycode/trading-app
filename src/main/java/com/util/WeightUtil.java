@@ -11,4 +11,7 @@ public class WeightUtil {
 		}
 	}
 	
+	public static void main(String[] args) {
+		WeightUtil.verifyWeight(40);
+	}
 }
