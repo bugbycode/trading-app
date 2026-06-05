@@ -436,8 +436,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FundingInfo fundingInfo = binanceRestTradeService.fundingInfo(pair);
 		if(fundingInfo.getFundingIntervalHours() == 1) {
-			logger.info("{}资金费率间隔为{}小时，价格可能出现较大波动，默认不做交易", pair, fundingInfo.getFundingIntervalHours());
-			return;
+			logger.debug("{}资金费率间隔为{}小时，价格可能出现较大波动，默认不做交易", pair, fundingInfo.getFundingIntervalHours());
+			//return;
 		}
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
@@ -538,7 +538,8 @@ public class KlinesServiceImpl implements KlinesService {
 					
 				try {
 
-					if(profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER) {
+					if(profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
+							 || autoTradeType == AutoTradeType.PRICE_ACTION) {
 						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT);
 						for(PositionInfo p : positionList) {
 							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
@@ -783,7 +784,8 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				try {
 
-					if(profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER) {
+					if(profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
+							 || autoTradeType == AutoTradeType.PRICE_ACTION) {
 						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG);
 						for(PositionInfo p : positionList) {
 							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
