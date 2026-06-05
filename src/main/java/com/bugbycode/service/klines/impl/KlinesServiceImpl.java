@@ -1071,7 +1071,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
-				new PriceActionFactoryImpl(list_1h, list_15m),
+				new PriceActionFactoryImpl(list_15m, list_15m, list_15m),
 		};
 		
 		for(PriceActionFactory factory : factorys) {
@@ -1080,10 +1080,16 @@ public class KlinesServiceImpl implements KlinesService {
 				continue;
 			}
 
+			FibInfo fibInfo = factory.getFibInfo();
+			
+			List<Klines> fibAfterKlines = factory.getFibAfterKlines();
+			
 			if(factory.isLong()) {
-				openLong_priceAction(factory.getOpenPrice(), list_15m);
+				Klines afterLowKlines = PriceUtil.getMinPriceKLine(fibAfterKlines);
+				openLong_priceAction(factory.getOpenPrices(), fibInfo, afterLowKlines, list_15m);
 			} else if(factory.isShort()) {
-				openShort_priceAction(factory.getOpenPrice(), list_15m);
+				Klines afterHighKlines = PriceUtil.getMaxPriceKLine(fibAfterKlines);
+				openShort_priceAction(factory.getOpenPrices(), fibInfo, afterHighKlines, list_15m);
 			}
 			
 		}
@@ -1342,9 +1348,9 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void openLong_priceAction(OpenPrice openPrice, List<Klines> klinesList_hit) {
-
-		if(openPrice == null) {
+	public void openLong_priceAction(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterLowKlines,
+			List<Klines> klinesList_hit) {
+		if(fibInfo == null) {
 			return;
 		}
 		
@@ -1353,83 +1359,204 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		double price = openPrice.getPrice();
+		//FibCode[] codes = FibCode.values();
 		
-		if(PriceUtil.isBreachLong(hitKline, price)) {
+		//开盘、收盘、最低、最高价格
+		double closePrice = hitKline.getClosePriceDoubleValue();
+		//double openPrice = hitKline.getOpenPrice();
+		//double lowPrice = hitKline.getLowPriceDoubleValue();
+		//double hightPrice = hitKline.getHighPrice();
+		double currentPrice = closePrice;
 		
-			//市价做多
-			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, openPrice, hitKline.getDecimalNum()));
+		for(int index = 0;index < openPrices.size(); index++) {
+		
+			OpenPrice openPrice = openPrices.get(index);
+			double price = openPrice.getPrice();
 			
-			//
-			List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			for(User u : userList) {
+			if(PriceUtil.isBreachLong(hitKline, price)
+					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
+					&& !PriceUtil.isTrade(openPrice)
+					) {
+			
+				//市价做多
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, openPrice, fibInfo.getDecimalPoint()));
 				
-				if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
-					continue;
+				//
+				List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+				
+				for(User u : userList) {
+					
+					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+						continue;
+					}
+					
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
+						continue;
+					}
+					/*
+					//是否监控突破交易
+					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughMonitor());
+					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && openPrice.getFibInfo().isShort()) {
+						continue;
+					}*/
+					
+					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
+						continue;
+					}
+					
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+						continue;
+					}
+					
+					//根据交易风格设置盈利限制
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					
+					//止盈价
+					double profitPrice = openPrice.getSecondTakeProfit();
+					//保守的交易风格
+					if(tradeStyle == TradeStyle.CONSERVATIVE) {
+						profitPrice = openPrice.getAreaTakeProfit(currentPrice, openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
+					}
+					
+					//计算预计盈利百分比
+					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, profitPrice) * 100;
+					
+					if(profitPercent < u.getMonitorProfit()) {
+						continue;
+					}
+					
+					//开仓订阅提醒
+					String subject = String.format("%s永续合约%s(%s)[%s]强势价格行为(PNL:%s%%) %s", pair, code.getDescription(),
+							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+							fibInfo.getLevel().getLabel(),
+							PriceUtil.formatDoubleDecimal(profitPercent, 2),
+							DateFormatUtil.format(new Date()));
+					
+					String text = StringUtil.formatLongMessage(pair, currentPrice, openPrice.getStopLossLimit(), 
+							profitPrice, fibInfo.getDecimalPoint());
+					
+					text += "\r\n\r\n" + fibInfo.toString();
+					
+					sendEmail(u, subject, text, u.getUsername());
 				}
-				
-				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
-					continue;
-				}
-				
-				if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
-					continue;
-				}
-				
-				//开仓订阅提醒
-				String subject = String.format("%s永续合约强势价格行为 %s", pair, DateFormatUtil.format(new Date()));
-				
-				String text = openPrice.toString();
-				
-				sendEmail(u, subject, text, u.getUsername());
+				break;
 			}
 		}
 	}
 
 	@Override
-	public void openShort_priceAction(OpenPrice openPrice, List<Klines> klinesList_hit) {
-
-		if(openPrice == null) {
+	public void openShort_priceAction(List<OpenPrice> openPrices, FibInfo fibInfo, Klines afterHighKlines,
+			List<Klines> klinesList_hit) {
+		if(fibInfo == null) {
 			return;
 		}
 		
 		Klines hitKline = PriceUtil.getLastKlines(klinesList_hit);
 		
+		//开盘、收盘、最低、最高价格
+		double closePrice = hitKline.getClosePriceDoubleValue();
+		//double openPrice = hitKline.getOpenPrice();
+		//double lowPrice = hitKline.getLowPrice();
+		//double hightPrice = hitKline.getHighPriceDoubleValue();
+		double currentPrice = closePrice;
 		String pair = hitKline.getPair();
 		
 		OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
 		
-		double price = openPrice.getPrice();
+		//FibCode[] codes = FibCode.values();
 		
-		if(PriceUtil.isBreachShort(hitKline, price)) {
-		
-			//市价做空
-			this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, openPrice, hitKline.getDecimalNum()));
-
-			//
-			List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
+		for(int index = 0;index < openPrices.size(); index++) {
 			
-			for(User u : userList) {
+			OpenPrice openPrice = openPrices.get(index);
+			double price = openPrice.getPrice();
+			
+			FibCode code = openPrice.getCode();//当前斐波那契点位
+			
+			if(//PriceUtil.isShort_v3(price, klinesList_hit)
+					PriceUtil.isBreachShort(hitKline, price)
+					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
+					&& !PriceUtil.isTrade(openPrice)
+					) {
+			
+				//市价做空
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, openPrice, fibInfo.getDecimalPoint()));
+
+				//
+				List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 				
-				if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
-					continue;
+				for(User u : userList) {
+					
+					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+						continue;
+					}
+					
+					if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
+						continue;
+					}
+					/*
+					//是否监控突破交易
+					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughMonitor());
+					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && openPrice.getFibInfo().isLong()) {
+						continue;
+					}*/
+					
+					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
+						continue;
+					}
+
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+						continue;
+					}
+					
+					//根据交易风格设置盈利限制
+					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
+					
+					//止盈价
+					double profitPrice = openPrice.getSecondTakeProfit();
+					
+					//保守的交易风格
+					if(tradeStyle == TradeStyle.CONSERVATIVE) {
+						profitPrice = openPrice.getAreaTakeProfit(currentPrice, openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
+					}
+					
+					//计算预计盈利百分比
+					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, profitPrice) * 100;
+					
+					if(profitPercent < u.getMonitorProfit()) {
+						continue;
+					}
+					
+					String subject = String.format("%s永续合约%s(%s)[%s]颓势价格行为(PNL:%s%%) %s", pair, code.getDescription(),
+							PriceUtil.formatDoubleDecimal(fibInfo.getFibValue(code),fibInfo.getDecimalPoint()),
+							fibInfo.getLevel().getLabel(),
+							PriceUtil.formatDoubleDecimal(profitPercent, 2),
+							DateFormatUtil.format(new Date()));
+					
+					String text = StringUtil.formatShortMessage(pair, currentPrice, profitPrice, 
+							openPrice.getStopLossLimit(), fibInfo.getDecimalPoint());
+					
+					text += "\r\n\r\n" + fibInfo.toString();
+					
+					
+					sendEmail(u, subject,text, u.getUsername());
 				}
-				
-				if(oih.getTradeNumber() < u.getTradeNumberMonitor()) {
-					continue;
-				}
-				
-				if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
-					continue;
-				}
-				
-				String subject = String.format("%s永续合约颓势价格行为 %s", pair, DateFormatUtil.format(new Date()));
-				
-				String text = openPrice.toString();
-				
-				
-				sendEmail(u, subject,text, u.getUsername());
+				break;
 			}
 		}
 	}
