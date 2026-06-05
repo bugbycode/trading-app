@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
@@ -24,6 +25,8 @@ import com.bugbycode.exception.OrderCancelException;
 import com.bugbycode.exception.OrderPlaceException;
 import com.bugbycode.module.PlaceOrderAgain;
 import com.bugbycode.module.ResultCode;
+import com.bugbycode.module.binance.AutoTrade;
+import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
@@ -41,6 +44,7 @@ import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.trading_app.task.email.SendMailTask;
+import com.util.DateFormatUtil;
 import com.util.PriceUtil;
 
 @SpringBootTest
@@ -319,25 +323,38 @@ public class WebsocketAPITest {
     
     @Test
     public void testCloseAllPosition() {
-    	List<PositionInfo> positionList = binanceRestTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, null);
-    	for(PositionInfo info : positionList) {
-    		com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, info);
-			RuntimeException ex = rs.getErr();
-			if(ex == null) {
-				logger.info("{}仓位已平仓", info.getSymbol());
-			} else {
-				String title = "平仓" + info.getSymbol() + "仓位时出现异常";
-				String message = ex.getMessage();
-				if(ex instanceof OrderPlaceException) {
-					title = ((OrderPlaceException)ex).getTitle();
+    	//查询所有启用墙头草策略用户
+		List<User> userList = userRepository.queryByAutoTrade(AutoTrade.OPEN, AutoTradeType.FENCE_SITTER);
+		if(!CollectionUtils.isEmpty(userList)) {
+			for(User u : userList) {
+				try {
+					String tradeUserEmail = u.getUsername();
+					String dateStr = DateFormatUtil.format(new Date());
+					String binanceApiKey = u.getBinanceApiKey();
+					String binanceSecretKey = u.getBinanceSecretKey();
+					List<PositionInfo> positionList = binanceRestTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, null);
+					for(PositionInfo info : positionList) {
+						com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, info);
+						RuntimeException ex = rs.getErr();
+						if(ex == null) {
+							logger.info("{}仓位已平仓", info.getSymbol());
+						} else {
+							String title = "平仓" + info.getSymbol() + "仓位时出现异常";
+							String message = ex.getMessage();
+							if(ex instanceof OrderPlaceException) {
+								title = ((OrderPlaceException)ex).getTitle();
+							}
+							//emailWorkTaskPool.add(new SendMailTask(u, title + " " + dateStr, message, tradeUserEmail, userRepository));
+						}
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
 				}
-				logger.info(message);
-				//emailWorkTaskPool.add(new SendMailTask(u, title + " " + dateStr, message, tradeUserEmail, userRepository));
-			}
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 		}
     }

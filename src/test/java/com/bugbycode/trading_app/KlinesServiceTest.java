@@ -205,7 +205,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testFenceSitter(){
-    	String pair = "BTCUSDT";
+    	String pair = "ZECUSDT";
     	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
     	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m, list_15m);
@@ -409,37 +409,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testPriceAction(){
-        String pair = "BTCUSDT";
-        List<Klines> list_1h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,500);
-        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,500);
-        PriceActionFactory factory = new PriceActionFactoryImpl(list_1h, list_1h, list_15m);
         
-        if(!(factory.isLong() || factory.isShort())) {
-            return;
-        }
-
-        List<Klines> fibAfKlines = factory.getFibAfterKlines();
-
-        if(!CollectionUtils.isEmpty(fibAfKlines)) {
-            for(Klines k : fibAfKlines) {
-                logger.info(k);
-            }
-        }
-
-        FibInfo fibInfo = factory.getFibInfo();
-        List<OpenPrice> openPrices = factory.getOpenPrices();
-
-        for(OpenPrice price : openPrices) {
-            FibCode code = fibInfo.getFibCode(price.getPrice());
-            FibCode profiCodeNext = fibInfo.getPriceActionTakeProfit_nextCode(code);
-            FibCode profitCode = fibInfo.getPriceActionTakeProfit_v1(code);
-            logger.info("{}({}) -> {}({}) ~ {}({}), isTreade:{}", code, price.getPrice(), profiCodeNext, fibInfo.getFibValue(profiCodeNext), profitCode, fibInfo.getFibValue(profitCode), 
-                PriceUtil.isTradedPriceAction(price.getPrice(), fibInfo));
-        }
-
-        logger.info(factory.getFibInfo());
-        //logger.info(factory.verifyOpen(list_15m));
-        //logger.info(factory.getFibAfterKlines());
     }
 
     @Test

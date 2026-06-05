@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
+import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
@@ -327,6 +328,22 @@ public class TestTradeRestApi {
     	String symbol = "DYDXUSDT";
     	CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, symbol);
     	logger.info(rate);
+    }
+    
+    @Test
+    public void testFundingInfo() {
+    	List<FundingInfo> list = binanceRestTradeService.fundingInfo();
+    	for(FundingInfo fi : list) {
+    		logger.info(fi);
+    	}
+    }
+    
+    @Test
+    public void testGetFundingInfo() {
+    	String symbol = "LABUSDT";
+    	binanceRestTradeService.fundingInfo();
+    	FundingInfo info = binanceRestTradeService.fundingInfo(symbol);
+    	logger.info(info);
     }
     
     @AfterEach
