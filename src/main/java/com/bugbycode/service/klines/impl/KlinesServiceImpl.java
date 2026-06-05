@@ -619,14 +619,14 @@ public class KlinesServiceImpl implements KlinesService {
 						
 					}
 					
-					if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
-						//多头的止盈价格必须大于当前价格
-						if(!(priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
-							continue;
-						}
+					//多头的止盈价格必须大于当前价格
+					if(!((priceInfo.getPriceDoubleValue() < takeProfit.doubleValue() || profitOrderEnabled == ProfitOrderEnabled.CLOSE) 
+							&& priceInfo.getPriceDoubleValue() > stopLoss.doubleValue())) {
+						continue;
 					}
 					
-					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue()) && openPrice.isResetStopLoss()) {
+					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue()) && openPrice.isResetStopLoss() 
+							&& profitOrderEnabled == ProfitOrderEnabled.OPEN) {
 						//计算最佳止损点
 						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
 						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB2);
@@ -866,14 +866,14 @@ public class KlinesServiceImpl implements KlinesService {
 						
 					}
 					
-					if(profitOrderEnabled == ProfitOrderEnabled.OPEN) {
-						//空头止盈价格必须小于当前价格
-						if(!(priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() && priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
-							continue;
-						}
+					//空头止盈价格必须小于当前价格
+					if(!((priceInfo.getPriceDoubleValue() > takeProfit.doubleValue() || profitOrderEnabled == ProfitOrderEnabled.CLOSE)
+							&& priceInfo.getPriceDoubleValue() < stopLoss.doubleValue())) {
+						continue;
 					}
 					
-					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue()) && openPrice.isResetStopLoss()) {
+					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue()) && openPrice.isResetStopLoss()
+							&& profitOrderEnabled == ProfitOrderEnabled.OPEN) {
 						//计算最佳止损点
 						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
 						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB2);
