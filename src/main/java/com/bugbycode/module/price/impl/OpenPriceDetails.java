@@ -52,6 +52,20 @@ public class OpenPriceDetails implements OpenPrice {
 	 * 开仓价格信息
 	 * @param code 所处的回撤点
 	 * @param price 开仓价
+	 * @param stopLoss 最佳止损
+	 * @param autoTradeType 参考指标
+	 */
+	public OpenPriceDetails(FibCode code, double price, double stopLossLimit, AutoTradeType autoTradeType) {
+		this.code = code;
+		this.price = price;
+		this.stopLossLimit = stopLossLimit;
+		this.autoTradeType = autoTradeType;
+	}
+	
+	/**
+	 * 开仓价格信息
+	 * @param code 所处的回撤点
+	 * @param price 开仓价
 	 * @param stopLoss 最佳止损点
 	 * @param firstTakeProfit 第一止盈点
 	 * @param secondTakeProfit 第二止盈点
