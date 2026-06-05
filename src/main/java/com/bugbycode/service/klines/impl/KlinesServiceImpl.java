@@ -484,7 +484,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 			if(openPrice.getFirstTakeProfit() <= 0 || openPrice.getSecondTakeProfit() <= 0) {
 				profitOrderEnabled = ProfitOrderEnabled.CLOSE;
-				logger.info(pair + "止盈价未初始化");
+				logger.debug(pair + "止盈价未初始化");
 			}
 			
 
