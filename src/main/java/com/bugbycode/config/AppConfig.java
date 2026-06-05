@@ -24,7 +24,7 @@ public class AppConfig {
 	
 	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
 	
-	public static final int BINANCE_REST_API_WEIGHT = 31;
+	public static final int BINANCE_REST_API_WEIGHT = 35;
 	
 	public static Map<String,FundingInfo> FUNDING_INFO = Collections.synchronizedMap(new HashMap<String,FundingInfo>());
 	
