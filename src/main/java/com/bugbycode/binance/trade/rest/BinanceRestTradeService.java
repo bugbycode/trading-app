@@ -195,6 +195,15 @@ public interface BinanceRestTradeService {
 	public List<SymbolConfig> getSymbolConfig(String binanceApiKey,String binanceSecretKey,String symbol);
 	
 	/**
+	 * 获取所有交易对配置 (USER_DATA)  请求权重 5 查询交易对上的基础配置
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol
+	 * @return
+	 */
+	public List<SymbolConfig> getAllSymbolConfig(String binanceApiKey,String binanceSecretKey);
+	
+	/**
 	 * 交易对配置 (USER_DATA)  请求权重 5 查询交易对上的基础配置
 	 * @param binanceApiKey
 	 * @param binanceSecretKey

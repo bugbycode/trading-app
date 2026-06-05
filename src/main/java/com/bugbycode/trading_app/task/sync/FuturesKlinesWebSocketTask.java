@@ -73,6 +73,14 @@ public class FuturesKlinesWebSocketTask {
 		logger.debug("FuturesKlinesWebSocketTask start.");
 		
 		try {
+			synchronized (AppConfig.SYMBOL_CONFIG_INFO) {
+				AppConfig.SYMBOL_CONFIG_INFO.clear();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		
+		try {
 			binanceRestTradeService.fundingInfo();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

@@ -18,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
@@ -857,7 +858,7 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			JSONArray array = new JSONArray(result.getBody());
 			array.forEach(obj -> {
 				JSONObject o = (JSONObject) obj;
-				SymbolConfig sc = new SymbolConfig(symbol, o.getString("marginType"), o.getBoolean("isAutoAddMargin"), o.getInt("leverage"), o.getString("maxNotionalValue"));
+				SymbolConfig sc = new SymbolConfig(o.getString("symbol"), o.getString("marginType"), o.getBoolean("isAutoAddMargin"), o.getInt("leverage"), o.getString("maxNotionalValue"));
 				scList.add(sc);
 			});
 			return scList;
@@ -865,16 +866,27 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			throw new RuntimeException(result.getBody());
 		}
 	}
+	
+	public List<SymbolConfig> getAllSymbolConfig(String binanceApiKey,String binanceSecretKey) {
+		synchronized (AppConfig.SYMBOL_CONFIG_INFO) {
+			List<SymbolConfig> cacheList = AppConfig.SYMBOL_CONFIG_INFO.get(binanceApiKey);
+			if(CollectionUtils.isEmpty(cacheList)) {
+				List<SymbolConfig> newScList = getSymbolConfig(binanceApiKey, binanceSecretKey, "");
+				AppConfig.SYMBOL_CONFIG_INFO.put(binanceApiKey, newScList);
+			}
+		}
+		return AppConfig.SYMBOL_CONFIG_INFO.get(binanceApiKey);
+	}
 
 	@Override
 	public SymbolConfig getSymbolConfigBySymbol(String binanceApiKey, String binanceSecretKey, String symbol) {
-		List<SymbolConfig> scList = getSymbolConfig(binanceApiKey, binanceSecretKey, symbol);
+		List<SymbolConfig> scList = getAllSymbolConfig(binanceApiKey, binanceSecretKey);
 		for(SymbolConfig sc : scList) {
 			if(sc.getSymbol().equals(symbol)) {
 				return sc;
 			}
 		}
-		return null;
+		throw new RuntimeException("无法获取" + symbol + "交易对配置");
 	}
 
 	@Override

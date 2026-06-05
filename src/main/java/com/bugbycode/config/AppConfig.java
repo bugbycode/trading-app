@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
+import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.websocket.realtime.endpoint.PerpetualWebSocketClientEndpoint;
 
@@ -27,6 +28,8 @@ public class AppConfig {
 	public static final int BINANCE_REST_API_WEIGHT = 35;
 	
 	public static Map<String,FundingInfo> FUNDING_INFO = Collections.synchronizedMap(new HashMap<String,FundingInfo>());
+	
+	public static Map<String,List<SymbolConfig>> SYMBOL_CONFIG_INFO = Collections.synchronizedMap(new HashMap<String,List<SymbolConfig>>());
 	
 	//交易对交易规则
 	public static Map<String,SymbolExchangeInfo> SYMBOL_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, SymbolExchangeInfo>());
