@@ -495,7 +495,7 @@ public class KlinesServiceImpl implements KlinesService {
 			String orderBackBody = String.format("方向: %s, 开仓价: %s, 止损价: %s, 第一止盈价: %s, 第二止盈价: %s", 
 					ps.getMemo(), openPrice.getPrice(), stopLossLimit, openPrice.getFirstTakeProfit(), openPrice.getSecondTakeProfit());
 			
-			if(autoTradeType == AutoTradeType.FIB_RET) {
+			if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
 				
 				if(code.lt(u.getFibLevelType().getLevelCode())) {//回撤限制
 					continue;
