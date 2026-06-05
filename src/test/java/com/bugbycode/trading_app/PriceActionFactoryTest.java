@@ -43,9 +43,9 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "BTWUSDT";
+        String pair = "HYPEUSDT";
         
-        //List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
@@ -54,18 +54,41 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m);
         
         logger.info("init factory finish.");
         
         if(!(factory.isLong() || factory.isShort())) {
+
+            FibInfo fibInfo = factory.getFibInfo();
+            logger.info(fibInfo);
+            
             return;
         }
         
-        OpenPrice openPrice = factory.getOpenPrice();
+        logger.info(factory);
+
+        List<Klines> fibAfKlines = factory.getFibAfterKlines();
+
+        if(!CollectionUtils.isEmpty(fibAfKlines)) {
+            for(Klines k : fibAfKlines) {
+                logger.info(k);
+            }
+        }
+        
+        List<OpenPrice> openPrices = factory.getOpenPrices();
+
+        logger.info(factory.getFibInfo());
         
         QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
 
-        logger.info("{}: {}", mode, openPrice);
+        for(OpenPrice price : openPrices) {
+            //FibCode code = fibInfo.getFibCode(price.getPrice());
+            //FibCode profiCodeNext = fibInfo.getPriceActionTakeProfit_nextCode(code);
+            //FibCode profitCode = fibInfo.getPriceActionTakeProfit_v1(code);
+            logger.info("{}: {}, isTreade:{}", mode, price, PriceUtil.isTrade(price));
+        }
+        //logger.info(factory.verifyOpen(list_15m));
+        //logger.info(factory.getFibAfterKlines());
     }
 }
