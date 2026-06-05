@@ -83,7 +83,6 @@ import com.util.PairPolicyUtil;
 import com.util.PriceUtil;
 import com.util.StraightLineUtil;
 import com.util.StringUtil;
-import com.util.WeightUtil;
 
 import jakarta.annotation.Resource;
 
@@ -653,7 +652,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//查询杠杆
 					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-					WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
+					//WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
 					
 					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
 					
@@ -901,7 +900,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//查询杠杆
 					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-					WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
+					//WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
 
 					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
 					
