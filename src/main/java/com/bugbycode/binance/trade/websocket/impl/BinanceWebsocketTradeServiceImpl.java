@@ -672,10 +672,12 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	
 	public Result<BinanceOrderInfo, RuntimeException> closePositionInfo(String binanceApiKey, String binanceSecretKey, PositionInfo info) {
 		PositionSide ps = PositionSide.valueOf(info.getPositionSide());
-		Side side = ps == PositionSide.LONG ? Side.SELL : Side.BUY;
+		//Side side = ps == PositionSide.LONG ? Side.SELL : Side.BUY;
+		Side side = Side.SELL;
 		BigDecimal quantity = new BigDecimal(info.getPositionAmt());
 		if(quantity.compareTo(new BigDecimal(0)) == -1) {//持仓数量为负数时修改为正数
 			quantity = quantity.multiply(new BigDecimal(-1));
+			side = Side.BUY;
 		}
 		return order_place(binanceApiKey, binanceSecretKey, info.getSymbol(), side, ps, Type.MARKET, null, quantity, null, null, null, null, null, null, null);
 	}
