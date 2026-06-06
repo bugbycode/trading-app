@@ -73,6 +73,14 @@ public class FuturesKlinesWebSocketTask {
 		logger.debug("FuturesKlinesWebSocketTask start.");
 		
 		try {
+			synchronized (AppConfig.LEVERAGE_BRACKET) {
+				AppConfig.LEVERAGE_BRACKET.clear();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		
+		try {
 			synchronized (AppConfig.SYMBOL_CONFIG_INFO) {
 				AppConfig.SYMBOL_CONFIG_INFO.clear();
 			}

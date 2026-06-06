@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
+import com.bugbycode.binance.module.leverage.LeverageBracket;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
@@ -1035,58 +1036,83 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	}
 
 	@Override
-	public List<LeverageBracketInfo> getLeverageBracketInfo(String binanceApiKey, String binanceSecretKey, String symbol) {
+	public List<LeverageBracket> getLeverageBracket(String binanceApiKey, String binanceSecretKey) {
 		
-		if(StringUtil.isEmpty(symbol)) {
-			throw new RuntimeException("symbol is not null");
-		}
-		
-		List<LeverageBracketInfo> leverageList = new ArrayList<LeverageBracketInfo>();
-		
-		String queryString = String.format("symbol=%s&timestamp=%s", StringUtil.urlEncoder(symbol), getLocalTime());
+		synchronized (AppConfig.LEVERAGE_BRACKET) {
+			List<LeverageBracket> leverageBracketCache = AppConfig.LEVERAGE_BRACKET.get(binanceApiKey);
+			if(CollectionUtils.isEmpty(leverageBracketCache)) {
+				List<LeverageBracket> leverageBracketList = new ArrayList<LeverageBracket>();
+				
+				String queryString = String.format("symbol=%s&timestamp=%s", "", getLocalTime());
 
-		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
-		
-		queryString = StringUtil.urlDecoder(queryString);
-		queryString += "&signature=" + signature;
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-MBX-APIKEY", binanceApiKey);
-		HttpEntity<String> entity = new HttpEntity<>(headers);
-		
-		String url = AppConfig.REST_BASE_URL + "/fapi/v1/leverageBracket?" + queryString;
-		
-		logger.debug(url);
-		
-		ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
-		
-		if(status == HttpStatus.OK) {
-			
-			logger.debug(result.getBody());
-			
-			JSONArray resultJsonArr = new JSONArray(result.getBody());
-			resultJsonArr.forEach(rja -> {
+				String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
 				
-				JSONObject resultJson = (JSONObject)rja;
+				queryString = StringUtil.urlDecoder(queryString);
+				queryString += "&signature=" + signature;
 				
-				JSONArray jsonArr = resultJson.getJSONArray("brackets");
+				HttpHeaders headers = new HttpHeaders();
+				headers.add("X-MBX-APIKEY", binanceApiKey);
+				HttpEntity<String> entity = new HttpEntity<>(headers);
 				
-				jsonArr.forEach(obj -> {
-					JSONObject o = (JSONObject) obj;
-					leverageList.add(LeverageBracketInfo.parse(o));
-				});
-			});
-			
-		} else {
-			throw new RuntimeException("获取" + symbol + "杠杆分层标准时出现异常，status: " + status);
+				String url = AppConfig.REST_BASE_URL + "/fapi/v1/leverageBracket?" + queryString;
+				
+				logger.debug(url);
+				
+				ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+				HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
+				
+				if(status == HttpStatus.OK) {
+					
+					logger.debug(result.getBody());
+					
+					JSONArray resultJsonArr = new JSONArray(result.getBody());
+					resultJsonArr.forEach(rja -> {
+						
+						JSONObject resultJson = (JSONObject)rja;
+						
+						JSONArray jsonArr = resultJson.getJSONArray("brackets");
+						
+						List<LeverageBracketInfo> leverageList = new ArrayList<LeverageBracketInfo>();
+						
+						jsonArr.forEach(obj -> {
+							JSONObject o = (JSONObject) obj;
+							leverageList.add(LeverageBracketInfo.parse(o));
+						});
+						
+						leverageBracketList.add(new LeverageBracket(resultJson.getString("symbol"), leverageList));
+					});
+					
+				} else {
+					throw new RuntimeException("获取杠杆分层标准时出现异常，status: " + status);
+				}
+				
+				if(leverageBracketList.isEmpty()) {
+					throw new RuntimeException("无法获取杠杆分层标准");
+				}
+				
+				AppConfig.LEVERAGE_BRACKET.put(binanceApiKey, leverageBracketList);
+			}
 		}
 		
-		if(leverageList.isEmpty()) {
+		return AppConfig.LEVERAGE_BRACKET.get(binanceApiKey);
+	}
+	
+	public List<LeverageBracketInfo> getLeverageBracketInfo(String binanceApiKey, String binanceSecretKey, String symbol) {
+		List<LeverageBracketInfo> list = new ArrayList<LeverageBracketInfo>();
+		List<LeverageBracket> leverageBracketList = getLeverageBracket(binanceApiKey, binanceSecretKey);
+		
+		for(LeverageBracket lb : leverageBracketList) {
+			if(lb.getSymbol().equals(symbol)) {
+				list.addAll(lb.getBrackets());
+				break;
+			}
+		}
+		
+		if(leverageBracketList.isEmpty()) {
 			throw new RuntimeException("无法获取" + symbol + "杠杆分层标准");
 		}
 		
-		return leverageList;
+		return list;
 	}
 
 	@Override

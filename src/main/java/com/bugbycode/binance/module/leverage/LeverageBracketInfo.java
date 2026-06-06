@@ -77,5 +77,12 @@ public class LeverageBracketInfo {
 		info.setCum(o.getDouble("cum"));
 		return info;
 	}
+
+	@Override
+	public String toString() {
+		return "LeverageBracketInfo [bracket=" + bracket + ", initialLeverage=" + initialLeverage + ", notionalCap="
+				+ notionalCap + ", notionalFloor=" + notionalFloor + ", maintMarginRatio=" + maintMarginRatio + ", cum="
+				+ cum + "]";
+	}
 	
 }

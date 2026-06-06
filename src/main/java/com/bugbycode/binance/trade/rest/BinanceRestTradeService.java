@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
+import com.bugbycode.binance.module.leverage.LeverageBracket;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.module.binance.Balance;
@@ -271,6 +272,15 @@ public interface BinanceRestTradeService {
 	 * @return
 	 */
 	public int countPosition(String binanceApiKey, String binanceSecretKey);
+	
+	/**
+	 * 杠杆分层标准 (USER_DATA) 请求权重 1
+	 * 
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @return
+	 */
+	public List<LeverageBracket> getLeverageBracket(String binanceApiKey, String binanceSecretKey);
 	
 	/**
 	 * 杠杆分层标准 (USER_DATA) 请求权重 1
