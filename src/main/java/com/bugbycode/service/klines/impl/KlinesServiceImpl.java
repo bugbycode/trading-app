@@ -539,7 +539,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 					if(profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
 							 || autoTradeType == AutoTradeType.PRICE_ACTION) {
-						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT);
+						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT);
 						for(PositionInfo p : positionList) {
 							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
 							if(excute_rs.getErr() != null) {
@@ -695,7 +695,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 						continue;
@@ -785,7 +785,7 @@ public class KlinesServiceImpl implements KlinesService {
 
 					if(profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
 							 || autoTradeType == AutoTradeType.PRICE_ACTION) {
-						List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG);
+						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG);
 						for(PositionInfo p : positionList) {
 							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
 							if(excute_rs.getErr() != null) {
@@ -944,7 +944,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 
-					List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 						continue;
