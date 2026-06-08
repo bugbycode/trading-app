@@ -1246,7 +1246,8 @@ public class KlinesServiceImpl implements KlinesService {
 				OpenPrice price = openPrices.get(index);
 				if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice()) 
 						&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
-						&& !PriceUtil.isTraded(price, factory)) {
+						//&& !PriceUtil.isTraded(price, factory)
+						) {
 					
 					this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, last.getDecimalNum()));
 					
@@ -1297,7 +1298,8 @@ public class KlinesServiceImpl implements KlinesService {
 					
 				} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice()) 
 						&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
-						&& !PriceUtil.isTraded(price, factory)) {
+						//&& !PriceUtil.isTraded(price, factory)
+						) {
 					
 					this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, last.getDecimalNum()));
 					
