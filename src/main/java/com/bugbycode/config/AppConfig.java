@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.eoptions.EoptionContracts;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.binance.module.leverage.LeverageBracket;
@@ -27,6 +28,11 @@ public class AppConfig {
 	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
 	
 	public static final int BINANCE_REST_API_WEIGHT = 35;
+	
+	/**
+	 * 手续费率缓存
+	 */
+	public static Map<String,CommissionRate> COMMISSION_RATE_CACHE = Collections.synchronizedMap(new HashMap<String,CommissionRate>());
 	
 	/**
 	 * 资金费率缓存

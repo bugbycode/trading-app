@@ -20,6 +20,7 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
+import com.bugbycode.service.cache.CacheManager;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
@@ -60,6 +61,9 @@ public class FuturesKlinesWebSocketTask {
 	@Autowired
     private BinanceRestTradeService binanceRestTradeService;
 	
+	@Autowired
+	private CacheManager cacheManager;
+	
 	/**
 	 * 14分37秒开始执行 每15分钟执行一次
 	 */
@@ -72,21 +76,7 @@ public class FuturesKlinesWebSocketTask {
 		
 		logger.debug("FuturesKlinesWebSocketTask start.");
 		
-		try {
-			synchronized (AppConfig.LEVERAGE_BRACKET) {
-				AppConfig.LEVERAGE_BRACKET.clear();
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
-		
-		try {
-			synchronized (AppConfig.SYMBOL_CONFIG_INFO) {
-				AppConfig.SYMBOL_CONFIG_INFO.clear();
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
+		cacheManager.initTradeCahe();
 		
 		try {
 			binanceRestTradeService.fundingInfo();
