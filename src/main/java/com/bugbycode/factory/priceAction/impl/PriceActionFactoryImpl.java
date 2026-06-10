@@ -174,8 +174,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				if(current.lte(end)) {
 					break;
 				}
-				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent)) 
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v28(current, parent))) {
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v33(current, parent)) 
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent))) {
 					data.add(current);
 				}
 			}

@@ -452,6 +452,14 @@ public class Klines {
     	return Double.valueOf(getBodyLowPrice());
     }
     
+    /**
+     * 获取K线实体部分长度
+     * @return
+     */
+    public double getBodyLen() {
+    	return getBodyHighPriceDoubleValue() - getBodyLowPriceDoubleValue();
+    }
+    
     public Double getBbPercentB() {
 		return bbPercentB == null ? 0.5 : bbPercentB;
 	}

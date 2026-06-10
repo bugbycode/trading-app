@@ -2222,6 +2222,32 @@ public class PriceUtil {
 	}
 	
 	/**
+	 * 判断是否出现颓势 </br></br>
+	 * 
+	 * 1、价格不断上涨但是波动率逐渐缩小
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyDeclining_v33(Klines current, Klines parent) {
+		return verifyPowerful_v28(current, parent) && current.getBodyLen() <= parent.getBodyLen();
+	}
+	
+	/**
+	 * 判断是否出现强势 </br></br>
+	 * 
+	 * 1、价格不断下跌但是波动率逐渐缩小
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @return
+	 */
+	public static boolean verifyPowerful_v33(Klines current, Klines parent) {
+		return verifyDeclining_v28(current, parent) && current.getBodyLen() <= parent.getBodyLen();
+	}
+	
+	/**
 	 * MACD 连续衰竭
 	 * @param current 当前k线
 	 * @param parent 前一根k线
