@@ -55,7 +55,9 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		this.list_hit.sort(kc);
 		this.list_15m.sort(kc);
 		
-		Klines last = PriceUtil.getLastKlines(list);
+		int list_index = list.size() - 1;
+		Klines list_parent = list.get(list_index - 1);
+		Klines last = list.get(list_index);
 		Klines last_after_hit = PriceUtil.getAfterKlines(last, list_hit);
 		
 		if(last_after_hit == null) {
@@ -92,22 +94,25 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		}
 		
 		int decimalNum = last.getDecimalNum();
-		double bodyLen = last.isRise() ? last.getHighPriceDoubleValue() - last.getOpenPriceDoubleValue() : last.getOpenPriceDoubleValue() - last.getLowPriceDoubleValue();
+		double bodyLen = PriceUtil.getMaxPrice(getLen(last), getLen(list_parent));
 		double takeProfitPrice = this.ps == PositionSide.LONG ? hitPrice + bodyLen : hitPrice - bodyLen;
 			   takeProfitPrice = PriceUtil.formatDoubleDecimalValue(takeProfitPrice, decimalNum);
 			   
-	    double stopLossLimit = this.ps == PositionSide.LONG ? hitK.getLowPriceDoubleValue() : hitK.getHighPriceDoubleValue();
+	    //double stopLossLimit = this.ps == PositionSide.LONG ? hitK.getLowPriceDoubleValue() : hitK.getHighPriceDoubleValue();
 	    FibInfo stopLossFibInfo = new FibInfo(hitPrice, takeProfitPrice, decimalNum);
 	    double sf_limit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-	    if(this.ps == PositionSide.LONG) {
+	    /*if(this.ps == PositionSide.LONG) {
 	    	stopLossLimit = PriceUtil.getMaxPrice(stopLossLimit, sf_limit);
 	    } else {
 	    	stopLossLimit = PriceUtil.getMinPrice(stopLossLimit, sf_limit);
 	    }
 	    
 	    double openPriceValue = this.ps == PositionSide.LONG ? hitK.getBodyHighPriceDoubleValue() : hitK.getBodyLowPriceDoubleValue();
+	    */
 	    
-	    this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, takeProfitPrice, takeProfitPrice, AutoTradeType.FENCE_SITTER);
+	    double openPriceValue = hitK.getClosePriceDoubleValue();
+	    
+	    this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, sf_limit, takeProfitPrice, takeProfitPrice, AutoTradeType.FENCE_SITTER);
 	}
 
 	@Override
@@ -125,4 +130,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		return this.ps == PositionSide.SHORT && this.openPrice != null;
 	}
 
+	private double getLen(Klines k) {
+		return k.isRise() ? k.getHighPriceDoubleValue() - k.getOpenPriceDoubleValue() : k.getOpenPriceDoubleValue() - k.getLowPriceDoubleValue();
+	}
 }
