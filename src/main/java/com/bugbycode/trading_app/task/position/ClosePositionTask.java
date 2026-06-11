@@ -6,9 +6,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.binance.module.position.PositionInfo;
@@ -29,8 +26,8 @@ import com.util.DateFormatUtil;
 /**
  * 自动关闭现有持仓
  */
-@Configuration
-@EnableScheduling
+//@Configuration
+//@EnableScheduling
 public class ClosePositionTask {
 
 	private final Logger logger = LogManager.getLogger(ClosePositionTask.class);
@@ -47,8 +44,8 @@ public class ClosePositionTask {
 	@Autowired
 	private WorkTaskPool emailWorkTaskPool;
 	
-	//每天上午七点五十分执行
-	@Scheduled(cron = "0 50 7 * * ?")
+	//每天上午八点整执行
+	//@Scheduled(cron = "0 0 8 * * ?")
 	public void executeTask() {
 		
 		if(AppConfig.DEBUG) {
