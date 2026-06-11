@@ -86,7 +86,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 		
 		double openPriceValue = hit_current.getClosePriceDoubleValue();
 		this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, takeProfitPrice, takeProfitPrice, AutoTradeType.FENCE_SITTER);
-		
+		this.openPrice.setResetStopLoss(false);
 	}
 
 	@Override
