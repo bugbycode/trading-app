@@ -50,10 +50,18 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		
-		PriceUtil.calculateBollingerBands(list);
-		
 		Klines last = PriceUtil.getLastKlines(list);
 		Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		
+		Klines last_after_15m = PriceUtil.getAfterKlines(last, list_15m);
+		if(last_after_15m != null) {
+			List<Klines> data = PriceUtil.subList(last_after_15m, list_15m);
+			list.add(PriceUtil.parse(data, last.getInervalType()));
+			this.list.sort(kc);
+			last = PriceUtil.getLastKlines(list);
+		}
+		
+		PriceUtil.calculateBollingerBands(list);
 		
 		double last_15m_close = last_15m.getClosePriceDoubleValue();
 		int decimalNum = last.getDecimalNum();
