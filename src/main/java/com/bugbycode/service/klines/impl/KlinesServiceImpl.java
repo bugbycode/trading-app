@@ -3,7 +3,6 @@ package com.bugbycode.service.klines.impl;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -1135,17 +1134,8 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
-		
-		Klines lastWeek = PriceUtil.getLastWeekKlines(list_1d);
-		if(lastWeek == null) {
-			return;
-		}
-		
-		List<Klines> weekList = new ArrayList<>();
-		weekList.add(lastWeek);
-		
 		EoptionFactory[] factories = {
-				new EoptionFactoryImpl(weekList, list_1h, list_15m)
+				new EoptionFactoryImpl(list_4h, list_4h, list_15m)
 			};
 		
 		for(EoptionFactory factory : factories) {
