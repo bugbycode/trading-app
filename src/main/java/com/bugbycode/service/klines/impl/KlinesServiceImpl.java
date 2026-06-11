@@ -29,7 +29,6 @@ import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.eoption.EoptionFactory;
 import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
-import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl;
 import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl_v2;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
@@ -512,20 +511,6 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 			}*/
 			
-			//筛选策略限制
-			if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
-				continue;
-			}
-			
-			//活跃度限制
-			if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
-				continue;
-			}
-			
-			if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
-				continue;
-			}
-			
 			//计算预计盈利百分比
 			double profitPercent = 0;
 			
@@ -547,6 +532,21 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 						}
 					}
+
+					//筛选策略限制
+					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+						continue;
+					}
+					
+					//活跃度限制
+					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
+						continue;
+					}
+					
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
@@ -792,6 +792,20 @@ public class KlinesServiceImpl implements KlinesService {
 								throw new RuntimeException("关闭" + pair + "多头仓位时出现异常", excute_rs.getErr());
 							}
 						}
+					}
+
+					//筛选策略限制
+					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+						continue;
+					}
+					
+					//活跃度限制
+					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
+						continue;
 					}
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
