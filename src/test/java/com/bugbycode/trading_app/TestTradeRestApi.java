@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
+import com.bugbycode.binance.module.leverage.LeverageBracket;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
@@ -250,7 +251,7 @@ public class TestTradeRestApi {
 
     @Test
     public void testSymbolConfig(){
-        List<SymbolConfig> scList = binanceRestTradeService.getSymbolConfig(binanceApiKey, binanceSecretKey, "币安人生USDT");
+        List<SymbolConfig> scList = binanceRestTradeService.getAllSymbolConfig(binanceApiKey, binanceSecretKey);
         logger.info(new JSONArray(scList));
     }
 
@@ -258,10 +259,11 @@ public class TestTradeRestApi {
     public void getSymbolConfigBySymbol(){
         String pair = "币安人生USDT";
         SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-        MarginType marginType = MarginType.resolve(sc.getMarginType());
+        sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
+        /*MarginType marginType = MarginType.resolve(sc.getMarginType());
         if(marginType != MarginType.ISOLATED) {
             binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
-        }
+        }*/
     }
     
     @Test
@@ -321,12 +323,22 @@ public class TestTradeRestApi {
     	List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, symbol);
     	logger.info("{} min initialLeverage as {}", symbol, LeverageBracketUtil.getMinLeverageBracketInfo(list).getInitialLeverage());
     	logger.info("{} max initialLeverage as {}", symbol, LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage());
+    	//logger.info(list);
+    	
+    	symbol = "BTCUSDT";
+    	list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, symbol);
+    	logger.info("{} min initialLeverage as {}", symbol, LeverageBracketUtil.getMinLeverageBracketInfo(list).getInitialLeverage());
+    	logger.info("{} max initialLeverage as {}", symbol, LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage());
     }
     
     @Test
     public void testGetCommissionRate() {
-    	String symbol = "DYDXUSDT";
+    	String symbol = "BTCUSDT";
     	CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, symbol);
+    	logger.info(rate);
+    	
+    	symbol = "ZECUSDT";
+    	rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, symbol);
     	logger.info(rate);
     }
     

@@ -290,8 +290,8 @@ public class WebsocketAPITest {
     
     @Test
     public void testGetPositionInfo() {
-    	String symbol = "LTCUSDT";
-    	List<PositionInfo> list = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, symbol, PositionSide.LONG);
+    	String symbol = "ETHUSDT";
+    	List<PositionInfo> list = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, symbol, PositionSide.SHORT);
     	logger.info(list);
     }
     
