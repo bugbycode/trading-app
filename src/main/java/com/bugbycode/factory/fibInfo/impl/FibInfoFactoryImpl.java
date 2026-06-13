@@ -251,11 +251,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
