@@ -223,7 +223,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
-			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
+			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
