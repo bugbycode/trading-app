@@ -13,6 +13,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -41,7 +42,28 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<OpenPrice> openPrices;
 	
+	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
+	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+		this.list = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
+		}
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+			this.init();
+		}
+	}
+	
+	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, TradeTrend tradeTrend) {
+		this.tradeTrend = tradeTrend;
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
@@ -161,7 +183,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
-			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
+			FibCode openCode = fibInfo.getFibCode(openCodeValue);
 			
 			if(openCode == FibCode.FIB0) {
 				return;
@@ -192,6 +214,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double openPriceValue = hitKlines.getClosePriceDoubleValue();
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			FibCode takeProfitCode = FibCode.FIB618;
+			
+			if(tradeTrend == TradeTrend.AGAINST) {
+				takeProfitCode = FibCode.FIB382;
+			}
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
@@ -217,11 +244,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0;
+		return tradeTrend == TradeTrend.FOLLOW ? k.getDea() > 0 : k.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() < 0;
+		return tradeTrend == TradeTrend.FOLLOW ? k.getDea() < 0 : k.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
