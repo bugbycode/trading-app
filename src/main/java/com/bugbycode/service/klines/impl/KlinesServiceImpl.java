@@ -1059,7 +1059,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		FibInfoFactory[] factorys = {
-				new FibInfoFactoryImpl(list_1h, list_1h, list_15m)
+				new FibInfoFactoryImpl(list_15m, list_15m, list_15m)
 		};
 		
 		for(FibInfoFactory factory : factorys) {
