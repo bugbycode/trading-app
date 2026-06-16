@@ -13,6 +13,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -69,8 +70,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateEMA_7_25_99(list);
-		PriceUtil.calculateEMA_7_25_99(list_trend);
+		PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -194,6 +195,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			FibCode takeProfitCode = FibCode.FIB618;
 			
+			TradeTrend tradeTrend = getTradeTrend();
+			if(tradeTrend == TradeTrend.AGAINST) {
+				takeProfitCode = FibCode.FIB382;
+			}
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
@@ -203,6 +209,16 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
+	}
+	
+	private TradeTrend getTradeTrend() {
+		Klines last = PriceUtil.getLastKlines(list_trend);
+		TradeTrend tradeTrend = TradeTrend.AGAINST;
+		if((last.getDea() > 0 && isLong())
+				|| (last.getDea() < 0 && isShort())) {
+			tradeTrend = TradeTrend.FOLLOW;
+		}
+		return tradeTrend;
 	}
 	
 	private PositionSide getPositionSide() {
@@ -219,19 +235,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getDea() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getDea() < 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
