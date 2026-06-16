@@ -161,7 +161,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
-			FibCode openCode = fibInfo.getFibCode(openCodeValue);
+			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			if(openCode == FibCode.FIB0) {
 				return;
@@ -218,19 +218,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
