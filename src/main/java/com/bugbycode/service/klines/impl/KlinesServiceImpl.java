@@ -773,8 +773,10 @@ public class KlinesServiceImpl implements KlinesService {
 						title = ((OrderPlaceException)e).getTitle();
 					}
 					
+					message += "\r\n" + orderBackTitle + "\r\n" + orderBackBody ;
+					
 					sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
-					sendEmail(u, orderBackTitle, orderBackBody, tradeUserEmail);
+					//sendEmail(u, orderBackTitle, orderBackBody, tradeUserEmail);
 					
 					logger.error(e.getMessage(), e);
 				}
@@ -1035,8 +1037,11 @@ public class KlinesServiceImpl implements KlinesService {
 					if(e instanceof OrderPlaceException) {
 						title = ((OrderPlaceException)e).getTitle();
 					}
+					
+					message += "\r\n" + orderBackTitle + "\r\n" + orderBackBody ;
+					
 					sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
-					sendEmail(u, orderBackTitle, orderBackBody, tradeUserEmail);
+					//sendEmail(u, orderBackTitle, orderBackBody, tradeUserEmail);
 					
 					logger.error(e.getMessage(), e);
 				}
