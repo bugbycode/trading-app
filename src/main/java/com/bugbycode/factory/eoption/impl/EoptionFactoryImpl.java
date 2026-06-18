@@ -225,11 +225,11 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -256,7 +256,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	@Override
 	public boolean isLong() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.LONG && start.getDea() < 0) {
 			result = true;
 		}
 		return result;
@@ -265,7 +265,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	@Override
 	public boolean isShort() {
 		boolean result = false;
-		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT) {
+		if(fibInfo != null && fibInfo.getQuotationMode() == QuotationMode.SHORT && start.getDea() > 0) {
 			result = true;
 		}
 		return result;
