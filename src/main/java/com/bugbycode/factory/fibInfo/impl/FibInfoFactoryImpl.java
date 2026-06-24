@@ -69,8 +69,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateAllBBPercentB(list);
-		PriceUtil.calculateAllBBPercentB(list_trend);
+		PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
