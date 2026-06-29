@@ -3730,7 +3730,8 @@ public class PriceUtil {
         if (upperBand == lowerBand) {
             return 0.5; // 避免除以零的错误，返回中间值
         }
-        return (currentPrice - lowerBand) / (upperBand - lowerBand);
+        
+        return formatDoubleDecimalValue( (currentPrice - lowerBand) / (upperBand - lowerBand) , 2);
     }
 
     /**
