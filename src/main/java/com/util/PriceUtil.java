@@ -2246,6 +2246,34 @@ public class PriceUtil {
 	public static boolean verifyPowerful_v33(Klines current, Klines parent) {
 		return verifyDeclining_v28(current, parent) && current.getBodyLen() <= parent.getBodyLen();
 	}
+
+	/**
+	 * 判断是否出现颓势 </br></br>
+	 * 
+	 * 1、BB %B值出现颓势
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyDeclining_v34(Klines current, Klines parent, Klines next) {
+		return parent.getBbPercentB() >= next.getBbPercentB() && current.getBbPercentB() < parent.getBbPercentB();
+	}
+	
+	/**
+	 * 判断是否出现强势 </br></br>
+	 * 
+	 * 1、BB %B值出现强势
+	 * 
+	 * @param current 当前k线
+	 * @param parent 前一根k线
+	 * @param next ......
+	 * @return
+	 */
+	public static boolean verifyPowerful_v34(Klines current, Klines parent, Klines next) {
+		return parent.getBbPercentB() <= next.getBbPercentB() && current.getBbPercentB() > parent.getBbPercentB();
+	}
 	
 	/**
 	 * MACD 连续衰竭

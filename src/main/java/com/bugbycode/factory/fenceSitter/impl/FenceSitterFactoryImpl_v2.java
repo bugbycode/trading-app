@@ -7,7 +7,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
 import com.bugbycode.module.FibCode;
-import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -43,6 +42,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 	}
 	
 	private void init() {
+		
 		if(CollectionUtils.isEmpty(list) || list.size() < 50 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -50,40 +50,48 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		
-		Klines last = PriceUtil.getLastKlines(list);
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		PriceUtil.calculateAllBBPercentB(list);
 		
-		Klines last_after_15m = PriceUtil.getAfterKlines(last, list_15m);
-		if(last_after_15m != null) {
-			List<Klines> data = PriceUtil.subList(last_after_15m, list_15m);
-			list.add(PriceUtil.parse(data, last.getInervalType()));
-			this.list.sort(kc);
-			last = PriceUtil.getLastKlines(list);
+		Klines hit_c = null;
+		Klines hit_p = null;
+		for(int index = list.size() - 1; index > 1; index--) {
+			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
+			if(this.ps == PositionSide.DEFAULT) {
+				if(verifyLong(current, parent)) {
+					this.ps = PositionSide.LONG;
+				} else if(verifyShort(current, parent)) {
+					this.ps = PositionSide.SHORT;
+				}
+			}
+			
+			if((this.ps == PositionSide.LONG && PriceUtil.verifyPowerful_v34(current, parent, next)) 
+					|| (this.ps == PositionSide.SHORT && PriceUtil.verifyDeclining_v34(current, parent, next))) {
+				hit_c = current;
+				hit_p = parent;
+				break;
+			}
 		}
 		
-		PriceUtil.calculateBollingerBands(list);
-		
-		double last_15m_close = last_15m.getClosePriceDoubleValue();
-		int decimalNum = last.getDecimalNum();
-		double middleBand = PriceUtil.formatDoubleDecimalValue(last.getMiddleBand(), decimalNum);
-		double upperBand = PriceUtil.formatDoubleDecimalValue(last.getUpperBand(), decimalNum);
-		double lowerBand = PriceUtil.formatDoubleDecimalValue(last.getLowerBand(), decimalNum);
-		
-		if(last_15m_close < middleBand) {
-			ps = PositionSide.SHORT;
-		} else if(last_15m_close > middleBand) {
-			ps = PositionSide.LONG;
-		}
-		
-		if(ps == PositionSide.DEFAULT) {
+		if(hit_c == null || hit_p == null) {
 			return;
 		}
 		
-		double takeProfitValue = ps == PositionSide.LONG ? upperBand : lowerBand;
-		FibInfo stopLossFibInfo = new FibInfo(middleBand, takeProfitValue, decimalNum);
-		double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+		Klines stopLossKlines = this.ps == PositionSide.LONG ? PriceUtil.getMinPriceKlines(hit_c, hit_p) : PriceUtil.getMaxPriceKlines(hit_c, hit_p);
+		double stopLossLimit = this.ps == PositionSide.LONG ? stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
 		
-		this.openPrice = new OpenPriceDetails(FibCode.FIB1, middleBand, stopLossLimit, takeProfitValue, takeProfitValue, AutoTradeType.FENCE_SITTER);
+		double openPriceValue = hit_c.getClosePriceDoubleValue();
+		
+		this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER);
+	}
+	
+	private boolean verifyLong(Klines current, Klines parent) {
+		return current.getBbPercentB() > parent.getBbPercentB();
+	}
+	
+	private boolean verifyShort(Klines current, Klines parent) {
+		return current.getBbPercentB() < parent.getBbPercentB();
 	}
 
 	@Override

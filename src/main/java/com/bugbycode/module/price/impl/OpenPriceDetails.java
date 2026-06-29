@@ -60,6 +60,8 @@ public class OpenPriceDetails implements OpenPrice {
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
 		this.autoTradeType = autoTradeType;
+		this.firstTakeProfit = -1;
+		this.secondTakeProfit = -1;
 	}
 	
 	/**

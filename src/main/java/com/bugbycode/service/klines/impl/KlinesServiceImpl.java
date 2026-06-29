@@ -29,7 +29,7 @@ import com.bugbycode.factory.area.impl.AreaFactoryImpl;
 import com.bugbycode.factory.eoption.EoptionFactory;
 import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
-import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl;
+import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl_v2;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -1119,7 +1119,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFenceSitter(List<Klines> list, List<Klines> list_15m) {
 		
-		FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m, list_15m);
+		FenceSitterFactory factory = new FenceSitterFactoryImpl_v2(list, list_15m);
     	
 		if(!(factory.isLong() || factory.isShort())) {
     		return;
