@@ -133,6 +133,8 @@ public class User implements UserDetails {
 	
 	private int eoptionsStatus = 0;//期权交易机会监控  0：否 1：是
 	
+	private int dualSidePosition = 0; // 双向持仓启用状态 0：关闭 1：开启
+	
 	public String getId() {
 		return id;
 	}
@@ -598,5 +600,13 @@ public class User implements UserDetails {
 
 	public void setEoptionsStatus(int eoptionsStatus) {
 		this.eoptionsStatus = eoptionsStatus;
+	}
+
+	public int getDualSidePosition() {
+		return dualSidePosition;
+	}
+
+	public void setDualSidePosition(int dualSidePosition) {
+		this.dualSidePosition = dualSidePosition;
 	}
 }

@@ -34,6 +34,7 @@ import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
+import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -478,6 +479,8 @@ public class KlinesServiceImpl implements KlinesService {
 			double activationPriceRatio = u.getActivationPriceRatio();
 			CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
 			
+			DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.valueOf(u.getDualSidePosition());
+			
 			ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 
 			if(openPrice.getFirstTakeProfit() <= 0 || openPrice.getSecondTakeProfit() <= 0) {
@@ -522,8 +525,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 				try {
 
-					if(autoTradeType == AutoTradeType.FIB_RET || profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
-							 || autoTradeType == AutoTradeType.PRICE_ACTION || autoTradeType == AutoTradeType.AREA_INDEX) {
+					if(dualSidePositionStatus == DualSidePositionStatus.CLOSE) {
 						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT);
 						for(PositionInfo p : positionList) {
 							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
@@ -785,8 +787,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				try {
 
-					if(autoTradeType == AutoTradeType.FIB_RET || profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
-							 || autoTradeType == AutoTradeType.PRICE_ACTION || autoTradeType == AutoTradeType.AREA_INDEX) {
+					if(dualSidePositionStatus == DualSidePositionStatus.CLOSE) {
 						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG);
 						for(PositionInfo p : positionList) {
 							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);

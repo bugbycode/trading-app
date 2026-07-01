@@ -150,6 +150,7 @@ public interface UserRepository {
 	 * @param tradePolicyType 自动交易策略类型（白名单/黑名单）
 	 * @param positionCountLimit 持仓数量限制
 	 * @param tradeNumberIndex 市场活跃度排名索引，值越小热度越高
+	 * @param dualSidePosition 双向持仓启用状态 0：关闭 1：开启
 	 * 
 	 */
 	public void updateBinanceApiSecurity(String username,String binanceApiKey,String binanceSecretKey,int autoTrade,
@@ -157,7 +158,7 @@ public interface UserRepository {
 			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle,double profitLimit,
 			int countertrendTrading, FibLevel fibLevel, long tradeNumber, int breakthroughTrade, double callbackRate, 
 			double activationPriceRatio, int callbackRateEnabled, List<String> tradePairPolicySelected, int tradePolicyType,
-			int positionCountLimit, int tradeNumberIndex);
+			int positionCountLimit, int tradeNumberIndex, int dualSidePosition);
 	
 	/**
 	 * 根据自动交易启用状态查询所有关联用户信息

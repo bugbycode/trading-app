@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.BreakthroughTradeStatus;
 import com.bugbycode.module.CountertrendTradingStatus;
+import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.PolicyType;
 import com.bugbycode.module.RecvCrossUnPnlStatus;
 import com.bugbycode.module.RecvTradeStatus;
@@ -125,6 +126,8 @@ public class UserController extends BaseController{
 		
 		CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(data.getCallbackRateEnabled());
 		
+		DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.valueOf(data.getDualSidePosition());
+		
 		PolicyType policyType = PolicyType.valueOf(data.getTradePolicyType());
 		
 		if(data.getCutLoss() == 0) {
@@ -166,7 +169,7 @@ public class UserController extends BaseController{
 					tradeStepBackStatus.getValue(), tradeStyle.getValue(), data.getProfitLimit(), countertrendTradingStatus.getValue(), 
 					data.getFibLevelType(), data.getTradeNumber(), breakthroughTradeStatus.getValue(), data.getCallbackRate(),
 					data.getActivationPriceRatio() , callbackRateEnabled.getValue(), data.getTradePairPolicySelected(), policyType.getValue(), 
-					data.getPositionCountLimit(), data.getTradeNumberIndex());
+					data.getPositionCountLimit(), data.getTradeNumberIndex(), dualSidePositionStatus.getValue());
 			
 			user.setBinanceApiKey(data.getBinanceApiKey());
 			user.setBinanceSecretKey(data.getBinanceSecretKey());
@@ -195,6 +198,7 @@ public class UserController extends BaseController{
 			user.setTradePairPolicySelected(data.getTradePairPolicySelected());
 			user.setPositionCountLimit(data.getPositionCountLimit());
 			user.setTradeNumberIndex(data.getTradeNumberIndex());
+			user.setDualSidePosition(dualSidePositionStatus.getValue());
 			
 			json.put("message", "修改成功");
 		} else {

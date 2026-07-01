@@ -153,7 +153,7 @@ public class UserRepositoryImpl implements UserRepository {
 			int recvTrade,int recvCrossUnPnl,double recvCrossUnPnlPercent,int tradeStepBack,int tradeStyle,double profitLimit,
 			int countertrendTrading, FibLevel fibLevel, long tradeNumber, int breakthroughTrade, double callbackRate, 
 			double activationPriceRatio, int callbackRateEnabled, List<String> tradePairPolicySelected, int tradePolicyType,
-			int positionCountLimit, int tradeNumberIndex) {
+			int positionCountLimit, int tradeNumberIndex, int dualSidePosition) {
 		Update update = new Update();
 		update.set("binanceApiKey", binanceApiKey);
 		update.set("binanceSecretKey", binanceSecretKey);
@@ -182,6 +182,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("tradePolicyType", tradePolicyType);
 		update.set("positionCountLimit", positionCountLimit);
 		update.set("tradeNumberIndex", tradeNumberIndex);
+		update.set("dualSidePosition", dualSidePosition);
 		
 		template.updateMulti(Query.query(Criteria.where("username").is(username)), update, User.class);
 	}
