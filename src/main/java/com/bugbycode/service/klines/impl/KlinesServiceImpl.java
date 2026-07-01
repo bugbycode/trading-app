@@ -522,7 +522,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 				try {
 
-					if(profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
+					if(autoTradeType == AutoTradeType.FIB_RET || profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
 							 || autoTradeType == AutoTradeType.PRICE_ACTION || autoTradeType == AutoTradeType.AREA_INDEX) {
 						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT);
 						for(PositionInfo p : positionList) {
@@ -785,7 +785,7 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				try {
 
-					if(profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
+					if(autoTradeType == AutoTradeType.FIB_RET || profitOrderEnabled == ProfitOrderEnabled.CLOSE || autoTradeType == AutoTradeType.FENCE_SITTER
 							 || autoTradeType == AutoTradeType.PRICE_ACTION || autoTradeType == AutoTradeType.AREA_INDEX) {
 						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG);
 						for(PositionInfo p : positionList) {
