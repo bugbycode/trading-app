@@ -168,7 +168,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			}
 			
 			List<Klines> data = new ArrayList<Klines>();
-			for(int index = list.size() - 1; index > 0; index--) {
+			/*for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 				Klines parent = list.get(index - 1);
 				if(current.lte(end)) {
@@ -176,6 +176,17 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				}
 				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v33(current, parent)) 
 						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent))) {
+					data.add(current);
+				}
+			}*/
+			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				if(current.lte(end)) {
+					break;
+				}
+				if((mode == QuotationMode.LONG && current.getBbPercentB() <= 0) 
+						|| (mode == QuotationMode.SHORT && current.getBbPercentB() >= 1)) {
 					data.add(current);
 				}
 			}
