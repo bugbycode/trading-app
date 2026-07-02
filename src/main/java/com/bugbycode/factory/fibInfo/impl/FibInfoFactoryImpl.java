@@ -174,8 +174,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				if(current.lte(end)) {
 					break;
 				}
-				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v33(current, parent)) 
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent))) {
+				if( ( mode == QuotationMode.LONG && (PriceUtil.verifyPowerful_v33(current, parent) || current.getBbPercentB() <= 0) ) 
+						|| ( mode == QuotationMode.SHORT && (PriceUtil.verifyDeclining_v33(current, parent) || current.getBbPercentB() >= 1) ) ) {
 					data.add(current);
 				}
 			}
