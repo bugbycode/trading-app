@@ -69,8 +69,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateEMA_7_25_99(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -166,7 +166,24 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(openCode == FibCode.FIB0) {
 				return;
 			}
+
+			Klines last = PriceUtil.getLastKlines(list);
+			double openPriceValue = last.getEma7();
 			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				double ema7 = current.getEma7();
+				if(current.lte(end)) {
+					break;
+				}
+				if((mode == QuotationMode.LONG && openPriceValue > ema7) || (mode == QuotationMode.SHORT && openPriceValue < ema7)) {
+					openPriceValue = ema7;
+				}
+			}
+			
+			openPriceValue = PriceUtil.formatDoubleDecimalValue(openPriceValue, fibInfo.getDecimalPoint());
+			
+			/*
 			List<Klines> data = new ArrayList<Klines>();
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
@@ -190,8 +207,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			double openPriceValue = hitKlines.getClosePriceDoubleValue();
+			*/
+			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
-			FibCode takeProfitCode = FibCode.FIB5;
+			FibCode takeProfitCode = FibCode.FIB618;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -218,19 +237,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() < 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
