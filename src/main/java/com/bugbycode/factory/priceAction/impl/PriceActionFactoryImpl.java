@@ -69,8 +69,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateAllBBPercentB(list);
-		PriceUtil.calculateAllBBPercentB(list_trend);
+		PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -175,8 +175,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				if(current.lte(end)) {
 					break;
 				}
-				if( ( mode == QuotationMode.LONG && (PriceUtil.verifyPowerful_v33(current, parent) || current.getBbPercentB() <= 0) ) 
-						|| ( mode == QuotationMode.SHORT && (PriceUtil.verifyDeclining_v33(current, parent) || current.getBbPercentB() >= 1) ) ) {
+				if( ( mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v33(current, parent) ) 
+						|| ( mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent) ) ) {
 					data.add(current);
 				}
 			}
@@ -192,12 +192,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = hitKlines.getClosePriceDoubleValue();
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
-			//FibCode child_hit_code = childFibInfo.getFibCode(openPriceValue);
-			FibCode takeProfitCode = FibCode.FIB5;
-			/*
-			if(child_hit_code == FibCode.FIB0) {
-				takeProfitCode = FibCode.FIB382;
-			}*/
+			
+			FibCode takeProfitCode = FibCode.FIB618;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -224,19 +220,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getBbPercentB() < 0.5;
+		return k.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getBbPercentB() > 0.5;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getBbPercentB() > 0.5;
+		return k.getDea() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getBbPercentB() < 0.5;
+		return k.getDea() < 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
