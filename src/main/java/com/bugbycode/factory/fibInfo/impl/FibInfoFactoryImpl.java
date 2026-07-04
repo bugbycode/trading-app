@@ -206,7 +206,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
-			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
+			if(verifyOpen()) {
+				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
+			}
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
@@ -333,5 +335,21 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 		
 		return tradeTrend;
+	}
+	
+	private boolean verifyOpen() {
+		boolean result = false;
+		
+		for(int index = list.size() - 1; index > 0; index--) {
+			Klines current = list.get(index);
+			if(current.lte(end)) {
+				break;
+			}
+			if((isLong() && current.getBbPercentB() <= 0.8)
+					|| (isShort() && current.getBbPercentB() >= 0.2) ) {
+				result = true;
+			}
+		}
+		return result;
 	}
 }
