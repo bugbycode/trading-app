@@ -13,7 +13,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -56,11 +55,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init(PositionSide.DEFAULT);
+			this.init();
 		}
 	}
 	
-	private void init(PositionSide ps_mode) {
+	private void init() {
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -70,19 +69,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
-		PriceUtil.calculateAllBBPercentB(list);
-		PriceUtil.calculateAllBBPercentB(list_trend);
+		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateEMA_7_25_99(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 
-		PositionSide ps = ps_mode;
-		
-		if(ps == PositionSide.DEFAULT) {
-			 ps = getPositionSide();
-		}
+		PositionSide ps = getPositionSide();
 		
 		Klines third = null;
 		Klines second = null;
@@ -173,9 +166,36 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(openCode == FibCode.FIB0) {
 				return;
 			}
+
+			Klines last = PriceUtil.getLastKlines(list);
+			double openPriceValue = last.getEma7();
 			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				double ema7 = current.getEma7();
+				if(current.lte(end)) {
+					break;
+				}
+				if((mode == QuotationMode.LONG && openPriceValue > ema7) || (mode == QuotationMode.SHORT && openPriceValue < ema7)) {
+					openPriceValue = ema7;
+				}
+			}
+			
+			openPriceValue = PriceUtil.formatDoubleDecimalValue(openPriceValue, fibInfo.getDecimalPoint());
+			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				double hit = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
+				if(current.lte(end)) {
+					break;
+				}
+				if((mode == QuotationMode.LONG && openPriceValue > hit) || (mode == QuotationMode.SHORT && openPriceValue < hit)) {
+					openPriceValue = hit;
+				}
+			}
+			
+			/*
 			List<Klines> data = new ArrayList<Klines>();
-			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 				Klines parent = list.get(index - 1);
@@ -198,32 +218,20 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			double openPriceValue = hitKlines.getClosePriceDoubleValue();
-			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+			*/
 			
-			FibCode takeProfitCode = FibCode.FIB5;
+			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+			FibCode takeProfitCode = FibCode.FIB618;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
-			if(verifyOpen()) {
-				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
-			}
+			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
-		
-		TradeTrend tradeTrend = getTradeTrend();
-		
-		if(tradeTrend == TradeTrend.AGAINST && ps_mode == PositionSide.DEFAULT) {
-			if(isLong()) {
-				this.init(PositionSide.SHORT);
-			} else {
-				this.init(PositionSide.LONG);
-			}
-		}
-		
 	}
 	
 	private PositionSide getPositionSide() {
@@ -240,19 +248,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getBbPercentB() < 0.5;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getBbPercentB() > 0.5;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getBbPercentB() > 0.5;
+		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getBbPercentB() < 0.5;
+		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -304,53 +312,4 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return end;
 	}
 	
-	private TradeTrend getTradeTrend() {
-		
-		TradeTrend tradeTrend = TradeTrend.AGAINST;
-		
-		if(isLong() || isShort()) {
-			
-			Klines last = PriceUtil.getLastKlines(list);
-			double end_before_dea = end.getDea();
-			double end_after_dea = last.getDea();
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				double dea = current.getDea();
-				if(current.gt(end)) {
-					if((isLong() && end_after_dea > dea) || (isShort() && end_after_dea < dea)) {
-						end_after_dea = dea;
-					}
-				} else if(current.lte(end)) {
-					if((isLong() && end_before_dea > dea) || (isShort() && end_before_dea < dea)) {
-						end_before_dea = dea;
-					}
-				}
-				if(current.lte(start)) {
-					break;
-				}
-			}
-			
-			if((isLong() && end_after_dea >= end_before_dea) || (isShort() && end_after_dea <= end_before_dea)) {
-				tradeTrend = TradeTrend.FOLLOW;
-			}
-		}
-		
-		return tradeTrend;
-	}
-	
-	private boolean verifyOpen() {
-		boolean result = false;
-		
-		for(int index = list.size() - 1; index > 0; index--) {
-			Klines current = list.get(index);
-			if(current.lte(end)) {
-				break;
-			}
-			if((isLong() && current.getBbPercentB() <= 0.5)
-					|| (isShort() && current.getBbPercentB() >= 0.5) ) {
-				result = true;
-			}
-		}
-		return result;
-	}
 }
