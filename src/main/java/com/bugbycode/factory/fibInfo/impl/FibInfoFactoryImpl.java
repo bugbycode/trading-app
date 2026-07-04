@@ -73,6 +73,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
 		PriceUtil.calculateAllBBPercentB(list);
+		PriceUtil.calculateAllBBPercentB(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -239,19 +240,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0;
+		return k.getBbPercentB() < 0.5;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
+		return k.getBbPercentB() > 0.5;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getBbPercentB() > 0.5;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getBbPercentB() < 0.5;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -345,8 +346,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(current.lte(end)) {
 				break;
 			}
-			if((isLong() && current.getBbPercentB() <= 0.8)
-					|| (isShort() && current.getBbPercentB() >= 0.2) ) {
+			if((isLong() && current.getBbPercentB() <= 0.5)
+					|| (isShort() && current.getBbPercentB() >= 0.5) ) {
 				result = true;
 			}
 		}
