@@ -1136,17 +1136,15 @@ public class KlinesServiceImpl implements KlinesService {
     	
     	OpenPrice price = factory.getOpenPrice();
     	
-    	if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice())) {
+    	if(factory.isClosePosition()) {
+    		PositionSide ps = factory.isLong() ? PositionSide.LONG : PositionSide.SHORT;
+    		this.closePositionTaskPool.add(new FenceSitterClosePositionTask(pair, ps, userDetailsService));
+    	} else if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice())) {
     		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
     	} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice())) {
     		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, decimalNum));
     	}
     	
-    	if(factory.isClosePosition()) {
-    		//logger.info("{}永续合约仓位建议平仓", pair);
-    		PositionSide ps = factory.isLong() ? PositionSide.LONG : PositionSide.SHORT;
-    		this.closePositionTaskPool.add(new FenceSitterClosePositionTask(pair, ps, userDetailsService));
-    	}
 	}
 	
 	@Override
