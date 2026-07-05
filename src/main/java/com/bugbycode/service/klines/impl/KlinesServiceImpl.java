@@ -1145,7 +1145,7 @@ public class KlinesServiceImpl implements KlinesService {
     	if(factory.isClosePosition()) {
     		//logger.info("{}永续合约仓位建议平仓", pair);
     		PositionSide ps = factory.isLong() ? PositionSide.LONG : PositionSide.SHORT;
-    		this.closePositionTaskPool.add(new FenceSitterClosePositionTask(pair, ps, binanceRestTradeService, binanceWebsocketTradeService, userDetailsService));
+    		this.closePositionTaskPool.add(new FenceSitterClosePositionTask(pair, ps, userDetailsService));
     	}
 	}
 	

@@ -44,6 +44,14 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 	
 	@Autowired
 	private TradingWebSocketClientEndpoint websocketApi;
+	
+	public BinanceWebsocketTradeServiceImpl() {
+		
+	}
+	
+	public BinanceWebsocketTradeServiceImpl(TradingWebSocketClientEndpoint websocketApi) {
+		this.websocketApi = websocketApi;
+	}
 
 	@Override
 	public List<Balance> balance_v2(String apiKey, String secretKey) {
