@@ -182,8 +182,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				}
 			}
 			
-			/*
-			List<Klines> data = new ArrayList<Klines>();
 			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
@@ -191,22 +189,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				if(current.lte(end)) {
 					break;
 				}
-				if( ( mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v33(current, parent) ) 
-						|| ( mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent) ) ) {
-					data.add(current);
+				double closePrice = current.getClosePriceDoubleValue();
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent) && openPriceValue > closePrice) 
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v28(current, parent) && openPriceValue < closePrice)) {
+					openPriceValue = closePrice;
 				}
 			}
 			
-			if(data.isEmpty()) {
-				return;
-			}
-			
-			Klines hitKlines = mode == QuotationMode.LONG ? PriceUtil.getMinClosePriceKLine(data) : PriceUtil.getMaxClosePriceKLine(data);
-			if(hitKlines == null) {
-				return;
-			}
-			
-			double openPriceValue = hitKlines.getClosePriceDoubleValue();*/
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB5;
@@ -249,11 +238,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0 && k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
