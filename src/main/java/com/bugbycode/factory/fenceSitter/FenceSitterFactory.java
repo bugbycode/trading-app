@@ -16,4 +16,10 @@ public interface FenceSitterFactory {
 	public boolean isLong();
 	
 	public boolean isShort();
+	
+	/**
+	 * 是否已到达建议平仓价
+	 * @return
+	 */
+	public boolean isClosePosition();
 }
