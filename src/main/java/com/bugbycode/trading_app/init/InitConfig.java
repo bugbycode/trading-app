@@ -94,6 +94,11 @@ public class InitConfig implements ApplicationRunner {
 	}
 	
 	@Bean
+	public WorkTaskPool closePositionTaskPool() {
+		return new WorkTaskPool("ClosePositionTaskPool", 1);
+	}
+	
+	@Bean
 	public TradingWebSocketClientEndpoint websocketApi() {
 		return new TradingWebSocketClientEndpoint(websocketApiBaseUrl);
 	}

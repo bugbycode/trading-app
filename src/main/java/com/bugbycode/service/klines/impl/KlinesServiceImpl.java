@@ -73,6 +73,7 @@ import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
+import com.bugbycode.trading_app.task.position.FenceSitterClosePositionTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
@@ -102,6 +103,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private WorkTaskPool emailWorkTaskPool;
+	
+	@Autowired
+	private WorkTaskPool closePositionTaskPool;
 	
 	@Autowired
 	private WorkTaskPool tradingTaskPool;
@@ -1139,7 +1143,9 @@ public class KlinesServiceImpl implements KlinesService {
     	}
     	
     	if(factory.isClosePosition()) {
-    		logger.info("{}永续合约仓位建议平仓", pair);
+    		//logger.info("{}永续合约仓位建议平仓", pair);
+    		PositionSide ps = factory.isLong() ? PositionSide.LONG : PositionSide.SHORT;
+    		this.closePositionTaskPool.add(new FenceSitterClosePositionTask(pair, ps, binanceWebsocketTradeService, userDetailsService));
     	}
 	}
 	
