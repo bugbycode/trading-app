@@ -13,6 +13,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -210,6 +211,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibCode takeProfitCode = FibCode.FIB5;
 			
+			TradeTrend tradeTrend = getTradeTrend();
+			if(tradeTrend == TradeTrend.FOLLOW) {
+				takeProfitCode = FibCode.FIB618;
+			}
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
@@ -243,11 +249,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -289,4 +295,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		return result;
 	}
 	
+	
+	private TradeTrend getTradeTrend() {
+		TradeTrend tradeTrend = TradeTrend.AGAINST;
+		Klines last = PriceUtil.getLastKlines(list_trend);
+		if((isLong() && last.getDea() > 0) || (isShort() && last.getDea() < 0)) {
+			tradeTrend = TradeTrend.FOLLOW;
+		}
+		return tradeTrend;
+	}
 }
