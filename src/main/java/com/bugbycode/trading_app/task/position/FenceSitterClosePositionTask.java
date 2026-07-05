@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.bugbycode.binance.module.position.PositionInfo;
+import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -27,20 +28,24 @@ public class FenceSitterClosePositionTask implements Runnable{
 	
 	private BinanceWebsocketTradeService binanceWebsocketTradeService;
 	
+	private BinanceRestTradeService binanceRestTradeService;
+	
 	private UserService userDetailsService;
 
 	/**
 	 * 
 	 * @param pair 交易对
 	 * @param ps 要关闭的持仓方向 LONG/SHORT
+	 * @param binanceRestTradeService
 	 * @param binanceWebsocketTradeService
 	 * @param userDetailsService
 	 */
-	public FenceSitterClosePositionTask(String pair, PositionSide ps,
+	public FenceSitterClosePositionTask(String pair, PositionSide ps,BinanceRestTradeService binanceRestTradeService,
 			BinanceWebsocketTradeService binanceWebsocketTradeService, UserService userDetailsService) {
 		this.pair = pair;
 		this.ps = ps;
 		this.binanceWebsocketTradeService = binanceWebsocketTradeService;
+		this.binanceRestTradeService = binanceRestTradeService;
 		this.userDetailsService = userDetailsService;
 	}
 
@@ -51,7 +56,7 @@ public class FenceSitterClosePositionTask implements Runnable{
 			for(User u : userList) {
 				String binanceApiKey = u.getBinanceApiKey();
 				String binanceSecretKey = u.getBinanceSecretKey();
-				List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+				List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 				logger.info("共查询到{}交易对共{}个仓位", pair, positionList.size());
 				for(PositionInfo p : positionList) {
 					com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
@@ -60,6 +65,7 @@ public class FenceSitterClosePositionTask implements Runnable{
 						logger.error("关闭" + pair + ps.getMemo() + "仓位时出现异常", excute_rs.getErr());
 					}
 				}
+				Thread.sleep(1000);
 			}
 		} catch (Exception e) {
 			logger.error("自动关闭" + pair + "仓位时出现异常", e);
