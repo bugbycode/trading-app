@@ -57,7 +57,7 @@ public class FenceSitterClosePositionTask implements Runnable{
 				String binanceApiKey = u.getBinanceApiKey();
 				String binanceSecretKey = u.getBinanceSecretKey();
 				List<PositionInfo> positionList = binanceRestTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
-				logger.info("共查询到{}交易对共{}个仓位", pair, positionList.size());
+				logger.debug("共查询到{}交易对共{}个仓位", pair, positionList.size());
 				for(PositionInfo p : positionList) {
 					com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
 					if(excute_rs.getErr() != null) {
