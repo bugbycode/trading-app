@@ -225,7 +225,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			TradeTrend tradeTrend = getTradeTrend();
 			if(tradeTrend == TradeTrend.FOLLOW) {
-				takeProfitCode = FibCode.FIB1;
+				takeProfitCode = FibCode.FIB618;
 			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
