@@ -156,7 +156,7 @@ public class AnalysisKlinesTask implements Runnable{
             //klinesService.futuresEmaRiseAndFallMonitor(klines_list_1h_db, klines_list_15m);
             
             //盘整区分析
-            klinesService.consolidationAreaMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h_db, klines_list_15m);
+            //klinesService.consolidationAreaMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h_db, klines_list_15m);
             
             //价格行为分析
             klinesService.futuresPriceAction(klines_list_1d, klines_list_4h_db, klines_list_1h_db, klines_list_15m);
@@ -168,7 +168,7 @@ public class AnalysisKlinesTask implements Runnable{
             klinesService.eoptionMonitor(klines_list_1d, klines_list_4h_db, klines_list_1h_db, klines_list_15m);
             
             //墙头草策略
-            klinesService.futuresFenceSitter(klines_list_1h_db, klines_list_15m);
+            //klinesService.futuresFenceSitter(klines_list_1h_db, klines_list_15m);
             
 
         } catch (Exception e) {
