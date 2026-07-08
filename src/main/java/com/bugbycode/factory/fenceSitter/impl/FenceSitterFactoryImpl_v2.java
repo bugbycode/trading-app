@@ -104,7 +104,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 	@Override
 	public boolean isClosePosition() {
 		boolean result = false;
-		if(isLong() || isShort()) {
+		/*if(isLong() || isShort()) {
 			int index = list.size() - 1;
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
@@ -115,7 +115,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 					result = true;
 				}
 			}
-		}
+		}*/
 		return result;
 	}
 
