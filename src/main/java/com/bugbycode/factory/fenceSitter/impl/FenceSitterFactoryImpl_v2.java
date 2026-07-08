@@ -40,39 +40,57 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		
+		PriceUtil.calculateEMA_7_25_99(list);
+		
 		Klines c = null;
 		Klines p = null;
-		Klines n = null;
-		for(int index = list.size() - 1; index > 1; index--) {
+		//Klines n = null;
+		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
-			Klines next = list.get(index - 2);
+			//Klines next = list.get(index - 2);
 			
 			if(this.ps == PositionSide.DEFAULT) {
-				if(PriceUtil.verifyPowerful_v28(current, parent)) {
+				/*if(PriceUtil.verifyPowerful_v28(current, parent)) {
 					this.ps = PositionSide.LONG;
 				} else if(PriceUtil.verifyDeclining_v28(current, parent)) {
 					this.ps = PositionSide.SHORT;
+				}*/
+				if(current.getClosePriceDoubleValue() < current.getEma7()) {
+					this.ps = PositionSide.SHORT;
+				} else if(current.getClosePriceDoubleValue() > current.getEma7()) {
+					this.ps = PositionSide.LONG;
 				}
 			}
-			
+			/*
 			if((this.ps == PositionSide.LONG && PriceUtil.verifyDeclining_v28(parent, next))
 					|| (this.ps == PositionSide.SHORT && PriceUtil.verifyPowerful_v28(parent, next))) {
 				c = current;
 				p = parent;
 				n = next;
 				break;
+			}*/
+			
+			if((this.ps == PositionSide.LONG && PriceUtil.verifyPowerful_v29(current, parent))
+					|| (this.ps == PositionSide.SHORT && PriceUtil.verifyDeclining_v29(current, parent))) {
+				c = current;
+				p = parent;
+				break;
 			}
 		}
-		
+		/*
 		if(c == null || p == null || n == null || this.ps == PositionSide.DEFAULT) {
+			return;
+		}*/
+		
+		if(c == null || p == null || this.ps == PositionSide.DEFAULT) {
 			return;
 		}
 		
 		List<Klines> data = new ArrayList<Klines>();
 		data.add(c);
 		data.add(p);
-		data.add(n);
+		//data.add(n);
 		
 		Klines stopLossKlines = this.ps == PositionSide.LONG ? PriceUtil.getMinPriceKLine(data) : PriceUtil.getMaxPriceKLine(data);
 		double stopLossLimit = this.ps == PositionSide.LONG ? stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
