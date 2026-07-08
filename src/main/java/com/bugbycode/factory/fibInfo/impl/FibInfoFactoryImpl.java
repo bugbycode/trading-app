@@ -219,6 +219,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				}
 			}
 			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				Klines parent = list.get(index - 1);
+				if(current.lte(end)) {
+					break;
+				}
+				double closePrice = current.getClosePriceDoubleValue();
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v33(current, parent) && openPriceValue > closePrice)
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent) && openPriceValue < closePrice)) {
+					openPriceValue = closePrice;
+				}
+			}
+			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
