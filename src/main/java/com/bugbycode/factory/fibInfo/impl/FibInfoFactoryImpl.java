@@ -254,17 +254,17 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private boolean verifyLong(Klines k) {
 		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() > 0;
+			return k.getMacd() > 0;
 		} else {
-			return k.getDea() < 0;
+			return k.getMacd() < 0;
 		}
 	}
 	
 	private boolean verifyShort(Klines k) {
 		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() < 0;
+			return k.getMacd() < 0;
 		} else {
-			return k.getDea() > 0;
+			return k.getMacd() > 0;
 		}
 	}
 	
