@@ -164,7 +164,7 @@ public class AreaFactoryImpl implements AreaFactory {
 		//开始获取开仓点
 		for(FibInfo fibInfo : fibInfoList) {
 			double fib1Value = fibInfo.getFibValue(FibCode.FIB1);
-			FibCode takeProfitCode = FibCode.FIB5;
+			FibCode takeProfitCode = FibCode.FIB618;
 			List<Klines> fibAfterList = fibInfo.getFibAfterKlines();
 			
 			if(CollectionUtils.isEmpty(fibAfterList)) {
