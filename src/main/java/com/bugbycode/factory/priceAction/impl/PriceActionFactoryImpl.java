@@ -211,11 +211,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB382;
+			FibCode takeProfitCode = FibCode.FIB5;
 			
 			TradeTrend tradeTrend = getTradeTrend();
 			if(tradeTrend == TradeTrend.FOLLOW) {
-				takeProfitCode = FibCode.FIB5;
+				takeProfitCode = FibCode.FIB618;
 			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
