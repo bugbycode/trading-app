@@ -346,7 +346,9 @@ public class TestTradeRestApi {
     public void testFundingInfo() {
     	List<FundingInfo> list = binanceRestTradeService.fundingInfo();
     	for(FundingInfo fi : list) {
-    		logger.info(fi);
+    		if(fi.getFundingIntervalHours() == 1) {
+        		logger.info(fi);
+    		}
     	}
     }
     

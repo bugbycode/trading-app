@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
+import com.bugbycode.binance.trade.websocket.impl.BinanceWebsocketTradeServiceImpl;
 import com.bugbycode.config.AppConfig;
 import com.bugbycode.exception.OrderCancelException;
 import com.bugbycode.exception.OrderPlaceException;
@@ -44,6 +45,7 @@ import com.bugbycode.module.user.User;
 import com.bugbycode.repository.user.UserRepository;
 import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.trading_app.task.email.SendMailTask;
+import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 import com.util.DateFormatUtil;
 import com.util.PriceUtil;
 
@@ -56,7 +58,7 @@ public class WebsocketAPITest {
 	
 	private String binanceSecretKey;
 	
-	@Autowired
+	//@Autowired
 	private BinanceWebsocketTradeService binanceWebsocketTradeService;
 	
 	@Autowired
@@ -80,6 +82,8 @@ public class WebsocketAPITest {
         
         binanceApiKey = user.getBinanceApiKey();
         binanceSecretKey = user.getBinanceSecretKey();
+        
+        binanceWebsocketTradeService = new BinanceWebsocketTradeServiceImpl(new TradingWebSocketClientEndpoint(AppConfig.WEBSOCKET_API_URL));
 	}
 	
 	@Test
@@ -283,7 +287,7 @@ public class WebsocketAPITest {
     
     @Test
     public void testPositionRisk_v3() {
-    	String pair = "";
+    	String pair = "MANTAUSDT";
     	List<PositionInfo> list = binanceWebsocketTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, pair);
     	logger.info(list);
     }
