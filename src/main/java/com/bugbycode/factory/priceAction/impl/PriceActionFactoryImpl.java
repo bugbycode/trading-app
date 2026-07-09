@@ -168,7 +168,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				return;
 			}
 			
-			Klines last = PriceUtil.getLastKlines(list);
+			/*Klines last = PriceUtil.getLastKlines(list);
 			double openPriceValue = isLong() ? last.getHighPriceDoubleValue() : last.getLowPriceDoubleValue();
 			
 			for(int index = list.size() - 1; index > 0; index--) {
@@ -180,8 +180,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				if((mode == QuotationMode.LONG && openPriceValue > hit) || (mode == QuotationMode.SHORT && openPriceValue < hit)) {
 					openPriceValue = hit;
 				}
-			}
+			}*/
 			
+			double openPriceValue = 0;
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 				Klines parent = list.get(index - 1);
@@ -189,10 +190,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					break;
 				}
 				double closePrice = current.getClosePriceDoubleValue();
-				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent) && openPriceValue > closePrice) 
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v28(current, parent) && openPriceValue < closePrice)) {
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent) && (openPriceValue == 0 || openPriceValue > closePrice)) 
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v28(current, parent) && (openPriceValue == 0 || openPriceValue < closePrice))) {
 					openPriceValue = closePrice;
 				}
+			}
+			
+			if(openPriceValue == 0) {
+				return;
 			}
 			
 			/*
