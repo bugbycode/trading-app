@@ -195,7 +195,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				}
 			}
 			
-			
+			/*
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 				Klines parent = list.get(index - 1);
@@ -207,11 +207,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v28(current, parent) && openPriceValue < closePrice)) {
 					openPriceValue = closePrice;
 				}
-			}
+			}*/
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB5;
+			FibCode takeProfitCode = FibCode.FIB618;
 			
 			TradeTrend tradeTrend = getTradeTrend();
 			if(tradeTrend == TradeTrend.FOLLOW) {
