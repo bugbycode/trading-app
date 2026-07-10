@@ -40,7 +40,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
 		
-		PriceUtil.calculateAllBBPercentB(list);
+		PriceUtil.calculateMACD(list);
 		
 		Klines c = null;
 		Klines p = null;
@@ -51,15 +51,15 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 			Klines next = list.get(index - 2);
 			
 			if(this.ps == PositionSide.DEFAULT) {
-				if(PriceUtil.verifyPowerful_v28(current, parent)) {
+				if(PriceUtil.verifyPowerful_v14(current, parent)) {
 					this.ps = PositionSide.LONG;
-				} else if(PriceUtil.verifyDeclining_v28(current, parent)) {
+				} else if(PriceUtil.verifyDeclining_v14(current, parent)) {
 					this.ps = PositionSide.SHORT;
 				}
 			}
 			
-			if((this.ps == PositionSide.LONG && PriceUtil.verifyDeclining_v28(parent, next))
-					|| (this.ps == PositionSide.SHORT && PriceUtil.verifyPowerful_v28(parent, next))) {
+			if((this.ps == PositionSide.LONG && PriceUtil.verifyDeclining_v14(parent, next))
+					|| (this.ps == PositionSide.SHORT && PriceUtil.verifyPowerful_v14(parent, next))) {
 				c = current;
 				p = parent;
 				n = next;
@@ -70,22 +70,29 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 		if(c == null || p == null || n == null || this.ps == PositionSide.DEFAULT) {
 			return;
 		}
-		
+		/*
 		List<Klines> data = new ArrayList<Klines>();
 		data.add(c);
 		data.add(p);
 		data.add(n);
 		
-		Klines stopLossKlines = this.ps == PositionSide.LONG ? PriceUtil.getMinPriceKLine(data) : PriceUtil.getMaxPriceKLine(data);
+		Klines stopLossKlines = this.ps == PositionSide.LONG ? PriceUtil.getMinPriceKLine(data) : PriceUtil.getMaxPriceKLine(data);*/
+		
+		Klines stopLossKlines = c;
 		double stopLossLimit = this.ps == PositionSide.LONG ? stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
 		
+		/*
 		data = PriceUtil.subList(c, list);
 		
 		Klines openKlines = this.ps == PositionSide.LONG ? PriceUtil.getMinClosePriceKLine(data) : PriceUtil.getMaxClosePriceKLine(data);
 		
 		double openPriceValue = openKlines.getClosePriceDoubleValue();
+		*/
+		Klines openKlines = c;
+		double openPriceValue = this.ps == PositionSide.LONG ? openKlines.getBodyHighPriceDoubleValue() : openKlines.getBodyLowPriceDoubleValue();
 		
 		this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER);
+		
 	}
 
 	@Override
@@ -116,7 +123,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 						|| (isShort() && PriceUtil.verifyPowerful_v33(current, parent))) {
 					result = true;
 				}
-			}*/
+			}
 			Klines current = PriceUtil.getLastKlines(list);
 			double closePrice = current.getClosePriceDoubleValue();
 			if(closePrice != this.openPrice.getPrice()) {
@@ -124,7 +131,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 						|| (isShort() && current.getBbPercentB() <= 0)) {
 					result = true;
 				}
-			}
+			}*/
 		}
 		return result;
 	}
