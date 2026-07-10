@@ -13,7 +13,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -70,8 +69,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateAllBBPercentB(list);
+		PriceUtil.calculateAllBBPercentB(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -181,26 +180,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					openPriceValue = hit;
 				}
 			}
-			/*
-			double openPriceValue = 0;
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				Klines parent = list.get(index - 1);
-				if(current.lte(end)) {
-					break;
-				}
-				double closePrice = current.getClosePriceDoubleValue();
-				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent) && (openPriceValue == 0 || openPriceValue > closePrice)) 
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v28(current, parent) && (openPriceValue == 0 || openPriceValue < closePrice))) {
-					openPriceValue = closePrice;
-				}
-			}
 			
-			if(openPriceValue == 0) {
-				return;
-			}*/
 			
-			/*
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 				Klines parent = list.get(index - 1);
@@ -212,16 +193,24 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v28(current, parent) && openPriceValue < closePrice)) {
 					openPriceValue = closePrice;
 				}
-			}*/
+			}
+			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				Klines parent = list.get(index - 1);
+				if(current.lte(end)) {
+					break;
+				}
+				double closePrice = current.getClosePriceDoubleValue();
+				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v33(current, parent) && openPriceValue > closePrice)
+						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent) && openPriceValue < closePrice)) {
+					openPriceValue = closePrice;
+				}
+			}
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB618;
-			
-			TradeTrend tradeTrend = getTradeTrend();
-			if(tradeTrend == TradeTrend.FOLLOW) {
-				takeProfitCode = FibCode.FIB618;
-			}
+			FibCode takeProfitCode = FibCode.FIB5;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -248,19 +237,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0;
+		return k.getBbPercentB() < 0.5;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
+		return k.getBbPercentB() > 0.5;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getBbPercentB() > 0.5;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getBbPercentB() < 0.5;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -302,13 +291,4 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		return result;
 	}
 	
-	
-	private TradeTrend getTradeTrend() {
-		TradeTrend tradeTrend = TradeTrend.AGAINST;
-		Klines last = PriceUtil.getLastKlines(list_trend);
-		if((isLong() && last.getDea() > 0) || (isShort() && last.getDea() < 0)) {
-			tradeTrend = TradeTrend.FOLLOW;
-		}
-		return tradeTrend;
-	}
 }

@@ -95,6 +95,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateAllBBPercentB(list);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -226,8 +227,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 					break;
 				}
 				double closePrice = current.getClosePriceDoubleValue();
-				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v33(current, parent) && openPriceValue > closePrice)
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent) && openPriceValue < closePrice)) {
+				if((mode == QuotationMode.LONG && (PriceUtil.verifyPowerful_v33(current, parent) || current.getBbPercentB() <= 0) && openPriceValue > closePrice)
+						|| (mode == QuotationMode.SHORT && (PriceUtil.verifyDeclining_v33(current, parent) || current.getBbPercentB() >= 1) && openPriceValue < closePrice)) {
 					openPriceValue = closePrice;
 				}
 			}
