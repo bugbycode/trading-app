@@ -218,7 +218,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 					openPriceValue = closePrice;
 				}
 			}
-			/*
+			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 				Klines parent = list.get(index - 1);
@@ -230,7 +230,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v33(current, parent) && openPriceValue < closePrice)) {
 					openPriceValue = closePrice;
 				}
-			}*/
+			}
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
