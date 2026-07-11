@@ -131,7 +131,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 
 	private double getLen(Klines k) {
-		return k.isRise() ? k.getHighPriceDoubleValue() - k.getOpenPriceDoubleValue() : k.getOpenPriceDoubleValue() - k.getLowPriceDoubleValue();
+		return (k.isRise() ? k.getHighPriceDoubleValue() - k.getOpenPriceDoubleValue() : k.getOpenPriceDoubleValue() - k.getLowPriceDoubleValue()) * 0.786;
 	}
 
 	@Override
