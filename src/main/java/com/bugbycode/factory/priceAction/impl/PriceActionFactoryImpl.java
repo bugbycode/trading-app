@@ -173,7 +173,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibCode hitCode = childFibInfo.getFibCode(openPriceValue);
 			if(hitCode == FibCode.FIB0) {
-				takeProfitCode = FibCode.FIB5;
+				takeProfitCode = FibCode.FIB618;
 			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
