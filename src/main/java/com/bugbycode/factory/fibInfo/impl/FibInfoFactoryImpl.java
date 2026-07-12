@@ -58,7 +58,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(tradeTrend);
 		}
 	}
 	
@@ -79,11 +79,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(tradeTrend);
 		}
 	}
 	
-	private void init() {
+	private void init(TradeTrend tradeTrend) {
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -192,27 +192,18 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			Klines last = PriceUtil.getLastKlines(list);
-			double openPriceValue = isLong() ? last.getHighPriceDoubleValue() : last.getLowPriceDoubleValue();
-			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				double hit = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
-				if(current.lte(end)) {
-					break;
-				}
-				if((mode == QuotationMode.LONG && openPriceValue > hit) || (mode == QuotationMode.SHORT && openPriceValue < hit)) {
-					openPriceValue = hit;
-				}
+			double openPriceValue = fibInfo.getFibValue(FibCode.FIB236);
+			if(tradeTrend == TradeTrend.FOLLOW) {
+				openCodeValue = openPriceValue;
 			}
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
 			
-			TradeTrend tradeTrend = getTradeTrend();
-			if(tradeTrend == TradeTrend.FOLLOW) {
-				takeProfitCode = FibCode.FIB618;
+			if(tradeTrend == TradeTrend.AGAINST) {
+				openPriceValue = childFibInfo.getFibValue(FibCode.FIB236);
+				takeProfitCode = FibCode.FIB5;
 			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
@@ -302,11 +293,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return result;
 	}
 	
-	
-	private TradeTrend getTradeTrend() {
-		return tradeTrend;
-	}
-
 	@Override
 	public Klines getStart() {
 		return start;
