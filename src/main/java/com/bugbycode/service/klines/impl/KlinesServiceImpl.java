@@ -1473,6 +1473,10 @@ public class KlinesServiceImpl implements KlinesService {
 					sendEmail(u, subject, text, u.getUsername());
 				}
 				break;
+			} else if(PriceUtil.isBreachShort(hitKline, price)) {
+				//市价做空
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, openPrice, fibInfo.getDecimalPoint()));
+				break;
 			}
 		}
 	}
@@ -1580,6 +1584,10 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					sendEmail(u, subject,text, u.getUsername());
 				}
+				break;
+			} else if(PriceUtil.isBreachLong(hitKline, price)) {
+				//市价做多
+				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, openPrice, fibInfo.getDecimalPoint()));
 				break;
 			}
 		}
