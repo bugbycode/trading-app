@@ -74,6 +74,7 @@ import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
+import com.bugbycode.trading_app.task.position.ClosePositionTask;
 import com.bugbycode.trading_app.task.position.FenceSitterClosePositionTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
@@ -1474,8 +1475,8 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				break;
 			} else if(PriceUtil.isBreachShort(hitKline, price)) {
-				//市价做空
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, openPrice, fibInfo.getDecimalPoint()));
+				//关闭多头仓位
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.PRICE_ACTION, userDetailsService));
 				break;
 			}
 		}
@@ -1586,8 +1587,8 @@ public class KlinesServiceImpl implements KlinesService {
 				}
 				break;
 			} else if(PriceUtil.isBreachLong(hitKline, price)) {
-				//市价做多
-				this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, openPrice, fibInfo.getDecimalPoint()));
+				//关闭空头仓位
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.PRICE_ACTION, userDetailsService));
 				break;
 			}
 		}
