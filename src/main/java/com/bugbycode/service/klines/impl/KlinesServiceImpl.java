@@ -75,7 +75,6 @@ import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.position.ClosePositionTask;
-import com.bugbycode.trading_app.task.position.FenceSitterClosePositionTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
@@ -1141,7 +1140,7 @@ public class KlinesServiceImpl implements KlinesService {
     	
     	if(factory.isClosePosition()) {
     		PositionSide ps = factory.isLong() ? PositionSide.LONG : PositionSide.SHORT;
-    		this.closePositionTaskPool.add(new FenceSitterClosePositionTask(pair, ps, userDetailsService));
+    		this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, AutoTradeType.FENCE_SITTER, userDetailsService));
     	} else if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice())) {
     		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
     	} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice())) {
