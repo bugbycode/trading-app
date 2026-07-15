@@ -188,11 +188,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5)) {
+				openCode = FibCode.FIB5;
+			}
+			
 			if(openCode == FibCode.FIB0) {
 				return;
 			}
 			
-			double openPriceValue = fibInfo.getFibValue(FibCode.FIB236);
+			double openPriceValue = fibInfo.getFibValue(openCode);
 			if(tradeTrend == TradeTrend.FOLLOW) {
 				openCodeValue = openPriceValue;
 			}
