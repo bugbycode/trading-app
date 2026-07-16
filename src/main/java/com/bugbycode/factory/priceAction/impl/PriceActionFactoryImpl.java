@@ -13,7 +13,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -166,20 +165,40 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 
-			TradeTrend tradeTrend = getTradeTrend();
-			if(tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB1)) {
-				openCode = FibCode.FIB1;
+			Klines last = PriceUtil.getLastKlines(list);
+			
+			double openPriceValue = isLong() ? last.getHighPriceDoubleValue() : last.getLowPriceDoubleValue();
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				if(current.lte(end)) {
+					break;
+				}
+				
+				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
+				if((isLong() && openPriceValue > hitPrice) || (isShort() && openPriceValue < hitPrice)) {
+					openPriceValue = hitPrice;
+				}
 			}
 			
-			double openPriceValue = fibInfo.getFibValue(openCode);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				Klines parent = list.get(index - 1);
+				if(current.lte(end)) {
+					break;
+				}
+				
+				double hitPrice = current.getClosePriceDoubleValue();
+				if((isLong() && PriceUtil.verifyPowerful_v28(current, parent) && openPriceValue > hitPrice) 
+						|| (isShort() && PriceUtil.verifyDeclining_v28(current, parent) && openPriceValue < hitPrice)) {
+					openPriceValue = hitPrice;
+				}
+			}
+			
+			//double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB5;
-			
-			if(tradeTrend == TradeTrend.FOLLOW) {
-				takeProfitCode = FibCode.FIB618;
-			}
+			FibCode takeProfitCode = FibCode.FIB618;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -206,11 +225,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
@@ -260,14 +279,4 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		return result;
 	}
 	
-	private TradeTrend getTradeTrend() {
-		TradeTrend tradeTrend = TradeTrend.AGAINST;
-		Klines last = PriceUtil.getLastKlines(list);
-		if(last != null) {
-			if((isLong() && last.getDea() > 0) || (isShort() && last.getDea() < 0)) {
-				tradeTrend = TradeTrend.FOLLOW;
-			}
-		}
-		return tradeTrend;
-	}
 }
