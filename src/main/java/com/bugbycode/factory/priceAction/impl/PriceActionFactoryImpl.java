@@ -198,7 +198,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB618;
+			FibCode takeProfitCode = FibCode.FIB382;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -225,19 +225,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getMacd() > 0 && k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
