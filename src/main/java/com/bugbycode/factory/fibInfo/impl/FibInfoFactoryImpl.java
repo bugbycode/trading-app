@@ -192,7 +192,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			double openPriceValue = fibInfo.getFibValue(FibCode.FIB236);
+			double openPriceValue = fibInfo.getFibValue(openCode);
 			if(tradeTrend == TradeTrend.FOLLOW) {
 				openCodeValue = openPriceValue;
 			}
@@ -200,13 +200,22 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
+			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			if(tradeTrend == TradeTrend.AGAINST) {
-				openPriceValue = childFibInfo.getFibValue(FibCode.FIB236);
-				takeProfitCode = FibCode.FIB5;
+				//openPriceValue = childFibInfo.getFibValue(FibCode.FIB236);
+				//takeProfitCode = FibCode.FIB5;
+				FibInfoFactory parentFactory = new FibInfoFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
+				List<OpenPrice> parentOpenPrices = parentFactory.getOpenPrices();
+				if(CollectionUtils.isEmpty(parentOpenPrices)) {
+					return;
+				}
+				OpenPrice parentOpenPrice = parentOpenPrices.get(0);
+				openPriceValue = parentOpenPrice.getPrice();
+				//openCode = parentOpenPrice.getCode();
+				takeProfitCode = getAginstTakeProfitCode(parentOpenPrice.getCode());
+				takeProfitCodeValue = parentFactory.getFibInfo().getFibValue(takeProfitCode);
 			}
-			
-			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
@@ -303,4 +312,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return end;
 	}
 	
+	private FibCode getAginstTakeProfitCode(FibCode code) {
+		FibCode takeProfitCode = FibCode.FIB0;
+		FibCode[] codes = FibCode.values();
+		for(int index = 1; index < codes.length; index++) {
+			if(code == codes[index]) {
+				takeProfitCode = codes[index - 1];
+				break;
+			}
+		}
+		return takeProfitCode;
+	}
 }
