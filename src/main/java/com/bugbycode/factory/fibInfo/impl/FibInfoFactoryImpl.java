@@ -193,9 +193,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
-			if(tradeTrend == TradeTrend.FOLLOW) {
+			/*if(tradeTrend == TradeTrend.FOLLOW) {
 				openCodeValue = openPriceValue;
-			}
+			}*/
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
