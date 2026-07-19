@@ -1174,7 +1174,8 @@ public class KlinesServiceImpl implements KlinesService {
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
 		EoptionFactory[] factories = {
-				new EoptionFactoryImpl(list_1h, list_1h, list_15m)
+				new EoptionFactoryImpl(list_1d, list_1d, list_15m, TradeTrend.FOLLOW), 
+				new EoptionFactoryImpl(list_1d, list_1d, list_15m, TradeTrend.AGAINST), 
 			};
 		
 		for(EoptionFactory factory : factories) {
@@ -1235,6 +1236,29 @@ public class KlinesServiceImpl implements KlinesService {
 								pair, 
 								price.getCode().getDescription(),
 								PriceUtil.formatDoubleDecimal(price.getPrice(), last.getDecimalNum()),
+								DateFormatUtil.format(new Date()));
+						
+						String text = price.toString();
+						
+						sendEmail(u, subject,text, u.getUsername());
+					}
+				} else if(PriceUtil.hitPrice(last, price.getSecondTakeProfit())) {
+					//
+					List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
+					
+					for(User u : userList) {
+						
+						if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
+							continue;
+						}
+						
+						String typeStr = factory.isLong() ? "看涨" : "看跌";
+						
+						//开仓订阅提醒
+						String subject = String.format("%s%s期权%s平仓提醒 %s", 
+								pair, 
+								typeStr,
+								PriceUtil.formatDoubleDecimal(price.getSecondTakeProfit(), last.getDecimalNum()),
 								DateFormatUtil.format(new Date()));
 						
 						String text = price.toString();

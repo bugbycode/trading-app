@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.eoption.EoptionFactory;
+import com.bugbycode.factory.fibInfo.FibInfoFactory;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -58,7 +60,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(tradeTrend);
 		}
 	}
 	
@@ -79,11 +81,11 @@ public class EoptionFactoryImpl implements EoptionFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(tradeTrend);
 		}
 	}
 	
-	private void init() {
+	private void init(TradeTrend tradeTrend) {
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -95,6 +97,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 		
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateAllBBPercentB(list);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -191,44 +194,26 @@ public class EoptionFactoryImpl implements EoptionFactory {
 				return;
 			}
 			
-			Klines last = PriceUtil.getLastKlines(list);
-			double openPriceValue = isLong() ? last.getHighPriceDoubleValue() : last.getLowPriceDoubleValue();
-			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				double hit = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
-				if(current.lte(end)) {
-					break;
-				}
-				if((mode == QuotationMode.LONG && openPriceValue > hit) || (mode == QuotationMode.SHORT && openPriceValue < hit)) {
-					openPriceValue = hit;
-				}
-			}
-			
-			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				Klines parent = list.get(index - 1);
-				if(current.lte(end)) {
-					break;
-				}
-				double closePrice = current.getClosePriceDoubleValue();
-				if((mode == QuotationMode.LONG && PriceUtil.verifyPowerful_v28(current, parent) && openPriceValue > closePrice) 
-						|| (mode == QuotationMode.SHORT && PriceUtil.verifyDeclining_v28(current, parent) && openPriceValue < closePrice)) {
-					openPriceValue = closePrice;
-				}
-			}
+			double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
-			
-			TradeTrend tradeTrend = getTradeTrend();
-			if(tradeTrend == TradeTrend.FOLLOW) {
-				takeProfitCode = FibCode.FIB618;
-			}
-			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
+			
+			if(tradeTrend == TradeTrend.AGAINST) {
+				
+				FibInfoFactory parentFactory = new FibInfoFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
+				List<OpenPrice> parentOpenPrices = parentFactory.getOpenPrices();
+				if(CollectionUtils.isEmpty(parentOpenPrices)) {
+					return;
+				}
+				OpenPrice parentOpenPrice = parentOpenPrices.get(0);
+				openPriceValue = parentOpenPrice.getPrice();
+				
+				takeProfitCode = getAginstTakeProfitCode(parentOpenPrice.getCode());
+				takeProfitCodeValue = parentFactory.getFibInfo().getFibValue(takeProfitCode);
+			}
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
@@ -315,9 +300,16 @@ public class EoptionFactoryImpl implements EoptionFactory {
 		return result;
 	}
 	
-	
-	private TradeTrend getTradeTrend() {
-		return tradeTrend;
+	private FibCode getAginstTakeProfitCode(FibCode code) {
+		FibCode takeProfitCode = FibCode.FIB0;
+		FibCode[] codes = FibCode.values();
+		for(int index = 1; index < codes.length; index++) {
+			if(code == codes[index]) {
+				takeProfitCode = codes[index - 1];
+				break;
+			}
+		}
+		return takeProfitCode;
 	}
 
 }
