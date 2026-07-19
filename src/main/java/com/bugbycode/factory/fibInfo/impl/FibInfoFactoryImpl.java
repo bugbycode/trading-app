@@ -193,9 +193,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
-			/*if(tradeTrend == TradeTrend.FOLLOW) {
-				openCodeValue = openPriceValue;
-			}*/
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
@@ -203,8 +200,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			if(tradeTrend == TradeTrend.AGAINST) {
-				//openPriceValue = childFibInfo.getFibValue(FibCode.FIB236);
-				//takeProfitCode = FibCode.FIB5;
+				
 				FibInfoFactory parentFactory = new FibInfoFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
 				List<OpenPrice> parentOpenPrices = parentFactory.getOpenPrices();
 				if(CollectionUtils.isEmpty(parentOpenPrices)) {
@@ -212,7 +208,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				}
 				OpenPrice parentOpenPrice = parentOpenPrices.get(0);
 				openPriceValue = parentOpenPrice.getPrice();
-				//openCode = parentOpenPrice.getCode();
+				
 				takeProfitCode = getAginstTakeProfitCode(parentOpenPrice.getCode());
 				takeProfitCodeValue = parentFactory.getFibInfo().getFibValue(takeProfitCode);
 			}
