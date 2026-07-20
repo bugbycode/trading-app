@@ -39,7 +39,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || CollectionUtils.isEmpty(list_15m)) {
+		if(CollectionUtils.isEmpty(list) || list.size() < 25 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
@@ -49,29 +49,54 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 		
 		PriceUtil.calculateMACD(list);
 		
-		Klines last = PriceUtil.getLastKlines(list);
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
+		PositionSide ps_mode = PositionSide.DEFAULT;
 		
-		double hitPrice = last.getClosePriceDoubleValue();
+		double openPriceValue = 0;
+		
+		for(int index = list.size() - 1; index > 1; index--) {
+			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
+			Klines next = list.get(index - 2);
+			
+			if(ps_mode == PositionSide.DEFAULT) {
+				if(PriceUtil.verifyPowerful_v14(current, parent)) {
+					ps_mode = PositionSide.LONG;
+				} else if(PriceUtil.verifyDeclining_v14(current, parent)) {
+					ps_mode = PositionSide.SHORT;
+				}
+			}
+			
+			if((ps_mode == PositionSide.LONG && PriceUtil.verifyPowerful_v10(current, parent, next))
+					|| (ps_mode == PositionSide.SHORT && PriceUtil.verifyDeclining_v10(current, parent, next))) {
+				openPriceValue = current.getClosePriceDoubleValue();
+				break;
+			}
+		}
+		
+		if(ps_mode == PositionSide.DEFAULT || openPriceValue == 0) {
+			return;
+		}
+		
+		Klines last_15m = PriceUtil.getLastKlines(list_15m);
 		double last_15m_close = last_15m.getClosePriceDoubleValue();
 		
-		if(last.getDea() >= 0 && last_15m_close >= hitPrice) {
+		if(ps_mode == PositionSide.LONG && last_15m_close >= openPriceValue) {
 			this.ps = PositionSide.LONG;
-		} else if(last.getDea() >= 0 && last_15m_close < hitPrice) {
+		} else if(ps_mode == PositionSide.LONG && last_15m_close < openPriceValue) {
 			this.ps = PositionSide.SHORT;
-		} else if(last.getDea() < 0 && last_15m_close <= hitPrice) {
+		} else if(ps_mode == PositionSide.SHORT && last_15m_close <= openPriceValue) {
 			this.ps = PositionSide.SHORT;
-		} else if(last.getDea() < 0 && last_15m_close > hitPrice) {
+		} else if(ps_mode == PositionSide.SHORT && last_15m_close > openPriceValue) {
 			this.ps = PositionSide.LONG;
 		}
 		
 		double cutLoss = 10;
-		double stopLossLimit = this.ps == PositionSide.LONG ? PriceUtil.rectificationCutLossLongPrice_v3(hitPrice, cutLoss)
-				: PriceUtil.rectificationCutLossShortPrice_v3(hitPrice, cutLoss);
+		double stopLossLimit = this.ps == PositionSide.LONG ? PriceUtil.rectificationCutLossLongPrice_v3(openPriceValue, cutLoss)
+				: PriceUtil.rectificationCutLossShortPrice_v3(openPriceValue, cutLoss);
 		
-		stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, last.getDecimalNum());
+		stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, last_15m.getDecimalNum());
 		
-		this.openPrice = new OpenPriceDetails(FibCode.FIB1, hitPrice, stopLossLimit, AutoTradeType.FENCE_SITTER);
+		this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER);
 	}
 
 	@Override
