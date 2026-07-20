@@ -208,7 +208,7 @@ public class KlinesServiceTest {
     	String pair = "DOGEUSDT";
     	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl_v2(list);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl_v2(list, list_15m);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
