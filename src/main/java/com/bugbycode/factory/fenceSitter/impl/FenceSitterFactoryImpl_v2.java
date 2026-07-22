@@ -26,7 +26,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 	
 	private PositionSide ps = PositionSide.DEFAULT;
 	
-	public FenceSitterFactoryImpl_v2(List<Klines> list, List<Klines> list_15m) {
+	public FenceSitterFactoryImpl_v2(List<Klines> list) {
 		this.list = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		if(!CollectionUtils.isEmpty(list)) {
@@ -39,7 +39,7 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 	}
 	
 	private void init() {
-		if(CollectionUtils.isEmpty(list) || list.size() < 25 || CollectionUtils.isEmpty(list_15m)) {
+		if(CollectionUtils.isEmpty(list)) {
 			return;
 		}
 		
@@ -47,56 +47,29 @@ public class FenceSitterFactoryImpl_v2 implements FenceSitterFactory{
 		this.list.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateMACD(list);
-		
-		PositionSide ps_mode = PositionSide.DEFAULT;
-		
-		double openPriceValue = 0;
-		
-		for(int index = list.size() - 1; index > 1; index--) {
+		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
 			Klines parent = list.get(index - 1);
-			Klines next = list.get(index - 2);
-			
-			if(ps_mode == PositionSide.DEFAULT) {
-				if(PriceUtil.verifyPowerful_v14(current, parent)) {
-					ps_mode = PositionSide.LONG;
-				} else if(PriceUtil.verifyDeclining_v14(current, parent)) {
-					ps_mode = PositionSide.SHORT;
+			if(this.ps == PositionSide.DEFAULT) {
+				if(current.isRise()) {
+					this.ps = PositionSide.LONG;
+				} else {
+					this.ps = PositionSide.SHORT;
 				}
 			}
 			
-			if((ps_mode == PositionSide.LONG && PriceUtil.verifyPowerful_v10(current, parent, next))
-					|| (ps_mode == PositionSide.SHORT && PriceUtil.verifyDeclining_v10(current, parent, next))) {
-				openPriceValue = current.getClosePriceDoubleValue();
+			if((this.ps == PositionSide.LONG && parent.isFall()) 
+					|| (this.ps == PositionSide.SHORT && parent.isRise())) {
+				double openPriceValue = current.getClosePriceDoubleValue();
+				Klines stopLossKlines = this.ps == PositionSide.LONG ? 
+						PriceUtil.getMinPriceKlines(current, parent) : PriceUtil.getMaxPriceKlines(current, parent);
+				double stopLossLimit = this.ps == PositionSide.LONG ? 
+						stopLossKlines.getLowPriceDoubleValue() : stopLossKlines.getHighPriceDoubleValue();
+				
+				this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER);
 				break;
 			}
 		}
-		
-		if(ps_mode == PositionSide.DEFAULT || openPriceValue == 0) {
-			return;
-		}
-		
-		Klines last_15m = PriceUtil.getLastKlines(list_15m);
-		double last_15m_close = last_15m.getClosePriceDoubleValue();
-		
-		if(ps_mode == PositionSide.LONG && last_15m_close >= openPriceValue) {
-			this.ps = PositionSide.LONG;
-		} else if(ps_mode == PositionSide.LONG && last_15m_close < openPriceValue) {
-			this.ps = PositionSide.SHORT;
-		} else if(ps_mode == PositionSide.SHORT && last_15m_close <= openPriceValue) {
-			this.ps = PositionSide.SHORT;
-		} else if(ps_mode == PositionSide.SHORT && last_15m_close > openPriceValue) {
-			this.ps = PositionSide.LONG;
-		}
-		
-		double cutLoss = 10;
-		double stopLossLimit = this.ps == PositionSide.LONG ? PriceUtil.rectificationCutLossLongPrice_v3(openPriceValue, cutLoss)
-				: PriceUtil.rectificationCutLossShortPrice_v3(openPriceValue, cutLoss);
-		
-		stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, last_15m.getDecimalNum());
-		
-		this.openPrice = new OpenPriceDetails(FibCode.FIB1, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER);
 	}
 
 	@Override

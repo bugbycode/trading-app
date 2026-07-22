@@ -1135,7 +1135,7 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFenceSitter(List<Klines> list, List<Klines> list_15m) {
 		
-		FenceSitterFactory factory = new FenceSitterFactoryImpl_v2(list, list_15m);
+		FenceSitterFactory factory = new FenceSitterFactoryImpl_v2(list_15m);
     	
 		if(!(factory.isLong() || factory.isShort())) {
     		return;
