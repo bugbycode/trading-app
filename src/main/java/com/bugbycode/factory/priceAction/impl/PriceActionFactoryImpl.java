@@ -184,12 +184,16 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
+			if(openCode == FibCode.FIB1_272) {
+				openCode = FibCode.FIB1;
+			}
+			
 			if(openCode == FibCode.FIB0) {
 				return;
 			} else if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5)) {
 				openCode = FibCode.FIB5;
-			} else if(tradeTrend == TradeTrend.AGAINST && openCode.lt(FibCode.FIB1_618)) {
-				openCode = FibCode.FIB1_618;
+			} else if(tradeTrend == TradeTrend.AGAINST && openCode.lt(FibCode.FIB1)) {
+				openCode = FibCode.FIB1;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
