@@ -3,6 +3,7 @@ package com.bugbycode.module.price;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 
 /**
@@ -66,4 +67,8 @@ public interface OpenPrice {
 	public boolean isResetStopLoss();
 	
 	public void setResetStopLoss(boolean resetStopLoss);
+	
+	public AutoTrade getAutoTrade();
+	
+	public void setAutoTrade(AutoTrade autoTrade);
 }

@@ -3,6 +3,7 @@ package com.bugbycode.module.price.impl;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.util.PriceUtil;
@@ -24,6 +25,8 @@ public class OpenPriceDetails implements OpenPrice {
 	private AutoTradeType autoTradeType = AutoTradeType.DEFAULT;
 	
 	private boolean resetStopLoss = true;
+	
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	/**
 	 * 开仓价格信息
@@ -181,5 +184,13 @@ public class OpenPriceDetails implements OpenPrice {
 
 	public void setResetStopLoss(boolean resetStopLoss) {
 		this.resetStopLoss = resetStopLoss;
+	}
+
+	public AutoTrade getAutoTrade() {
+		return autoTrade;
+	}
+
+	public void setAutoTrade(AutoTrade autoTrade) {
+		this.autoTrade = autoTrade;
 	}
 }

@@ -14,6 +14,7 @@ import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.TradeTrend;
+import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -43,6 +44,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private List<OpenPrice> openPrices;
 	
 	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
+	
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -173,9 +176,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
+		Klines fibAfterKline = null;
+		if((isLong() && end.isFall()) || (isShort() && end.isRise())) {
+			fibAfterKline = end;
+		} else {
+			fibAfterKline = PriceUtil.getAfterKlines(end, this.list);
+		}
+		
 		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -184,19 +193,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			if(openCode == FibCode.FIB1_272) {
-				openCode = FibCode.FIB1;
-			}
+			Klines last_15m = PriceUtil.getLastKlines(list_15m);
+			double last_15m_close = last_15m.getClosePriceDoubleValue();
 			
-			if(openCode == FibCode.FIB0) {
-				return;
-			} else if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5)) {
-				openCode = FibCode.FIB5;
-			} else if(tradeTrend == TradeTrend.AGAINST && openCode.lt(FibCode.FIB1)) {
-				openCode = FibCode.FIB1;
-			}
+			double openPriceValue = isLong() ? ms.getMinBodyLowPrice() : ms.getMaxBodyHighPrice();
 			
-			double openPriceValue = fibInfo.getFibValue(openCode);
+			if((isLong() && last_15m_close <= openPriceValue)
+					|| (isShort() && last_15m_close >= openPriceValue)) {
+				autoTrade = AutoTrade.CLOSE;
+			}
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
@@ -255,6 +260,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
+			price.setAutoTrade(autoTrade);
 			openPrices.add(price);
 		}
 	}

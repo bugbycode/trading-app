@@ -1107,7 +1107,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		PriceActionFactory[] factorys = {
 				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.FOLLOW),
-				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST),
+				//new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST),
 		};
 		
 		for(PriceActionFactory factory : factorys) {
@@ -1435,6 +1435,7 @@ public class KlinesServiceImpl implements KlinesService {
 			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
+					&& openPrice.getAutoTrade() == AutoTrade.OPEN
 					) {
 			
 				//市价做多
@@ -1546,6 +1547,7 @@ public class KlinesServiceImpl implements KlinesService {
 					PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
+					&& openPrice.getAutoTrade() == AutoTrade.OPEN
 					) {
 			
 				//市价做空
