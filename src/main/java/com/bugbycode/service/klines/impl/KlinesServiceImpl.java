@@ -1136,27 +1136,37 @@ public class KlinesServiceImpl implements KlinesService {
 	@Override
 	public void futuresFenceSitter(List<Klines> list, List<Klines> list_15m) {
 		
-		FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m);
+		FenceSitterFactory[] factories = {
+				new FenceSitterFactoryImpl(list, list_15m, QuotationMode.LONG),
+				new FenceSitterFactoryImpl(list, list_15m, QuotationMode.SHORT)
+		};
     	
-		if(!(factory.isLong() || factory.isShort())) {
-    		return;
-    	}
-    	
-    	Klines last = PriceUtil.getLastKlines(list_15m);
-    	String pair = last.getPair();
-    	int decimalNum = last.getDecimalNum();
-    	
-    	OpenPrice price = factory.getOpenPrice();
-    	
-    	if(factory.isClosePosition()) {
-    		PositionSide ps = factory.isLong() ? PositionSide.LONG : PositionSide.SHORT;
-    		this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, AutoTradeType.FENCE_SITTER, userDetailsService));
-    	} else if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice())) {
-    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
-    	} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice())) {
-    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, decimalNum));
-    	}
-    	
+		for(FenceSitterFactory factory : factories) {
+			if(!(factory.isLong() || factory.isShort())) {
+	    		return;
+	    	}
+	    	
+	    	Klines last = PriceUtil.getLastKlines(list_15m);
+	    	String pair = last.getPair();
+	    	int decimalNum = last.getDecimalNum();
+	    	
+	    	OpenPrice price = factory.getOpenPrice();
+	    	
+	    	if(factory.isLong()) {
+	    		if(PriceUtil.isBreachLong(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
+		    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
+	    		} else if(PriceUtil.isBreachShort(last, price.getPrice())) {
+	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FENCE_SITTER, userDetailsService));
+	    		}
+	    	} else if(factory.isShort()) {
+	    		if(PriceUtil.isBreachShort(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
+		    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, decimalNum));
+	    		} else if(PriceUtil.isBreachLong(last, price.getPrice())) {
+	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FENCE_SITTER, userDetailsService));
+	    		}
+	    	}
+		}
+		
 	}
 	
 	@Override
