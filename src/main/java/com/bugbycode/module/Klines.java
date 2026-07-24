@@ -60,6 +60,10 @@ public class Klines {
     private double upperBand; // 上轨
     private double middleBand; // 中轨
     private double lowerBand; // 下轨
+    
+    private double k;
+    private double d;
+    private double j;
 
 	public Klines(String pair,long startTime, String openPrice, String highPrice, String lowPrice, 
 			String closePrice, long endTime,String interval,int decimalNum, String v, Long n, String q,
@@ -468,6 +472,30 @@ public class Klines {
 		this.bbPercentB = bbPercentB;
 	}
 
+	public double getK() {
+		return k;
+	}
+
+	public void setK(double k) {
+		this.k = k;
+	}
+
+	public double getD() {
+		return d;
+	}
+
+	public void setD(double d) {
+		this.d = d;
+	}
+
+	public double getJ() {
+		return j;
+	}
+
+	public void setJ(double j) {
+		this.j = j;
+	}
+
 	/**
      * 校验时间级别
      * @param inerval
@@ -480,9 +508,9 @@ public class Klines {
 	@Override
 	public String toString() {
 		return String.format("交易对：%s，开盘时间：%s，开盘价：%s，最高价：%s，最低价：%s，收盘价：%s，收盘时间：%s，时间级别：%s，成交量：%s，成交额：%s，成交笔数：%s，主动买入成交量：%s，主动买入成交额：%s，delta：%s，CVD：%s"
-				+ "，布林带上轨：%s，布林带中轨：%s，布林带下轨：%s", 
+				+ "，布林带上轨：%s，布林带中轨：%s，布林带下轨：%s，k: %s，d：%s，j：%s", 
 				pair,DateFormatUtil.format(startTime),getOpenPrice(),getHighPrice()
 				,getLowPrice(),getClosePrice(),DateFormatUtil.format(endTime),this.interval, this.v, this.q, this.n, this.iv, this.iq, this.delta, this.cvd,
-				getUpperBand(), getMiddleBand(), getLowerBand());
+				getUpperBand(), getMiddleBand(), getLowerBand(), this.k, this.d, this.j);
 	}
 }
