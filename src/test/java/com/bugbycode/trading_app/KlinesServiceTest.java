@@ -207,9 +207,9 @@ public class KlinesServiceTest {
     @Test
     public void testFenceSitter(){
     	String pair = "DOGEUSDT";
-    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m, QuotationMode.SHORT);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -218,7 +218,7 @@ public class KlinesServiceTest {
     	
     	OpenPrice price = factory.getOpenPrice();
     	
-    	logger.info("{} - {}", mode, price);
+    	logger.info("{} - {}, autoTrade: {}", mode, price, price.getAutoTrade());
     	logger.info("isClosePosition: {}", factory.isClosePosition());
     }
 
