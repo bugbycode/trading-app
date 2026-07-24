@@ -6,8 +6,6 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.eoption.EoptionFactory;
-import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -203,7 +201,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			
 			if(tradeTrend == TradeTrend.AGAINST) {
 				
-				FibInfoFactory parentFactory = new FibInfoFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
+				EoptionFactory parentFactory = new EoptionFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
 				List<OpenPrice> parentOpenPrices = parentFactory.getOpenPrices();
 				if(CollectionUtils.isEmpty(parentOpenPrices)) {
 					return;

@@ -271,6 +271,7 @@ public class KlinesServiceImpl implements KlinesService {
 			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
+					&& openPrice.getAutoTrade() == AutoTrade.OPEN
 					) {
 			
 				//市价做多
@@ -370,6 +371,7 @@ public class KlinesServiceImpl implements KlinesService {
 			if(PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
+					&& openPrice.getAutoTrade() == AutoTrade.OPEN
 					) {
 			
 				//市价做空
@@ -1077,8 +1079,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		FibInfoFactory[] factorys = {
-				new FibInfoFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.FOLLOW),
-				new FibInfoFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST)
+				new FibInfoFactoryImpl(list_4h, list_4h, list_15m)
 		};
 		
 		for(FibInfoFactory factory : factorys) {

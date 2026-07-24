@@ -41,8 +41,4 @@ public interface FibInfoFactory {
 	 */
 	public boolean isShort();
 	
-	public Klines getStart();
-	
-	public Klines getEnd();
-	
 }
