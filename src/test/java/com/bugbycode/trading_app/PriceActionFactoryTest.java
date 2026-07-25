@@ -54,7 +54,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m, TradeTrend.AGAINST);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m);
         
         logger.info("init factory finish.");
         
