@@ -194,17 +194,25 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			Klines last_15m = PriceUtil.getLastKlines(list_15m);
-			double last_15m_close = last_15m.getClosePriceDoubleValue();
+			Klines last = PriceUtil.getLastKlines(list);
 			
-			double openPriceValue = isLong() ? ms.getMinBodyLowPrice() : ms.getMaxBodyHighPrice();
+			double openPriceValue = isLong() ? last.getHighPriceDoubleValue() : last.getLowPriceDoubleValue();
 			
-			if((isLong() && last_15m_close <= openPriceValue)
-					|| (isShort() && last_15m_close >= openPriceValue)) {
-				autoTrade = AutoTrade.CLOSE;
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				if(current.lte(end)) {
+					break;
+				}
+				
+				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
+				
+				if((isLong() && openPriceValue > hitPrice)
+						|| (isShort() && openPriceValue < hitPrice)) {
+					openPriceValue = hitPrice;
+				}
 			}
 			
-			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+			FibInfo childFibInfo = new FibInfo(fib0Value, openPriceValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
 			if(tradeTrend == TradeTrend.AGAINST) {
