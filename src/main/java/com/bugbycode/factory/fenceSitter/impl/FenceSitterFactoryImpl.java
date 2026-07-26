@@ -241,6 +241,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 	
 	private void addPrices(OpenPrice price) {
+		price.setResetStopLoss(false);
 		price.setAutoTrade(autoTrade);
 		this.openPrice = price;
 	}
