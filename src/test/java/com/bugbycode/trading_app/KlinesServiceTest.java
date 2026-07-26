@@ -24,7 +24,6 @@ import com.bugbycode.factory.eoption.EoptionFactory;
 import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
 import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl;
-import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl_v2;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
@@ -206,7 +205,7 @@ public class KlinesServiceTest {
     
     @Test
     public void testFenceSitter(){
-    	String pair = "XRPUSDT";
+    	String pair = "ZAMAUSDT";
     	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
     	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m);
