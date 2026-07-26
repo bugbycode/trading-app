@@ -1137,8 +1137,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresFenceSitter(List<Klines> list, List<Klines> list_15m) {
 		
 		FenceSitterFactory[] factories = {
-				new FenceSitterFactoryImpl(list, list_15m, QuotationMode.LONG),
-				new FenceSitterFactoryImpl(list, list_15m, QuotationMode.SHORT)
+				new FenceSitterFactoryImpl(list, list, list_15m)
 		};
     	
 		for(FenceSitterFactory factory : factories) {
