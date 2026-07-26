@@ -94,7 +94,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow(current)) {
+					if(verifyLow_end(current)) {
 						first = current;
 						break;
 					}
@@ -109,7 +109,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh_end(current)) {
 						first = current;
 						break;
 					}
@@ -206,10 +206,18 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
+		return k.getDea() < 0;
+	}
+	
+	private boolean verifyHigh_end(Klines k) {
+		return k.getMacd() > 0 && k.getDea() > 0;
+	}
+	
+	private boolean verifyLow_end(Klines k) {
 		return k.getMacd() < 0 && k.getDea() < 0;
 	}
 	
