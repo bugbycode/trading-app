@@ -239,8 +239,7 @@ public class FibInfoFactoryForMacdImpl implements FibInfoFactory {
 	public TradeTrend getTradeTrend() {
 		TradeTrend tradeTrend = TradeTrend.AGAINST;
 		if(fibInfo != null) {
-			Klines last = PriceUtil.getLastKlines(list_trend);
-			if((isLong() && last.getDea() >= 0) || (isShort() && last.getDea() <= 0)) {
+			if((isLong() && end.getDea() >= 0) || (isShort() && end.getDea() <= 0)) {
 				tradeTrend = TradeTrend.FOLLOW;
 			}
 		}
