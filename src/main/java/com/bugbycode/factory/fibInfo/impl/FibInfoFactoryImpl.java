@@ -42,16 +42,34 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private List<OpenPrice> openPrices;
 	
-	private PositionSide ps = PositionSide.DEFAULT;
+	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
 	
-	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, PositionSide ps) {
+	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
-		if(ps != null) {
-			this.ps = ps;
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
+		}
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+			this.init();
+		}
+	}
+	
+	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, TradeTrend tradeTrend) {
+		this.list = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
+		if(tradeTrend != null) {
+			this.tradeTrend = tradeTrend;
 		}
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
@@ -66,8 +84,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private void init() {
-		if(ps == PositionSide.DEFAULT || list_trend.size() < 99 
-				|| list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
+		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
@@ -83,6 +100,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 
+		PositionSide ps = getPositionSide();
+		
 		Klines third = null;
 		Klines second = null;
 		Klines first = null;
@@ -155,12 +174,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			return;
 		}
 		
-		FibInfoFactoryForMacdImpl factoryForMacdImpl = new FibInfoFactoryForMacdImpl(list_trend, list, list_15m, ps);
-		TradeTrend tradeTrend = factoryForMacdImpl.getTradeTrend();
-		if(tradeTrend == TradeTrend.AGAINST) {
-			return;
-		}
-		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
@@ -173,10 +186,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
-			FibCode openCode = fibInfo.getFibCode(openCodeValue);
+			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			if(openCode.lte(FibCode.FIB382)) {
-				openCode = FibCode.FIB5;
+			if(openCode == FibCode.FIB0) {
+				return;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
@@ -184,7 +197,25 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
+			if(openCode.gte(FibCode.FIB5)) {
+				takeProfitCode = FibCode.FIB5;
+			}
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
+			
+			if(tradeTrend == TradeTrend.AGAINST) {
+				
+				FibInfoFactory parentFactory = new FibInfoFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
+				List<OpenPrice> parentOpenPrices = parentFactory.getOpenPrices();
+				if(CollectionUtils.isEmpty(parentOpenPrices)) {
+					return;
+				}
+				OpenPrice parentOpenPrice = parentOpenPrices.get(0);
+				openPriceValue = parentOpenPrice.getPrice();
+				
+				takeProfitCode = getAginstTakeProfitCode(parentOpenPrice.getCode());
+				takeProfitCodeValue = parentFactory.getFibInfo().getFibValue(takeProfitCode);
+			}
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
@@ -192,6 +223,35 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
+		}
+	}
+	
+	private PositionSide getPositionSide() {
+		PositionSide ps = PositionSide.DEFAULT;
+		Klines last = PriceUtil.getLastKlines(list_trend);
+		
+		if(verifyShort(last)) {
+			ps = PositionSide.SHORT;
+		} else if(verifyLong(last)) {
+			ps = PositionSide.LONG;
+		}
+		
+		return ps;
+	}
+	
+	private boolean verifyLong(Klines k) {
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() > 0;
+		} else {
+			return k.getDea() < 0;
+		}
+	}
+	
+	private boolean verifyShort(Klines k) {
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() < 0;
+		} else {
+			return k.getDea() > 0;
 		}
 	}
 	
@@ -204,11 +264,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
+		return k.getDea() > 0 && k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getMacd() < 0 && k.getDea() < 0;
+		return k.getDea() < 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -250,4 +310,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return result;
 	}
 	
+	private FibCode getAginstTakeProfitCode(FibCode code) {
+		FibCode takeProfitCode = FibCode.FIB0;
+		FibCode[] codes = FibCode.values();
+		for(int index = 1; index < codes.length; index++) {
+			if(code == codes[index]) {
+				takeProfitCode = codes[index - 1];
+				break;
+			}
+		}
+		return takeProfitCode;
+	}
 }
