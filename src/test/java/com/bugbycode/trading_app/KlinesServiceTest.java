@@ -205,10 +205,10 @@ public class KlinesServiceTest {
     
     @Test
     public void testFenceSitter(){
-    	String pair = "ZAMAUSDT";
-    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+    	String pair = "BTWUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -223,7 +223,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "DOGEUSDT";
+        String pair = "ETHUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
