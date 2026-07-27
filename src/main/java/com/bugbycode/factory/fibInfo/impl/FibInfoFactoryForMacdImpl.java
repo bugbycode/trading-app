@@ -24,7 +24,7 @@ import com.util.PriceUtil;
 /**
  * 斐波那契回指标撤接口实现类
  */
-public class FibInfoFactoryImpl implements FibInfoFactory {
+public class FibInfoFactoryForMacdImpl implements FibInfoFactory {
 
 	private List<Klines> list;
 	
@@ -44,7 +44,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private PositionSide ps = PositionSide.DEFAULT;
 	
-	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, PositionSide ps) {
+	public FibInfoFactoryForMacdImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, PositionSide ps) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
@@ -66,8 +66,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private void init() {
-		if(ps == PositionSide.DEFAULT || list_trend.size() < 99 
-				|| list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
+		
+		if(this.ps == PositionSide.DEFAULT || list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
@@ -99,7 +99,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow_end(current)) {
+					if(verifyLow(current)) {
 						first = current;
 						break;
 					}
@@ -114,7 +114,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh_end(current)) {
+					if(verifyHigh(current)) {
 						first = current;
 						break;
 					}
@@ -155,12 +155,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			return;
 		}
 		
-		FibInfoFactoryForMacdImpl factoryForMacdImpl = new FibInfoFactoryForMacdImpl(list_trend, list, list_15m, ps);
-		TradeTrend tradeTrend = factoryForMacdImpl.getTradeTrend();
-		if(tradeTrend == TradeTrend.AGAINST) {
-			return;
-		}
-		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
@@ -173,10 +167,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
-			FibCode openCode = fibInfo.getFibCode(openCodeValue);
+			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			if(openCode.lte(FibCode.FIB236)) {
-				openCode = FibCode.FIB382;
+			if(openCode.lte(FibCode.FIB382)) {
+				openCode = FibCode.FIB5;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
@@ -196,19 +190,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
-	}
-	
-	private boolean verifyHigh_end(Klines k) {
-		return k.getMacd() > 0 && k.getDea() > 0;
-	}
-	
-	private boolean verifyLow_end(Klines k) {
-		return k.getMacd() < 0 && k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
@@ -250,4 +236,14 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		return result;
 	}
 	
+	public TradeTrend getTradeTrend() {
+		TradeTrend tradeTrend = TradeTrend.AGAINST;
+		if(fibInfo != null) {
+			Klines last = PriceUtil.getLastKlines(list_trend);
+			if((isLong() && last.getDea() >= 0) || (isShort() && last.getDea() <= 0)) {
+				tradeTrend = TradeTrend.FOLLOW;
+			}
+		}
+		return tradeTrend;
+	}
 }
