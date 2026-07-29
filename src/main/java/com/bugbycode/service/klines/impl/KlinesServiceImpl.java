@@ -1108,10 +1108,8 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
-				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.FOLLOW, PositionSide.LONG),
-				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.FOLLOW, PositionSide.SHORT),
-				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST, PositionSide.LONG),
-				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST, PositionSide.SHORT),
+				new PriceActionFactoryImpl(list_4h, list_1h, list_15m),
+				new PriceActionFactoryImpl(list_1h, list_15m, list_15m),
 		};
 		
 		for(PriceActionFactory factory : factorys) {
