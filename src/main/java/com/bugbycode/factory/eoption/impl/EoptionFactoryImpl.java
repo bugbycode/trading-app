@@ -165,7 +165,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			if(openCode.lte(FibCode.FIB382)) {
-				openCode = FibCode.FIB5;
+				return;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
