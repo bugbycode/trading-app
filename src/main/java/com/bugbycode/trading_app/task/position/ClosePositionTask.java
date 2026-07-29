@@ -1,5 +1,6 @@
 package com.bugbycode.trading_app.task.position;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -36,8 +37,22 @@ public class ClosePositionTask implements Runnable{
 	
 	private TradingWebSocketClientEndpoint websocketApi;
 	
+	private User user;
+	
 	/**
-	 * 
+	 * 关闭用户持仓任务
+	 * @param pair 交易对
+	 * @param ps 要关闭的持仓方向 LONG/SHORT
+	 * @param user 相关用户
+	 */
+	public ClosePositionTask(String pair, PositionSide ps, User user) {
+		this.pair = pair;
+		this.ps = ps;
+		this.user = user;
+	}
+	
+	/**
+	 * 关闭用户持仓任务
 	 * @param pair 交易对
 	 * @param ps 要关闭的持仓方向 LONG/SHORT
 	 * @param autoTradeType 指标
@@ -56,7 +71,14 @@ public class ClosePositionTask implements Runnable{
 		try {
 			this.websocketApi = new TradingWebSocketClientEndpoint(AppConfig.WEBSOCKET_API_URL);
 			this.binanceWebsocketTradeService = new BinanceWebsocketTradeServiceImpl(this.websocketApi);
-			List<User> userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
+			
+			List<User> userList = new ArrayList<User>();
+			if(user == null && userDetailsService != null) {
+				userList = userDetailsService.queryByAutoTrade(AutoTrade.OPEN, autoTradeType);
+			} else if(user != null) {
+				userList.add(user);
+			}
+			
 			for(User u : userList) {
 				String binanceApiKey = u.getBinanceApiKey();
 				String binanceSecretKey = u.getBinanceSecretKey();

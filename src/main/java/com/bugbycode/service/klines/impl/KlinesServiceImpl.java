@@ -64,6 +64,7 @@ import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.module.trading.PositionSide;
+import com.bugbycode.module.trading.Type;
 import com.bugbycode.module.user.User;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.repository.klines.KlinesRepository;
@@ -787,7 +788,13 @@ public class KlinesServiceImpl implements KlinesService {
 					String title = "下单" + pair + "多头仓位时出现异常";
 					String message = e.getMessage();
 					if(e instanceof OrderPlaceException) {
-						title = ((OrderPlaceException)e).getTitle();
+						OrderPlaceException orderEx = (OrderPlaceException)e;
+						title = orderEx.getTitle();
+						Type type = orderEx.getType();
+						if(type == Type.STOP || type == Type.STOP_MARKET) {
+							//关闭仓位
+							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u));
+						}
 					}
 					
 					message += "\r\n" + orderBackTitle + "\r\n" + orderBackBody ;
@@ -1051,7 +1058,13 @@ public class KlinesServiceImpl implements KlinesService {
 					String title = "下单" + pair + "空头仓位时出现异常";
 					String message = e.getMessage();
 					if(e instanceof OrderPlaceException) {
-						title = ((OrderPlaceException)e).getTitle();
+						OrderPlaceException orderEx = (OrderPlaceException)e;
+						title = orderEx.getTitle();
+						Type type = orderEx.getType();
+						if(type == Type.STOP || type == Type.STOP_MARKET) {
+							//关闭仓位
+							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u));
+						}
 					}
 					
 					message += "\r\n" + orderBackTitle + "\r\n" + orderBackBody ;

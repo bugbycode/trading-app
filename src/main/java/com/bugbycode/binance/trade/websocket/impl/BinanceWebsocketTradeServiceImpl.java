@@ -338,7 +338,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常";
 				String message = type.value() + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
 				//throw new OrderPlaceException(title, message);
-				return new Result<BinanceOrderInfo, RuntimeException>(order, new OrderPlaceException(title, message));
+				return new Result<BinanceOrderInfo, RuntimeException>(order, new OrderPlaceException(title, message, type));
 			}
 			
 		}
