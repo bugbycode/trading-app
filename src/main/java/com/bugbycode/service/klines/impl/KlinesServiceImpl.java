@@ -31,7 +31,7 @@ import com.bugbycode.factory.eoption.impl.EoptionFactoryImpl;
 import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
 import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl;
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
-import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
+import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl_v2;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.DualSidePositionStatus;
@@ -49,7 +49,6 @@ import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
-import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.VolumeMonitorStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
@@ -1092,8 +1091,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		FibInfoFactory[] factorys = {
-				new FibInfoFactoryImpl(list_4h, list_1h, list_15m, TradeTrend.FOLLOW),
-				new FibInfoFactoryImpl(list_4h, list_1h, list_15m, TradeTrend.AGAINST),
+				new FibInfoFactoryImpl_v2(list_1h, list_1h, list_15m)
 		};
 		
 		for(FibInfoFactory factory : factorys) {
