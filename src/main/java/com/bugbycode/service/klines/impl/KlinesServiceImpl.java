@@ -1120,7 +1120,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		PriceActionFactory[] factorys = {
 				new PriceActionFactoryImpl(list_4h, list_1h, list_15m),
-				new PriceActionFactoryImpl(list_1h, list_15m, list_15m),
+				//new PriceActionFactoryImpl(list_1h, list_15m, list_15m),
 		};
 		
 		for(PriceActionFactory factory : factorys) {
