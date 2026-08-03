@@ -1093,7 +1093,7 @@ public class KlinesServiceImpl implements KlinesService {
 		
 		FibInfoFactory[] factorys = {
 				new FibInfoFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.FOLLOW),
-				new FibInfoFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST),
+				//new FibInfoFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST),
 		};
 		
 		for(FibInfoFactory factory : factorys) {
