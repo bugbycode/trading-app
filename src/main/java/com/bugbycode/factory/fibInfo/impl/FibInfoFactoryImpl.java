@@ -188,18 +188,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			if(openCode == FibCode.FIB0) {
-				return;
+			if(openCode.lte(FibCode.FIB382)) {
+				openCode = FibCode.FIB5;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB618;
-			if(openCode.gte(FibCode.FIB5)) {
-				takeProfitCode = FibCode.FIB5;
-			}
+			FibCode takeProfitCode = FibCode.FIB5;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
