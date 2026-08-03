@@ -166,8 +166,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			if(openCode.lte(FibCode.FIB382)) {
 				openCode = FibCode.FIB5;
-			} else if(openCode == FibCode.FIB1_272) {
-				openCode = FibCode.FIB1;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
