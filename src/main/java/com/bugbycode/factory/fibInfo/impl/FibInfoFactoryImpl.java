@@ -192,6 +192,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB382)) {
+				openCode = FibCode.FIB5;
+			}
+			
 			double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
