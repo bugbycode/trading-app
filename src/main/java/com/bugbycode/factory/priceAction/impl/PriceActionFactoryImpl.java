@@ -164,15 +164,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			if(openCode.lte(FibCode.FIB382)) {
-				openCode = FibCode.FIB5;
+			if(openCode == FibCode.FIB0) {
+				return;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB5;
+			FibCode takeProfitCode = FibCode.FIB618;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
