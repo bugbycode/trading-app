@@ -202,6 +202,12 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			FibCode takeProfitCode = FibCode.FIB5;
 			
+			if(openCode.lte(FibCode.FIB382)) {
+				takeProfitCode = FibCode.FIB618;
+			} else if(tradeTrend == TradeTrend.AGAINST && openCode.gte(FibCode.FIB2_618)) {
+				takeProfitCode = FibCode.FIB382;
+			}
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
