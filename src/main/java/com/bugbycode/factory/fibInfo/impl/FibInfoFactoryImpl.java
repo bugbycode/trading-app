@@ -194,6 +194,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			if(tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB382)) {
 				openCode = FibCode.FIB5;
+			} else if(tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB1)) {
+				openCode = FibCode.FIB1;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
@@ -204,8 +206,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			if(openCode.lte(FibCode.FIB382)) {
 				takeProfitCode = FibCode.FIB618;
-			} else if(tradeTrend == TradeTrend.AGAINST && openCode.gte(FibCode.FIB2_618)) {
-				takeProfitCode = FibCode.FIB382;
 			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
