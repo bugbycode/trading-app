@@ -174,7 +174,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			Klines last = PriceUtil.getLastKlines(list);
 			TradeTrend tradeTrend = getTradeTrend(last);
-			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB382)) {
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB618)) {
 				autoTrade = AutoTrade.CLOSE;
 			}
 			
