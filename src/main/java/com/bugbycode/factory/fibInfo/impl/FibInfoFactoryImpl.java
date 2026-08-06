@@ -209,7 +209,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			FibCode takeProfitCode = FibCode.FIB618;
 			
-			if(openCode.gte(FibCode.FIB1)) {
+			if(openCode.gte(FibCode.FIB1) && tradeTrend == TradeTrend.AGAINST) {
 				takeProfitCode = FibCode.FIB5;
 			}
 			
