@@ -199,7 +199,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				autoTrade = AutoTrade.CLOSE;
 			}
 			
-			if(tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB382)) {
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB5)) {
 				autoTrade = AutoTrade.CLOSE;
 			}
 			
