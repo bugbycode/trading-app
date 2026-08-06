@@ -13,6 +13,8 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
+import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -40,6 +42,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
+	
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -168,11 +172,20 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				return;
 			}
 			
+			Klines last = PriceUtil.getLastKlines(list);
+			TradeTrend tradeTrend = getTradeTrend(last);
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB618)) {
+				autoTrade = AutoTrade.CLOSE;
+			}
+			
 			double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
+			if(tradeTrend == TradeTrend.AGAINST && openCode.gte(FibCode.FIB1)) {
+				takeProfitCode = FibCode.FIB5;
+			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -224,6 +237,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
+			price.setAutoTrade(autoTrade);
 			openPrices.add(price);
 		}
 	}
@@ -261,4 +275,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		return result;
 	}
 	
+	
+	private TradeTrend getTradeTrend(Klines last) {
+		TradeTrend tradeTrend = TradeTrend.AGAINST;
+		if((isLong() && last.getDea() > 0) ||
+				(isShort() && last.getDea() < 0)) {
+			tradeTrend = TradeTrend.FOLLOW;
+		}
+		return tradeTrend;
+	}
 }

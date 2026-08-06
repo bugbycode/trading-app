@@ -709,7 +709,8 @@ public class FibInfo {
 		
 		for(int offset = 0;offset < len;offset++) {
 			FibCode code = codes[offset];
-			if(code.gt(FibCode.FIB1)) {
+			double fibValue = getFibValue(code);
+			if(code.gt(FibCode.FIB4_764) || fibValue <= 0) {
 				continue;
 			}
 			if(code.getValue() > 1) {
