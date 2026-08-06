@@ -210,15 +210,15 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			FibCode takeProfitCode = FibCode.FIB618;
 			
 			if(openCode == FibCode.FIB1_272) {
-				takeProfitCode = FibCode.FIB236;
+				takeProfitCode = FibCode.FIB5;
 			} else if(openCode == FibCode.FIB1_618) {
-				takeProfitCode = FibCode.FIB382;
+				takeProfitCode = FibCode.FIB5;
 			} else if(openCode == FibCode.FIB2) {
 				takeProfitCode = FibCode.FIB5;
 			} else if(openCode == FibCode.FIB2_618) {
 				takeProfitCode = FibCode.FIB618;
 			} else if(openCode.gte(FibCode.FIB3_618)) {
-				takeProfitCode = FibCode.FIB786;
+				takeProfitCode = FibCode.FIB618;
 			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
