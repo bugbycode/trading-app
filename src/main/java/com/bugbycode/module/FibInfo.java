@@ -709,11 +709,11 @@ public class FibInfo {
 		
 		for(int offset = 0;offset < len;offset++) {
 			FibCode code = codes[offset];
-			if(!code.isTrade() && code.gt(FibCode.FIB1)) {
+			if(code.gt(FibCode.FIB1)) {
 				continue;
 			}
 			if(code.getValue() > 1) {
-				if(code.gt(FibCode.FIB4_618)) {
+				if(code.gt(FibCode.FIB4_764)) {
 					continue;
 				}
 				if(extensionBuffer.length() > 0) {

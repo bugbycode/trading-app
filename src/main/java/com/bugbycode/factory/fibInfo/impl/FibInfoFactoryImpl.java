@@ -14,6 +14,7 @@ import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.TradeTrend;
+import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -43,6 +44,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private List<OpenPrice> openPrices;
 	
 	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
+	
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -192,10 +195,12 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
+			if(tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB4_764)) {
+				autoTrade = AutoTrade.CLOSE;
+			}
+			
 			if(tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB382)) {
-				openCode = FibCode.FIB5;
-			} else if(tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB1)) {
-				openCode = FibCode.FIB1;
+				autoTrade = AutoTrade.CLOSE;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
@@ -204,7 +209,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			FibCode takeProfitCode = FibCode.FIB5;
 			
-			if(openCode.lte(FibCode.FIB382)) {
+			if(openCode.lte(FibCode.FIB382) || tradeTrend == TradeTrend.FOLLOW) {
 				takeProfitCode = FibCode.FIB618;
 			}
 			
@@ -266,6 +271,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
+			price.setAutoTrade(autoTrade);
 			openPrices.add(price);
 		}
 	}
