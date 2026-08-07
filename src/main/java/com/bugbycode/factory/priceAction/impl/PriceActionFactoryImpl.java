@@ -174,7 +174,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			Klines last = PriceUtil.getLastKlines(list);
 			TradeTrend tradeTrend = getTradeTrend(last);
-			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB382)) {
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5)) {
 				autoTrade = AutoTrade.CLOSE;
 			}
 			
@@ -183,9 +183,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
-			if(tradeTrend == TradeTrend.AGAINST && openCode.gte(FibCode.FIB1)) {
-				takeProfitCode = FibCode.FIB5;
-			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
