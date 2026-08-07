@@ -195,11 +195,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			if(tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB1_272)) {
-				autoTrade = AutoTrade.CLOSE;
-			}
-			
-			if(tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB382)) {
+			if((tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB1_618))
+					|| (tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5))) {
 				autoTrade = AutoTrade.CLOSE;
 			}
 			
