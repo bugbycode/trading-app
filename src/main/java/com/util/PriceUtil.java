@@ -1783,6 +1783,30 @@ public class PriceUtil {
 		return result;
 	}
 	
+	public static boolean verifyDeclining_j(Klines current, Klines parent) {
+		return current.getJ() < parent.getJ();
+	}
+	
+	public static boolean verifyPowerful_j(Klines current, Klines parent) {
+		return current.getJ() > parent.getJ();
+	}
+	
+	public static boolean verifyDeclining_j(Klines current) {
+		return current.getJ() >= 80;
+	}
+	
+	public static boolean verifyPowerful_j(Klines current) {
+		return current.getJ() <= 20;
+	}
+	
+	public static boolean verifyDeclining_j(Klines current, Klines parent, Klines next) {
+		return current.getJ() < parent.getJ() && parent.getJ() >= next.getJ();
+	}
+	
+	public static boolean verifyPowerful_j(Klines current, Klines parent, Klines next) {
+		return current.getJ() > parent.getJ() && parent.getJ() <= next.getJ();
+	}
+	
 	/**
 	 * 校验价格是否出现颓势 </br>
 	 * 
