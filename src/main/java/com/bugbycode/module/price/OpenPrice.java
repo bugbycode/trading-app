@@ -1,5 +1,6 @@
 package com.bugbycode.module.price;
 
+import com.bugbycode.module.AutoClosePosition;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
@@ -71,4 +72,8 @@ public interface OpenPrice {
 	public AutoTrade getAutoTrade();
 	
 	public void setAutoTrade(AutoTrade autoTrade);
+	
+	public AutoClosePosition getAutoClosePosition();
+
+	public void setAutoClosePosition(AutoClosePosition autoClosePosition);
 }

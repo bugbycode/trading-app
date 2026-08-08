@@ -1,5 +1,6 @@
 package com.bugbycode.module.price.impl;
 
+import com.bugbycode.module.AutoClosePosition;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
@@ -27,6 +28,8 @@ public class OpenPriceDetails implements OpenPrice {
 	private boolean resetStopLoss = true;
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
+	
+	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN; 
 	
 	/**
 	 * 开仓价格信息
@@ -192,5 +195,13 @@ public class OpenPriceDetails implements OpenPrice {
 
 	public void setAutoTrade(AutoTrade autoTrade) {
 		this.autoTrade = autoTrade;
+	}
+
+	public AutoClosePosition getAutoClosePosition() {
+		return autoClosePosition;
+	}
+
+	public void setAutoClosePosition(AutoClosePosition autoClosePosition) {
+		this.autoClosePosition = autoClosePosition;
 	}
 }
