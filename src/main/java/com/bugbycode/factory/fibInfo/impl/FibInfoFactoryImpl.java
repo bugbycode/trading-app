@@ -48,7 +48,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
+	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
 	
 	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
