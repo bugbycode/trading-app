@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
+import com.bugbycode.module.AutoClosePosition;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -46,6 +47,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
+	
+	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
 	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -269,6 +272,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			price.setAutoTrade(autoTrade);
+			price.setAutoClosePosition(autoClosePosition);
 			openPrices.add(price);
 		}
 	}
