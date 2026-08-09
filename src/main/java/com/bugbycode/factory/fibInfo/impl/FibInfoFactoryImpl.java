@@ -198,9 +198,29 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			if((tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB1))
-					|| (tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5))) {
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5)) {
 				autoTrade = AutoTrade.CLOSE;
+			}
+			
+			if(tradeTrend == TradeTrend.AGAINST) {
+				for(int index = list.size() - 1; index > 0; index--) {
+					Klines current = list.get(index);
+					Klines parent = list.get(index - 1);
+					if(current.lte(end)) {
+						break;
+					}
+					if((isLong() && parent.getDea() >= 0) 
+							|| (isShort() && parent.getDea() <= 0)) {
+						List<Klines> data = PriceUtil.subList(end, current, list);
+						ms = new MarketSentiment(data);
+						double limitCodeValue = isLong() ? ms.getLowPrice() : ms.getHighPrice();
+						FibCode limitCode = fibInfo.getFibCode_v2(limitCodeValue);
+						if(openCode.gt(limitCode)) {
+							autoTrade = AutoTrade.CLOSE;
+						}
+						break;
+					}
+				}
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
