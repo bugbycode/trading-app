@@ -198,11 +198,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5)) {
+			if(tradeTrend == TradeTrend.FOLLOW) {
 				autoTrade = AutoTrade.CLOSE;
-			}
-			
-			if(tradeTrend == TradeTrend.AGAINST) {
+				FibInfoFactory againstFactory = new FibInfoFactoryImpl(list_trend, list, list_15m, TradeTrend.AGAINST);
+				if(againstFactory.getAutoTrade() == AutoTrade.CLOSE) {
+					autoTrade = AutoTrade.OPEN;
+				}
+			} else if(tradeTrend == TradeTrend.AGAINST) {
 				for(int index = list.size() - 1; index > 0; index--) {
 					Klines current = list.get(index);
 					Klines parent = list.get(index - 1);
@@ -232,10 +234,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
-			
-			if(tradeTrend == TradeTrend.AGAINST) {
-				takeProfitCode = FibCode.FIB5;
-			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -332,6 +330,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			result = true;
 		}
 		return result;
+	}
+	
+	@Override
+	public AutoTrade getAutoTrade() {
+		return autoTrade;
 	}
 	
 }

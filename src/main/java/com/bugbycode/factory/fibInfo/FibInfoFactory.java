@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
+import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.price.OpenPrice;
 
 /**
@@ -40,5 +41,7 @@ public interface FibInfoFactory {
 	 * @return
 	 */
 	public boolean isShort();
+	
+	public AutoTrade getAutoTrade();
 	
 }
