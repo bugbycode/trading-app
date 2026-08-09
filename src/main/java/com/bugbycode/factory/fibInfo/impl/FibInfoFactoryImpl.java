@@ -215,7 +215,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						ms = new MarketSentiment(data);
 						double limitCodeValue = isLong() ? ms.getLowPrice() : ms.getHighPrice();
 						FibCode limitCode = fibInfo.getFibCode_v2(limitCodeValue);
-						if(openCode.gt(limitCode)) {
+						if(openCode.gt(limitCode) && openCode != FibCode.FIB1) {
 							autoTrade = AutoTrade.CLOSE;
 						}
 						break;
