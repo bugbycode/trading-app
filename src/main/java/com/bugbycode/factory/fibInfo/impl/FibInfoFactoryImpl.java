@@ -211,7 +211,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 					}
 					if((isLong() && parent.getDea() >= 0) 
 							|| (isShort() && parent.getDea() <= 0)) {
-						List<Klines> data = PriceUtil.subList(end, current, list);
+						Klines end_after = PriceUtil.getAfterKlines(end, list);
+						if(end_after == null) {
+							break;
+						}
+						List<Klines> data = PriceUtil.subList(end_after, current, list);
 						ms = new MarketSentiment(data);
 						double limitCodeValue = isLong() ? ms.getLowPrice() : ms.getHighPrice();
 						FibCode limitCode = fibInfo.getFibCode_v2(limitCodeValue);
