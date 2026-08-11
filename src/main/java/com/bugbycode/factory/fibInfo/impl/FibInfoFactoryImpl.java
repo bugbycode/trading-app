@@ -198,42 +198,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			if(tradeTrend == TradeTrend.FOLLOW) {
+
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB618)) {
 				autoTrade = AutoTrade.CLOSE;
-				FibInfoFactory againstFactory = new FibInfoFactoryImpl(list_trend, list, list_15m, TradeTrend.AGAINST);
-				if(againstFactory.getAutoTrade() == AutoTrade.CLOSE && openCode.gte(FibCode.FIB618)) {
-					autoTrade = AutoTrade.OPEN;
-				}
-			} else if(tradeTrend == TradeTrend.AGAINST) {
-				for(int index = list.size() - 1; index > 0; index--) {
-					Klines current = list.get(index);
-					Klines parent = list.get(index - 1);
-					if(current.lte(end)) {
-						break;
-					}
-					if((isLong() && parent.getDea() >= 0) 
-							|| (isShort() && parent.getDea() <= 0)) {
-						Klines end_after = PriceUtil.getAfterKlines(end, list);
-						if(end_after == null) {
-							break;
-						}
-						List<Klines> data = PriceUtil.subList(end_after, current, list);
-						ms = new MarketSentiment(data);
-						double limitCodeValue = isLong() ? ms.getLowPrice() : ms.getHighPrice();
-						FibCode limitCode = fibInfo.getFibCode_v2(limitCodeValue);
-						if(openCode.gt(limitCode) && openCode != FibCode.FIB1) {
-							autoTrade = AutoTrade.CLOSE;
-						}
-						break;
-					}
-				}
+			} else if(tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB2_618)) {
+				autoTrade = AutoTrade.CLOSE;
 			}
+			
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB618;
+			FibCode takeProfitCode = FibCode.FIB5;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
