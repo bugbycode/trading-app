@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.module.AutoClosePosition;
+import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -49,6 +50,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	
+	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
 	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -199,34 +202,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			if(tradeTrend == TradeTrend.FOLLOW) {
-				autoTrade = AutoTrade.CLOSE;
-				FibInfoFactory againstFactory = new FibInfoFactoryImpl(list_trend, list, list_15m, TradeTrend.AGAINST);
-				if(againstFactory.getAutoTrade() == AutoTrade.CLOSE && openCode.gte(FibCode.FIB618)) {
-					autoTrade = AutoTrade.OPEN;
-				}
-			} else if(tradeTrend == TradeTrend.AGAINST) {
-				for(int index = list.size() - 1; index > 0; index--) {
-					Klines current = list.get(index);
-					Klines parent = list.get(index - 1);
-					if(current.lte(end)) {
-						break;
-					}
-					if((isLong() && parent.getDea() >= 0) 
-							|| (isShort() && parent.getDea() <= 0)) {
-						Klines end_after = PriceUtil.getAfterKlines(end, list);
-						if(end_after == null) {
-							break;
-						}
-						List<Klines> data = PriceUtil.subList(end_after, current, list);
-						ms = new MarketSentiment(data);
-						double limitCodeValue = isLong() ? ms.getLowPrice() : ms.getHighPrice();
-						FibCode limitCode = fibInfo.getFibCode_v2(limitCodeValue);
-						if(openCode.gt(limitCode) && openCode != FibCode.FIB1) {
-							autoTrade = AutoTrade.CLOSE;
-						}
-						break;
-					}
-				}
+				this.dualSidePositionStatus = DualSidePositionStatus.OPEN;
+			} else if(tradeTrend == TradeTrend.AGAINST && openCode.gt(FibCode.FIB4_764)) {
+				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
@@ -295,6 +273,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			price.setAutoTrade(autoTrade);
 			price.setAutoClosePosition(autoClosePosition);
+			price.setDualSidePositionStatus(dualSidePositionStatus);
 			openPrices.add(price);
 		}
 	}

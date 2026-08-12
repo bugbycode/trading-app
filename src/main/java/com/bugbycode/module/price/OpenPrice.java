@@ -1,6 +1,7 @@
 package com.bugbycode.module.price;
 
 import com.bugbycode.module.AutoClosePosition;
+import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
@@ -76,4 +77,8 @@ public interface OpenPrice {
 	public AutoClosePosition getAutoClosePosition();
 
 	public void setAutoClosePosition(AutoClosePosition autoClosePosition);
+	
+	public DualSidePositionStatus getDualSidePositionStatus();
+	
+	public void setDualSidePositionStatus(DualSidePositionStatus dualSidePositionStatus);
 }

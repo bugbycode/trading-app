@@ -1,6 +1,7 @@
 package com.bugbycode.module.price.impl;
 
 import com.bugbycode.module.AutoClosePosition;
+import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
@@ -29,7 +30,9 @@ public class OpenPriceDetails implements OpenPrice {
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN; 
+	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	
+	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
 	/**
 	 * 开仓价格信息
@@ -203,5 +206,13 @@ public class OpenPriceDetails implements OpenPrice {
 
 	public void setAutoClosePosition(AutoClosePosition autoClosePosition) {
 		this.autoClosePosition = autoClosePosition;
+	}
+
+	public DualSidePositionStatus getDualSidePositionStatus() {
+		return dualSidePositionStatus;
+	}
+
+	public void setDualSidePositionStatus(DualSidePositionStatus dualSidePositionStatus) {
+		this.dualSidePositionStatus = dualSidePositionStatus;
 	}
 }
