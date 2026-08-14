@@ -11,9 +11,12 @@ import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.binance.trade.websocket.impl.BinanceWebsocketTradeServiceImpl;
 import com.bugbycode.config.AppConfig;
+import com.bugbycode.module.FibCode;
+import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.BinanceOrderInfo;
+import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.user.User;
 import com.bugbycode.service.user.UserService;
@@ -42,16 +45,20 @@ public class ClosePositionTask implements Runnable{
 	
 	private List<User> users;
 	
+	private OpenPrice price;
+	
 	/**
 	 * 关闭用户持仓任务
 	 * @param pair 交易对
 	 * @param ps 要关闭的持仓方向 LONG/SHORT
 	 * @param user 相关用户
+	 * @param price 触发的价格信息
 	 */
-	public ClosePositionTask(String pair, PositionSide ps, User user) {
+	public ClosePositionTask(String pair, PositionSide ps, User user, OpenPrice price) {
 		this.pair = pair;
 		this.ps = ps;
 		this.user = user;
+		this.price = price;
 	}
 	
 	/**
@@ -59,11 +66,13 @@ public class ClosePositionTask implements Runnable{
 	 * @param pair 交易对
 	 * @param ps 要关闭的持仓方向 LONG/SHORT
 	 * @param users 相关用户
+	 * @param price 触发的价格信息
 	 */
-	public ClosePositionTask(String pair, PositionSide ps, List<User> users) {
+	public ClosePositionTask(String pair, PositionSide ps, List<User> users, OpenPrice price) {
 		this.pair = pair;
 		this.ps = ps;
 		this.users = users;
+		this.price = price;
 	}
 	
 	/**
@@ -72,13 +81,15 @@ public class ClosePositionTask implements Runnable{
 	 * @param ps 要关闭的持仓方向 LONG/SHORT
 	 * @param autoTradeType 指标
 	 * @param userDetailsService
+	 * @param price 触发的价格信息
 	 */
 	public ClosePositionTask(String pair, PositionSide ps, AutoTradeType autoTradeType,
-			UserService userDetailsService) {
+			UserService userDetailsService, OpenPrice price) {
 		this.pair = pair;
 		this.ps = ps;
 		this.autoTradeType = autoTradeType;
 		this.userDetailsService = userDetailsService;
+		this.price = price;
 	}
 
 	@Override
@@ -99,6 +110,22 @@ public class ClosePositionTask implements Runnable{
 			for(User u : userList) {
 				String binanceApiKey = u.getBinanceApiKey();
 				String binanceSecretKey = u.getBinanceSecretKey();
+				
+				if(price != null && (autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION)) {
+					
+					FibCode code = price.getCode();
+					
+					if(code.lt(u.getFibLevelType().getLevelCode())) {//回撤限制
+						continue;
+					}
+					
+					//回踩单判断
+					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+						continue;
+					}
+				}
+				
 				List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 				logger.debug("共查询到{}交易对共{}个仓位", pair, positionList.size());
 				for(PositionInfo p : positionList) {

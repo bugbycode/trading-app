@@ -340,7 +340,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			} else if(PriceUtil.isBreachShort(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭多头仓位
-				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FIB_RET, userDetailsService));
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FIB_RET, userDetailsService, openPrice));
 				break;
 			}
 		}
@@ -440,7 +440,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			} else if(PriceUtil.isBreachLong(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭空头仓位
-				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FIB_RET, userDetailsService));
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FIB_RET, userDetailsService, openPrice));
 				break;
 			}
 		}
@@ -793,7 +793,7 @@ public class KlinesServiceImpl implements KlinesService {
 						Type type = orderEx.getType();
 						if(type == Type.STOP || type == Type.STOP_MARKET) {
 							//关闭仓位
-							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u));
+							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u, openPrice));
 						}
 					}
 					
@@ -1063,7 +1063,7 @@ public class KlinesServiceImpl implements KlinesService {
 						Type type = orderEx.getType();
 						if(type == Type.STOP || type == Type.STOP_MARKET) {
 							//关闭仓位
-							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u));
+							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u, openPrice));
 						}
 					}
 					
@@ -1167,13 +1167,13 @@ public class KlinesServiceImpl implements KlinesService {
 	    		if(PriceUtil.isBreachLong(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
 		    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
 	    		} else if(PriceUtil.isBreachShort(last, price.getPrice())) {
-	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FENCE_SITTER, userDetailsService));
+	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FENCE_SITTER, userDetailsService, price));
 	    		}
 	    	} else if(factory.isShort()) {
 	    		if(PriceUtil.isBreachShort(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
 		    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, decimalNum));
 	    		} else if(PriceUtil.isBreachLong(last, price.getPrice())) {
-	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FENCE_SITTER, userDetailsService));
+	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FENCE_SITTER, userDetailsService, price));
 	    		}
 	    	}
 		}
@@ -1531,7 +1531,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			} else if(PriceUtil.isBreachShort(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭多头仓位
-				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.PRICE_ACTION, userDetailsService));
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.PRICE_ACTION, userDetailsService, openPrice));
 				break;
 			}
 		}
@@ -1644,7 +1644,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			} else if(PriceUtil.isBreachLong(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭空头仓位
-				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.PRICE_ACTION, userDetailsService));
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.PRICE_ACTION, userDetailsService, openPrice));
 				break;
 			}
 		}
