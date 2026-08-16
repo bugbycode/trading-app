@@ -14,7 +14,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
@@ -22,6 +21,7 @@ import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
+import com.util.SuperTrendIndicatorUtil;
 
 /**
  * 价格行为指标接口实现类
@@ -43,8 +43,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
-	
-	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
@@ -78,9 +76,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
-		PriceUtil.calculateAllBBPercentB(list);
+		SuperTrendIndicatorUtil.calculate(list);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -103,7 +99,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow_end(current)) {
+					if(verifyLow(current)) {
 						first = current;
 						break;
 					}
@@ -118,7 +114,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh_end(current)) {
+					if(verifyHigh(current)) {
 						first = current;
 						break;
 					}
@@ -183,6 +179,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibCode takeProfitCode = FibCode.FIB618;
 			
+			if(openCode.gte(FibCode.FIB382)) {
+				takeProfitCode = FibCode.FIB5;
+			}
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
@@ -208,35 +208,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() > 0;
-		} else {
-			return k.getDea() < 0;
-		}
+		return k.getTrend();
 	}
 	
 	private boolean verifyShort(Klines k) {
-		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() < 0;
-		} else {
-			return k.getDea() > 0;
-		}
+		return !k.getTrend();
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getTrend();
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
-	}
-	
-	private boolean verifyHigh_end(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
-	}
-	
-	private boolean verifyLow_end(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return !k.getTrend();
 	}
 	
 	private void addPrices(OpenPrice price) {
