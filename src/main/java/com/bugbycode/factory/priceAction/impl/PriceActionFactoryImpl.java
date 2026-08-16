@@ -14,6 +14,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
@@ -21,7 +22,6 @@ import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
-import com.util.SuperTrendIndicatorUtil;
 
 /**
  * 价格行为指标接口实现类
@@ -43,6 +43,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
+	
+	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
@@ -76,7 +78,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		SuperTrendIndicatorUtil.calculate(list);
+		PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list_trend);
+		PriceUtil.calculateAllBBPercentB(list);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -99,7 +103,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow(current)) {
+					if(verifyLow_end(current)) {
 						first = current;
 						break;
 					}
@@ -114,7 +118,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh_end(current)) {
 						first = current;
 						break;
 					}
@@ -173,15 +177,33 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				return;
 			}
 			
-			double openPriceValue = fibInfo.getFibValue(openCode);
+			double openPriceValue = 0;
+			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				Klines parent = list.get(index - 1);
+				if(current.lte(end)) {
+					break;
+				}
+				if((isLong() && PriceUtil.verifyPowerful_v33(current, parent)) || 
+						(isShort() && PriceUtil.verifyDeclining_v33(current, parent))) {
+					double closePrice = current.getClosePriceDoubleValue();
+					if(openPriceValue == 0 || (isLong() && openPriceValue > closePrice)
+							|| (isShort() && openPriceValue < closePrice)) {
+						openPriceValue = closePrice;
+					}
+				}
+			}
+			
+			if(openPriceValue == 0) {
+				return;
+			}
+			
+			//double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
-			
-			if(openCode.gte(FibCode.FIB382)) {
-				takeProfitCode = FibCode.FIB5;
-			}
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -208,19 +230,35 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getTrend();
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() > 0;
+		} else {
+			return k.getDea() < 0;
+		}
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return !k.getTrend();
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() < 0;
+		} else {
+			return k.getDea() > 0;
+		}
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getTrend();
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return !k.getTrend();
+		return k.getDea() < 0;
+	}
+	
+	private boolean verifyHigh_end(Klines k) {
+		return k.getDea() > 0 && k.getMacd() > 0;
+	}
+	
+	private boolean verifyLow_end(Klines k) {
+		return k.getDea() < 0 && k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
