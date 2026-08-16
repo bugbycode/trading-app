@@ -185,8 +185,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				if(current.lte(end)) {
 					break;
 				}
-				if((isLong() && PriceUtil.verifyPowerful_v33(current, parent)) || 
-						(isShort() && PriceUtil.verifyDeclining_v33(current, parent))) {
+				if((isLong() && (PriceUtil.verifyPowerful_v33(current, parent) || PriceUtil.verifyPowerful_v28(current, parent))) || 
+						(isShort() && (PriceUtil.verifyDeclining_v33(current, parent) || PriceUtil.verifyDeclining_v28(current, parent)))) {
 					double closePrice = current.getClosePriceDoubleValue();
 					if(openPriceValue == 0 || (isLong() && openPriceValue > closePrice)
 							|| (isShort() && openPriceValue < closePrice)) {
