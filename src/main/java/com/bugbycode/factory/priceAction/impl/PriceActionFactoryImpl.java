@@ -48,7 +48,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -179,19 +179,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = 0;
 			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				Klines parent = list.get(index - 1);
-				if(current.lte(end)) {
-					break;
-				}
-				if((isLong() && (PriceUtil.verifyPowerful_v33(current, parent) || PriceUtil.verifyPowerful_v28(current, parent))) || 
-						(isShort() && (PriceUtil.verifyDeclining_v33(current, parent) || PriceUtil.verifyDeclining_v28(current, parent)))) {
+			for(int index = fibAfterKlines.size() - 1; index > 0; index--) {
+				Klines current = fibAfterKlines.get(index);
+				Klines parent = fibAfterKlines.get(index - 1);
+				if((isLong() && PriceUtil.verifyPowerful_v28(current, parent)) || 
+						(isShort() && PriceUtil.verifyDeclining_v28(current, parent))) {
 					double closePrice = current.getClosePriceDoubleValue();
 					if(openPriceValue == 0 || (isLong() && openPriceValue > closePrice)
 							|| (isShort() && openPriceValue < closePrice)) {
 						openPriceValue = closePrice;
 					}
+				}
+				if(current.lte(fibAfterKline)) {
+					break;
 				}
 			}
 			
