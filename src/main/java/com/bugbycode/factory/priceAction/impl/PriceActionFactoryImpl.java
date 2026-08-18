@@ -200,9 +200,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = 0;
 			
-			for(int index = fibAfterKlines.size() - 1; index > 0; index--) {
-				Klines current = fibAfterKlines.get(index);
-				Klines parent = fibAfterKlines.get(index - 1);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				Klines parent = list.get(index - 1);
 				if((isLong() && PriceUtil.verifyPowerful_v28(current, parent)) || 
 						(isShort() && PriceUtil.verifyDeclining_v28(current, parent))) {
 					double closePrice = current.getClosePriceDoubleValue();
