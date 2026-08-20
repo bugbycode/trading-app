@@ -19,6 +19,7 @@ import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
+import com.util.SuperTrendIndicatorUtil;
 
 /**
  * 期权交易
@@ -70,9 +71,8 @@ public class EoptionFactoryImpl implements EoptionFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
-		//PriceUtil.calculateAllBBPercentB(list);
+		SuperTrendIndicatorUtil.calculate(list);
+		SuperTrendIndicatorUtil.calculate(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -164,7 +164,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			if(openCode.lte(FibCode.FIB5)) {
+			if(openCode.lte(FibCode.FIB236)) {
 				return;
 			}
 			
@@ -172,7 +172,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB5;
+			FibCode takeProfitCode = FibCode.FIB618;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -199,27 +199,27 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0;
+		return k.getTrend();
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() < 0;
+		return !k.getTrend();
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getTrend();
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
+		return !k.getTrend();
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getTrend();
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return !k.getTrend();
 	}
 	
 	private void addPrices(OpenPrice price) {
