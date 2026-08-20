@@ -46,7 +46,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
 	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
