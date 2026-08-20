@@ -1218,6 +1218,7 @@ public class KlinesServiceImpl implements KlinesService {
 				if(factory.isLong() && PriceUtil.isBreachLong(last, price.getPrice()) 
 						&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 						//&& !PriceUtil.isTraded(price, factory)
+						&& price.getAutoTrade() == AutoTrade.OPEN
 						) {
 					
 					List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
@@ -1244,6 +1245,7 @@ public class KlinesServiceImpl implements KlinesService {
 				} else if(factory.isShort() && PriceUtil.isBreachShort(last, price.getPrice()) 
 						&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 						//&& !PriceUtil.isTraded(price, factory)
+						&& price.getAutoTrade() == AutoTrade.OPEN
 						) {
 					
 					//
@@ -1266,7 +1268,8 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						sendEmail(u, subject,text, u.getUsername());
 					}
-				} else if(PriceUtil.hitPrice(last, price.getSecondTakeProfit())) {
+				} else if(PriceUtil.hitPrice(last, price.getSecondTakeProfit())
+						&& price.getAutoTrade() == AutoTrade.OPEN) {
 					//
 					List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
 					

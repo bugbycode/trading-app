@@ -13,6 +13,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -41,6 +42,8 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	private Klines end = null;
 	
 	private List<OpenPrice> openPrices;
+	
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	public EoptionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -165,7 +168,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			if(openCode.lte(FibCode.FIB236)) {
-				return;
+				autoTrade = AutoTrade.CLOSE;
 			}
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
@@ -224,6 +227,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
+			price.setAutoTrade(autoTrade);
 			openPrices.add(price);
 		}
 	}
