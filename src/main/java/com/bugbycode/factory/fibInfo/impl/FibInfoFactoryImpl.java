@@ -22,6 +22,7 @@ import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
+import com.util.SuperTrendIndicatorUtil;
 
 /**
  * 斐波那契回指标撤接口实现类
@@ -78,9 +79,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		PriceUtil.calculateMACD(list);
-		PriceUtil.calculateMACD(list_trend);
-		PriceUtil.calculateAllBBPercentB(list);
+		SuperTrendIndicatorUtil.calculate(list);
+		SuperTrendIndicatorUtil.calculate(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -103,7 +103,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow_end(current)) {
+					if(verifyLow(current)) {
 						first = current;
 						break;
 					}
@@ -118,7 +118,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh_end(current)) {
+					if(verifyHigh(current)) {
 						first = current;
 						break;
 					}
@@ -164,7 +164,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			this.fibInfo.setFibAfterKlines(fibAfterKlines);
+			//this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -221,10 +221,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
 			FibCode takeProfitCode = FibCode.FIB618;
-			/*
-			if(openCode.gte(FibCode.FIB382)) {
-				takeProfitCode = FibCode.FIB5;
-			}*/
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -233,7 +229,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
-			//this.fibAfterKlines = new ArrayList<Klines>();
+			this.fibAfterKlines = new ArrayList<Klines>();
 		}
 	}
 	
@@ -251,27 +247,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() < 0;
+		return k.getTrend();
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() > 0;
+		return !k.getTrend();
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getTrend();
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
-	}
-	
-	private boolean verifyHigh_end(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
-	}
-	
-	private boolean verifyLow_end(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return !k.getTrend();
 	}
 	
 	private void addPrices(OpenPrice price) {
