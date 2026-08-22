@@ -101,7 +101,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
-		PriceUtil.calculateAllBBPercentB(list);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -192,10 +191,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
-			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
+			FibCode openCode = fibInfo.getFibCode(openCodeValue);
 			
 			if(openCode == FibCode.FIB0) {
-				return;
+				openCode = FibCode.FIB236;
+				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
 			double openPriceValue = 0;
