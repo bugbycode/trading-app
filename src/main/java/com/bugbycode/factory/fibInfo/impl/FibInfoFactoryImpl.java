@@ -133,7 +133,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		List<Klines> tradeTrendSubList = PriceUtil.subList(first, third, list);
 		
-		List<Klines> firstSubList = PriceUtil.subList(second, fourth, list);
+		List<Klines> firstSubList = PriceUtil.subList(second, third, list);
 		
 		List<Klines> secondSubList = null;
 		
