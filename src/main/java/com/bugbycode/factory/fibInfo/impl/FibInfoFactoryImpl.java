@@ -22,7 +22,6 @@ import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
 import com.util.PriceUtil;
-import com.util.SuperTrendIndicatorUtil;
 
 /**
  * 斐波那契回指标撤接口实现类
@@ -30,8 +29,6 @@ import com.util.SuperTrendIndicatorUtil;
 public class FibInfoFactoryImpl implements FibInfoFactory {
 
 	private List<Klines> list;
-	
-	private List<Klines> list_trend;
 	
 	private List<Klines> fibAfterKlines;
 	
@@ -51,15 +48,14 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
-	public FibInfoFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+	private PositionSide ps = PositionSide.DEFAULT;
+	
+	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_15m, PositionSide ps) {
+		this.ps = ps;
 		this.list = new ArrayList<Klines>();
-		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
-		if(!CollectionUtils.isEmpty(list_trend)) {
-			this.list_trend.addAll(list_trend);
-		}
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
 		}
@@ -70,55 +66,60 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private void init() {
-		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
+		if(ps == PositionSide.DEFAULT || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
-		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
-		SuperTrendIndicatorUtil.calculate(list);
-		SuperTrendIndicatorUtil.calculate(list_trend);
+		PriceUtil.calculateMACD(list);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
 
-		PositionSide ps = getPositionSide();
-		
+		Klines fourth = null;
 		Klines third = null;
 		Klines second = null;
 		Klines first = null;
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
-			if(ps == PositionSide.SHORT) {//low - high - low
-				if(third == null) {
+			if(ps == PositionSide.SHORT) {//low - high - low - high
+				if(fourth == null) {
 					if(verifyLow(current)) {
+						fourth = current;
+					}
+				} else if(third == null) {
+					if(verifyHigh(current)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyHigh(current)) {
+					if(verifyLow(current)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow(current)) {
+					if(verifyHigh(current)) {
 						first = current;
 						break;
 					}
 				}
-			} else if(ps == PositionSide.LONG) { // high - low - high
-				if(third == null) {
+			} else if(ps == PositionSide.LONG) { // high - low - high - low
+				if(fourth == null) {
 					if(verifyHigh(current)) {
+						fourth = current;
+					}
+				} else if(third == null) {
+					if(verifyLow(current)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyLow(current)) {
+					if(verifyHigh(current)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh(current)) {
+					if(verifyLow(current)) {
 						first = current;
 						break;
 					}
@@ -126,11 +127,13 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 		}
 		
-		if(first == null || second == null || third == null) {
+		if(first == null || second == null || third == null || fourth == null) {
 			return;
 		}
 		
-		List<Klines> firstSubList = PriceUtil.subList(first, second, list);
+		List<Klines> tradeTrendSubList = PriceUtil.subList(first, third, list);
+		
+		List<Klines> firstSubList = PriceUtil.subList(second, fourth, list);
 		
 		List<Klines> secondSubList = null;
 		
@@ -141,7 +144,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(startAfterFlag == null) {
 				startAfterFlag = start;
 			}
-			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
+			secondSubList = PriceUtil.subList(startAfterFlag, fourth, list);
 			end = PriceUtil.getMinPriceKLine(secondSubList);
 			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
 		} else if(ps == PositionSide.LONG) {
@@ -150,7 +153,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			if(startAfterFlag == null) {
 				startAfterFlag = start;
 			}
-			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
+			secondSubList = PriceUtil.subList(startAfterFlag, fourth, list);
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
 			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
 		}
@@ -164,7 +167,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			//this.fibInfo.setFibAfterKlines(fibAfterKlines);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -176,6 +178,14 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			if(openCode == FibCode.FIB0) {
 				openCode = FibCode.FIB236;
+				this.autoTrade = AutoTrade.CLOSE;
+			}
+			
+			ms = new MarketSentiment(tradeTrendSubList);
+			double tradeTrendPrice = isLong() ? ms.getHighPrice() : ms.getLowPrice();
+			
+			if((isLong() && tradeTrendPrice > fib0Value) 
+					|| (isShort() && tradeTrendPrice < fib0Value)) {//做多时没有出现更高的高点，做空时没有出现更低的低点
 				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
@@ -234,33 +244,12 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 	}
 	
-	private PositionSide getPositionSide() {
-		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list_trend);
-		
-		if(verifyShort(last)) {
-			ps = PositionSide.SHORT;
-		} else if(verifyLong(last)) {
-			ps = PositionSide.LONG;
-		}
-		
-		return ps;
-	}
-	
-	private boolean verifyLong(Klines k) {
-		return k.getTrend();
-	}
-	
-	private boolean verifyShort(Klines k) {
-		return !k.getTrend();
-	}
-	
 	private boolean verifyHigh(Klines k) {
-		return k.getTrend();
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return !k.getTrend();
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
