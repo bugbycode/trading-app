@@ -24,4 +24,17 @@ public interface BinanceExchangeService {
 	 * @return
 	 */
 	public List<SymbolExchangeInfo> eOptionsExchangeInfoSymbol();
+	
+	/**
+	 * 获取所有比本位永续合约交易对信息
+	 * @return
+	 */
+	public List<SymbolExchangeInfo> exchangeInfoUsd();
+	
+	/**
+	 * 校验标的资产是否上市币本位合约
+	 * @param baseAsset 标的资产 如：BTC、ETH
+	 * @return
+	 */
+	public boolean verifyCoin(String baseAsset);
 }

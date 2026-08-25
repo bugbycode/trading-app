@@ -3,6 +3,7 @@ package com.bugbycode.service.exchange.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -179,5 +180,77 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 			});
 		}
  		return list;
+	}
+
+	@Override
+	public List<SymbolExchangeInfo> exchangeInfoUsd() {
+		List<SymbolExchangeInfo> list = new ArrayList<SymbolExchangeInfo>();
+		String resultStr = restTemplate.getForObject(AppConfig.DAPI_REST_BASE_URL + "/dapi/v1/exchangeInfo", String.class);
+		JSONObject result = new JSONObject(resultStr);
+		if(result.has("symbols")) {
+			JSONArray symbolJsonArray = result.getJSONArray("symbols");
+			symbolJsonArray.forEach(item -> {
+				if(item instanceof JSONObject) {
+					JSONObject symbolJson = (JSONObject) item;
+					String contractType = symbolJson.getString("contractType");
+					String statusStr = symbolJson.getString("contractStatus");
+					String symbol = symbolJson.getString("symbol");
+					String pair = symbolJson.getString("pair");
+					String baseAsset = symbolJson.getString("baseAsset");
+					String quoteAsset = symbolJson.getString("quoteAsset");
+					String marginAsset = symbolJson.getString("marginAsset");
+					
+					//long deliveryDate = symbolJson.getLong("deliveryDate");
+					JSONArray filters = symbolJson.getJSONArray("filters");
+					
+					ContractType type = ContractType.resolve(contractType);
+					ContractStatus status = ContractStatus.resolve(statusStr);
+					
+					if(status == ContractStatus.TRADING) {
+						SymbolExchangeInfo info = new SymbolExchangeInfo();
+						info.setSymbol(symbol);
+						info.setPair(pair);
+						info.setContractType(type);
+						info.setStatus(status);
+						info.setBaseAsset(baseAsset);
+						info.setQuoteAsset(quoteAsset);
+						info.setMarginAsset(marginAsset);
+						
+						filters.forEach(filter -> {
+							JSONObject f = (JSONObject) filter;
+							String filterType = f.getString("filterType");
+							if("LOT_SIZE".equals(filterType)) {//限价单交易规则
+								info.setLot_stepSize(f.getDouble("stepSize"));
+								info.setLot_minQty(f.getDouble("minQty"));
+								info.setLot_maxQty(f.getDouble("maxQty"));
+							} else if("MARKET_LOT_SIZE".equals(filterType)) {//市价单交易规则
+								info.setLot_market_stepSize(f.getDouble("stepSize"));
+								info.setLot_market_minQty(f.getDouble("minQty"));
+								info.setLot_market_maxQty(f.getDouble("maxQty"));
+							} else if("MIN_NOTIONAL".equals(filterType)) {//最小名义价值
+								info.setMin_notional(f.getDouble("notional"));
+							} else if("PRICE_FILTER".equals(filterType)) {// 订单最小价格间隔
+								info.setTickSize(f.getString("tickSize"));
+							}
+						});
+						AppConfig.COIN_EXCHANGE_INFO.put(info.getSymbol(), info);
+						list.add(info);
+					}
+				}
+			});
+		}
+		return list;
+	}
+
+	@Override
+	public boolean verifyCoin(String baseAsset) {
+		Set<String> keySet = AppConfig.COIN_EXCHANGE_INFO.keySet();
+		for(String symbol : keySet) {
+			SymbolExchangeInfo info = AppConfig.COIN_EXCHANGE_INFO.get(symbol);
+			if(info.getBaseAsset().equals(baseAsset)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

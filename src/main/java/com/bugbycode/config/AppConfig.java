@@ -25,6 +25,8 @@ public class AppConfig {
 	
 	public static String WEBSOCKET_API_URL;
 	
+	public static String DAPI_REST_BASE_URL;//币本位REST基地址
+	
 	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
 	
 	public static final int BINANCE_REST_API_WEIGHT = 35;
@@ -51,6 +53,9 @@ public class AppConfig {
 	
 	//交易对交易规则
 	public static Map<String,SymbolExchangeInfo> SYMBOL_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, SymbolExchangeInfo>());
+	
+	//币本位交易规则
+	public static Map<String,SymbolExchangeInfo> COIN_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, SymbolExchangeInfo>());
 	
 	//期权底层资产信息
 	public static Map<String,EoptionContracts> EOPTION_EXCHANGE_INFO = Collections.synchronizedMap(new HashMap<String, EoptionContracts>());
