@@ -39,6 +39,7 @@ import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
+import com.bugbycode.module.FollowMasterStatus;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MonitorStatus;
@@ -72,6 +73,7 @@ import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.openInterest.OpenInterestHistRepository;
 import com.bugbycode.repository.shape.ShapeRepository;
 import com.bugbycode.repository.user.UserRepository;
+import com.bugbycode.service.exchange.BinanceExchangeService;
 import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.UserService;
 import com.bugbycode.trading_app.pool.WorkTaskPool;
@@ -121,6 +123,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private BinanceWebsocketTradeService binanceWebsocketTradeService;
+	
+	@Autowired
+	private BinanceExchangeService binanceExchangeService;
 	
 	@Autowired
 	private ShapeRepository shapeRepository;
@@ -284,6 +289,13 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
+					FollowMasterStatus followMasterStatus = FollowMasterStatus.valueOf(u.getFollowMaster());
+					SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+					if(followMasterStatus == FollowMasterStatus.OPEN && info != null
+							&& !binanceExchangeService.verifyCoin(info.getBaseAsset())) {
+						continue;
+					}
+					
 					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
 					}
@@ -383,6 +395,13 @@ public class KlinesServiceImpl implements KlinesService {
 				List<User> userList = userRepository.queryAllUserByFibMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
+					
+					FollowMasterStatus followMasterStatus = FollowMasterStatus.valueOf(u.getFollowMaster());
+					SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+					if(followMasterStatus == FollowMasterStatus.OPEN && info != null
+							&& !binanceExchangeService.verifyCoin(info.getBaseAsset())) {
+						continue;
+					}
 					
 					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
@@ -484,6 +503,13 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		for(User u : userList) {
+			
+			FollowMasterStatus followMasterStatus = FollowMasterStatus.valueOf(u.getTradeFollowMaster());
+			//SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+			if(followMasterStatus == FollowMasterStatus.OPEN && info != null
+					&& !binanceExchangeService.verifyCoin(info.getBaseAsset())) {
+				continue;
+			}
 			
 			String binanceApiKey = u.getBinanceApiKey();
 			String binanceSecretKey = u.getBinanceSecretKey();
@@ -1473,6 +1499,13 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				for(User u : userList) {
 					
+					FollowMasterStatus followMasterStatus = FollowMasterStatus.valueOf(u.getFollowMaster());
+					SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+					if(followMasterStatus == FollowMasterStatus.OPEN && info != null
+							&& !binanceExchangeService.verifyCoin(info.getBaseAsset())) {
+						continue;
+					}
+					
 					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
 					}
@@ -1584,6 +1617,13 @@ public class KlinesServiceImpl implements KlinesService {
 				List<User> userList = userRepository.queryAllUserByEmaMonitor(MonitorStatus.OPEN);
 				
 				for(User u : userList) {
+					
+					FollowMasterStatus followMasterStatus = FollowMasterStatus.valueOf(u.getFollowMaster());
+					SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
+					if(followMasterStatus == FollowMasterStatus.OPEN && info != null
+							&& !binanceExchangeService.verifyCoin(info.getBaseAsset())) {
+						continue;
+					}
 					
 					if(!PairPolicyUtil.verifyPairPolicy(u.getPairPolicySelected(), pair, u.getMonitorPolicyType())) {
 						continue;
