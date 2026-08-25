@@ -1,5 +1,6 @@
 package com.bugbycode.trading_app;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -75,5 +76,25 @@ public class BinanceExchangeServiceTest {
     		set.add(info);
     		logger.info("{} - {}", info.getUnderlying(), set.getStreamName());
     	}
+    }
+    
+    @Test
+    public void testExchangeInfoUsd() {
+    	List<SymbolExchangeInfo> symbols = binanceExchangeService.exchangeInfoUsd();
+    	Set<String> symbolSet = new HashSet<String>();
+    	for(SymbolExchangeInfo info : symbols) {
+    		logger.info("{} - {} - {}" , info.getSymbol(), info.getBaseAsset(), info.getMarginAsset());
+    		symbolSet.add(info.getPair());
+    	}
+    	logger.info("symbol total: {}", symbolSet.size());
+    	logger.info("symbol: {}", symbolSet);
+    }
+    
+    @Test
+    public void testVerifyCoin() {
+    	String baseAsset = "LTC";
+    	binanceExchangeService.exchangeInfoUsd();
+    	boolean ver = binanceExchangeService.verifyCoin(baseAsset);
+    	logger.info("{} aready coin marklet is {}", baseAsset, ver);
     }
 }
