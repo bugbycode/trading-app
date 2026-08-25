@@ -26,7 +26,7 @@ public interface BinanceExchangeService {
 	public List<SymbolExchangeInfo> eOptionsExchangeInfoSymbol();
 	
 	/**
-	 * 获取所有比本位永续合约交易对信息
+	 * 获取所有币本位永续合约交易对信息
 	 * @return
 	 */
 	public List<SymbolExchangeInfo> exchangeInfoUsd();
