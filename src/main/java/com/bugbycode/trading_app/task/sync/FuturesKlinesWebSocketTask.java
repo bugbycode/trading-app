@@ -79,6 +79,12 @@ public class FuturesKlinesWebSocketTask {
 		cacheManager.initTradeCahe();
 		
 		try {
+			binanceExchangeService.exchangeInfoUsd();
+		}catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		
+		try {
 			binanceRestTradeService.fundingInfo();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

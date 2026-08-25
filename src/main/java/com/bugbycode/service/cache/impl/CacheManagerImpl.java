@@ -16,6 +16,9 @@ public class CacheManagerImpl implements CacheManager {
 	public void initTradeCahe() {
 
 		try {
+			synchronized (AppConfig.COIN_EXCHANGE_INFO) {
+				AppConfig.COIN_EXCHANGE_INFO.clear();
+			}
 			synchronized (AppConfig.LEVERAGE_BRACKET) {
 				AppConfig.LEVERAGE_BRACKET.clear();
 			}

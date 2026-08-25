@@ -135,6 +135,10 @@ public class User implements UserDetails {
 	
 	private int dualSidePosition = 0; // 双向持仓启用状态 0：关闭 1：开启
 	
+	private int followMaster = 0;// 跟随主力(行情监控) 0：否 1：是
+	
+	private int tradeFollowMaster = 0;// 跟随主力(自动交易) 0：否 1：是
+	
 	public String getId() {
 		return id;
 	}
@@ -408,6 +412,7 @@ public class User implements UserDetails {
 		this.setMonitorfibLevel(user.getMonitorfibLevel());
 		this.setEoptionsStatus(user.getEoptionsStatus());
 		this.setTradeNumberIndexMonitor(user.getTradeNumberIndexMonitor());
+		this.setFollowMaster(user.getFollowMaster());
 	}
 
 	public String getSmtpUser2() {
@@ -608,5 +613,21 @@ public class User implements UserDetails {
 
 	public void setDualSidePosition(int dualSidePosition) {
 		this.dualSidePosition = dualSidePosition;
+	}
+
+	public int getFollowMaster() {
+		return followMaster;
+	}
+
+	public void setFollowMaster(int followMaster) {
+		this.followMaster = followMaster;
+	}
+
+	public int getTradeFollowMaster() {
+		return tradeFollowMaster;
+	}
+
+	public void setTradeFollowMaster(int tradeFollowMaster) {
+		this.tradeFollowMaster = tradeFollowMaster;
 	}
 }
