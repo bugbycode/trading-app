@@ -817,7 +817,7 @@ public class KlinesServiceImpl implements KlinesService {
 						OrderPlaceException orderEx = (OrderPlaceException)e;
 						title = orderEx.getTitle();
 						Type type = orderEx.getType();
-						if(type == Type.STOP || type == Type.STOP_MARKET) {
+						if(type == Type.STOP || type == Type.STOP_MARKET || type == Type.TAKE_PROFIT || type == Type.TAKE_PROFIT_MARKET) {
 							//关闭仓位
 							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u, openPrice));
 						}
@@ -1087,7 +1087,7 @@ public class KlinesServiceImpl implements KlinesService {
 						OrderPlaceException orderEx = (OrderPlaceException)e;
 						title = orderEx.getTitle();
 						Type type = orderEx.getType();
-						if(type == Type.STOP || type == Type.STOP_MARKET) {
+						if(type == Type.STOP || type == Type.STOP_MARKET || type == Type.TAKE_PROFIT || type == Type.TAKE_PROFIT_MARKET) {
 							//关闭仓位
 							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u, openPrice));
 						}
