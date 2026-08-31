@@ -3,6 +3,7 @@ package com.bugbycode.service.klines.impl;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -81,6 +82,7 @@ import com.bugbycode.trading_app.task.position.ClosePositionTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
+import com.util.FactoryInitUtil;
 import com.util.FileUtil;
 import com.util.KlinesComparator;
 import com.util.LeverageBracketUtil;
@@ -1145,19 +1147,19 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Override
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
-		
+		/*
 		PriceActionFactory[] factorys = {
 				new PriceActionFactoryImpl(list_4h, list_1h, list_15m),
 				new PriceActionFactoryImpl(list_1h, list_1h, list_15m),
 		};
+		*/
 		
-		/*
 		List<PriceActionFactory> factoryList = new ArrayList<PriceActionFactory>();
         factoryList.add(new PriceActionFactoryImpl(list_1h, list_1h, list_15m));
-        factoryList.add(new PriceActionFactoryImpl(list_4h, list_4h, list_15m));
+        factoryList.add(new PriceActionFactoryImpl(list_4h, list_1h, list_15m));
         
         List<PriceActionFactory> factorys = new FactoryInitUtil<PriceActionFactory>(factoryList).deduplicate();
-		*/
+		
 		
 		for(PriceActionFactory factory : factorys) {
 			
