@@ -1,5 +1,6 @@
 package com.bugbycode.trading_app;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +23,7 @@ import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.repository.klines.KlinesRepository;
+import com.util.FactoryInitUtil;
 import com.util.PriceUtil;
 
 import jakarta.annotation.Resource;
@@ -44,9 +46,9 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "ETHUSDT";
+        String pair = "BTCUSDT";
         
-        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
@@ -91,5 +93,30 @@ public class PriceActionFactoryTest {
         }
         //logger.info(factory.verifyOpen(list_15m));
         //logger.info(factory.getFibAfterKlines());
+        
+        
     }
+	
+	@Test
+	public void testFactoryInitUtil() {
+		String pair = "ENAUSDT";
+		List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 1500);
+        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+		
+		List<PriceActionFactory> factoryList = new ArrayList<PriceActionFactory>();
+        factoryList.add(new PriceActionFactoryImpl(list, list, list_15m));
+        factoryList.add(new PriceActionFactoryImpl(list_4h, list_4h, list_15m));
+        
+        List<PriceActionFactory> factorys = new FactoryInitUtil<PriceActionFactory>(factoryList).deduplicate();
+		
+		for(PriceActionFactory factory : factorys) {
+			logger.info(factory.getFibInfo());
+			List<OpenPrice> openPrices = factory.getOpenPrices();
+	        QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
+			 for(OpenPrice price : openPrices) {
+	            logger.info("{}: {}, autoTrade:{}, isTreade:{}", mode, price, price.getAutoTrade(), PriceUtil.isTrade(price));
+	        }
+		}
+	}
 }
