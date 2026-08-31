@@ -210,22 +210,28 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = 0;
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+
+				if(current.lte(end)) {
+					break;
+				}
+				
 				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
 				}
 				
-				if(current.lte(fibAfterKline)) {
-					break;
-				}
 			}
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
-				Klines parent = list_15m.get(index - 1);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				Klines parent = list.get(index - 1);
+
+				if(current.lte(end)) {
+					break;
+				}
 
 				if((isLong() && PriceUtil.verifyPowerful_v28(current, parent)) || 
 						(isShort() && PriceUtil.verifyDeclining_v28(current, parent))) {
@@ -236,10 +242,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					}
 				}
 
-				if(current.lte(fibAfterKline)) {
-					break;
-				}
-				
 			}
 			
 			if(openPriceValue == 0) {
