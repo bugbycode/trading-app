@@ -244,6 +244,24 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 
 			}
 			
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
+				Klines parent = list_15m.get(index - 1);
+				
+				if((isLong() && PriceUtil.verifyPowerful_v33(current, parent)) || 
+						(isShort() && PriceUtil.verifyDeclining_v33(current, parent))) {
+					double closePrice = current.getClosePriceDoubleValue();
+					if(openPriceValue == 0 || (isLong() && openPriceValue > closePrice)
+							|| (isShort() && openPriceValue < closePrice)) {
+						openPriceValue = closePrice;
+					}
+				}
+				
+				if(current.lte(fibAfterKline)) {
+					break;
+				}
+			}
+			
 			if(openPriceValue == 0) {
 				return;
 			}
@@ -252,7 +270,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB618;
+			FibCode takeProfitCode = FibCode.FIB5;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
