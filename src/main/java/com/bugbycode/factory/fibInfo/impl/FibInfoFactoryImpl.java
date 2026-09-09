@@ -41,7 +41,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private List<OpenPrice> openPrices;
 	
-	private AutoTrade autoTrade = AutoTrade.OPEN;
+	private AutoTrade autoTrade = AutoTrade.CLOSE;
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
@@ -181,16 +181,16 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
 				
-				if((isLong() && current.getMacd() <= 0)
-						|| (isShort() && current.getMacd() >= 0)) {
+				if((isShort() && current.getDea() <= 0)
+						|| (isLong() && current.getDea() >= 0)) {
 					this.autoTrade = AutoTrade.OPEN;
 					break;
 				}
 				
-				if(current.lte(fibAfterKline)) {
+				if(current.lte(end)) {
 					break;
 				}
 			}
