@@ -183,7 +183,22 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					break;
 				}
 			}*/
-			this.autoTrade = AutoTrade.OPEN;
+			
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
+				Klines parent = list_15m.get(index - 1);
+
+				if((isLong() && PriceUtil.verifyDeclining_v28(current, parent)) || 
+						(isShort() && PriceUtil.verifyPowerful_v28(current, parent))) {
+					this.autoTrade = AutoTrade.OPEN;
+					break;
+				}
+				
+				if(current.lte(fibAfterKline)) {
+					break;
+				}
+
+			}
 			
 			double openPriceValue = 0;
 			
