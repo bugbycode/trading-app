@@ -141,15 +141,20 @@ public class BinanceExchangeServiceImpl implements BinanceExchangeService {
 					ContractType type = ContractType.E_OPTIONS;
 					ContractStatus status = ContractStatus.resolve(statusStr);
 					String underlying = symbolJson.getString("underlying");
+					int unit = symbolJson.getInt("unit");
+					String strikePrice = symbolJson.getString("strikePrice");
 					
 					if(status == ContractStatus.TRADING) {
-
+						
 						info.setSymbol(symbol);
 						info.setStatus(status);
 						info.setContractType(type);
 						info.setPriceScale(priceScale);
 						info.setSide(side);
 						info.setUnderlying(underlying);
+						info.setUnit(unit);
+						info.setStrikePrice(strikePrice);
+						
 						
 						JSONArray filters = symbolJson.getJSONArray("filters");
 						filters.forEach(filter -> {

@@ -49,6 +49,10 @@ public class SymbolExchangeInfo {
 	private int priceScale;//期权价格精度
 	
 	private String underlying;//期权合约底层资产
+	
+	private int unit;//合约单位, 单一合约代表的底层资产数量
+	
+	private String strikePrice;//行权价
 
 	public String getId() {
 		return id;
@@ -200,6 +204,22 @@ public class SymbolExchangeInfo {
 
 	public void setUnderlying(String underlying) {
 		this.underlying = underlying;
+	}
+
+	public int getUnit() {
+		return unit;
+	}
+
+	public void setUnit(int unit) {
+		this.unit = unit;
+	}
+
+	public String getStrikePrice() {
+		return strikePrice;
+	}
+
+	public void setStrikePrice(String strikePrice) {
+		this.strikePrice = strikePrice;
 	}
 
 	public int getDecimalNum() {
