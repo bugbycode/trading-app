@@ -224,10 +224,10 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "SKRUSDT";
+        String pair = "ENAUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
         //Klines last_15m = PriceUtil.getLastKlines(list_15m);
@@ -370,16 +370,16 @@ public class KlinesServiceTest {
     
     @Test
     public void testEoptionsFibInfo(){
-    	String pair = "DOGEUSDT";
-    	List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
-    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
+    	String pair = "BTCUSDT";
+    	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
         //List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
         Klines last = PriceUtil.getLastKlines(list_15m);
         
         //Klines list_trend_last = PriceUtil.getLastWeekKlines(list_1d);
         
-        EoptionFactory factory = new EoptionFactoryImpl(list_trend, list, list_15m);
+        EoptionFactory factory = new EoptionFactoryImpl(list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;

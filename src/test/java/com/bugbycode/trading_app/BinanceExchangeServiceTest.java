@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,9 +73,12 @@ public class BinanceExchangeServiceTest {
     public void testEOptionsExchangeInfoSymbol() {
     	List<SymbolExchangeInfo> list = binanceExchangeService.eOptionsExchangeInfoSymbol();
     	for(SymbolExchangeInfo info : list) {
-    		CoinPairSet set = new CoinPairSet(Inerval.INERVAL_15M);
+    		/*CoinPairSet set = new CoinPairSet(Inerval.INERVAL_15M);
     		set.add(info);
-    		logger.info("{} - {}", info.getUnderlying(), set.getStreamName());
+    		logger.info("{} - {}", info.getUnderlying(), set.getStreamName());*/
+    		if(info.getUnderlying().equals("XRPUSDT")) {
+        		logger.info(new JSONObject(info));
+    		}
     	}
     }
     
