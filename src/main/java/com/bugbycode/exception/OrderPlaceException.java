@@ -16,16 +16,27 @@ public class OrderPlaceException extends RuntimeException {
 	
 	private final Type type;
 	
+	private final int code;
+	
 	public OrderPlaceException(String title, String message, Type type) {
 		super(message);
 		this.title = title;
 		this.type = type;
+		this.code = 0;
+	}
+	
+	public OrderPlaceException(String title, String message, Type type, int code) {
+		super(message);
+		this.title = title;
+		this.type = type;
+		this.code = code;
 	}
 	
 	public OrderPlaceException(String title, String message, Type type, Throwable cause) {
 		super(message, cause);
 		this.title = title;
 		this.type = type;
+		this.code = 0;
 	}
 
 	public String getTitle() {
@@ -34,6 +45,10 @@ public class OrderPlaceException extends RuntimeException {
 
 	public Type getType() {
 		return type;
+	}
+
+	public int getCode() {
+		return code;
 	}
 	
 }

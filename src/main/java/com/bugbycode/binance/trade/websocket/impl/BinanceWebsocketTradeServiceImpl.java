@@ -335,10 +335,19 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 				return order_place(binanceApiKey, binanceSecretKey, symbol, side, ps, type, newClientOrderId, quantity, price, stopPrice, 
 						closePosition, workingType, activationPrice, callbackRate, PlaceOrderAgain.CLOSE);
 			} else {
-				String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常";
+				
+				int code = 0;
+				if(result.has("error")) {
+					JSONObject errorObj = result.getJSONObject("error");
+					if(errorObj.has("code")) {
+						code = errorObj.getInt("code");
+					}
+				}
+				
+				String title = "下单" + symbol + ps.getMemo() + type.getMemo() + "出现异常[" + code + "]";
 				String message = type.value() + "_" + side + " \r\n " + method.toString() + "\r\n" + result.toString();
 				//throw new OrderPlaceException(title, message);
-				return new Result<BinanceOrderInfo, RuntimeException>(order, new OrderPlaceException(title, message, type));
+				return new Result<BinanceOrderInfo, RuntimeException>(order, new OrderPlaceException(title, message, type, code));
 			}
 			
 		}
