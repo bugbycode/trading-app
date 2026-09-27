@@ -813,8 +813,10 @@ public class KlinesServiceImpl implements KlinesService {
 				} catch (Exception e) {
 					String title = "下单" + pair + "多头仓位时出现异常";
 					String message = e.getMessage();
+					int errorCode = -1000;
 					if(e instanceof OrderPlaceException) {
 						OrderPlaceException orderEx = (OrderPlaceException)e;
+						errorCode = orderEx.getCode();
 						title = orderEx.getTitle();
 						Type type = orderEx.getType();
 						if(type == Type.STOP || type == Type.STOP_MARKET || type == Type.TAKE_PROFIT || type == Type.TAKE_PROFIT_MARKET) {
@@ -825,7 +827,9 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					message += "\r\n" + orderBackTitle + "\r\n" + orderBackBody ;
 					
-					sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
+					if(errorCode != -4164) {
+						sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
+					}
 					//sendEmail(u, orderBackTitle, orderBackBody, tradeUserEmail);
 					
 					logger.error(e.getMessage(), e);
@@ -1083,8 +1087,10 @@ public class KlinesServiceImpl implements KlinesService {
 				} catch (Exception e) {
 					String title = "下单" + pair + "空头仓位时出现异常";
 					String message = e.getMessage();
+					int errorCode = -1000;
 					if(e instanceof OrderPlaceException) {
 						OrderPlaceException orderEx = (OrderPlaceException)e;
+						errorCode = orderEx.getCode();
 						title = orderEx.getTitle();
 						Type type = orderEx.getType();
 						if(type == Type.STOP || type == Type.STOP_MARKET || type == Type.TAKE_PROFIT || type == Type.TAKE_PROFIT_MARKET) {
@@ -1095,7 +1101,9 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					message += "\r\n" + orderBackTitle + "\r\n" + orderBackBody ;
 					
-					sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
+					if(errorCode != -4164) {
+						sendEmail(u, title + " " + dateStr, message, tradeUserEmail);
+					}
 					//sendEmail(u, orderBackTitle, orderBackBody, tradeUserEmail);
 					
 					logger.error(e.getMessage(), e);

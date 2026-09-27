@@ -22,7 +22,7 @@ public class OrderPlaceException extends RuntimeException {
 		super(message);
 		this.title = title;
 		this.type = type;
-		this.code = 0;
+		this.code = -1000;
 	}
 	
 	public OrderPlaceException(String title, String message, Type type, int code) {
@@ -36,7 +36,7 @@ public class OrderPlaceException extends RuntimeException {
 		super(message, cause);
 		this.title = title;
 		this.type = type;
-		this.code = 0;
+		this.code = -1000;
 	}
 
 	public String getTitle() {

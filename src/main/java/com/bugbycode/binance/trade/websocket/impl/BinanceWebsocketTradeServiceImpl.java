@@ -336,7 +336,7 @@ public class BinanceWebsocketTradeServiceImpl implements BinanceWebsocketTradeSe
 						closePosition, workingType, activationPrice, callbackRate, PlaceOrderAgain.CLOSE);
 			} else {
 				
-				int code = 0;
+				int code = -1000;
 				if(result.has("error")) {
 					JSONObject errorObj = result.getJSONObject("error");
 					if(errorObj.has("code")) {
