@@ -190,7 +190,7 @@ public class WebsocketAPITest {
 	public void testTradeMarket(){
 		String symbol = "USDCUSDT";
 		PositionSide ps = PositionSide.LONG;
-		BigDecimal quantity = new BigDecimal(String.valueOf(6));
+		BigDecimal quantity = new BigDecimal(String.valueOf(1));
 		BigDecimal stopLoss = new BigDecimal(String.valueOf(0.9994));
 		BigDecimal takeProfit = new BigDecimal(String.valueOf(1.001));
 		BigDecimal callbackRate = new BigDecimal("0.5");

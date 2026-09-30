@@ -206,10 +206,10 @@ public class KlinesServiceTest {
     
     @Test
     public void testFenceSitter(){
-    	String pair = "ETHUSDT";
+    	String pair = "SOONUSDT";
     	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, PositionSide.SHORT);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
