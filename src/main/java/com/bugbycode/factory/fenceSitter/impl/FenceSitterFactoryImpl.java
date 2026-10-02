@@ -166,17 +166,17 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			
 			double openPriceValue = 0;
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
 
+				if(current.lte(end)) {
+					break;
+				}
+				
 				double hitPrice = mode == QuotationMode.LONG ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((mode == QuotationMode.LONG && hitPrice < openPriceValue) || (mode == QuotationMode.SHORT && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
-				}
-				
-				if(current.lte(fibAfterKline)) {
-					break;
 				}
 				
 			}
