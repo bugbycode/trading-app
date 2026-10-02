@@ -56,11 +56,11 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
+			this.init(true);
 		}
 	}
 	
-	private void init() {
+	private void init(boolean first_init) {
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m) || ps_mode == PositionSide.DEFAULT) {
 			return;
 		}
@@ -195,6 +195,16 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
+		}
+		
+		if(first_init && !(isShort() || isLong())) {
+			int last_list_trend_index = list_trend.size() - 1;
+			int last_list_index = list.size() - 1;
+			
+			list_trend.remove(last_list_trend_index);
+			list.remove(last_list_index);
+			
+			init(false);
 		}
 	}
 	
