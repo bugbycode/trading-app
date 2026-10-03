@@ -43,7 +43,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<OpenPrice> openPrices;
 	
-	private AutoTrade autoTrade = AutoTrade.CLOSE;
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
@@ -169,36 +169,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
-			/*
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
-				
-				if((isLong() && current.getMacd() <= 0)
-						|| (isShort() && current.getMacd() >= 0)) {
-					this.autoTrade = AutoTrade.OPEN;
-					break;
-				}
-				
-				if(current.lte(fibAfterKline)) {
-					break;
-				}
-			}*/
-			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
-				Klines parent = list_15m.get(index - 1);
-
-				if((isLong() && PriceUtil.verifyDeclining_v28(current, parent)) || 
-						(isShort() && PriceUtil.verifyPowerful_v28(current, parent))) {
-					this.autoTrade = AutoTrade.OPEN;
-					break;
-				}
-				
-				if(current.lte(fibAfterKline)) {
-					break;
-				}
-
-			}
 			
 			double openPriceValue = 0;
 			
@@ -217,48 +187,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				
 			}
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
-				Klines parent = list_15m.get(index - 1);
-
-				if((isLong() && PriceUtil.verifyPowerful_v28(current, parent)) || 
-						(isShort() && PriceUtil.verifyDeclining_v28(current, parent))) {
-					double closePrice = current.getClosePriceDoubleValue();
-					if(openPriceValue == 0 || (isLong() && openPriceValue > closePrice)
-							|| (isShort() && openPriceValue < closePrice)) {
-						openPriceValue = closePrice;
-					}
-				}
-				
-				if(current.lte(fibAfterKline)) {
-					break;
-				}
-
-			}
-			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
-				Klines parent = list_15m.get(index - 1);
-				
-				if((isLong() && PriceUtil.verifyPowerful_v33(current, parent)) || 
-						(isShort() && PriceUtil.verifyDeclining_v33(current, parent))) {
-					double closePrice = current.getClosePriceDoubleValue();
-					if(openPriceValue == 0 || (isLong() && openPriceValue > closePrice)
-							|| (isShort() && openPriceValue < closePrice)) {
-						openPriceValue = closePrice;
-					}
-				}
-				
-				if(current.lte(fibAfterKline)) {
-					break;
-				}
-			}
-			
 			if(openPriceValue == 0) {
 				return;
 			}
-			
-			//double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
