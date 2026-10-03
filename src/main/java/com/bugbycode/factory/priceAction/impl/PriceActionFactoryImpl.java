@@ -45,7 +45,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
+	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
 	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
