@@ -47,6 +47,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
 	
+	private boolean resetStopLoss = false;
+	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
@@ -175,14 +177,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			for(int index = list_15m.size() - 1; index > 0; index--) {
 				Klines current = list_15m.get(index);
 
-				if(current.lte(end)) {
-					break;
-				}
-				
 				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
+				}
+
+				if(current.lte(fibAfterKline)) {
+					break;
 				}
 				
 			}
@@ -193,7 +195,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB618;
+			FibCode takeProfitCode = FibCode.FIB786;
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
@@ -247,6 +249,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
+			price.setResetStopLoss(resetStopLoss);
 			price.setAutoTrade(autoTrade);
 			price.setAutoClosePosition(autoClosePosition);
 			openPrices.add(price);
