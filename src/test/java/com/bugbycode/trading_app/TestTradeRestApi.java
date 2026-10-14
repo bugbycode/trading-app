@@ -95,7 +95,7 @@ public class TestTradeRestApi {
         user = userRepository.queryByUsername("bugbycode@gmail.com");
         binanceApiKey = user.getBinanceApiKey();
         binanceSecretKey = user.getBinanceSecretKey();
-        //binanceExchangeService.exchangeInfo();
+        binanceExchangeService.exchangeInfo();
     }
     
     @Test
@@ -469,6 +469,33 @@ public class TestTradeRestApi {
     	binanceRestTradeService.fundingInfo();
     	FundingInfo info = binanceRestTradeService.fundingInfo(symbol);
     	logger.info(info);
+    }
+    
+    @Test
+    public void testMarket() {
+    	String pair = "SUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+    	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+    	
+    	Klines last = PriceUtil.getLastKlines(list);
+    	
+    	int decimalNum = last.getDecimalNum();
+    	
+    	PositionSide ps = PositionSide.SHORT; 
+    	
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, ps);
+    	if(!(factory.isLong() || factory.isShort())) {
+    		return;
+    	}
+    	
+    	QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
+    	
+    	OpenPrice price = factory.getOpenPrice();
+    	
+    	logger.info("{} - {}, autoTrade: {}", mode, price, price.getAutoTrade());
+    	logger.info("isClosePosition: {}", factory.isClosePosition());
+    	binanceRestTradeService.fundingInfo();
+    	klinesService.marketPlace(pair, PositionSide.LONG, price, decimalNum);
     }
     
     @AfterEach
