@@ -31,6 +31,11 @@ public enum Method {
 	ORDER_CANCEL("order.cancel"),
 	
 	/**
+	 * 修改订单
+	 */
+	ORDER_MODIFY("order.modify"),
+	
+	/**
 	 * 用户持仓风险V2 (USER_DATA)
 	 */
 	POSITION_RISK_V2("v2/account.position");

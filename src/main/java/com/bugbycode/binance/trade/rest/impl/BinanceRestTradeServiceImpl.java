@@ -25,6 +25,7 @@ import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.binance.module.leverage.LeverageBracket;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
+import com.bugbycode.binance.module.order.AlgoOrder;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.config.AppConfig;
@@ -909,8 +910,8 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 	}
 
 	@Override
-	public List<BinanceOrderInfo> openAlgoOrders(String binanceApiKey,String binanceSecretKey, String symbol) {
-		List<BinanceOrderInfo> orders = new ArrayList<BinanceOrderInfo>();
+	public List<AlgoOrder> openAlgoOrders(String binanceApiKey,String binanceSecretKey, String symbol) {
+		List<AlgoOrder> orders = new ArrayList<AlgoOrder>();
 		
 		String queryString = String.format("timestamp=%s", getLocalTime());
 		
@@ -934,37 +935,51 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 			JSONArray jsonArr = new JSONArray(result.getBody());
 			jsonArr.forEach(obj -> {
 				JSONObject o = (JSONObject) obj;
-				BinanceOrderInfo order = new BinanceOrderInfo();
-				//order.setAvgPrice(o.getString("avgPrice"));
-				order.setClientOrderId(o.getString("clientAlgoId"));
-				//order.setCumQuote(o.getString("cumQuote"));
-				//order.setExecutedQty(o.getString("executedQty"));
-				order.setOrderId(o.getLong("algoId"));
-				order.setOrigQty(o.getString("quantity"));
-				order.setOrigType(o.getString("orderType"));
-				order.setPrice(o.getString("price"));
-				order.setReduceOnly(o.getBoolean("reduceOnly"));
+				AlgoOrder order = new AlgoOrder();
+				
+				order.setAlgoId(o.getLong("algoId"));
+				order.setClientAlgoId(o.getString("clientAlgoId"));
+				order.setAlgoType(o.getString("algoType"));
+				order.setOrderType(o.getString("orderType"));
+				order.setSymbol(o.getString("symbol"));
 				order.setSide(o.getString("side"));
 				order.setPositionSide(o.getString("positionSide"));
-				order.setStatus(o.getString("algoStatus"));
-				order.setStopPrice(o.getString("triggerPrice"));
-				order.setClosePosition(o.getBoolean("closePosition"));
-				order.setSymbol(o.getString("symbol"));
-				order.setTime(o.getLong("createTime"));
 				order.setTimeInForce(o.getString("timeInForce"));
-				order.setType(o.getString("orderType"));
-				if(o.has("activatePrice")) {
-					order.setActivatePrice(o.getString("activatePrice"));
+				order.setQuantity(o.getString("quantity"));
+				order.setAlgoStatus(o.getString("algoStatus"));
+				order.setActualOrderId(o.getString("actualOrderId"));
+				if(o.has("actualPrice")) {
+					order.setActualPrice(o.getString("actualPrice"));
 				}
-				if(o.has("priceRate")) {
-					order.setPriceRate(o.getString("priceRate"));
+				order.setTriggerPrice(o.getString("triggerPrice"));
+				order.setPrice(o.getString("price"));
+				order.setIcebergQuantity(o.isNull("icebergQuantity") ? null : o.getString("icebergQuantity"));
+				if(o.has("tpTriggerPrice")) {
+					order.setTpTriggerPrice(o.getString("tpTriggerPrice"));
 				}
-				order.setUpdateTime(o.getLong("updateTime"));
-				order.setWorkingType(o.getString("workingType"));
-				order.setPriceProtect(o.getBoolean("priceProtect"));
-				order.setPriceMatch(o.getString("priceMatch"));
+				if(o.has("tpPrice")) {
+					order.setTpPrice(o.getString("tpPrice"));
+				}
+				if(o.has("slTriggerPrice")) {
+					order.setSlTriggerPrice(o.getString("slTriggerPrice"));
+				}
+				if(o.has("slPrice")) {
+					order.setSlPrice(o.getString("slPrice"));
+				}
+				if(o.has("tpOrderType")) {
+					order.setTpOrderType(o.getString("tpOrderType"));
+				}
 				order.setSelfTradePreventionMode(o.getString("selfTradePreventionMode"));
+				order.setWorkingType(o.getString("workingType"));
+				order.setPriceMatch(o.getString("priceMatch"));
+				order.setClosePosition(o.getBoolean("closePosition"));
+				order.setPriceProtect(o.getBoolean("priceProtect"));
+				order.setReduceOnly(o.getBoolean("reduceOnly"));
+				order.setCreateTime(o.getLong("createTime"));
+				order.setUpdateTime(o.getLong("updateTime"));
+				order.setTriggerTime(o.getLong("triggerTime"));
 				order.setGoodTillDate(o.getLong("goodTillDate"));
+				
 				orders.add(order);
 			});
 		}
