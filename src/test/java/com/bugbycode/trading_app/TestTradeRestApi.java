@@ -12,6 +12,7 @@ import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.binance.module.leverage.LeverageBracket;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
+import com.bugbycode.binance.module.order.AlgoOrder;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.exception.OrderPlaceException;
@@ -274,8 +275,11 @@ public class TestTradeRestApi {
 
     @Test
     public void testOpenAlgoOrders() {
-    	String pair = "ADAUSDT";
-    	List<BinanceOrderInfo> list = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair);
+    	String pair = "ETHUSDT";
+    	List<AlgoOrder> list = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair);
+    	for(AlgoOrder order : list) {
+    		logger.info(new JSONObject(order));
+    	}
     	logger.info(list.size());
     }
     
