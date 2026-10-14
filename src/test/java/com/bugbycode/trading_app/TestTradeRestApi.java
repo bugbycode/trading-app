@@ -1,12 +1,14 @@
 package com.bugbycode.trading_app;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
@@ -15,7 +17,15 @@ import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
 import com.bugbycode.binance.module.order.AlgoOrder;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
+import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.exception.OrderPlaceException;
+import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
+import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl;
+import com.bugbycode.module.Inerval;
+import com.bugbycode.module.Klines;
+import com.bugbycode.module.PlaceOrderAgain;
+import com.bugbycode.module.QUERY_SPLIT;
+import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
@@ -26,14 +36,19 @@ import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.binance.WorkingType;
+import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.module.trading.Side;
 import com.bugbycode.module.trading.Type;
 import com.bugbycode.module.user.ChildApiKeyConfig;
 import com.bugbycode.module.user.User;
+import com.bugbycode.repository.klines.KlinesRepository;
 import com.bugbycode.repository.user.UserRepository;
+import com.bugbycode.service.exchange.BinanceExchangeService;
+import com.bugbycode.service.klines.KlinesService;
 import com.bugbycode.service.user.ChildApiKeyConfigService;
 import com.util.LeverageBracketUtil;
+import com.util.PriceUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,9 +66,21 @@ public class TestTradeRestApi {
 
     @Autowired
     private BinanceRestTradeService binanceRestTradeService;
+    
+    @Autowired
+  	private BinanceWebsocketTradeService binanceWebsocketTradeService;
 
     @Autowired
     private ChildApiKeyConfigService childApiKeyConfigService;
+    
+    @Autowired
+    private KlinesService klinesService;
+    
+    @Autowired
+	private KlinesRepository klinesRepository;
+    
+    @Autowired
+    private BinanceExchangeService binanceExchangeService;
     
     private User user;
     
@@ -68,6 +95,7 @@ public class TestTradeRestApi {
         user = userRepository.queryByUsername("bugbycode@gmail.com");
         binanceApiKey = user.getBinanceApiKey();
         binanceSecretKey = user.getBinanceSecretKey();
+        //binanceExchangeService.exchangeInfo();
     }
     
     @Test
@@ -281,6 +309,85 @@ public class TestTradeRestApi {
     		logger.info(new JSONObject(order));
     	}
     	logger.info(list.size());
+    }
+    
+    @Test
+    public void testDeleteAlgoOrder() {
+    	binanceRestTradeService.deleteAlgoOrder(binanceApiKey, binanceSecretKey, 3000002249444377l);
+    }
+    
+    @Test
+    public void testResetAlgoOrder() {
+    	String pair = "SUSDT";
+    	
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+    	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+    	
+    	int decimalPoint = PriceUtil.getLastKlines(list).getDecimalNum();
+    	
+    	//PositionSide ps = PositionSide.SHORT;
+    	
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, PositionSide.SHORT);
+    	if(!(factory.isLong() || factory.isShort())) {
+    		return;
+    	}
+    	
+    	QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
+    	
+    	OpenPrice price = factory.getOpenPrice();
+    	
+    	logger.info("{} - {}, autoTrade: {}", mode, price, price.getAutoTrade());
+    	logger.info("isClosePosition: {}", factory.isClosePosition());
+
+		BigDecimal stopPrice = new BigDecimal(PriceUtil.formatDoubleDecimal(price.getStopLossLimit(), decimalPoint));
+    	
+    	//查看持仓信息
+    	List<PositionInfo> positionList = binanceRestTradeService.positionRisk_v3(binanceApiKey, binanceSecretKey, pair);
+    	for(PositionInfo position : positionList) {
+    		logger.info(position);
+    		BigDecimal quantity = new BigDecimal(position.getPositionAmt());
+    		
+    		Side side = Side.SELL;
+    		Type type = Type.STOP_MARKET;
+    		
+    		if(quantity.compareTo(new BigDecimal(0)) == -1) {
+    			quantity = quantity.multiply(new BigDecimal(-1));
+    			side = Side.BUY;
+    		}
+    		logger.info(quantity);
+    		
+    		PositionSide ps = PositionSide.parse(position.getPositionSide());
+    		
+    		klinesService.resetAlgoOrder(binanceApiKey, binanceSecretKey, pair, quantity, stopPrice, ps, side, type);
+    		
+    		/*
+    		
+    		boolean resetAlgoOrder = false;
+    		
+    		//查看条件订单
+    		List<AlgoOrder> orderList = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair, ps);
+    		for(AlgoOrder order : orderList) {
+    			logger.info(new JSONObject(order));
+    			
+    			if(type != Type.STOP_MARKET) {
+    				continue;
+    			}
+    			
+    			double triggerPrice = Double.valueOf(order.getTriggerPrice());
+    			long algoId = order.getAlgoId();
+    			//取消条件订单
+    			if(triggerPrice != price.getStopLossLimit()) {
+        			resetAlgoOrder = true;
+        			binanceRestTradeService.deleteAlgoOrder(binanceApiKey, binanceSecretKey, algoId);
+    			}
+    		}
+    		
+    		if(resetAlgoOrder || CollectionUtils.isEmpty(orderList)) {
+    			BigDecimal stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(price.getStopLossLimit(), decimalPoint));
+				binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, pair, side, ps, type, null, 
+						quantity, null, stopLoss, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.CLOSE);
+    		}*/
+    	}
     }
     
     @Test
