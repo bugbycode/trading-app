@@ -714,34 +714,6 @@ public class KlinesServiceImpl implements KlinesService {
 						logger.debug("开始修改" + pair + "杠杆倍数");
 						binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
 					}
-					
-					//持仓价值 = 持仓数量 * 价格
-					double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
-					
-					if(order_value > u.getPositionValue()) {
-						logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + marginAsset);
-						continue;
-					}
-					
-					//获取用户手续费率
-					CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
-					double orderBalance = (order_value / updateLeverage);//持仓所需保证金
-					
-					//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
-					double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
-					
-					String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, marginAsset);
-					if(Double.valueOf(availableBalanceStr) < minOrder_value) {
-						logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + marginAsset);
-						continue;
-					}
-					
-					//仓位数量限制
-					int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
-					if(positionCount >= u.getPositionCountLimit()) {
-						logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
-						continue;
-					}
 
 					if(openPrice != null && stopLossLimit > 0) {
 						priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -775,6 +747,34 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
+					//持仓价值 = 持仓数量 * 价格
+					double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
+					
+					if(order_value > u.getPositionValue()) {
+						logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + marginAsset);
+						continue;
+					}
+					
+					//获取用户手续费率
+					CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
+					double orderBalance = (order_value / updateLeverage);//持仓所需保证金
+					
+					//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
+					double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
+					
+					String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, marginAsset);
+					if(Double.valueOf(availableBalanceStr) < minOrder_value) {
+						logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + marginAsset);
+						continue;
+					}
+					
+					//仓位数量限制
+					int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
+					if(positionCount >= u.getPositionCountLimit()) {
+						logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
+						continue;
+					}
+
 					boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
 					logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
 					if(!dualSidePosition) {
@@ -1004,34 +1004,6 @@ public class KlinesServiceImpl implements KlinesService {
 						binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
 					}
 					
-					//持仓价值 = 持仓数量 * 价格
-					double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
-					
-					if(order_value > u.getPositionValue()) {
-						logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + marginAsset);
-						continue;
-					}
-					
-					//获取用户手续费率
-					CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
-					double orderBalance = (order_value / updateLeverage);//持仓所需保证金
-					
-					//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
-					double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
-					
-					String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, marginAsset);
-					if(Double.valueOf(availableBalanceStr) < minOrder_value) {
-						logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + marginAsset);
-						continue;
-					}
-					
-					//仓位数量限制
-					int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
-					if(positionCount >= u.getPositionCountLimit()) {
-						logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
-						continue;
-					}
-
 					if(openPrice != null && stopLossLimit > 0) {
 						priceInfo = binanceWebsocketTradeService.getPrice(pair);
 						//double stopLossLimit = openPrice.getStopLossLimit();
@@ -1064,6 +1036,34 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
+					//持仓价值 = 持仓数量 * 价格
+					double order_value = quantity.doubleValue() * priceInfo.getPriceDoubleValue();
+					
+					if(order_value > u.getPositionValue()) {
+						logger.debug(pair + "下单数量仓位价值超过" + u.getPositionValue() + marginAsset);
+						continue;
+					}
+					
+					//获取用户手续费率
+					CommissionRate rate = binanceRestTradeService.getCommissionRate(binanceApiKey, binanceSecretKey, pair);
+					double orderBalance = (order_value / updateLeverage);//持仓所需保证金
+					
+					//开仓所需金额 = 持仓所需保证金 + (持仓所需保证金 x 用户手续费率【吃单费率】 x 2)
+					double minOrder_value = orderBalance + (orderBalance * rate.getTakerCommissionRateDoubleValue() * 2);
+					
+					String availableBalanceStr = binanceWebsocketTradeService.availableBalance(binanceApiKey, binanceSecretKey, marginAsset);
+					if(Double.valueOf(availableBalanceStr) < minOrder_value) {
+						logger.debug("用户" + u.getUsername() + "可下单金额小于" + minOrder_value + marginAsset);
+						continue;
+					}
+					
+					//仓位数量限制
+					int positionCount = binanceRestTradeService.countPosition(binanceApiKey, binanceSecretKey);
+					if(positionCount >= u.getPositionCountLimit()) {
+						logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
+						continue;
+					}
+
 					boolean dualSidePosition = binanceRestTradeService.dualSidePosition(binanceApiKey, binanceSecretKey);
 					logger.debug("当前持仓模式：" + (dualSidePosition ? "双向持仓" : "单向持仓"));
 					if(!dualSidePosition) {
