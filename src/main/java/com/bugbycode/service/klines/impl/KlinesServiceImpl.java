@@ -580,21 +580,6 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 						}
 					}
-
-					//筛选策略限制
-					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
-						continue;
-					}
-					
-					//活跃度限制
-					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
-						continue;
-					}
-					
-					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
-						continue;
-					}
-					
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
@@ -796,6 +781,20 @@ public class KlinesServiceImpl implements KlinesService {
 						logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
 					}
+
+					//筛选策略限制
+					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+						continue;
+					}
+					
+					//活跃度限制
+					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
+						continue;
+					}
 					
 					binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit, 
 							callbackRateEnabled, activationPriceValue, callbackRateValue, profitOrderEnabled);
@@ -866,20 +865,6 @@ public class KlinesServiceImpl implements KlinesService {
 								throw new RuntimeException("关闭" + pair + "多头仓位时出现异常", excute_rs.getErr());
 							}
 						}
-					}
-
-					//筛选策略限制
-					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
-						continue;
-					}
-					
-					//活跃度限制
-					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
-						continue;
-					}
-					
-					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
-						continue;
 					}
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -1084,6 +1069,20 @@ public class KlinesServiceImpl implements KlinesService {
 					if(marginType != MarginType.ISOLATED) {
 						logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
+					}
+
+					//筛选策略限制
+					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+						continue;
+					}
+					
+					//活跃度限制
+					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
+						continue;
 					}
 					
 					binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit, 
