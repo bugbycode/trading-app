@@ -161,7 +161,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
-			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
+			//double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			double openPriceValue = 0;
@@ -184,13 +184,15 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			if(openPriceValue == 0) {
 				return;
 			}
-			
+			/*
 			double stopLossLimit = fib0Value;
 			
 			if((ps_mode == PositionSide.LONG && mode == QuotationMode.LONG) 
 					|| (ps_mode == PositionSide.SHORT && mode == QuotationMode.SHORT)) {
 				stopLossLimit = openCodeValue;
-			}
+			}*/
+			
+			double stopLossLimit = openPriceValue;
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER));
 			
