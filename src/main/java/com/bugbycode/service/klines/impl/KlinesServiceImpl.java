@@ -742,10 +742,36 @@ public class KlinesServiceImpl implements KlinesService {
 						logger.debug("用户" + u.getUsername() + "当前仓位数量不能超过" + u.getPositionCountLimit());
 						continue;
 					}
+
+					if(openPrice != null && stopLossLimit > 0) {
+						priceInfo = binanceWebsocketTradeService.getPrice(pair);
+						//double stopLossLimit = openPrice.getStopLossLimit();
+						if(priceInfo.getPriceDoubleValue() <= stopLossLimit) {
+							continue;
+						}
+						if(stopLoss.doubleValue() < stopLossLimit) {
+							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
+						}
+					}
 					
 					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+						
+						if(autoTradeType == AutoTradeType.FENCE_SITTER) {
+							//重置条件订单
+							for(PositionInfo position : positionList) {
+					    		Side side = Side.SELL;
+								quantity = new BigDecimal(position.getPositionAmt());
+					    		ps = PositionSide.parse(position.getPositionSide());
+					    		if(quantity.compareTo(new BigDecimal(0)) == -1) {
+					    			quantity = quantity.multiply(new BigDecimal(-1));
+					    			side = Side.BUY;
+					    		}
+					    		resetAlgoOrder(binanceApiKey, binanceSecretKey, pair, quantity, stopLoss, ps, side, Type.STOP_MARKET);
+							}
+						}
+						
 						continue;
 					}
 					
@@ -769,17 +795,6 @@ public class KlinesServiceImpl implements KlinesService {
 					if(marginType != MarginType.ISOLATED) {
 						logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
-					}
-					
-					if(openPrice != null && stopLossLimit > 0) {
-						priceInfo = binanceWebsocketTradeService.getPrice(pair);
-						//double stopLossLimit = openPrice.getStopLossLimit();
-						if(priceInfo.getPriceDoubleValue() <= stopLossLimit) {
-							continue;
-						}
-						if(stopLoss.doubleValue() < stopLossLimit) {
-							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
-						}
 					}
 					
 					binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit, 
@@ -1017,9 +1032,35 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 
+					if(openPrice != null && stopLossLimit > 0) {
+						priceInfo = binanceWebsocketTradeService.getPrice(pair);
+						//double stopLossLimit = openPrice.getStopLossLimit();
+						if(priceInfo.getPriceDoubleValue() >= stopLossLimit) {
+							continue;
+						}
+						if(stopLoss.doubleValue() > stopLossLimit) {
+							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
+						}
+					}
+					
 					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
+						
+						if(autoTradeType == AutoTradeType.FENCE_SITTER) {
+							//重置条件订单
+							for(PositionInfo position : positionList) {
+					    		Side side = Side.SELL;
+								quantity = new BigDecimal(position.getPositionAmt());
+					    		ps = PositionSide.parse(position.getPositionSide());
+					    		if(quantity.compareTo(new BigDecimal(0)) == -1) {
+					    			quantity = quantity.multiply(new BigDecimal(-1));
+					    			side = Side.BUY;
+					    		}
+					    		resetAlgoOrder(binanceApiKey, binanceSecretKey, pair, quantity, stopLoss, ps, side, Type.STOP_MARKET);
+							}
+						}
+						
 						continue;
 					}
 					
@@ -1043,17 +1084,6 @@ public class KlinesServiceImpl implements KlinesService {
 					if(marginType != MarginType.ISOLATED) {
 						logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
-					}
-					
-					if(openPrice != null && stopLossLimit > 0) {
-						priceInfo = binanceWebsocketTradeService.getPrice(pair);
-						//double stopLossLimit = openPrice.getStopLossLimit();
-						if(priceInfo.getPriceDoubleValue() >= stopLossLimit) {
-							continue;
-						}
-						if(stopLoss.doubleValue() > stopLossLimit) {
-							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
-						}
 					}
 					
 					binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit, 
