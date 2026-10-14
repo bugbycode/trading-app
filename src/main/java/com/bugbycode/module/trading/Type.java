@@ -56,4 +56,19 @@ public enum Type {
 	public String getMemo() {
 		return memo;
 	}
+	
+	public static Type parse(String value) {
+		Type result = null;
+		Type[] arr = Type.values();
+		for(Type t : arr) {
+			if(t.value().equals(value)) {
+				result = t;
+				break;
+			}
+		}
+		if(result == null) {
+			throw new RuntimeException("订单类型错误");
+		}
+		return result;
+	}
 }

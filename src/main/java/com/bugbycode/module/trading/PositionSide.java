@@ -26,4 +26,15 @@ public enum PositionSide {
 		return memo;
 	}
 	
+	public static PositionSide parse(String positionSide) {
+		PositionSide result = DEFAULT;
+		PositionSide[] arr = PositionSide.values();
+		for(PositionSide ps : arr) {
+			if(ps.value().equals(positionSide)) {
+				result = ps;
+				break;
+			}
+		}
+		return result;
+	}
 }

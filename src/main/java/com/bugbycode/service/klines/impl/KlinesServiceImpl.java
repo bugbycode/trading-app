@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.bugbycode.binance.module.commission_rate.CommissionRate;
 import com.bugbycode.binance.module.fundingInfo.FundingInfo;
 import com.bugbycode.binance.module.leverage.LeverageBracketInfo;
+import com.bugbycode.binance.module.order.AlgoOrder;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.rest.BinanceRestTradeService;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
@@ -43,6 +44,7 @@ import com.bugbycode.module.FollowMasterStatus;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MonitorStatus;
+import com.bugbycode.module.PlaceOrderAgain;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.RecvTradeStatus;
@@ -63,8 +65,10 @@ import com.bugbycode.module.binance.ProfitOrderEnabled;
 import com.bugbycode.module.binance.Result;
 import com.bugbycode.module.binance.SymbolConfig;
 import com.bugbycode.module.binance.SymbolExchangeInfo;
+import com.bugbycode.module.binance.WorkingType;
 import com.bugbycode.module.open_interest.OpenInterestHist;
 import com.bugbycode.module.trading.PositionSide;
+import com.bugbycode.module.trading.Side;
 import com.bugbycode.module.trading.Type;
 import com.bugbycode.module.user.User;
 import com.bugbycode.module.price.OpenPrice;
@@ -1112,6 +1116,37 @@ public class KlinesServiceImpl implements KlinesService {
 			}
 		}
 		
+	}
+	
+	@Override
+	public void resetAlgoOrder(String binanceApiKey, String binanceSecretKey, String pair, BigDecimal quantity, BigDecimal stopPrice, PositionSide ps, Side side, Type type) {
+		boolean resetAlgoOrder = false;
+		
+		//查看条件订单
+		List<AlgoOrder> orderList = binanceRestTradeService.openAlgoOrders(binanceApiKey, binanceSecretKey, pair, ps);
+		for(AlgoOrder order : orderList) {
+			logger.debug(new JSONObject(order));
+			
+			if(Type.parse(order.getOrderType()) != type) {
+				continue;
+			}
+			
+			double triggerPrice = Double.valueOf(order.getTriggerPrice());
+			long algoId = order.getAlgoId();
+			//取消条件订单
+			if(triggerPrice != stopPrice.doubleValue()) {
+    			resetAlgoOrder = true;
+    			binanceRestTradeService.deleteAlgoOrder(binanceApiKey, binanceSecretKey, algoId);
+			}
+		}
+		
+		if(resetAlgoOrder || CollectionUtils.isEmpty(orderList)) {
+			com.bugbycode.module.Result<BinanceOrderInfo,RuntimeException> order_rs = binanceWebsocketTradeService.order_place(binanceApiKey, binanceSecretKey, pair, side, ps, type, null, 
+					quantity, null, stopPrice, true, WorkingType.CONTRACT_PRICE, null, null, PlaceOrderAgain.CLOSE);
+			if(order_rs != null && order_rs.getErr() != null) {
+				throw order_rs.getErr();
+			}
+		}
 	}
 	
 	public void sendEmail(User user, String subject,String text,String recEmail) {

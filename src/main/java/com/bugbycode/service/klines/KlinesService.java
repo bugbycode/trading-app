@@ -1,5 +1,6 @@
 package com.bugbycode.service.klines;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
+import com.bugbycode.module.trading.Side;
+import com.bugbycode.module.trading.Type;
 import com.bugbycode.module.user.User;
 
 public interface KlinesService {
@@ -245,6 +248,19 @@ public interface KlinesService {
      * @param decimalNum 价格小数点个数
      */
     public void marketPlace(String pair,PositionSide ps, OpenPrice openPrice, int decimalNum);
+    
+    /**
+     * 重置条件订单
+     * @param binanceApiKey
+     * @param binanceSecretKey
+     * @param pair 交易对
+     * @param quantity 持仓数量
+     * @param stopPrice 触发价
+     * @param ps 持仓方向
+     * @param side 买卖方向 做多为：SELL 反之为：BUY
+     * @param type 订单类型（条件单类型）
+     */
+    public void resetAlgoOrder(String binanceApiKey, String binanceSecretKey, String pair, BigDecimal quantity, BigDecimal stopPrice, PositionSide ps, Side side, Type type);
     
     /**
      * 获取最新k线收盘价

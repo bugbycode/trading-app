@@ -986,6 +986,49 @@ public class BinanceRestTradeServiceImpl implements BinanceRestTradeService {
 		
 		return orders;
 	}
+	
+	@Override
+	public List<AlgoOrder> openAlgoOrders(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide positionSide) {
+		List<AlgoOrder> orderList = openAlgoOrders(binanceApiKey, binanceSecretKey, symbol);
+		List<AlgoOrder> orders = new ArrayList<AlgoOrder>();
+		for(AlgoOrder order : orderList) {
+			if(PositionSide.parse(order.getPositionSide()) == positionSide) {
+				orders.add(order);
+			}
+		}
+		return orders;
+	}
+	
+	@Override
+	public void deleteAlgoOrder(String binanceApiKey, String binanceSecretKey, long algoId) {
+		
+		String queryString = String.format("algoId=%s&timestamp=%s", algoId, getLocalTime());
+		
+		String signature = HmacSHA256Util.generateSignature(queryString, binanceSecretKey);
+		
+		queryString = StringUtil.urlDecoder(queryString);
+		queryString += "&signature=" + signature;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-MBX-APIKEY", binanceApiKey);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		
+		ResponseEntity<String> result = restTemplate.exchange(AppConfig.REST_BASE_URL + "/fapi/v1/algoOrder?" + queryString, HttpMethod.DELETE, entity, String.class);
+		HttpStatus status = HttpStatus.resolve(result.getStatusCode().value());
+		
+		if(status == HttpStatus.OK) {
+			JSONObject json = new JSONObject(result.getBody());
+			if(json.has("code") && json.getInt("code") == 200) {
+				//
+			} else {
+				logger.info(result.getBody());
+				throw new RuntimeException("撤销条件订单时出现异常，response：" + result.getBody());
+			}
+		} else {
+			logger.info(result.getBody());
+			throw new RuntimeException("撤销条件订单时出现异常，response：" + result.getBody());
+		}
+	}
 
 	@Override
 	public int allCountOpenAlgoOrders(String binanceApiKey, String binanceSecretKey) {

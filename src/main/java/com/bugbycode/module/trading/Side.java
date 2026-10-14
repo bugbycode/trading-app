@@ -17,4 +17,16 @@ public enum Side {
 	public String value() {
 		return this.side;
 	}
+	
+	public static Side parse(String value) {
+		Side result = BUY;
+		Side[] arr = Side.values();
+		for(Side side : arr) {
+			if(side.value().equals(value)) {
+				result = side;
+				break;
+			}
+		}
+		return result;
+	}
 }

@@ -240,6 +240,28 @@ public interface BinanceRestTradeService {
 	public List<AlgoOrder> openAlgoOrders(String binanceApiKey, String binanceSecretKey, String symbol);
 	
 	/**
+	 * 查看当前全部条件挂单 (USER_DATA) </br>
+	 * -请求权重 </br>
+	 * 查看某个交易对下当前所有的条件挂单（Algo / Conditional Order），包括 U 本位合约的止盈止损（TP/SL, Take Profit / Stop Loss）与追踪止损（Trailing Stop）订单。</br>
+	 *  1、带symbol 1 </br>
+	 *  2、不带 40 请小心使用不带symbol参数的调用 </br>
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param symbol 
+	 * @param positionSide
+	 * @return
+	 */
+	public List<AlgoOrder> openAlgoOrders(String binanceApiKey, String binanceSecretKey, String symbol, PositionSide positionSide);
+	
+	/**
+	 * 撤销条件订单 (TRADE)
+	 * @param binanceApiKey
+	 * @param binanceSecretKey
+	 * @param algoId 
+	 */
+	public void deleteAlgoOrder(String binanceApiKey, String binanceSecretKey, long algoId);
+	
+	/**
 	 * 统计当前全部条件挂单总数量 (USER_DATA) </br>
 	 * @param binanceApiKey
 	 * @param binanceSecretKey
