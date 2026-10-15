@@ -47,6 +47,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
+	private boolean resetStopLoss = false;
+	
 	private PositionSide ps = PositionSide.DEFAULT;
 	
 	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_15m, PositionSide ps) {
@@ -226,6 +228,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
 			price.setAutoTrade(autoTrade);
+			price.setResetStopLoss(resetStopLoss);
 			price.setAutoClosePosition(autoClosePosition);
 			price.setDualSidePositionStatus(dualSidePositionStatus);
 			openPrices.add(price);
