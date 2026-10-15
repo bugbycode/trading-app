@@ -41,7 +41,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private List<OpenPrice> openPrices;
 	
-	private AutoTrade autoTrade = AutoTrade.CLOSE;
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
