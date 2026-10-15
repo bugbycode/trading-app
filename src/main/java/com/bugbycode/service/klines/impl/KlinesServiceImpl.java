@@ -682,23 +682,6 @@ public class KlinesServiceImpl implements KlinesService {
 					if(quantity.doubleValue() == 0) {
 						continue;
 					}
-					
-					//查询杠杆
-					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-					//WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
-					
-					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
-					
-					int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
-					int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
-					
-					int leverage = sc.getLeverage();
-					
-					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
-					if(leverage != updateLeverage) {
-						logger.debug("开始修改" + pair + "杠杆倍数");
-						binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
-					}
 
 					if(openPrice != null && stopLossLimit > 0) {
 						priceInfo = binanceWebsocketTradeService.getPrice(pair);
@@ -730,6 +713,37 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						continue;
+					}
+
+					//筛选策略限制
+					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+						continue;
+					}
+					
+					//活跃度限制
+					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
+						continue;
+					}
+					
+					//查询杠杆
+					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
+					//WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
+					
+					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
+					
+					int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
+					int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
+					
+					int leverage = sc.getLeverage();
+					
+					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
+					if(leverage != updateLeverage) {
+						logger.debug("开始修改" + pair + "杠杆倍数");
+						binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
 					}
 					
 					//持仓价值 = 持仓数量 * 价格
@@ -780,20 +794,6 @@ public class KlinesServiceImpl implements KlinesService {
 					if(marginType != MarginType.ISOLATED) {
 						logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
-					}
-
-					//筛选策略限制
-					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
-						continue;
-					}
-					
-					//活跃度限制
-					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
-						continue;
-					}
-					
-					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
-						continue;
 					}
 					
 					binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG, quantity, stopLoss, takeProfit, 
@@ -971,24 +971,6 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					//查询杠杆
-					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-					//WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
-
-					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
-					
-					int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
-					int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
-					
-					int leverage = sc.getLeverage();
-					
-					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
-					
-					if(leverage != updateLeverage) {
-						logger.debug("开始修改" + pair + "杠杆倍数");
-						binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
-					}
-					
 					if(openPrice != null && stopLossLimit > 0) {
 						priceInfo = binanceWebsocketTradeService.getPrice(pair);
 						//double stopLossLimit = openPrice.getStopLossLimit();
@@ -1019,6 +1001,38 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 						
 						continue;
+					}
+
+					//筛选策略限制
+					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
+						continue;
+					}
+					
+					//活跃度限制
+					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
+						continue;
+					}
+					
+					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
+						continue;
+					}
+					
+					//查询杠杆
+					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
+					//WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
+
+					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
+					
+					int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
+					int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
+					
+					int leverage = sc.getLeverage();
+					
+					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
+					
+					if(leverage != updateLeverage) {
+						logger.debug("开始修改" + pair + "杠杆倍数");
+						binanceRestTradeService.leverage(binanceApiKey, binanceSecretKey, pair, updateLeverage);
 					}
 					
 					//持仓价值 = 持仓数量 * 价格
@@ -1069,20 +1083,6 @@ public class KlinesServiceImpl implements KlinesService {
 					if(marginType != MarginType.ISOLATED) {
 						logger.debug("修改" + pair + "保证金模式为：" + MarginType.ISOLATED);
 						binanceRestTradeService.marginType(binanceApiKey, binanceSecretKey, pair, MarginType.ISOLATED);
-					}
-
-					//筛选策略限制
-					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
-						continue;
-					}
-					
-					//活跃度限制
-					if(oih.getTradeNumber() < u.getTradeNumber() && autoTradeType != AutoTradeType.DEFAULT) {
-						continue;
-					}
-					
-					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
-						continue;
 					}
 					
 					binanceWebsocketTradeService.tradeMarket(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT, quantity, stopLoss, takeProfit, 
