@@ -43,7 +43,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
+	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
 	
 	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
@@ -208,7 +208,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			//FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			//double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
-			double stopLossLimit = openPriceValue;
+			Klines last_15m = PriceUtil.getLastKlines(list_15m);
+			
+			double stopLossLimit = isLong() ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
