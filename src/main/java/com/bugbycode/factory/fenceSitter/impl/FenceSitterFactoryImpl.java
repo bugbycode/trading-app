@@ -198,7 +198,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
-		/*
+		
 		if(first_init && !(isShort() || isLong())) {
 			int last_list_trend_index = list_trend.size() - 1;
 			int last_list_index = list.size() - 1;
@@ -207,7 +207,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			list.remove(last_list_index);
 			
 			init(false);
-		}*/
+		}
 	}
 	
 	private PositionSide getPositionSide() {
