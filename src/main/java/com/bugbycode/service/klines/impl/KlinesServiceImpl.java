@@ -1201,7 +1201,7 @@ public class KlinesServiceImpl implements KlinesService {
 		for(FibInfoFactory factory : factorys) {
 			
 			if(!(factory.isLong() || factory.isShort())) {
-				return;
+				continue;
 			}
 			
 			FibInfo fibInfo = factory.getFibInfo();
@@ -1266,7 +1266,7 @@ public class KlinesServiceImpl implements KlinesService {
     	
 		for(FenceSitterFactory factory : factories) {
 			if(!(factory.isLong() || factory.isShort())) {
-	    		return;
+	    		continue;
 	    	}
 	    	
 	    	Klines last = PriceUtil.getLastKlines(list_15m);
