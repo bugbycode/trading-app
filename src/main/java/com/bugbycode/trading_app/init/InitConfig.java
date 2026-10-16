@@ -107,6 +107,11 @@ public class InitConfig implements ApplicationRunner {
 		return new TradingWebSocketClientEndpoint(websocketApiBaseUrl);
 	}
 	
+	@Bean
+	public TradingWebSocketClientEndpoint closePositionWebsocketApi() {
+		return new TradingWebSocketClientEndpoint(websocketApiBaseUrl);
+	}
+	
 	private class HttpResponseErrorHandler implements ResponseErrorHandler{
 		
 		private final Logger logger = LogManager.getLogger(HttpResponseErrorHandler.class);

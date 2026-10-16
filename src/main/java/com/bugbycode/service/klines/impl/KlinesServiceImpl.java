@@ -83,6 +83,7 @@ import com.bugbycode.trading_app.pool.WorkTaskPool;
 import com.bugbycode.trading_app.task.email.SendMailTask;
 import com.bugbycode.trading_app.task.position.ClosePositionTask;
 import com.bugbycode.trading_app.task.trading.TradingTask;
+import com.bugbycode.websocket.trading.endpoint.TradingWebSocketClientEndpoint;
 import com.util.CommandUtil;
 import com.util.DateFormatUtil;
 import com.util.FileUtil;
@@ -135,6 +136,9 @@ public class KlinesServiceImpl implements KlinesService {
 	
 	@Autowired
 	private OpenInterestHistRepository openInterestHistRepository;
+	
+	@Autowired
+	private TradingWebSocketClientEndpoint closePositionWebsocketApi;
 	
 	@Override
 	public List<Klines> continuousKlines(String pair, long startTime, long endTime,
@@ -356,7 +360,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			} else if(PriceUtil.isBreachShort(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭多头仓位
-				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FIB_RET, userDetailsService, openPrice));
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FIB_RET, userDetailsService, openPrice, closePositionWebsocketApi));
 				break;
 			}
 		}
@@ -463,7 +467,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			} else if(PriceUtil.isBreachLong(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭空头仓位
-				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FIB_RET, userDetailsService, openPrice));
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FIB_RET, userDetailsService, openPrice, closePositionWebsocketApi));
 				break;
 			}
 		}
@@ -839,7 +843,7 @@ public class KlinesServiceImpl implements KlinesService {
 						Type type = orderEx.getType();
 						if(type == Type.STOP || type == Type.STOP_MARKET || type == Type.TAKE_PROFIT || type == Type.TAKE_PROFIT_MARKET) {
 							//关闭仓位
-							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u, openPrice));
+							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u, openPrice, closePositionWebsocketApi));
 						}
 					}
 					
@@ -1128,7 +1132,7 @@ public class KlinesServiceImpl implements KlinesService {
 						Type type = orderEx.getType();
 						if(type == Type.STOP || type == Type.STOP_MARKET || type == Type.TAKE_PROFIT || type == Type.TAKE_PROFIT_MARKET) {
 							//关闭仓位
-							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u, openPrice));
+							this.closePositionTaskPool.add(new ClosePositionTask(pair, ps, u, openPrice, closePositionWebsocketApi));
 						}
 					}
 					
@@ -1275,13 +1279,13 @@ public class KlinesServiceImpl implements KlinesService {
 	    		if(PriceUtil.isBreachLong(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
 		    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
 	    		} else if(PriceUtil.isBreachShort(last, price.getPrice())) {
-	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FENCE_SITTER, userDetailsService, price));
+	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FENCE_SITTER, userDetailsService, price, closePositionWebsocketApi));
 	    		}
 	    	} else if(factory.isShort()) {
 	    		if(PriceUtil.isBreachShort(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
 		    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, decimalNum));
 	    		} else if(PriceUtil.isBreachLong(last, price.getPrice())) {
-	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FENCE_SITTER, userDetailsService, price));
+	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FENCE_SITTER, userDetailsService, price, closePositionWebsocketApi));
 	    		}
 	    	}
 		}
@@ -1648,7 +1652,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			} else if(PriceUtil.isBreachShort(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭多头仓位
-				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.PRICE_ACTION, userDetailsService, openPrice));
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.PRICE_ACTION, userDetailsService, openPrice, closePositionWebsocketApi));
 				break;
 			}
 		}
@@ -1768,7 +1772,7 @@ public class KlinesServiceImpl implements KlinesService {
 				break;
 			} else if(PriceUtil.isBreachLong(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭空头仓位
-				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.PRICE_ACTION, userDetailsService, openPrice));
+				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.PRICE_ACTION, userDetailsService, openPrice, closePositionWebsocketApi));
 				break;
 			}
 		}

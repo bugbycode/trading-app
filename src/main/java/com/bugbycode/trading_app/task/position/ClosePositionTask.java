@@ -10,7 +10,6 @@ import org.springframework.util.CollectionUtils;
 import com.bugbycode.binance.module.position.PositionInfo;
 import com.bugbycode.binance.trade.websocket.BinanceWebsocketTradeService;
 import com.bugbycode.binance.trade.websocket.impl.BinanceWebsocketTradeServiceImpl;
-import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.binance.AutoTrade;
@@ -53,12 +52,14 @@ public class ClosePositionTask implements Runnable{
 	 * @param ps 要关闭的持仓方向 LONG/SHORT
 	 * @param user 相关用户
 	 * @param price 触发的价格信息
+	 * @param websocketApi
 	 */
-	public ClosePositionTask(String pair, PositionSide ps, User user, OpenPrice price) {
+	public ClosePositionTask(String pair, PositionSide ps, User user, OpenPrice price, TradingWebSocketClientEndpoint websocketApi) {
 		this.pair = pair;
 		this.ps = ps;
 		this.user = user;
 		this.price = price;
+		this.websocketApi = websocketApi;
 	}
 	
 	/**
@@ -67,12 +68,14 @@ public class ClosePositionTask implements Runnable{
 	 * @param ps 要关闭的持仓方向 LONG/SHORT
 	 * @param users 相关用户
 	 * @param price 触发的价格信息
+	 * @param websocketApi
 	 */
-	public ClosePositionTask(String pair, PositionSide ps, List<User> users, OpenPrice price) {
+	public ClosePositionTask(String pair, PositionSide ps, List<User> users, OpenPrice price, TradingWebSocketClientEndpoint websocketApi) {
 		this.pair = pair;
 		this.ps = ps;
 		this.users = users;
 		this.price = price;
+		this.websocketApi = websocketApi;
 	}
 	
 	/**
@@ -82,20 +85,25 @@ public class ClosePositionTask implements Runnable{
 	 * @param autoTradeType 指标
 	 * @param userDetailsService
 	 * @param price 触发的价格信息
+	 * @param websocketApi
 	 */
 	public ClosePositionTask(String pair, PositionSide ps, AutoTradeType autoTradeType,
-			UserService userDetailsService, OpenPrice price) {
+			UserService userDetailsService, OpenPrice price, TradingWebSocketClientEndpoint websocketApi) {
 		this.pair = pair;
 		this.ps = ps;
 		this.autoTradeType = autoTradeType;
 		this.userDetailsService = userDetailsService;
 		this.price = price;
+		this.websocketApi = websocketApi;
 	}
 
 	@Override
 	public void run() {
 		try {
-			this.websocketApi = new TradingWebSocketClientEndpoint(AppConfig.WEBSOCKET_API_URL);
+			if(this.websocketApi == null) {
+				throw new RuntimeException("Websocket连接未初始化");
+			}
+			//this.websocketApi = new TradingWebSocketClientEndpoint(AppConfig.WEBSOCKET_API_URL);
 			this.binanceWebsocketTradeService = new BinanceWebsocketTradeServiceImpl(this.websocketApi);
 			
 			List<User> userList = new ArrayList<User>();
@@ -139,13 +147,13 @@ public class ClosePositionTask implements Runnable{
 		} catch (Exception e) {
 			logger.error("自动关闭" + pair + "仓位时出现异常", e);
 		} finally {
-			try {
+			/*try {
 				if(this.websocketApi != null) {
 					this.websocketApi.close();
 				}
 			}catch (Exception e) {
 				logger.error(e.getMessage(), e);
-			}
+			}*/
 		}
 	}
 }
