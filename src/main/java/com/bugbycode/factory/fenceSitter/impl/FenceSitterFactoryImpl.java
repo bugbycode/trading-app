@@ -198,7 +198,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
-		
+		/*
 		if(first_init && !(isShort() || isLong())) {
 			int last_list_trend_index = list_trend.size() - 1;
 			int last_list_index = list.size() - 1;
@@ -207,36 +207,41 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			list.remove(last_list_index);
 			
 			init(false);
-		}
+		}*/
 	}
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list_trend);
-		
+		//Klines last = PriceUtil.getLastKlines(list_trend);
+		/*
 		if(verifyShort(last)) {
 			ps = PositionSide.SHORT;
 		} else if(verifyLong(last)) {
 			ps = PositionSide.LONG;
 		}
-		
+		*/
+		if(ps_mode == PositionSide.LONG) {
+			ps = PositionSide.SHORT;
+		} else if(ps_mode == PositionSide.SHORT) {
+			ps = PositionSide.LONG;
+		}
 		return ps;
 	}
-	
+	/*
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
-	}
+		return k.getDea() > 0;
+	}*/
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
