@@ -173,6 +173,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			double openPriceValue = 0;
+			Klines hit_k = PriceUtil.getLastKlines(list_15m);
 			
 			for(int index = list_15m.size() - 1; index > 0; index--) {
 				Klines current = list_15m.get(index);
@@ -181,6 +182,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
+					hit_k = current;
 				}
 
 				if(current.lte(fibAfterKline)) {
@@ -202,7 +204,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			//FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			//double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
-			double stopLossLimit = openPriceValue;
+			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
 			
@@ -240,11 +242,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getDea() > 0 && k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getDea() < 0 && k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
