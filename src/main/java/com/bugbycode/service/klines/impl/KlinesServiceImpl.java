@@ -579,8 +579,16 @@ public class KlinesServiceImpl implements KlinesService {
 						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT);
 						for(PositionInfo p : positionList) {
 							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
-							if(excute_rs.getErr() != null) {
-								throw new RuntimeException("关闭" + pair + "空头仓位时出现异常", excute_rs.getErr());
+							RuntimeException ex = excute_rs.getErr();
+							if(ex != null) {
+								if(ex instanceof OrderPlaceException) {
+									OrderPlaceException orderEx = (OrderPlaceException) ex;
+									if(orderEx.getCode() != -2022) {
+										throw new RuntimeException("关闭" + pair + "空头仓位时出现异常[" + orderEx.getCode() + "]", excute_rs.getErr());
+									}
+								} else {
+									throw new RuntimeException("关闭" + pair + "空头仓位时出现异常", excute_rs.getErr());
+								}
 							}
 						}
 					}
@@ -865,8 +873,16 @@ public class KlinesServiceImpl implements KlinesService {
 						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG);
 						for(PositionInfo p : positionList) {
 							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
-							if(excute_rs.getErr() != null) {
-								throw new RuntimeException("关闭" + pair + "多头仓位时出现异常", excute_rs.getErr());
+							RuntimeException ex = excute_rs.getErr();
+							if(ex != null) {
+								if(ex instanceof OrderPlaceException) {
+									OrderPlaceException orderEx = (OrderPlaceException) ex;
+									if(orderEx.getCode() != -2022) {
+										throw new RuntimeException("关闭" + pair + "多头仓位时出现异常[" + orderEx.getCode() + "]", excute_rs.getErr());
+									}
+								} else {
+									throw new RuntimeException("关闭" + pair + "多头仓位时出现异常", excute_rs.getErr());
+								}
 							}
 						}
 					}
