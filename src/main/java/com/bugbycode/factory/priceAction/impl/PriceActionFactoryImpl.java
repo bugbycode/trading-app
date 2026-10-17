@@ -165,13 +165,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			MarketSentiment ms_ = new MarketSentiment(startAfterList);
 			double fib0Value = this.fibInfo.getFibValue(FibCode.FIB0);
 			if(isLong()) {
-				double newEndPrice = end.getHighPriceDoubleValue();
+				double newEndPrice = ms_.getHigh().getHighPriceDoubleValue();
 				if(newEndPrice > fib0Value) {
 					end = ms_.getHigh();
 					this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
 				}
 			} else {
-				double newEndPrice = end.getLowPriceDoubleValue();
+				double newEndPrice = ms_.getLow().getLowPriceDoubleValue();
 				if(newEndPrice < fib0Value) {
 					end = ms_.getLow();
 					this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
