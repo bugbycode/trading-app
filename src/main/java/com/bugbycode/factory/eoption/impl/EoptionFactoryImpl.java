@@ -9,7 +9,6 @@ import com.bugbycode.factory.eoption.EoptionFactory;
 import com.bugbycode.module.AutoClosePosition;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
-import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
@@ -43,9 +42,11 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	
 	private List<OpenPrice> openPrices;
 	
-	private AutoTrade autoTrade = AutoTrade.CLOSE;
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	
+	private boolean resetStopLoss = false;
 	
 	public EoptionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -140,7 +141,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			}
 			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
 			end = PriceUtil.getMinPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
 		} else if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
 			startAfterFlag = PriceUtil.getAfterKlines(start, firstSubList);
@@ -149,7 +150,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			}
 			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
 		}
 		
 		if(this.fibInfo == null) {
@@ -157,6 +158,26 @@ public class EoptionFactoryImpl implements EoptionFactory {
 		}
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
+		
+		Klines startAfterKline = PriceUtil.getAfterKlines(start, list_15m);
+		if(startAfterKline != null) {
+			List<Klines> startAfterList = PriceUtil.subList(startAfterKline, list_15m);
+			MarketSentiment ms_ = new MarketSentiment(startAfterList);
+			double fib0Value = this.fibInfo.getFibValue(FibCode.FIB0);
+			if(isLong()) {
+				double newEndPrice = ms_.getHigh().getHighPriceDoubleValue();
+				if(newEndPrice > fib0Value) {
+					end = ms_.getHigh();
+					this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
+				}
+			} else {
+				double newEndPrice = ms_.getLow().getLowPriceDoubleValue();
+				if(newEndPrice < fib0Value) {
+					end = ms_.getLow();
+					this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
+				}
+			}
+		}
 		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
@@ -168,13 +189,30 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
-			FibCode openCode = fibInfo.getFibCode(openCodeValue);
+			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			if(openCode == FibCode.FIB0) {
-				return;
+			double openPriceValue = 0;
+			Klines hit_k = PriceUtil.getLastKlines(list_15m);
+			
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
+
+				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
+				if(openPriceValue == 0 || 
+						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
+					openPriceValue = hitPrice;
+					hit_k = current;
+				}
+
+				if(current.lte(fibAfterKline)) {
+					break;
+				}
+				
 			}
 			
-			double openPriceValue = fibInfo.getFibValue(openCode);
+			if(openPriceValue == 0) {
+				return;
+			}
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
@@ -182,8 +220,10 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
-			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
-			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+			//FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
+			//double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+			
+			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.EOPTION, fibInfo));
 			
@@ -213,23 +253,24 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
+			price.setResetStopLoss(resetStopLoss);
 			price.setAutoTrade(autoTrade);
 			price.setAutoClosePosition(autoClosePosition);
 			openPrices.add(price);
