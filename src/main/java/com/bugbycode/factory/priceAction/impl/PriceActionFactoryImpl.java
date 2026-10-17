@@ -9,7 +9,6 @@ import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.module.AutoClosePosition;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
-import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
@@ -142,7 +141,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			}
 			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
 			end = PriceUtil.getMinPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
 		} else if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
 			startAfterFlag = PriceUtil.getAfterKlines(start, firstSubList);
@@ -151,7 +150,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			}
 			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
 		}
 		
 		if(this.fibInfo == null) {
@@ -159,6 +158,26 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		}
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
+		
+		Klines startAfterKline = PriceUtil.getAfterKlines(start, list_15m);
+		if(startAfterKline != null) {
+			List<Klines> startAfterList = PriceUtil.subList(startAfterKline, list_15m);
+			MarketSentiment ms_ = new MarketSentiment(startAfterList);
+			double fib0Value = this.fibInfo.getFibValue(FibCode.FIB0);
+			if(isLong()) {
+				double newEndPrice = end.getHighPriceDoubleValue();
+				if(newEndPrice > fib0Value) {
+					end = ms_.getHigh();
+					this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
+				}
+			} else {
+				double newEndPrice = end.getLowPriceDoubleValue();
+				if(newEndPrice < fib0Value) {
+					end = ms_.getLow();
+					this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
+				}
+			}
+		}
 		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
