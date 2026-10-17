@@ -583,7 +583,9 @@ public class KlinesServiceImpl implements KlinesService {
 							if(ex != null) {
 								if(ex instanceof OrderPlaceException) {
 									OrderPlaceException orderEx = (OrderPlaceException) ex;
-									if(orderEx.getCode() != -2022) {
+									if(orderEx.getCode() == -2022) {
+										logger.error(orderEx.getLocalizedMessage(), orderEx);
+									} else {
 										throw new RuntimeException("关闭" + pair + "空头仓位时出现异常[" + orderEx.getCode() + "]", excute_rs.getErr());
 									}
 								} else {
@@ -877,7 +879,9 @@ public class KlinesServiceImpl implements KlinesService {
 							if(ex != null) {
 								if(ex instanceof OrderPlaceException) {
 									OrderPlaceException orderEx = (OrderPlaceException) ex;
-									if(orderEx.getCode() != -2022) {
+									if(orderEx.getCode() == -2022) {
+										logger.error(orderEx.getLocalizedMessage(), orderEx);
+									} else {
 										throw new RuntimeException("关闭" + pair + "多头仓位时出现异常[" + orderEx.getCode() + "]", excute_rs.getErr());
 									}
 								} else {
