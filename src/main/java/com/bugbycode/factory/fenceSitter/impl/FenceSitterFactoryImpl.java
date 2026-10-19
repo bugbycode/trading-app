@@ -13,6 +13,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -40,6 +41,8 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	
 	private PositionSide ps_mode = PositionSide.DEFAULT;
 	
+	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
+	
 	public FenceSitterFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, PositionSide ps_mode) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
@@ -56,11 +59,11 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init(true);
+			this.init();
 		}
 	}
 	
-	private void init(boolean first_init) {
+	private void init() {
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m) || ps_mode == PositionSide.DEFAULT) {
 			return;
 		}
@@ -187,13 +190,6 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			if(openPriceValue == 0) {
 				return;
 			}
-			/*
-			double stopLossLimit = fib0Value;
-			
-			if((ps_mode == PositionSide.LONG && mode == QuotationMode.LONG) 
-					|| (ps_mode == PositionSide.SHORT && mode == QuotationMode.SHORT)) {
-				stopLossLimit = openCodeValue;
-			}*/
 			
 			double stopLossLimit = ps_mode == PositionSide.LONG ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
@@ -202,14 +198,9 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
 		
-		if(first_init && !(isShort() || isLong())) {
-			int last_list_trend_index = list_trend.size() - 1;
-			int last_list_index = list.size() - 1;
-			
-			list_trend.remove(last_list_trend_index);
-			list.remove(last_list_index);
-			
-			init(false);
+		if(tradeTrend == TradeTrend.FOLLOW && !(isShort() || isLong())) {
+			tradeTrend = TradeTrend.AGAINST;
+			init();
 		}
 	}
 	
@@ -227,11 +218,19 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0;
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() > 0;
+		} else {
+			return k.getDea() < 0;
+		}
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() < 0;
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() < 0;
+		} else {
+			return k.getDea() > 0;
+		}
 	}
 	
 	private boolean verifyHigh(Klines k) {
