@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
+import com.bugbycode.module.AutoClosePosition;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -42,6 +43,8 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	private PositionSide ps_mode = PositionSide.DEFAULT;
 	
 	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
+	
+	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
 	public FenceSitterFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
@@ -258,6 +261,9 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 	
 	private void addPrices(OpenPrice price) {
+		if(price != null) {
+			price.setAutoClosePosition(autoClosePosition);
+		}
 		this.openPrice = price;
 	}
 	
