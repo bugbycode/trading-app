@@ -327,7 +327,7 @@ public class TestTradeRestApi {
     	
     	//PositionSide ps = PositionSide.SHORT;
     	
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, PositionSide.SHORT);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -473,7 +473,7 @@ public class TestTradeRestApi {
     
     @Test
     public void testMarket() {
-    	String pair = "SUSDT";
+    	String pair = "STRKUSDT";
     	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
     	
@@ -481,21 +481,32 @@ public class TestTradeRestApi {
     	
     	int decimalNum = last.getDecimalNum();
     	
-    	PositionSide ps = PositionSide.SHORT; 
     	
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, ps);
+    	
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
     	
     	QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
     	
+    	PositionSide ps = factory.isLong() ? PositionSide.LONG : PositionSide.SHORT;
+    	
     	OpenPrice price = factory.getOpenPrice();
     	
     	logger.info("{} - {}, autoTrade: {}", mode, price, price.getAutoTrade());
     	logger.info("isClosePosition: {}", factory.isClosePosition());
     	binanceRestTradeService.fundingInfo();
-    	klinesService.marketPlace(pair, PositionSide.LONG, price, decimalNum);
+    	klinesService.marketPlace(pair, ps, price, decimalNum);
+    }
+    
+    @Test
+    public void testFuturesFenceSitter() {
+    	binanceRestTradeService.fundingInfo();
+    	String pair = "STRKUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+    	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+    	klinesService.futuresFenceSitter(list, list_15m);
     }
     
     @AfterEach
