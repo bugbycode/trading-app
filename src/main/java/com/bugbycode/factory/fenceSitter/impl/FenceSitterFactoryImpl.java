@@ -43,14 +43,11 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	
 	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
 	
-	public FenceSitterFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, PositionSide ps_mode) {
+	public FenceSitterFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.fibAfterKlines = new ArrayList<Klines>();
-		if(ps_mode != null) {
-			this.ps_mode = ps_mode;
-		}
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
 		}
@@ -64,7 +61,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 	
 	private void init() {
-		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m) || ps_mode == PositionSide.DEFAULT) {
+		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
@@ -169,7 +166,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			
 			double openPriceValue = 0;
 			
-			Klines hit_k = PriceUtil.getLastKlines(list);
+			//Klines hit_k = PriceUtil.getLastKlines(list);
 			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
@@ -182,7 +179,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 				if(openPriceValue == 0 || 
 						((mode == QuotationMode.LONG && hitPrice < openPriceValue) || (mode == QuotationMode.SHORT && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
-					hit_k = current;
+					//hit_k = current;
 				}
 				
 			}
@@ -191,7 +188,18 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 				return;
 			}
 			
-			double stopLossLimit = ps_mode == PositionSide.LONG ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
+			Klines last_15m = PriceUtil.getLastKlines(list_15m);
+			double last_15m_close = last_15m.getClosePriceDoubleValue();
+			
+			if(last_15m_close > openPriceValue) {
+				ps_mode = PositionSide.LONG;
+			} else {
+				ps_mode = PositionSide.SHORT;
+			}
+			
+			openPriceValue = last_15m_close;
+			
+			double stopLossLimit = ps_mode == PositionSide.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER));
 			
