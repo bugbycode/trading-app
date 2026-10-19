@@ -166,6 +166,8 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			
 			double openPriceValue = 0;
 			
+			Klines hit_k = PriceUtil.getLastKlines(list);
+			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 
@@ -177,6 +179,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 				if(openPriceValue == 0 || 
 						((mode == QuotationMode.LONG && hitPrice < openPriceValue) || (mode == QuotationMode.SHORT && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
+					hit_k = current;
 				}
 				
 			}
@@ -192,7 +195,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 				stopLossLimit = openCodeValue;
 			}*/
 			
-			double stopLossLimit = openPriceValue;
+			double stopLossLimit = ps_mode == PositionSide.LONG ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER));
 			
@@ -212,29 +215,24 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		//Klines last = PriceUtil.getLastKlines(list_trend);
-		/*
+		Klines last = PriceUtil.getLastKlines(list_trend);
+		
 		if(verifyShort(last)) {
 			ps = PositionSide.SHORT;
 		} else if(verifyLong(last)) {
 			ps = PositionSide.LONG;
 		}
-		*/
-		if(ps_mode == PositionSide.LONG) {
-			ps = PositionSide.SHORT;
-		} else if(ps_mode == PositionSide.SHORT) {
-			ps = PositionSide.LONG;
-		}
+		
 		return ps;
 	}
-	/*
+	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() < 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() > 0;
-	}*/
+		return k.getDea() < 0;
+	}
 	
 	private boolean verifyHigh(Klines k) {
 		return k.getDea() > 0;
