@@ -77,10 +77,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		this.list.sort(kc);
 		this.list_15m.sort(kc);
 		
-		//PriceUtil.calculateMACD(list);
-		//PriceUtil.calculateMACD(list_15m);
-		
-		PriceUtil.calculateEMA_7_25_99(list);
+		PriceUtil.calculateMACD(list);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
@@ -218,11 +215,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getEma7() > k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getEma7() < k.getEma25() && k.getEma25() > 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
