@@ -166,9 +166,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list);
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list);
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
