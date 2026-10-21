@@ -218,11 +218,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			double openPriceValue = 0;
-			Klines hit_k = PriceUtil.getLastKlines(list_15m);
+			Klines hit_k = PriceUtil.getLastKlines(list);
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
 
+				if(current.lte(end)) {
+					break;
+				}
+				
 				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
@@ -230,10 +234,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					hit_k = current;
 				}
 
-				if(current.lte(fibAfterKline)) {
-					break;
-				}
-				
 			}
 			
 			if(openPriceValue == 0) {
@@ -269,27 +269,27 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
