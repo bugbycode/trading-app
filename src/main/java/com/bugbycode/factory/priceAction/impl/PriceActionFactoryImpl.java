@@ -184,7 +184,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		}
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
-		
+		/*
 		Klines startAfterKline = PriceUtil.getAfterKlines(start, list_15m);
 		if(startAfterKline != null) {
 			List<Klines> startAfterList = PriceUtil.subList(startAfterKline, list_15m);
@@ -204,7 +204,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				}
 			}
 		}
-		
+		*/
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
