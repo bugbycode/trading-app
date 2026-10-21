@@ -48,12 +48,38 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private boolean resetStopLoss = false;
 	
+	private final FibCode takeProfitCode;
+	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+		this.takeProfitCode = FibCode.FIB618;
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
+		}
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+			this.init();
+		}
+	}
+	
+	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, FibCode takeProfitCode) {
+		this.list = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
+		if(takeProfitCode == null) {
+			takeProfitCode = FibCode.FIB618;
+		}
+		this.takeProfitCode = takeProfitCode;
+		
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
 		}
@@ -216,8 +242,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			FibCode takeProfitCode = FibCode.FIB618;
-			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			//FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
@@ -245,27 +269,27 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
