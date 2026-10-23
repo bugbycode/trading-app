@@ -729,6 +729,10 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						continue;
 					}
+					
+					if(stopLoss.doubleValue() > openPrice.getPrice()) {//限制大波动率
+						continue;
+					}
 
 					//筛选策略限制
 					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
@@ -1025,6 +1029,10 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 						}
 						
+						continue;
+					}
+					
+					if(stopLoss.doubleValue() < openPrice.getPrice()) {//限制大波动率
 						continue;
 					}
 
