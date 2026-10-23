@@ -43,7 +43,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<OpenPrice> openPrices;
 	
-	private AutoTrade autoTrade = AutoTrade.CLOSE;
+	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
 	
@@ -219,26 +219,20 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			double openPriceValue = 0;
-			Klines hit_k = PriceUtil.getLastKlines(list);
+			Klines hit_k = PriceUtil.getLastKlines(list_15m);
 			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				
-				if(current.lte(end)) {
-					break;
-				}
-
-				if((isLong() && current.getMacd() <= 0)
-						|| (isShort() && current.getMacd() >= 0)
-						|| tradeTrend == TradeTrend.AGAINST) {
-					this.autoTrade = AutoTrade.OPEN;
-				}
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
 				
 				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
 					hit_k = current;
+				}
+
+				if(current.lte(fibAfterKline)) {
+					break;
 				}
 
 			}
