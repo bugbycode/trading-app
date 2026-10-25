@@ -327,7 +327,7 @@ public class TestTradeRestApi {
     	
     	//PositionSide ps = PositionSide.SHORT;
     	
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, PositionSide.LONG);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -483,7 +483,7 @@ public class TestTradeRestApi {
     	
     	
     	
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, PositionSide.LONG);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
