@@ -49,7 +49,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private boolean resetStopLoss = false;
 	
-	private final FibCode takeProfitCode = FibCode.FIB618;
+	private final FibCode takeProfitCode = FibCode.FIB5;
 	
 	private final TradeTrend tradeTrend;
 	
