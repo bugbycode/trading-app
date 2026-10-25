@@ -711,7 +711,7 @@ public class KlinesServiceImpl implements KlinesService {
 					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-						
+						/*
 						if(autoTradeType == AutoTradeType.FENCE_SITTER) {
 							//重置条件订单
 							for(PositionInfo position : positionList) {
@@ -725,7 +725,7 @@ public class KlinesServiceImpl implements KlinesService {
 					    		resetAlgoOrder(binanceApiKey, binanceSecretKey, pair, quantity, stopLoss, ps, side, Type.STOP_MARKET);
 							}
 						}
-						
+						*/
 						continue;
 					}
 					
@@ -1013,7 +1013,7 @@ public class KlinesServiceImpl implements KlinesService {
 					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-						
+						/*
 						if(autoTradeType == AutoTradeType.FENCE_SITTER) {
 							//重置条件订单
 							for(PositionInfo position : positionList) {
@@ -1027,7 +1027,7 @@ public class KlinesServiceImpl implements KlinesService {
 					    		resetAlgoOrder(binanceApiKey, binanceSecretKey, pair, quantity, stopLoss, ps, side, Type.STOP_MARKET);
 							}
 						}
-						
+						*/
 						continue;
 					}
 					
@@ -1288,7 +1288,8 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresFenceSitter(List<Klines> list, List<Klines> list_15m) {
 		
 		FenceSitterFactory[] factories = {
-				new FenceSitterFactoryImpl(list_15m, list_15m, list_15m),
+				new FenceSitterFactoryImpl(list_15m, list_15m, list_15m, PositionSide.LONG),
+				new FenceSitterFactoryImpl(list_15m, list_15m, list_15m, PositionSide.SHORT),
 		};
     	
 		for(FenceSitterFactory factory : factories) {

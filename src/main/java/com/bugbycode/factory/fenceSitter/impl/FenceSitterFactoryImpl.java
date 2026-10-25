@@ -14,7 +14,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -40,17 +39,16 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	
 	private OpenPrice openPrice;
 	
-	private PositionSide ps_mode = PositionSide.DEFAULT;
-	
-	private TradeTrend tradeTrend = TradeTrend.FOLLOW;
-	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
-	public FenceSitterFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+	private PositionSide ps_mode = PositionSide.DEFAULT;
+	
+	public FenceSitterFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, PositionSide ps_mode) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+		this.ps_mode = ps_mode;
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
 		}
@@ -64,7 +62,8 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 	
 	private void init() {
-		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
+		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m) 
+				|| ps_mode == null || ps_mode == PositionSide.DEFAULT) {
 			return;
 		}
 		
@@ -169,7 +168,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			
 			double openPriceValue = 0;
 			
-			//Klines hit_k = PriceUtil.getLastKlines(list);
+			Klines hit_k = PriceUtil.getLastKlines(list);
 			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
@@ -182,7 +181,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 				if(openPriceValue == 0 || 
 						((mode == QuotationMode.LONG && hitPrice < openPriceValue) || (mode == QuotationMode.SHORT && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
-					//hit_k = current;
+					hit_k = current;
 				}
 				
 			}
@@ -191,28 +190,13 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 				return;
 			}
 			
-			Klines last_15m = PriceUtil.getLastKlines(list_15m);
-			double last_15m_close = last_15m.getClosePriceDoubleValue();
-			
-			if(last_15m_close > openPriceValue) {
-				ps_mode = PositionSide.LONG;
-			} else {
-				ps_mode = PositionSide.SHORT;
-			}
-			
-			openPriceValue = last_15m_close;
-			
-			double stopLossLimit = ps_mode == PositionSide.LONG ? last_15m.getLowPriceDoubleValue() : last_15m.getHighPriceDoubleValue();
+			double stopLossLimit = ps_mode == PositionSide.LONG ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
 		
-		if(tradeTrend == TradeTrend.FOLLOW && !(isShort() || isLong())) {
-			tradeTrend = TradeTrend.AGAINST;
-			init();
-		}
 	}
 	
 	private PositionSide getPositionSide() {
@@ -229,19 +213,11 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() > 0;
-		} else {
-			return k.getDea() < 0;
-		}
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() < 0;
-		} else {
-			return k.getDea() > 0;
-		}
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
