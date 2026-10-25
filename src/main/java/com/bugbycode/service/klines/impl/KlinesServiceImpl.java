@@ -729,7 +729,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(stopLoss.doubleValue() > openPrice.getPrice()) {//限制大波动率
+					if(stopLoss.doubleValue() > openPrice.getPrice() && autoTradeType != AutoTradeType.FENCE_SITTER) {//限制大波动率
 						continue;
 					}
 
@@ -1031,7 +1031,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(stopLoss.doubleValue() < openPrice.getPrice()) {//限制大波动率
+					if(stopLoss.doubleValue() < openPrice.getPrice() && autoTradeType != AutoTradeType.FENCE_SITTER) {//限制大波动率
 						continue;
 					}
 
