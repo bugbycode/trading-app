@@ -247,6 +247,12 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
+			FibCode childHitCode = childFibInfo.getFibCode_v2(openPriceValue);
+			
+			if(childHitCode.gte(FibCode.FIB5)) {
+				this.autoTrade = AutoTrade.CLOSE;
+			}
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
