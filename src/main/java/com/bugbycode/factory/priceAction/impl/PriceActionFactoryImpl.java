@@ -228,8 +228,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 					break;
 				}
 				
-				if(tradeTrend == TradeTrend.AGAINST
-						|| (isLong() && current.getMacd() <= 0) || (isShort() && current.getMacd() >= 0)) {
+				if(tradeTrend == TradeTrend.AGAINST || openCode.gte(FibCode.FIB5)) {
 					this.autoTrade = AutoTrade.OPEN;
 				}
 
