@@ -43,13 +43,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<OpenPrice> openPrices;
 	
-	private AutoTrade autoTrade = AutoTrade.OPEN;
+	private AutoTrade autoTrade = AutoTrade.CLOSE;
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
 	
 	private boolean resetStopLoss = false;
 	
-	private final FibCode takeProfitCode = FibCode.FIB5;
+	private final FibCode takeProfitCode = FibCode.FIB618;
 	
 	private final TradeTrend tradeTrend;
 	
@@ -226,6 +226,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 
 				if(current.lte(end)) {
 					break;
+				}
+				
+				if(tradeTrend == TradeTrend.AGAINST
+						|| (isLong() && current.getMacd() <= 0) || (isShort() && current.getMacd() >= 0)) {
+					this.autoTrade = AutoTrade.OPEN;
 				}
 
 				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
