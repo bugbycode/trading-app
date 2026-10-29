@@ -1,5 +1,6 @@
 package com.bugbycode.trading_app;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.TradeTrend;
+import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.trading.PositionSide;
 import com.bugbycode.repository.klines.KlinesRepository;
@@ -57,7 +59,9 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m, TradeTrend.AGAINST);
+        
+        PriceInfo priceInfo = new PriceInfo(pair, "80500", new Date().getTime());
         
         logger.info("init factory finish.");
         
@@ -89,7 +93,8 @@ public class PriceActionFactoryTest {
             //FibCode code = fibInfo.getFibCode(price.getPrice());
             //FibCode profiCodeNext = fibInfo.getPriceActionTakeProfit_nextCode(code);
             //FibCode profitCode = fibInfo.getPriceActionTakeProfit_v1(code);
-            logger.info("{}: {}, autoTrade:{}, isTreade:{}", mode, price, price.getAutoTrade(), PriceUtil.isTrade(price));
+            logger.info("{}: {}, autoTrade:{}, isTreade:{}, verifyOpen: {}", mode, price, price.getAutoTrade(), PriceUtil.isTrade(price),
+            		price.verifyOpen(priceInfo));
         }
         //logger.info(factory.verifyOpen(list_15m));
         //logger.info(factory.getFibAfterKlines());
