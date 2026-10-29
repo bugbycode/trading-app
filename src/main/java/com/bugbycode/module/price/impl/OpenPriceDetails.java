@@ -7,6 +7,7 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
+import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
 import com.util.PriceUtil;
 
@@ -23,6 +24,8 @@ public class OpenPriceDetails implements OpenPrice {
 	private double secondTakeProfit;//第二止盈点
 	
 	private FibInfo fibInfo;
+
+	private FibInfo childFibInfo;
 	
 	private AutoTradeType autoTradeType = AutoTradeType.DEFAULT;
 	
@@ -214,5 +217,32 @@ public class OpenPriceDetails implements OpenPrice {
 
 	public void setDualSidePositionStatus(DualSidePositionStatus dualSidePositionStatus) {
 		this.dualSidePositionStatus = dualSidePositionStatus;
+	}
+
+	public FibInfo getChildFibInfo() {
+		return childFibInfo;
+	}
+
+	@Override
+	public void setChildFibInfo(FibInfo childFibInfo) {
+		this.childFibInfo = childFibInfo;
+	}
+	
+	public FibCode getChildFibCode(PriceInfo priceInfo) {
+		FibCode fibCode = FibCode.FIB0;
+		if(this.childFibInfo != null && priceInfo != null) {
+			fibCode = this.childFibInfo.getFibCode(priceInfo.getPriceDoubleValue());
+		}
+		return fibCode;
+	}
+	
+	@Override
+	public boolean verifyOpen(PriceInfo priceInfo) {
+		boolean result = false;
+		FibCode code = getChildFibCode(priceInfo);
+		if(code.lte(FibCode.FIB382)) {
+			result = true;
+		}
+		return result;
 	}
 }

@@ -717,6 +717,10 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
+					if(!openPrice.verifyOpen(priceInfo)) {
+						continue;
+					}
+					
 					//查询杠杆
 					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
 					//WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
@@ -996,6 +1000,10 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					if(oih.getTradeNumberIndex() > u.getTradeNumberIndex()) {
+						continue;
+					}
+					
+					if(!openPrice.verifyOpen(priceInfo)) {
 						continue;
 					}
 					

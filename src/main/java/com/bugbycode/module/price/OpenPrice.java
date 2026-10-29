@@ -7,6 +7,7 @@ import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
+import com.bugbycode.module.binance.PriceInfo;
 
 /**
  * 开仓价
@@ -81,4 +82,8 @@ public interface OpenPrice {
 	public DualSidePositionStatus getDualSidePositionStatus();
 	
 	public void setDualSidePositionStatus(DualSidePositionStatus dualSidePositionStatus);
+	
+	public void setChildFibInfo(FibInfo chilFibInfo);
+	
+	public boolean verifyOpen(PriceInfo priceInfo);
 }

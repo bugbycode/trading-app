@@ -33,6 +33,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private FibInfo fibInfo;
 	
+	private FibInfo childFibInfo;
+	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
 	
 	private Klines start = null;
@@ -200,7 +202,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				return;
 			}
 			
-			FibInfo childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+			childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 
 			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
 			
@@ -235,6 +237,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			price.setResetStopLoss(resetStopLoss);
 			price.setAutoClosePosition(autoClosePosition);
 			price.setDualSidePositionStatus(dualSidePositionStatus);
+			price.setChildFibInfo(childFibInfo);
 			openPrices.add(price);
 		}
 	}
