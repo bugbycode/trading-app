@@ -728,15 +728,15 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					int leverage = sc.getLeverage();
 					
-					updateLeverage = LeverageBracketUtil.resetLeverage(leverage, priceInfo, stopLossLimit);
+					updateLeverage = LeverageBracketUtil.resetLeverage(updateLeverage, priceInfo, stopLossLimit);
 					
 					if(updateLeverage == 0) {
 						updateLeverage = 1;
-						double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, 
-								priceInfo.getPriceDoubleValue() > stopLossLimit ? QuotationMode.SHORT : QuotationMode.LONG);
-						if(percent * updateLeverage <= 30) {
-							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
-						}
+					}
+					
+					double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, QuotationMode.SHORT);
+					if(percent * updateLeverage <= 30) {
+						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 					}
 					
 					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
@@ -1009,15 +1009,15 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					int leverage = sc.getLeverage();
 
-					updateLeverage = LeverageBracketUtil.resetLeverage(leverage, priceInfo, stopLossLimit);
+					updateLeverage = LeverageBracketUtil.resetLeverage(updateLeverage, priceInfo, stopLossLimit);
 					
 					if(updateLeverage == 0) {
 						updateLeverage = 1;
-						double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, 
-								priceInfo.getPriceDoubleValue() > stopLossLimit ? QuotationMode.SHORT : QuotationMode.LONG);
-						if(percent * updateLeverage <= 30) {
-							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
-						}
+					}
+					
+					double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, QuotationMode.LONG);
+					if(percent * updateLeverage <= 30) {
+						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 					}
 					
 					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
