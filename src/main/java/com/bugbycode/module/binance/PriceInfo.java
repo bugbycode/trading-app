@@ -7,11 +7,11 @@ import java.math.BigDecimal;
  */
 public class PriceInfo {
 
-	private String symbol;
+	private final String symbol;
 	
-	private String price;
+	private final String price;
 	
-	private long time;
+	private final long time;
 
 	public PriceInfo(String symbol, String price, long time) {
 		this.symbol = symbol;
@@ -21,10 +21,6 @@ public class PriceInfo {
 
 	public String getSymbol() {
 		return symbol;
-	}
-
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
 	}
 
 	public String getPrice() {
@@ -39,16 +35,8 @@ public class PriceInfo {
 		return new BigDecimal(price);
 	}
 
-	public void setPrice(String price) {
-		this.price = price;
-	}
-
 	public long getTime() {
 		return time;
 	}
 
-	public void setTime(long time) {
-		this.time = time;
-	}
-	
 }

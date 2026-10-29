@@ -673,13 +673,6 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue()) && openPrice.isResetStopLoss() 
-							&& profitOrderEnabled == ProfitOrderEnabled.OPEN) {
-						//计算最佳止损点
-						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
-						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB2);
-					}
-					
 					//最少下单数量
 					String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
 					BigDecimal minQuantity = new BigDecimal(quantityNum);
@@ -699,41 +692,17 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 
 					if(openPrice != null && stopLossLimit > 0) {
-						priceInfo = binanceWebsocketTradeService.getPrice(pair);
-						//double stopLossLimit = openPrice.getStopLossLimit();
 						if(priceInfo.getPriceDoubleValue() <= stopLossLimit) {
 							continue;
-						}
-						if(stopLoss.doubleValue() < stopLossLimit) {
-							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 						}
 					}
 					
 					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-						/*
-						if(autoTradeType == AutoTradeType.FENCE_SITTER) {
-							//重置条件订单
-							for(PositionInfo position : positionList) {
-					    		Side side = Side.SELL;
-								quantity = new BigDecimal(position.getPositionAmt());
-					    		ps = PositionSide.parse(position.getPositionSide());
-					    		if(quantity.compareTo(new BigDecimal(0)) == -1) {
-					    			quantity = quantity.multiply(new BigDecimal(-1));
-					    			side = Side.BUY;
-					    		}
-					    		resetAlgoOrder(binanceApiKey, binanceSecretKey, pair, quantity, stopLoss, ps, side, Type.STOP_MARKET);
-							}
-						}
-						*/
 						continue;
 					}
 					
-					if(stopLoss.doubleValue() > openPrice.getPrice() && autoTradeType != AutoTradeType.FENCE_SITTER) {//限制大波动率
-						continue;
-					}
-
 					//筛选策略限制
 					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
 						continue;
@@ -758,6 +727,17 @@ public class KlinesServiceImpl implements KlinesService {
 					int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
 					
 					int leverage = sc.getLeverage();
+					
+					updateLeverage = LeverageBracketUtil.resetLeverage(leverage, priceInfo, stopLossLimit);
+					
+					if(updateLeverage == 0) {
+						updateLeverage = 1;
+						double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, 
+								priceInfo.getPriceDoubleValue() > stopLossLimit ? QuotationMode.SHORT : QuotationMode.LONG);
+						if(percent * updateLeverage <= 30) {
+							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
+						}
+					}
 					
 					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
 					if(leverage != updateLeverage) {
@@ -975,13 +955,6 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(!PriceUtil.verifyRisk(stopLossLimit, priceInfo.getPriceDoubleValue(), takeProfit.doubleValue()) && openPrice.isResetStopLoss()
-							&& profitOrderEnabled == ProfitOrderEnabled.OPEN) {
-						//计算最佳止损点
-						FibInfo stopLossFibInfo = new FibInfo(priceInfo.getPriceDoubleValue(), takeProfit.doubleValue(), decimalNum);
-						stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB2);
-					}
-
 					//最少下单数量
 					String quantityNum = binanceWebsocketTradeService.getMarketMinQuantity(pair);
 					BigDecimal minQuantity = new BigDecimal(quantityNum);
@@ -1001,41 +974,17 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					if(openPrice != null && stopLossLimit > 0) {
-						priceInfo = binanceWebsocketTradeService.getPrice(pair);
-						//double stopLossLimit = openPrice.getStopLossLimit();
 						if(priceInfo.getPriceDoubleValue() >= stopLossLimit) {
 							continue;
-						}
-						if(stopLoss.doubleValue() > stopLossLimit) {
-							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 						}
 					}
 					
 					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
-						/*
-						if(autoTradeType == AutoTradeType.FENCE_SITTER) {
-							//重置条件订单
-							for(PositionInfo position : positionList) {
-					    		Side side = Side.SELL;
-								quantity = new BigDecimal(position.getPositionAmt());
-					    		ps = PositionSide.parse(position.getPositionSide());
-					    		if(quantity.compareTo(new BigDecimal(0)) == -1) {
-					    			quantity = quantity.multiply(new BigDecimal(-1));
-					    			side = Side.BUY;
-					    		}
-					    		resetAlgoOrder(binanceApiKey, binanceSecretKey, pair, quantity, stopLoss, ps, side, Type.STOP_MARKET);
-							}
-						}
-						*/
 						continue;
 					}
 					
-					if(stopLoss.doubleValue() < openPrice.getPrice() && autoTradeType != AutoTradeType.FENCE_SITTER) {//限制大波动率
-						continue;
-					}
-
 					//筛选策略限制
 					if(!PairPolicyUtil.verifyPairPolicy(u.getTradePairPolicySelected(), pair, u.getTradePolicyType())) {
 						continue;
@@ -1052,14 +1001,24 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					//查询杠杆
 					SymbolConfig sc = binanceRestTradeService.getSymbolConfigBySymbol(binanceApiKey, binanceSecretKey, pair);
-					//WeightUtil.verifyWeight(AppConfig.BINANCE_REST_API_WEIGHT);
-
+					
 					List<LeverageBracketInfo> list = binanceRestTradeService.getLeverageBracketInfo(binanceApiKey, binanceSecretKey, pair);
 					
 					int maxLeverage = LeverageBracketUtil.getMaxLeverageBracketInfo(list).getInitialLeverage();
 					int updateLeverage = u.getLeverage() > maxLeverage ? maxLeverage : u.getLeverage();
 					
 					int leverage = sc.getLeverage();
+
+					updateLeverage = LeverageBracketUtil.resetLeverage(leverage, priceInfo, stopLossLimit);
+					
+					if(updateLeverage == 0) {
+						updateLeverage = 1;
+						double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, 
+								priceInfo.getPriceDoubleValue() > stopLossLimit ? QuotationMode.SHORT : QuotationMode.LONG);
+						if(percent * updateLeverage <= 30) {
+							stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
+						}
+					}
 					
 					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
 					
