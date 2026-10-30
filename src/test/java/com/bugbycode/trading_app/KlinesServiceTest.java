@@ -56,7 +56,6 @@ import com.bugbycode.service.user.UserService;
 import com.util.CoinPairSet;
 import com.util.DateFormatUtil;
 import com.util.EmaFibUtil;
-import com.util.KDJIndicatorUtil;
 import com.util.PriceUtil;
 import com.util.SuperTrendIndicatorUtil;
 
@@ -604,16 +603,6 @@ public class KlinesServiceTest {
 		}
 		logger.info(pairs.size());
 		logger.info(coinList.size());
-    }
-    
-    @Test
-    public void testKDJ() {
-    	String pair = "BTCUSDT";
-    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
-    	KDJIndicatorUtil.calculate(list);
-    	for(Klines k : list) {
-    		logger.info(k);
-    	}
     }
     
     @Test
