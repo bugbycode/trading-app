@@ -247,7 +247,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
 			
-			if(childHitCode.gte(FibCode.FIB382)) {
+			if(childHitCode.gte(FibCode.FIB382) || (tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB236))) {
 				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
