@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.module.AutoClosePosition;
+import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.Klines;
@@ -48,6 +49,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
 	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	
+	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
 	private boolean resetStopLoss = false;
 	
@@ -99,6 +102,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	private void init() {
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
+		}
+		
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			this.dualSidePositionStatus = DualSidePositionStatus.OPEN;
 		}
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
@@ -247,7 +254,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
 			
-			if(childHitCode.gte(FibCode.FIB382) || (tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB236))) {
+			if(childHitCode.gte(FibCode.FIB382)) {
 				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
@@ -312,6 +319,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			price.setAutoTrade(autoTrade);
 			price.setAutoClosePosition(autoClosePosition);
 			price.setChildFibInfo(childFibInfo);
+			price.setDualSidePositionStatus(dualSidePositionStatus);
 			openPrices.add(price);
 		}
 	}
