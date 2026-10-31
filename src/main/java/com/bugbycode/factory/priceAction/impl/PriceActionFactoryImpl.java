@@ -103,10 +103,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
-		
+		/*
 		if(tradeTrend == TradeTrend.FOLLOW) {
 			this.dualSidePositionStatus = DualSidePositionStatus.OPEN;
-		}
+		}*/
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
