@@ -258,6 +258,16 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
+			if(tradeTrend == TradeTrend.AGAINST) {
+				Klines last_15m = PriceUtil.getLastKlines(list_15m);
+				double last_15m_close = last_15m.getClosePriceDoubleValue();
+				double fib1Value = fibInfo.getFibValue(FibCode.FIB1);
+				if((isLong() && last_15m_close < fib1Value)
+						|| (isShort() && last_15m_close > fib1Value)) {
+					this.autoTrade = AutoTrade.CLOSE;
+				}
+			}
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
