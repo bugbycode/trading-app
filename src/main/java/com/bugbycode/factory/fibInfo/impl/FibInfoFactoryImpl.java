@@ -224,11 +224,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
