@@ -63,7 +63,7 @@ public class LeverageBracketUtil {
 			for(int index = leverage; index > 0; index--) {
 				//仓位保证金 = 价格 % 杠杆倍数
 				double orderBalance = price / index;
-				if((stopLoss_sub / orderBalance) <= 0.3) {
+				if((stopLoss_sub / orderBalance) <= 0.25) {
 					leverageReset = index;
 					break;
 				}
