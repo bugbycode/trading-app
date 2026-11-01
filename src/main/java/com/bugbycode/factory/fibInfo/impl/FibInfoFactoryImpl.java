@@ -206,7 +206,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 
 			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
 			
-			if(childHitCode.gte(FibCode.FIB382)) {
+			if(childHitCode.gte(FibCode.FIB5)) {
 				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
