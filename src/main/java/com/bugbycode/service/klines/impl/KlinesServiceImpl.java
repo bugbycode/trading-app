@@ -499,6 +499,7 @@ public class KlinesServiceImpl implements KlinesService {
 		}
 		
 		double stopLossLimit = openPrice.getStopLossLimit();
+		BigDecimal stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 		
 		FibInfo fibInfo = openPrice.getFibInfo();
 		AutoTradeType autoTradeType = openPrice.getAutoTradeType();
@@ -569,7 +570,6 @@ public class KlinesServiceImpl implements KlinesService {
 			double profitPercent = 0;
 			
 			BigDecimal callbackRateValue = new BigDecimal(callbackRate);
-			BigDecimal stopLoss = new BigDecimal(0);
 			BigDecimal takeProfit = new BigDecimal(0);
 			
 			if(ps == PositionSide.LONG) {//做多
@@ -608,7 +608,6 @@ public class KlinesServiceImpl implements KlinesService {
 							);
 					
 					if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
-						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getFirstTakeProfit() , decimalNum));
 						
 						//计算预计盈利百分比
@@ -639,9 +638,6 @@ public class KlinesServiceImpl implements KlinesService {
 										decimalNum
 								)
 							);
-						
-						stopLoss = new BigDecimal(
-								PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossLongPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum));
 						
 						//计算预计盈利百分比
 						profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
@@ -736,11 +732,6 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					if(updateLeverage == 0) {
 						continue;
-					}
-					
-					double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, QuotationMode.SHORT);
-					if(percent * updateLeverage <= 30) {
-						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 					}
 					
 					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");
@@ -892,7 +883,6 @@ public class KlinesServiceImpl implements KlinesService {
 							);
 					
 					if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
-						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getFirstTakeProfit() , decimalNum));
 						
 						//计算预计盈利百分比
@@ -923,10 +913,6 @@ public class KlinesServiceImpl implements KlinesService {
 										decimalNum
 								)
 							);
-						
-						stopLoss = new BigDecimal(
-								PriceUtil.formatDoubleDecimal(PriceUtil.rectificationCutLossShortPrice_v3(Double.valueOf(priceInfo.getPrice()), u.getCutLoss()), decimalNum)
-										);
 						
 						//计算预计盈利百分比
 						profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
@@ -1020,11 +1006,6 @@ public class KlinesServiceImpl implements KlinesService {
 					updateLeverage = LeverageBracketUtil.resetLeverage(updateLeverage, priceInfo.getPriceDoubleValue(), stopLossLimit);
 					if(updateLeverage == 0) {
 						continue;
-					}
-					
-					double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, QuotationMode.LONG);
-					if(percent * updateLeverage <= 30) {
-						stopLoss = new BigDecimal(PriceUtil.formatDoubleDecimal(stopLossLimit, decimalNum));
 					}
 					
 					logger.debug(pair + "当前杠杆倍数：" + leverage + "倍");

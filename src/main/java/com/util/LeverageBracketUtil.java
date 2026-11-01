@@ -53,17 +53,20 @@ public class LeverageBracketUtil {
 	 * @return 返回杠杆倍数
 	 */
 	public static int resetLeverage(int leverage, double price, double stopLoss) {
+		
 		int leverageReset = 0;
 		
-		//止损差价
-		double stopLoss_sub = price > stopLoss ? price - stopLoss : stopLoss - price;
-		
-		for(int index = leverage; index > 0; index--) {
-			//仓位保证金 = 价格 % 杠杆倍数
-			double orderBalance = price / index;
-			if((stopLoss_sub / orderBalance) <= 0.3) {
-				leverageReset = index;
-				break;
+		if(stopLoss > 0) {
+			//止损差价
+			double stopLoss_sub = price > stopLoss ? price - stopLoss : stopLoss - price;
+			
+			for(int index = leverage; index > 0; index--) {
+				//仓位保证金 = 价格 % 杠杆倍数
+				double orderBalance = price / index;
+				if((stopLoss_sub / orderBalance) <= 0.3) {
+					leverageReset = index;
+					break;
+				}
 			}
 		}
 		
