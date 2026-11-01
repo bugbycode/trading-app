@@ -732,10 +732,10 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					int leverage = sc.getLeverage();
 					
-					updateLeverage = LeverageBracketUtil.resetLeverage(updateLeverage, priceInfo, stopLossLimit);
+					updateLeverage = LeverageBracketUtil.resetLeverage(updateLeverage, priceInfo.getPriceDoubleValue(), stopLossLimit);
 					
 					if(updateLeverage == 0) {
-						updateLeverage = 1;
+						continue;
 					}
 					
 					double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, QuotationMode.SHORT);
@@ -1017,10 +1017,9 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					int leverage = sc.getLeverage();
 
-					updateLeverage = LeverageBracketUtil.resetLeverage(updateLeverage, priceInfo, stopLossLimit);
-					
+					updateLeverage = LeverageBracketUtil.resetLeverage(updateLeverage, priceInfo.getPriceDoubleValue(), stopLossLimit);
 					if(updateLeverage == 0) {
-						updateLeverage = 1;
+						continue;
 					}
 					
 					double percent = PriceUtil.getPercent(priceInfo.getPriceDoubleValue(), stopLossLimit, QuotationMode.LONG);
