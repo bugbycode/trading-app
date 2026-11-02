@@ -34,6 +34,7 @@ import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.LongOrShortType;
+import com.bugbycode.module.PriceType;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.StepPriceInfo;
@@ -205,10 +206,10 @@ public class KlinesServiceTest {
     
     @Test
     public void testFenceSitter(){
-    	String pair = "BCHUSDT";
-    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
-    	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.SHORT);
+    	String pair = "LTCUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
+    	List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_hit, PriceType.HIGH, PositionSide.SHORT);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
