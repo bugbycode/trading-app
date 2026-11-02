@@ -205,10 +205,10 @@ public class KlinesServiceTest {
     
     @Test
     public void testFenceSitter(){
-    	String pair = "BTCUSDT";
-    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
+    	String pair = "BCHUSDT";
+    	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, PositionSide.SHORT);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.SHORT);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -218,7 +218,7 @@ public class KlinesServiceTest {
     	OpenPrice price = factory.getOpenPrice();
     	
     	logger.info("{} - {}, autoTrade: {}", mode, price, price.getAutoTrade());
-    	logger.info("isClosePosition: {}", factory.isClosePosition());
+    	
     }
 
     @Test

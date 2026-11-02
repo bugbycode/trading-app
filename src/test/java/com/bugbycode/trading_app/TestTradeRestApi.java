@@ -27,6 +27,7 @@ import com.bugbycode.module.PlaceOrderAgain;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ResultCode;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.Balance;
 import com.bugbycode.module.binance.BinanceOrderInfo;
 import com.bugbycode.module.binance.CallbackRateEnabled;
@@ -327,7 +328,7 @@ public class TestTradeRestApi {
     	
     	//PositionSide ps = PositionSide.SHORT;
     	
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, PositionSide.LONG);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.LONG);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -337,7 +338,6 @@ public class TestTradeRestApi {
     	OpenPrice price = factory.getOpenPrice();
     	
     	logger.info("{} - {}, autoTrade: {}", mode, price, price.getAutoTrade());
-    	logger.info("isClosePosition: {}", factory.isClosePosition());
 
 		BigDecimal stopPrice = new BigDecimal(PriceUtil.formatDoubleDecimal(price.getStopLossLimit(), decimalPoint));
     	
@@ -483,7 +483,7 @@ public class TestTradeRestApi {
     	
     	
     	
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, PositionSide.LONG);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.LONG);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -495,7 +495,6 @@ public class TestTradeRestApi {
     	OpenPrice price = factory.getOpenPrice();
     	
     	logger.info("{} - {}, autoTrade: {}", mode, price, price.getAutoTrade());
-    	logger.info("isClosePosition: {}", factory.isClosePosition());
     	binanceRestTradeService.fundingInfo();
     	klinesService.marketPlace(pair, ps, price, decimalNum);
     }
