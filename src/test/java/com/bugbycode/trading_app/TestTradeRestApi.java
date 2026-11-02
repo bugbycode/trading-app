@@ -24,7 +24,6 @@ import com.bugbycode.factory.fenceSitter.impl.FenceSitterFactoryImpl;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.PlaceOrderAgain;
-import com.bugbycode.module.PriceType;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.ResultCode;
@@ -329,7 +328,7 @@ public class TestTradeRestApi {
     	
     	//PositionSide ps = PositionSide.SHORT;
     	
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m, PriceType.HIGH, PositionSide.LONG);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.LONG);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -484,7 +483,7 @@ public class TestTradeRestApi {
     	
     	
     	
-    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list_15m, PriceType.HIGH, PositionSide.LONG);
+    	FenceSitterFactory factory = new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.LONG);
     	if(!(factory.isLong() || factory.isShort())) {
     		return;
     	}
@@ -506,7 +505,7 @@ public class TestTradeRestApi {
     	String pair = "STRKUSDT";
     	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
     	List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-    	klinesService.futuresFenceSitter(list, list, list_15m);
+    	klinesService.futuresFenceSitter(list, list_15m);
     }
     
     @AfterEach
