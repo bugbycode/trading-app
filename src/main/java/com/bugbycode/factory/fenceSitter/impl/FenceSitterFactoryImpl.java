@@ -7,13 +7,15 @@ import org.springframework.util.CollectionUtils;
 
 import com.bugbycode.factory.fenceSitter.FenceSitterFactory;
 import com.bugbycode.module.AutoClosePosition;
+import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
-import com.bugbycode.module.FibLevel;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
+import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
@@ -31,6 +33,8 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	
 	private FibInfo fibInfo;
 	
+	private FibInfo childFibInfo;
+	
 	private List<Klines> list_15m;//十五分钟级别k线 用于补充回撤之后的k线信息
 	
 	private Klines start = null;
@@ -39,16 +43,30 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	
 	private OpenPrice openPrice;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
+	private AutoTrade autoTrade = AutoTrade.OPEN;
+	
+	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	
+	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
+	
+	private boolean resetStopLoss = false;
+	
+	private final TradeTrend tradeTrend;
 	
 	private PositionSide ps_mode = PositionSide.DEFAULT;
 	
-	public FenceSitterFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, PositionSide ps_mode) {
+	public FenceSitterFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, TradeTrend tradeTrend, PositionSide ps_mode) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.fibAfterKlines = new ArrayList<Klines>();
-		this.ps_mode = ps_mode;
+		if(tradeTrend == null) {
+			tradeTrend = TradeTrend.FOLLOW;
+		}
+		this.tradeTrend = tradeTrend;
+		if(ps_mode != null) {
+			this.ps_mode = ps_mode; 
+		}
 		if(!CollectionUtils.isEmpty(list_trend)) {
 			this.list_trend.addAll(list_trend);
 		}
@@ -62,8 +80,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 	
 	private void init() {
-		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m) 
-				|| ps_mode == null || ps_mode == PositionSide.DEFAULT) {
+		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m) || this.ps_mode == PositionSide.DEFAULT) {
 			return;
 		}
 		
@@ -74,7 +91,6 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 		
 		PriceUtil.calculateMACD(list);
 		PriceUtil.calculateMACD(list_trend);
-		PriceUtil.calculateMACD(list_15m);
 		
 		this.fibAfterKlines = new ArrayList<Klines>();
 
@@ -136,7 +152,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			}
 			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
 			end = PriceUtil.getMinPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
 		} else if(ps == PositionSide.LONG) {
 			start = PriceUtil.getMinPriceKLine(firstSubList);
 			startAfterFlag = PriceUtil.getAfterKlines(start, firstSubList);
@@ -145,7 +161,7 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			}
 			secondSubList = PriceUtil.subList(startAfterFlag, third, list);
 			end = PriceUtil.getMaxPriceKLine(secondSubList);
-			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum(), FibLevel.LEVEL_0);
+			this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
 		}
 		
 		if(this.fibInfo == null) {
@@ -163,40 +179,57 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 			
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
-			//double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
+			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			double openPriceValue = 0;
-			
 			Klines hit_k = PriceUtil.getLastKlines(list);
 			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
-
+				
 				if(current.lte(end)) {
 					break;
 				}
-				
+
 				double hitPrice = mode == QuotationMode.LONG ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((mode == QuotationMode.LONG && hitPrice < openPriceValue) || (mode == QuotationMode.SHORT && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
 					hit_k = current;
 				}
-				
 			}
 			
 			if(openPriceValue == 0) {
 				return;
 			}
 			
-			double stopLossLimit = ps_mode == PositionSide.LONG ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
+			childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
-			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER));
+			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
+			
+			if(childHitCode.gte(FibCode.FIB382)) {
+				this.autoTrade = AutoTrade.CLOSE;
+			}
+
+			double stopLossLimit = mode == QuotationMode.LONG ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
+			
+			if((mode == QuotationMode.LONG && ps_mode == PositionSide.SHORT)
+					|| (mode == QuotationMode.SHORT && ps_mode == PositionSide.LONG)) {
+				
+				double lossLen = hit_k.getHighPriceDoubleValue() - hit_k.getLowPriceDoubleValue();
+				
+				stopLossLimit = ps_mode == PositionSide.LONG ? openPriceValue - lossLen : openPriceValue + lossLen;
+				
+				stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, fibInfo.getDecimalPoint());
+			}
+			
+			if(this.autoTrade == AutoTrade.OPEN) {
+				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER));
+			}
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 		}
-		
 	}
 	
 	private PositionSide getPositionSide() {
@@ -213,40 +246,67 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0;
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() > 0;
+		} else {
+			return k.getDea() < 0;
+		}
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() < 0;
+		} else {
+			return k.getDea() > 0;
+		}
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getMacd() > 0;
+		return k.getDea() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getMacd() < 0;
+		return k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
-		if(price != null) {
+		if(price.getCode().gte(FibCode.FIB236)) {
+			price.setResetStopLoss(resetStopLoss);
+			price.setAutoTrade(autoTrade);
 			price.setAutoClosePosition(autoClosePosition);
+			price.setChildFibInfo(childFibInfo);
+			price.setDualSidePositionStatus(dualSidePositionStatus);
+			openPrice = price;
 		}
-		this.openPrice = price;
 	}
 	
 	@Override
+	public FibInfo getFibInfo() {
+		return fibInfo;
+	}
+
+	@Override
+	public List<Klines> getFibAfterKlines() {
+		return fibAfterKlines;
+	}
+
+	@Override
+	public OpenPrice getOpenPrice() {
+		return openPrice;
+	}
+
+	@Override
 	public boolean isLong() {
 		boolean result = false;
-		if(this.ps_mode == PositionSide.LONG && this.openPrice != null) {
+		if(openPrice != null && ps_mode == PositionSide.LONG) {
 			result = true;
 		}
 		return result;
@@ -255,20 +315,10 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 	@Override
 	public boolean isShort() {
 		boolean result = false;
-		if(this.ps_mode == PositionSide.SHORT && this.openPrice != null) {
+		if(openPrice != null && ps_mode == PositionSide.SHORT) {
 			result = true;
 		}
 		return result;
-	}
-
-	@Override
-	public OpenPrice getOpenPrice() {
-		return this.openPrice;
-	}
-
-	@Override
-	public boolean isClosePosition() {
-		return false;
 	}
 	
 }
