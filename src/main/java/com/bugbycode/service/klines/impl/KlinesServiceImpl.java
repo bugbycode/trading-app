@@ -45,7 +45,6 @@ import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.PlaceOrderAgain;
-import com.bugbycode.module.PriceType;
 import com.bugbycode.module.QUERY_SPLIT;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.RecvTradeStatus;
@@ -1235,13 +1234,13 @@ public class KlinesServiceImpl implements KlinesService {
 	}
 	
 	@Override
-	public void futuresFenceSitter(List<Klines> list_1d, List<Klines> list_1h, List<Klines> list_15m) {
+	public void futuresFenceSitter(List<Klines> list, List<Klines> list_15m) {
 		
 		FenceSitterFactory[] factories = {
-				new FenceSitterFactoryImpl(list_1d, list_1h, PriceType.HIGH, PositionSide.LONG),
-				new FenceSitterFactoryImpl(list_1d, list_1h, PriceType.HIGH, PositionSide.SHORT),
-				new FenceSitterFactoryImpl(list_1d, list_1h, PriceType.LOW, PositionSide.LONG),
-				new FenceSitterFactoryImpl(list_1d, list_1h, PriceType.LOW, PositionSide.SHORT),
+				new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.LONG),
+				new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.SHORT),
+				new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.AGAINST, PositionSide.LONG),
+				new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.AGAINST, PositionSide.SHORT),
 		};
     	
 		for(FenceSitterFactory factory : factories) {
