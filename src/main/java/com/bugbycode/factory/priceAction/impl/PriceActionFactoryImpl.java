@@ -48,7 +48,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
 	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
@@ -229,17 +229,20 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = 0;
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
+			Klines hit_k = PriceUtil.getLastKlines(list);
+			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				
+				if(current.lte(end)) {
+					break;
+				}
 
 				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
-				}
-				
-				if(current.lte(fibAfterKline)) {
-					break;
+					hit_k = current;
 				}
 			}
 			
@@ -257,7 +260,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
-			double stopLossLimit = openCodeValue;
+			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
 			
