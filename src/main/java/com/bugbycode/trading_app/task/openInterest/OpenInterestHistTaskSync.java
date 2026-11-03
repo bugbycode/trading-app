@@ -108,7 +108,7 @@ public class OpenInterestHistTaskSync {
 				});
 				
 			} catch (Exception e) {
-				logger.error("同步历史合约持仓量信息时出现异常", e);
+				logger.error("同步" + symbol + "历史合约持仓量信息时出现异常", e);
 			}
 		}
 		long now = new Date().getTime();
