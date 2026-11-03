@@ -61,7 +61,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
-		this.autoClosePositionPrice = stopLossLimit;
+		this.autoClosePositionPrice = price;
 	}
 	
 	/**
@@ -75,7 +75,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
-		this.autoClosePositionPrice = stopLossLimit;
+		this.autoClosePositionPrice = price;
 		this.autoTradeType = autoTradeType;
 		this.firstTakeProfit = -1;
 		this.secondTakeProfit = -1;
@@ -94,7 +94,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
-		this.autoClosePositionPrice = stopLossLimit;
+		this.autoClosePositionPrice = price;
 		this.firstTakeProfit = firstTakeProfit;
 		this.secondTakeProfit = secondTakeProfit;
 	}
@@ -113,7 +113,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
-		this.autoClosePositionPrice = stopLossLimit;
+		this.autoClosePositionPrice = price;
 		this.firstTakeProfit = firstTakeProfit;
 		this.secondTakeProfit = secondTakeProfit;
 		this.autoTradeType = autoTradeType;
@@ -135,7 +135,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
-		this.autoClosePositionPrice = stopLossLimit;
+		this.autoClosePositionPrice = price;
 		this.firstTakeProfit = firstTakeProfit;
 		this.secondTakeProfit = secondTakeProfit;
 		this.autoTradeType = autoTradeType;
