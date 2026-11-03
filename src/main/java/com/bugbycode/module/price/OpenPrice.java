@@ -86,4 +86,8 @@ public interface OpenPrice {
 	public void setChildFibInfo(FibInfo chilFibInfo);
 	
 	public boolean verifyOpen(PriceInfo priceInfo);
+	
+	public double getAutoClosePositionPrice();
+	
+	public void setAutoClosePositionPrice(double autoClosePositionPrice);
 }

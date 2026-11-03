@@ -37,6 +37,8 @@ public class OpenPriceDetails implements OpenPrice {
 	
 	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
+	private double autoClosePositionPrice;
+	
 	/**
 	 * 开仓价格信息
 	 * @param code 所处的回撤点
@@ -45,6 +47,7 @@ public class OpenPriceDetails implements OpenPrice {
 	public OpenPriceDetails(FibCode code, double price) {
 		this.code = code;
 		this.price = price;
+		this.autoClosePositionPrice = price;
 		this.stopLossLimit = -1;
 	}
 	
@@ -58,6 +61,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
+		this.autoClosePositionPrice = stopLossLimit;
 	}
 	
 	/**
@@ -71,6 +75,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
+		this.autoClosePositionPrice = stopLossLimit;
 		this.autoTradeType = autoTradeType;
 		this.firstTakeProfit = -1;
 		this.secondTakeProfit = -1;
@@ -89,6 +94,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
+		this.autoClosePositionPrice = stopLossLimit;
 		this.firstTakeProfit = firstTakeProfit;
 		this.secondTakeProfit = secondTakeProfit;
 	}
@@ -107,6 +113,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
+		this.autoClosePositionPrice = stopLossLimit;
 		this.firstTakeProfit = firstTakeProfit;
 		this.secondTakeProfit = secondTakeProfit;
 		this.autoTradeType = autoTradeType;
@@ -128,6 +135,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
+		this.autoClosePositionPrice = stopLossLimit;
 		this.firstTakeProfit = firstTakeProfit;
 		this.secondTakeProfit = secondTakeProfit;
 		this.autoTradeType = autoTradeType;
@@ -244,5 +252,13 @@ public class OpenPriceDetails implements OpenPrice {
 			result = true;
 		}
 		return result;
+	}
+
+	public double getAutoClosePositionPrice() {
+		return autoClosePositionPrice;
+	}
+
+	public void setAutoClosePositionPrice(double autoClosePositionPrice) {
+		this.autoClosePositionPrice = autoClosePositionPrice;
 	}
 }
