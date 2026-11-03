@@ -21,7 +21,6 @@ import com.bugbycode.module.price.OpenPrice;
 import com.bugbycode.module.price.impl.OpenPriceDetails;
 import com.bugbycode.module.trading.PositionSide;
 import com.util.KlinesComparator;
-import com.util.PriceComparator;
 import com.util.PriceUtil;
 
 /**
@@ -175,27 +174,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		}
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
-		/*
-		Klines startAfterKline = PriceUtil.getAfterKlines(start, list_15m);
-		if(startAfterKline != null) {
-			List<Klines> startAfterList = PriceUtil.subList(startAfterKline, list_15m);
-			MarketSentiment ms_ = new MarketSentiment(startAfterList);
-			double fib0Value = this.fibInfo.getFibValue(FibCode.FIB0);
-			if(isLong()) {
-				double newEndPrice = ms_.getHigh().getHighPriceDoubleValue();
-				if(newEndPrice > fib0Value) {
-					end = ms_.getHigh();
-					this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
-				}
-			} else {
-				double newEndPrice = ms_.getLow().getLowPriceDoubleValue();
-				if(newEndPrice < fib0Value) {
-					end = ms_.getLow();
-					this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
-				}
-			}
-		}
-		*/
+		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
@@ -211,77 +190,18 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
+			double openPriceValue = fibInfo.getFibValue(openCode);
+			
 			Klines last_15m = PriceUtil.getLastKlines(list_15m);
 			double stopLossLen = last_15m.getHighPriceDoubleValue() - last_15m.getLowPriceDoubleValue();
 			
-			Klines endKlines = null;
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				if(endKlines == null) {
-					if((isLong() && current.isRise()) || (isShort() && current.isFall())) {
-						endKlines = current;
-					} else {
-						continue;
-					}
-				}
-				
-				List<Klines> data = PriceUtil.subList(current, endKlines, list);
-				ms = new MarketSentiment(data);
-				
-				double openPriceValue = isLong() ? ms.getLowPrice() : ms.getHighPrice();
-				double stopLossLimit = isLong() ? openPriceValue - stopLossLen : openPriceValue + stopLossLen;
-				stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, fibInfo.getDecimalPoint());
-				
-				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
-				
-				if(current.lte(start)) {
-					break;
-				}
-			}
+			double stopLossLimit = isLong() ? openPriceValue - stopLossLen : openPriceValue + stopLossLen;
 			
-			if(isLong()) {
-				this.openPrices.sort(new PriceComparator(SortType.DESC));
-			} else {
-				this.openPrices.sort(new PriceComparator(SortType.ASC));
-			}
-			
-			this.fibAfterKlines = new ArrayList<Klines>();
-			
-			fibAfterKline = PriceUtil.getAfterKlines(endKlines, list_15m);
-			if(fibAfterKline != null) {
-				this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
-			}
-			
-			OpenPrice newOpenPrice = getHitOpenPrice();
-			
-			this.openPrices = new ArrayList<OpenPrice>();
-			
-			if(newOpenPrice != null) {
-				addPrices(newOpenPrice);
-			}
+			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
 			
 		}
-	}
-	
-	private OpenPrice getHitOpenPrice() {
-		OpenPrice result = null;
-		if(!CollectionUtils.isEmpty(openPrices)) {
-			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
-			for(int index = openPrices.size() - 1; index >= 0; index--) {
-				OpenPrice p = openPrices.get(index);
-				if((isLong() && ms.getLowPrice() <= p.getPrice())
-						|| (isShort() && ms.getHighPrice() >= p.getPrice())) {
-					result = p;
-					break;
-				}
-			}
-			if(result == null) {
-				result = openPrices.get(0);
-			}
-		}
-		return result;
 	}
 	
 	private PositionSide getPositionSide() {
@@ -314,19 +234,19 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
