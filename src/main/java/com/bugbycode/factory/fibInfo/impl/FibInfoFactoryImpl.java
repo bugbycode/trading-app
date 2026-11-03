@@ -197,6 +197,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			double stopLossLimit = isLong() ? openPriceValue - stopLossLen : openPriceValue + stopLossLen;
 			
+			stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, this.fibInfo.getDecimalPoint());
+			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
