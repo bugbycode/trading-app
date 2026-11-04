@@ -180,6 +180,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double fib1Value = fibInfo.getFibValue(FibCode.FIB1);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 
+			if(openCode.gt(FibCode.FIB1)) {
+				openCode = FibCode.FIB1;
+			}
+			
 			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			double takeProfitCodeValue = childFibInfo.getFibValue(FibCode.FIB618);
 			
