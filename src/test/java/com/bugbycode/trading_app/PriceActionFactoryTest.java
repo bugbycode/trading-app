@@ -48,7 +48,7 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "BCHUSDT";
+        String pair = "ETHUSDT";
         
         //List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
