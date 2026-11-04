@@ -100,6 +100,9 @@ public class ClosePositionTask implements Runnable{
 	@Override
 	public void run() {
 		try {
+			if(price.getAutoTrade() == AutoTrade.CLOSE) {
+				return;
+			}
 			if(this.websocketApi == null) {
 				throw new RuntimeException("Websocket连接未初始化");
 			}
