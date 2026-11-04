@@ -215,10 +215,14 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
-			Klines last_15m = PriceUtil.getLastKlines(list_15m);
-			double last_15m_close = last_15m.getClosePriceDoubleValue();
-			if((isLong() && last_15m_close < fib1Value) || (isShort() && last_15m_close > fib1Value)) {
-				this.autoTrade = AutoTrade.CLOSE;
+			if((isLong() && openPriceValue < fib1Value) || (isShort() && openPriceValue > fib1Value)) {
+				Klines last_15m = PriceUtil.getLastKlines(list_15m);
+				double stopLossLen = last_15m.getHighPriceDoubleValue() - last_15m.getLowPriceDoubleValue();
+				openPriceValue = fib1Value;
+				
+				stopLossLimit = isLong() ? openPriceValue - stopLossLen : openPriceValue + stopLossLen;
+				
+				stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, this.fibInfo.getDecimalPoint());
 			}
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
@@ -229,11 +233,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyHigh(Klines c) {
-		return c.getMacd() > 0;
+		return c.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines c) {
-		return c.getMacd() < 0;
+		return c.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
