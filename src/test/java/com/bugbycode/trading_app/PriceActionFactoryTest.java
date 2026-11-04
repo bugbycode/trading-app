@@ -48,7 +48,7 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "BTCUSDT";
+        String pair = "BCHUSDT";
         
         List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -59,7 +59,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m, TradeTrend.AGAINST);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
         
         PriceInfo priceInfo = new PriceInfo(pair, "80500", new Date().getTime());
         
