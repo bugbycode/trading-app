@@ -50,7 +50,7 @@ public class PriceActionFactoryTest {
 		
         String pair = "BCHUSDT";
         
-        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        //List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
@@ -59,7 +59,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m, TradeTrend.FOLLOW);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m, PositionSide.SHORT);
         
         PriceInfo priceInfo = new PriceInfo(pair, "80500", new Date().getTime());
         
@@ -102,26 +102,4 @@ public class PriceActionFactoryTest {
         
     }
 	
-	@Test
-	public void testFactoryInitUtil() {
-		String pair = "ENAUSDT";
-		List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
-        List<Klines> list_4h = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 1500);
-        List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
-		
-		List<PriceActionFactory> factoryList = new ArrayList<PriceActionFactory>();
-        factoryList.add(new PriceActionFactoryImpl(list, list, list_15m));
-        factoryList.add(new PriceActionFactoryImpl(list_4h, list_4h, list_15m));
-        
-        List<PriceActionFactory> factorys = new FactoryInitUtil<PriceActionFactory>(factoryList).deduplicate();
-		
-		for(PriceActionFactory factory : factorys) {
-			logger.info(factory.getFibInfo());
-			List<OpenPrice> openPrices = factory.getOpenPrices();
-	        QuotationMode mode = factory.isLong() ? QuotationMode.LONG : QuotationMode.SHORT;
-			 for(OpenPrice price : openPrices) {
-	            logger.info("{}: {}, autoTrade:{}, isTreade:{}", mode, price, price.getAutoTrade(), PriceUtil.isTrade(price));
-	        }
-		}
-	}
 }
