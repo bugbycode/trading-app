@@ -87,7 +87,4 @@ public interface OpenPrice {
 	
 	public boolean verifyOpen(PriceInfo priceInfo);
 	
-	public double getAutoClosePositionPrice();
-	
-	public void setAutoClosePositionPrice(double autoClosePositionPrice);
 }

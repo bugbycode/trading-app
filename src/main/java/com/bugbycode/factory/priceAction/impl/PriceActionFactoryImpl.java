@@ -58,8 +58,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private final TradeTrend tradeTrend;
 	
-	private double autoClosePositionPrice;
-	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
@@ -264,8 +262,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
-			this.autoClosePositionPrice = isLong() ? hit_k.getBodyLowPriceDoubleValue() : hit_k.getBodyHighPriceDoubleValue();
-			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
@@ -324,10 +320,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			price.setAutoClosePosition(autoClosePosition);
 			price.setChildFibInfo(childFibInfo);
 			price.setDualSidePositionStatus(dualSidePositionStatus);
-			
-			if(this.autoClosePositionPrice > 0) {
-				price.setAutoClosePositionPrice(this.autoClosePositionPrice);
-			}
 			
 			openPrices.add(price);
 		}
