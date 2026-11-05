@@ -235,7 +235,7 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_15m, PositionSide.LONG);
+        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_15m, PositionSide.SHORT);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
