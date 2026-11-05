@@ -35,7 +35,6 @@ import com.bugbycode.factory.fibInfo.FibInfoFactory;
 import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
-import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImplPlus;
 import com.bugbycode.module.AutoClosePosition;
 import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
@@ -1208,10 +1207,10 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
-				new PriceActionFactoryImplPlus(list_1h, list_15m, PositionSide.LONG),
-				new PriceActionFactoryImplPlus(list_1h, list_15m, PositionSide.SHORT),
+				//new PriceActionFactoryImplPlus(list_1h, list_15m, PositionSide.LONG),
+				//new PriceActionFactoryImplPlus(list_1h, list_15m, PositionSide.SHORT),
 				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.FOLLOW),
-				//new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST),
+				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST),
 		};
 		
 		/*
