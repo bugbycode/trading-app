@@ -222,11 +222,11 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyHigh(Klines c) {
-		return c.getMacd() > 0;
+		return c.getDea() > 0;
 	}
 	
 	private boolean verifyLow(Klines c) {
-		return c.getMacd() < 0;
+		return c.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
