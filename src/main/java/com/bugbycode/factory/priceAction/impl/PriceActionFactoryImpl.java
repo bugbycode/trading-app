@@ -194,27 +194,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		}
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
-		/*
-		Klines startAfterKline = PriceUtil.getAfterKlines(start, list_15m);
-		if(startAfterKline != null) {
-			List<Klines> startAfterList = PriceUtil.subList(startAfterKline, list_15m);
-			MarketSentiment ms_ = new MarketSentiment(startAfterList);
-			double fib0Value = this.fibInfo.getFibValue(FibCode.FIB0);
-			if(isLong()) {
-				double newEndPrice = ms_.getHigh().getHighPriceDoubleValue();
-				if(newEndPrice > fib0Value) {
-					end = ms_.getHigh();
-					this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
-				}
-			} else {
-				double newEndPrice = ms_.getLow().getLowPriceDoubleValue();
-				if(newEndPrice < fib0Value) {
-					end = ms_.getLow();
-					this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
-				}
-			}
-		}
-		*/
+		
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
