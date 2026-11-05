@@ -215,7 +215,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			Klines hit_k = PriceUtil.getLastKlines(list_15m);
 			
-			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
+			double stopLossLen = hit_k.getHighPriceDoubleValue() - hit_k.getLowPriceDoubleValue();
+			double stopLossLimit = isLong() ? openPriceValue - stopLossLen : openPriceValue + stopLossLen;
+			
+			stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, fibInfo.getDecimalPoint());
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
