@@ -14,6 +14,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
@@ -28,6 +29,8 @@ import com.util.PriceUtil;
 public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private List<Klines> list;
+	
+	private List<Klines> list_trend;
 	
 	private List<Klines> fibAfterKlines;
 	
@@ -45,21 +48,47 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private AutoTrade autoTrade = AutoTrade.OPEN;
 	
-	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
+	private AutoClosePosition autoClosePosition = AutoClosePosition.CLOSE;
 	
 	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
 	
 	private boolean resetStopLoss = false;
 	
-	private PositionSide ps = PositionSide.DEFAULT;
+	private final FibCode takeProfitCode = FibCode.FIB618;
 	
-	public PriceActionFactoryImpl(List<Klines> list, List<Klines> list_15m, PositionSide ps) {
+	private final TradeTrend tradeTrend;
+	
+	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
 		this.list = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
-		if(ps != null) {
-			this.ps = ps;
+		this.tradeTrend = TradeTrend.FOLLOW;
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
+		}
+		if(!CollectionUtils.isEmpty(list_15m)) {
+			this.list_15m.addAll(list_15m);
+		}
+		if(!CollectionUtils.isEmpty(list)) {
+			this.list.addAll(list);
+			this.init();
+		}
+	}
+	
+	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, TradeTrend tradeTrend) {
+		this.list = new ArrayList<Klines>();
+		this.list_trend = new ArrayList<Klines>();
+		this.list_15m = new ArrayList<Klines>();
+		this.openPrices = new ArrayList<OpenPrice>();
+		this.fibAfterKlines = new ArrayList<Klines>();
+		if(tradeTrend == null) {
+			tradeTrend = TradeTrend.FOLLOW;
+		}
+		this.tradeTrend = tradeTrend;
+		if(!CollectionUtils.isEmpty(list_trend)) {
+			this.list_trend.addAll(list_trend);
 		}
 		if(!CollectionUtils.isEmpty(list_15m)) {
 			this.list_15m.addAll(list_15m);
@@ -71,32 +100,35 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private void init() {
-		if(ps == PositionSide.DEFAULT || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
+		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
+		/*
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			this.dualSidePositionStatus = DualSidePositionStatus.OPEN;
+		}*/
 		
 		KlinesComparator kc = new KlinesComparator(SortType.ASC);
 		this.list.sort(kc);
+		this.list_trend.sort(kc);
 		this.list_15m.sort(kc);
 		
 		PriceUtil.calculateMACD(list);
+		PriceUtil.calculateMACD(list_trend);
 		
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
+
+		PositionSide ps = getPositionSide();
 		
-		Klines fourth = null;
 		Klines third = null;
 		Klines second = null;
 		Klines first = null;
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
-			if(ps == PositionSide.SHORT) {//high - low - high - low
-				if(fourth == null) {
-					if(verifyHigh(current)) {
-						fourth = current;
-					}
-				} else if(third == null) {
+			if(ps == PositionSide.SHORT) {//low - high - low
+				if(third == null) {
 					if(verifyLow(current)) {
 						third = current;
 					}
@@ -105,17 +137,13 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow(current)) {
+					if(verifyLow_end(current)) {
 						first = current;
 						break;
 					}
 				}
-			} else if(ps == PositionSide.LONG) { // low - high - low - high
-				if(fourth == null) {
-					if(verifyLow(current)) {
-						fourth = current;
-					}
-				} else if(third == null) {
+			} else if(ps == PositionSide.LONG) { // high - low - high
+				if(third == null) {
 					if(verifyHigh(current)) {
 						third = current;
 					}
@@ -124,7 +152,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh_end(current)) {
 						first = current;
 						break;
 					}
@@ -132,7 +160,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			}
 		}
 		
-		if(first == null || second == null || third == null || fourth == null) {
+		if(first == null || second == null || third == null) {
 			return;
 		}
 		
@@ -166,7 +194,27 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		}
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
-		
+		/*
+		Klines startAfterKline = PriceUtil.getAfterKlines(start, list_15m);
+		if(startAfterKline != null) {
+			List<Klines> startAfterList = PriceUtil.subList(startAfterKline, list_15m);
+			MarketSentiment ms_ = new MarketSentiment(startAfterList);
+			double fib0Value = this.fibInfo.getFibValue(FibCode.FIB0);
+			if(isLong()) {
+				double newEndPrice = ms_.getHigh().getHighPriceDoubleValue();
+				if(newEndPrice > fib0Value) {
+					end = ms_.getHigh();
+					this.fibInfo = new FibInfo(start.getLowPriceDoubleValue(), end.getHighPriceDoubleValue(), start.getDecimalNum());
+				}
+			} else {
+				double newEndPrice = ms_.getLow().getLowPriceDoubleValue();
+				if(newEndPrice < fib0Value) {
+					end = ms_.getLow();
+					this.fibInfo = new FibInfo(start.getHighPriceDoubleValue(), end.getLowPriceDoubleValue(), start.getDecimalNum());
+				}
+			}
+		}
+		*/
 		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
 			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
@@ -209,33 +257,73 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			if(childHitCode.gte(FibCode.FIB382)) {
 				this.autoTrade = AutoTrade.CLOSE;
 			}
+			
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lt(FibCode.FIB5)) {
+				this.autoTrade = AutoTrade.CLOSE;
+			}
 
-			double takeProfitCodeValue = childFibInfo.getFibValue(FibCode.FIB618);
+			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
 			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
-
 		}
 	}
 	
-	private boolean verifyHigh(Klines c) {
-		return c.getDea() > 0;
+	private PositionSide getPositionSide() {
+		PositionSide ps = PositionSide.DEFAULT;
+		Klines last = PriceUtil.getLastKlines(list_trend);
+		
+		if(verifyShort(last)) {
+			ps = PositionSide.SHORT;
+		} else if(verifyLong(last)) {
+			ps = PositionSide.LONG;
+		}
+		
+		return ps;
 	}
 	
-	private boolean verifyLow(Klines c) {
-		return c.getDea() < 0;
+	private boolean verifyLong(Klines k) {
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() > 0;
+		} else {
+			return k.getDea() < 0;
+		}
+	}
+	
+	private boolean verifyShort(Klines k) {
+		if(tradeTrend == TradeTrend.FOLLOW) {
+			return k.getDea() < 0;
+		} else {
+			return k.getDea() > 0;
+		}
+	}
+	
+	private boolean verifyHigh(Klines k) {
+		return k.getDea() > 0;
+	}
+	
+	private boolean verifyLow(Klines k) {
+		return k.getDea() < 0;
+	}
+	
+	private boolean verifyHigh_end(Klines k) {
+		return k.getDea() > 0;
+	}
+	
+	private boolean verifyLow_end(Klines k) {
+		return k.getDea() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
 		if(!PriceUtil.contains(openPrices, price) && price.getCode().gte(FibCode.FIB236)) {
-			price.setAutoTrade(autoTrade);
 			price.setResetStopLoss(resetStopLoss);
+			price.setAutoTrade(autoTrade);
 			price.setAutoClosePosition(autoClosePosition);
-			price.setDualSidePositionStatus(dualSidePositionStatus);
 			price.setChildFibInfo(childFibInfo);
+			price.setDualSidePositionStatus(dualSidePositionStatus);
 			openPrices.add(price);
 		}
 	}
