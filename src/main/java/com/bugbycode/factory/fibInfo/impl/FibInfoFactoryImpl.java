@@ -185,6 +185,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+			
 			double takeProfitCodeValue = childFibInfo.getFibValue(FibCode.FIB618);
 			
 			double openPriceValue = fibInfo.getFibValue(openCode);
@@ -194,6 +195,12 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			double last_15m_close = last_15m.getClosePriceDoubleValue();
 			if((isLong() && last_15m_close < fib1Value) || (isShort() && last_15m_close > fib1Value)) {
+				this.autoTrade = AutoTrade.CLOSE;
+			}
+			
+			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
+			
+			if(childHitCode.gte(FibCode.FIB382)) {
 				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
