@@ -179,22 +179,45 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+			double openPriceValue = 0;
 			
-			double openPriceValue = this.childFibInfo.getFibValue(FibCode.FIB236);
+			Klines hit_k = PriceUtil.getLastKlines(list);
 			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				
+				if(current.lte(end)) {
+					break;
+				}
+
+				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
+				if(openPriceValue == 0 || 
+						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
+					openPriceValue = hitPrice;
+					hit_k = current;
+				}
+			}
+			
+			if(openPriceValue == 0) {
+				return;
+			}
+			
+			childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+			
+			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
+			
+			if(childHitCode.gte(FibCode.FIB382)) {
+				this.autoTrade = AutoTrade.CLOSE;
+			}
+
 			double takeProfitCodeValue = childFibInfo.getFibValue(FibCode.FIB618);
 			
-			Klines hit_k = PriceUtil.getLastKlines(list_15m);
-			
-			double stopLossLen = hit_k.getHighPriceDoubleValue() - hit_k.getLowPriceDoubleValue();
-			double stopLossLimit = isLong() ? openPriceValue - stopLossLen : openPriceValue + stopLossLen;
-			
-			stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, fibInfo.getDecimalPoint());
+			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
 			
 			this.fibAfterKlines = new ArrayList<Klines>();
+
 		}
 	}
 	
