@@ -1297,8 +1297,7 @@ public class KlinesServiceImpl implements KlinesService {
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
 		EoptionFactory[] factories = {
-				new EoptionFactoryImpl(list_1h, list_15m, PositionSide.LONG),
-				new EoptionFactoryImpl(list_1h, list_15m, PositionSide.SHORT),
+				new EoptionFactoryImpl(list_1d, list_1h, list_15m),
 			};
 		
 		for(EoptionFactory factory : factories) {
