@@ -209,8 +209,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = 0;
 			
-			Klines hit_k = PriceUtil.getLastKlines(list);
-			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 				
@@ -222,7 +220,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
-					hit_k = current;
 				}
 			}
 			
@@ -244,7 +241,9 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 
 			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
 			
-			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
+			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
+			
+			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
 			
