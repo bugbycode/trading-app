@@ -48,9 +48,9 @@ public class PriceActionFactoryTest {
 		
 		logger.info("start testPriceAction.");
 		
-        String pair = "ETHUSDT";
+        String pair = "ZECUSDT";
         
-        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        //List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
@@ -59,7 +59,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list_trend, list, list_15m, TradeTrend.AGAINST);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m, PositionSide.LONG);
         
         PriceInfo priceInfo = new PriceInfo(pair, "80500", new Date().getTime());
         
