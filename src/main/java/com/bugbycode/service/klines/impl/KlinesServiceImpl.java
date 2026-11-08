@@ -1206,10 +1206,8 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
-				//new PriceActionFactoryImplPlus(list_1h, list_15m, PositionSide.LONG),
-				//new PriceActionFactoryImplPlus(list_1h, list_15m, PositionSide.SHORT),
-				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.FOLLOW),
-				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST),
+				new PriceActionFactoryImpl(list_1h, list_15m, PositionSide.LONG),
+				new PriceActionFactoryImpl(list_1h, list_15m, PositionSide.SHORT),
 		};
 		
 		/*
@@ -1556,7 +1554,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			if(PriceUtil.isBreachLong(hitKline, price)
+			if(PriceUtil.isBreachLong_v2(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
 					&& openPrice.getAutoTrade() == AutoTrade.OPEN
@@ -1675,7 +1673,7 @@ public class KlinesServiceImpl implements KlinesService {
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
 			if(//PriceUtil.isShort_v3(price, klinesList_hit)
-					PriceUtil.isBreachShort(hitKline, price)
+					PriceUtil.isBreachShort_v2(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
 					&& openPrice.getAutoTrade() == AutoTrade.OPEN

@@ -696,6 +696,16 @@ public class PriceUtil {
 				//2. 开盘价小于等于条件价 收盘价大于等于条件价
 				|| (Double.valueOf(current.getOpenPrice()) <= hitPrice && Double.valueOf(current.getClosePrice()) >= hitPrice);
 	}
+
+	/**
+	 * 是否出现突破条件价的价格行为</br></br>
+	 * @param current
+	 * @param price
+	 * @return
+	 */
+	public static boolean isBreachLong_v2(Klines current, double price) {
+		return isHitPrice(current, price) && current.getClosePriceDoubleValue() > price;
+	}
 	
 
 	/**
@@ -712,6 +722,16 @@ public class PriceUtil {
 		return (Double.valueOf(current.getOpenPrice()) <= hitPrice && Double.valueOf(current.getClosePrice()) <= hitPrice && Double.valueOf(current.getHighPrice()) >= hitPrice) ||
 			   //开盘价大于等于条件价、收盘价小于等于条件价
 				(Double.valueOf(current.getOpenPrice()) >= hitPrice && Double.valueOf(current.getClosePrice()) <= hitPrice);
+	}
+	
+	/**
+	 * 是否出现跌破条件价的价格行为</br></br>
+	 * @param current
+	 * @param price
+	 * @return
+	 */
+	public static boolean isBreachShort_v2(Klines current, double price) {
+		return isHitPrice(current, price) && current.getClosePriceDoubleValue() < price;
 	}
 	
 	/**
