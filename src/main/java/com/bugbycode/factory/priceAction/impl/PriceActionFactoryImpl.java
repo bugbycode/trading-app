@@ -180,7 +180,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
 				
-				if(current.lte(end)) {
+				if(current.isEquals(end) && ( (isLong() && current.isRise()) || (isShort() && current.isFall()) ) ) {
 					break;
 				}
 
@@ -188,6 +188,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
+				}
+				
+				if(current.lte(end)) {
+					break;
 				}
 			}
 			
