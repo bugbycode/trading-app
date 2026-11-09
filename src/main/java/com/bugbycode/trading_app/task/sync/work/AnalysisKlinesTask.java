@@ -178,7 +178,7 @@ public class AnalysisKlinesTask implements Runnable{
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
         } finally {
         	long endTime = new Date().getTime();
-        	logger.info("分析{}交易对耗时[{}]ms", pair, endTime - startTime);
+        	logger.debug("分析{}交易对耗时[{}]ms", pair, endTime - startTime);
         }
     }
 
