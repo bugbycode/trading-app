@@ -3,8 +3,10 @@ spring:
 #    web-application-type: NONE
   datasource:
     mongodb:
-      url: mongodb://trading:trading%40cai@localhost:27017
-      database: trading
+      url: mongodb://trading:trading%40cai@localhost:27017/trading
+      maxSize: 100
+      minSize: 10
+      maxConnecting: 10
 google:
   recaptcha:
     secret: 6LfFqqgqAAAAAMp1-4MDjtlxAt75mZdtlwwxjgr7	
