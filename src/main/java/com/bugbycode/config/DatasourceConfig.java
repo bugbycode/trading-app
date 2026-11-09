@@ -32,7 +32,7 @@ public class DatasourceConfig {
     @Bean
     public MongoClient mongoClient(){
     	
-    	ConnectionString connString = new ConnectionString(connStr);
+    	ConnectionString connString = new ConnectionString(connStr + "/" + database);
     	
     	MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connString)
@@ -48,6 +48,6 @@ public class DatasourceConfig {
 
     @Bean
     public MongoOperations mongoTemplate(MongoClient mongoClient){
-        return new MongoTemplate(mongoClient,database);
+        return new MongoTemplate(mongoClient, database);
     }
 }
