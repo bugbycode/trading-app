@@ -39,6 +39,14 @@
 			</exclusions>
 		</dependency>
 		
+		<!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-aop</artifactId>
+		    <version>4.0.0-M2</version>
+		    <scope>compile</scope>
+		</dependency>
+		
 		<!-- Log4j -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
