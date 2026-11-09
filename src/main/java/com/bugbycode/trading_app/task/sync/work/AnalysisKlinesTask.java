@@ -42,6 +42,9 @@ public class AnalysisKlinesTask implements Runnable{
 
     @Override
     public void run() {
+    	
+    	long startTime = new Date().getTime();
+    	
         try {
             
         	OpenInterestHist oih = openInterestHistRepository.findOneBySymbol(pair);
@@ -173,6 +176,9 @@ public class AnalysisKlinesTask implements Runnable{
 
         } catch (Exception e) {
             logger.error("分析" + pair + "交易对K线信息时出现异常", e);
+        } finally {
+        	long endTime = new Date().getTime();
+        	logger.info("分析{}交易对耗时[{}]ms", pair, endTime - startTime);
         }
     }
 
