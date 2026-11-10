@@ -223,10 +223,10 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "ONEUSDT";
+        String pair = "SOLUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
-        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
+        List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
 		
         //Klines last_15m = PriceUtil.getLastKlines(list_15m);
@@ -235,7 +235,13 @@ public class KlinesServiceTest {
         
         //logger.info(klines_list_1h);
         
-        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_15m, PositionSide.LONG);
+        Date start = new Date();
+        
+        FibInfoFactory factory = new FibInfoFactoryImpl(list, list, list_15m);
+        
+        Date end = new Date();
+        
+        logger.info("{}ms", end.getTime() - start.getTime());
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;

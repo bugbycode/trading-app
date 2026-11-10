@@ -6,6 +6,7 @@ import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +37,7 @@ public class IndexTest {
 	@Autowired
 	private IndexesRepository indexesRepository;
 	
-	@BeforeAll
+	@BeforeEach
 	public void befor() {
 		AppConfig.DEBUG = true;
 	}
