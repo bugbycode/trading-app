@@ -177,6 +177,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
+			if(openCode.gt(FibCode.FIB1)) {
+				openCode = FibCode.FIB1;
+			}
+			
 			double openPriceValue = fibInfo.getFibValue(openCode);
 			
 			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
@@ -209,11 +213,11 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	}
 	
 	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() < 0;
 	}
 	
 	private boolean verifyShort(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
