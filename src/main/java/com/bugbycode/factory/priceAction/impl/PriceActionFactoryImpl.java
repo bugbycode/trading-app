@@ -188,6 +188,10 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
+			if(tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB382)) {
+				this.autoTrade = AutoTrade.CLOSE;
+			}
+			
 			double openPriceValue = 0;
 			
 			for(int index = list_15m.size() - 1; index > 0; index--) {
@@ -239,34 +243,34 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private boolean verifyLong(Klines k) {
 		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() > 0;
+			return k.getMacd() > 0;
 		} else {
-			return k.getDea() < 0;
+			return k.getMacd() < 0;
 		}
 	}
 	
 	private boolean verifyShort(Klines k) {
 		if(tradeTrend == TradeTrend.FOLLOW) {
-			return k.getDea() < 0;
+			return k.getMacd() < 0;
 		} else {
-			return k.getDea() > 0;
+			return k.getMacd() > 0;
 		}
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
