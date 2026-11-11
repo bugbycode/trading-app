@@ -42,7 +42,7 @@ public class MethodCostAspect {
 
             String methodName = method.getName();
 
-            logger.info("[METHOD COST] {}.{}() 耗时: {} ms",
+            logger.debug("[METHOD COST] {}.{}() 耗时: {} ms",
                     className, methodName, cost);
         }
     }
