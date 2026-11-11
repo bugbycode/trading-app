@@ -548,23 +548,6 @@ public class KlinesServiceImpl implements KlinesService {
 			String orderBackBody = String.format("方向: %s, 开仓价: %s, 止损价: %s, 第一止盈价: %s, 第二止盈价: %s", 
 					ps.getMemo(), openPrice.getPrice(), stopLossLimit, openPrice.getFirstTakeProfit(), openPrice.getSecondTakeProfit());
 			
-			if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
-				
-				if(code.lt(u.getFibLevelType().getLevelCode())) {//回撤限制
-					continue;
-				}
-				
-				//回踩单判断
-				TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-				if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-					continue;
-				}
-			} /* else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-				//突破交易控制
-				if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
-					continue;
-				}
-			}*/
 			
 			//计算预计盈利百分比
 			double profitPercent = 0;
@@ -595,6 +578,24 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 						}
 					}
+
+					if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
+						
+						if(code.lt(u.getFibLevelType().getLevelCode())) {//回撤限制
+							continue;
+						}
+						
+						//回踩单判断
+						TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+						if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+							continue;
+						}
+					} /* else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
+						//突破交易控制
+						if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
+							continue;
+						}
+					}*/
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
@@ -874,6 +875,24 @@ public class KlinesServiceImpl implements KlinesService {
 							}
 						}
 					}
+					
+					if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
+						
+						if(code.lt(u.getFibLevelType().getLevelCode())) {//回撤限制
+							continue;
+						}
+						
+						//回踩单判断
+						TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
+						if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
+							continue;
+						}
+					} /* else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
+						//突破交易控制
+						if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
+							continue;
+						}
+					}*/
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
