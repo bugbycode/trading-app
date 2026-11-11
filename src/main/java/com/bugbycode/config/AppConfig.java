@@ -29,6 +29,8 @@ public class AppConfig {
 	
 	public static String CACHE_PATH = "/usr/local/cache";//缓存路径
 	
+	public static final int DB_KLINES_MAX_LIMIT = 1500;
+	
 	public static final int BINANCE_REST_API_WEIGHT = 35;
 	
 	/**

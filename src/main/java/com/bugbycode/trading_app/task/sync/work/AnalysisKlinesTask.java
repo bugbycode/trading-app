@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
+import com.bugbycode.config.AppConfig;
 import com.bugbycode.module.Inerval;
 import com.bugbycode.module.Klines;
 import com.bugbycode.module.QUERY_SPLIT;
@@ -54,20 +55,20 @@ public class AnalysisKlinesTask implements Runnable{
         	}
         	
             //查询15分钟级别k线信息 START ============================================================================
-            List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
+            List<Klines> klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, AppConfig.DB_KLINES_MAX_LIMIT);
             if(CollectionUtils.isEmpty(klines_list_15m)){
                 logger.info("无法获取" + pair + "交易对15分钟级别K线信息");
                 return;
             }
             
             if(!klinesService.checkData(klines_list_15m)) {
-            	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, 5000);
+            	klines_list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M, AppConfig.DB_KLINES_MAX_LIMIT);
             }
             
             //查询15分钟级别k线信息 END ============================================================================
             
             //查询1小时级别k线信息 START ===============================================================================
-            List<Klines> klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
+            List<Klines> klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, AppConfig.DB_KLINES_MAX_LIMIT);
             List<Klines> klines_list_1h = PriceUtil.to1HFor15MKlines(klines_list_15m);
         	Klines last_1h = PriceUtil.getLastKlines(klines_list_1h);
             int minute = DateFormatUtil.getMinute(last_1h.getEndTime());
@@ -84,10 +85,10 @@ public class AnalysisKlinesTask implements Runnable{
             	klinesRepository.insert(last_1h);
             }
             
-            klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
+            klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, AppConfig.DB_KLINES_MAX_LIMIT);
             if(!CollectionUtils.isEmpty(klines_list_1h_db)) {
                 klinesService.checkData(klines_list_1h_db);
-                klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 5000);
+                klines_list_1h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, AppConfig.DB_KLINES_MAX_LIMIT);
             }
             //查询1小时级别k线信息 END ===============================================================================
             
@@ -99,7 +100,7 @@ public class AnalysisKlinesTask implements Runnable{
             List<Klines> lastDay_15m = PriceUtil.subListForBetweenStartTimeAndEndTime(klines_list_15m, lastDayStartTimeDate.getTime(), lastDayEndTimeDate.getTime() + 1000);
 
         	//查询日线级别K线信息
-            List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
+            List<Klines> klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, AppConfig.DB_KLINES_MAX_LIMIT);
             
             if(!CollectionUtils.isEmpty(lastDay_15m)) {
             	
@@ -114,11 +115,11 @@ public class AnalysisKlinesTask implements Runnable{
             	if(!lastDay.isEquals(parseKlines_1d)) {
             		klinesRepository.insert(parseKlines_1d);
                 	
-                	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
+                	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, AppConfig.DB_KLINES_MAX_LIMIT);
                 	//检查数据完整性
                 	klinesService.checkData(klines_list_1d);
                 	
-                	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 5000);
+                	klines_list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, AppConfig.DB_KLINES_MAX_LIMIT);
             	}
                 
             }
@@ -127,7 +128,7 @@ public class AnalysisKlinesTask implements Runnable{
             
             //查询4小时级别k线信息 START==========================================================================
             Klines klines_4h = PriceUtil.parse1Hto4H(klines_list_1h_db);
-            List<Klines> klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
+            List<Klines> klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, AppConfig.DB_KLINES_MAX_LIMIT);
             if(CollectionUtils.isEmpty(klines_list_4h_db)) {
             	List<Klines> klines_list_4h = klinesService.continuousKlines4H(pair, new Date(), 1500, QUERY_SPLIT.ALL);
             	Klines klines_last_4h = PriceUtil.getLastKlines(klines_list_4h);
@@ -144,10 +145,10 @@ public class AnalysisKlinesTask implements Runnable{
             	klinesRepository.insert(klines_4h);
             }
             
-            klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
+            klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, AppConfig.DB_KLINES_MAX_LIMIT);
             
             if(!klinesService.checkData(klines_list_4h_db)) {
-            	klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, 5000);
+            	klines_list_4h_db = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_4H, AppConfig.DB_KLINES_MAX_LIMIT);
             }
             
             //查询4小时级别k线信息 END==========================================================================
