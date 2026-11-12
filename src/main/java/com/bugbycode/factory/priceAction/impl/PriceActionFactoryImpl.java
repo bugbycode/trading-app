@@ -188,10 +188,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			if(tradeTrend == TradeTrend.FOLLOW && openCode.lte(FibCode.FIB382)) {
-				this.autoTrade = AutoTrade.CLOSE;
-			}
-			
 			double openPriceValue = 0;
 			
 			for(int index = list_15m.size() - 1; index > 0; index--) {
