@@ -74,7 +74,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			this.list.addAll(list);
 		}
 		
-		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
+		if(list_trend.size() < 2 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
 		
