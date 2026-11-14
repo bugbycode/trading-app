@@ -218,23 +218,28 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list_trend);
 		
-		if(verifyShort(last)) {
-			ps = PositionSide.SHORT;
-		} else if(verifyLong(last)) {
-			ps = PositionSide.LONG;
+		int size = list_trend.size();
+		if(size > 1) {
+			int index = list_trend.size() - 1;
+			Klines current = list_trend.get(index);
+			Klines parent = list_trend.get(index - 1);
+			if(verifyLong(current, parent)) {
+				ps = PositionSide.LONG;
+			} else if(verifyShort(current, parent)) {
+				ps = PositionSide.SHORT;
+			}
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines k) {
-		return k.getMacd() < 0;
+	private boolean verifyLong(Klines current, Klines parent) {
+		return PriceUtil.verifyPowerful_v28(current, parent);
 	}
 	
-	private boolean verifyShort(Klines k) {
-		return k.getMacd() > 0;
+	private boolean verifyShort(Klines current, Klines parent) {
+		return PriceUtil.verifyDeclining_v28(current, parent);
 	}
 	
 	private boolean verifyHigh(Klines k) {
