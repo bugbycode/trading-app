@@ -53,9 +53,12 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	
 	private boolean resetStopLoss = false;
 	
-	private final FibCode takeProfitCode = FibCode.FIB786;
-	
 	public EoptionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+		this.init(list_trend, list, list_15m);
+	}
+	
+	private void init(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+		
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
@@ -69,11 +72,8 @@ public class EoptionFactoryImpl implements EoptionFactory {
 		}
 		if(!CollectionUtils.isEmpty(list)) {
 			this.list.addAll(list);
-			this.init();
 		}
-	}
-	
-	private void init() {
+		
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
 			return;
 		}
@@ -174,12 +174,14 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
+			
+			this.fibAfterKlines = new ArrayList<Klines>();
+			
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
 			double openPriceValue = 0;
-			
-			Klines hit_k = PriceUtil.getLastKlines(list);
+			Klines hit_k = null;
 			
 			for(int index = list.size() - 1; index > 0; index--) {
 				Klines current = list.get(index);
@@ -187,7 +189,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 				if(current.lte(end)) {
 					break;
 				}
-
+				
 				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
@@ -196,25 +198,25 @@ public class EoptionFactoryImpl implements EoptionFactory {
 				}
 			}
 			
-			if(openPriceValue == 0) {
+			if(openPriceValue == 0 || hit_k == null) {
 				return;
 			}
 			
 			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
-			
-			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
-			
-			if(childHitCode.gte(FibCode.FIB382)) {
+
+			FibCode hitChildCode = this.childFibInfo.getFibCode(openPriceValue);
+			if(hitChildCode.gte(FibCode.FIB382)) {
 				this.autoTrade = AutoTrade.CLOSE;
 			}
 			
-			double takeProfitCodeValue = childFibInfo.getFibValue(takeProfitCode);
+			double takeProfitCodeValue = this.childFibInfo.getFibValue(FibCode.FIB1);
 			
 			double stopLossLimit = isLong() ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
 			
-			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.EOPTION, fibInfo));
+			//FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
+			//double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
-			this.fibAfterKlines = new ArrayList<Klines>();
+			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.EOPTION, fibInfo));
 
 		}
 		
@@ -222,23 +224,28 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		Klines last = PriceUtil.getLastKlines(list_trend);
 		
-		if(verifyShort(last)) {
-			ps = PositionSide.SHORT;
-		} else if(verifyLong(last)) {
-			ps = PositionSide.LONG;
+		int size = list_trend.size();
+		if(size > 1) {
+			int index = list_trend.size() - 1;
+			Klines current = list_trend.get(index);
+			Klines parent = list_trend.get(index - 1);
+			if(verifyLong(current, parent)) {
+				ps = PositionSide.LONG;
+			} else if(verifyShort(current, parent)) {
+				ps = PositionSide.SHORT;
+			}
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines k) {
-		return k.getDea() > 0;
+	private boolean verifyLong(Klines current, Klines parent) {
+		return PriceUtil.verifyPowerful_v28(current, parent);
 	}
 	
-	private boolean verifyShort(Klines k) {
-		return k.getDea() < 0;
+	private boolean verifyShort(Klines current, Klines parent) {
+		return PriceUtil.verifyDeclining_v28(current, parent);
 	}
 	
 	private boolean verifyHigh(Klines k) {
