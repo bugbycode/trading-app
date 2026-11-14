@@ -1197,7 +1197,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresFibMonitor(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		FibInfoFactory[] factorys = {
-				new FibInfoFactoryImpl(list_1h, list_1h, list_15m),
+				new FibInfoFactoryImpl(list_1d, list_1h, list_15m),
 		};
 		
 		for(FibInfoFactory factory : factorys) {
@@ -1225,8 +1225,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
-				new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.FOLLOW),
-				//new PriceActionFactoryImpl(list_1h, list_1h, list_15m, TradeTrend.AGAINST),
+				new PriceActionFactoryImpl(list_1d, list_1h, list_15m),
 		};
 		
 		for(PriceActionFactory factory : factorys) {
