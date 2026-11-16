@@ -220,11 +220,6 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			}
 			
 			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
-
-			FibCode hitChildCode = this.childFibInfo.getFibCode(openPriceValue);
-			if(hitChildCode.gte(FibCode.FIB382)) {
-				this.autoTrade = AutoTrade.CLOSE;
-			}
 			
 			double takeProfitCodeValue = this.childFibInfo.getFibValue(FibCode.FIB618);
 			
