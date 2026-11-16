@@ -174,21 +174,64 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
+			
+			this.fibAfterKlines = new ArrayList<Klines>();
+			
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			double openPriceValue = fibInfo.getFibValue(openCode);
+			double openPriceValue = 0;
+			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				
+				if(current.lte(end)) {
+					break;
+				}
+				
+				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
+				if(openPriceValue == 0 || 
+						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
+					openPriceValue = hitPrice;
+				}
+			}
+			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				Klines parent = list.get(index - 1);
+				
+				if(current.lte(end)) {
+					break;
+				}
+				
+				if((isLong() && PriceUtil.verifyPowerful_v33(current, parent)) 
+						|| (isShort() && PriceUtil.verifyDeclining_v33(current, parent))) {
+					double hitPrice = current.getClosePriceDoubleValue();
+					if(openPriceValue == 0 || 
+							((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
+						openPriceValue = hitPrice;
+					}
+				}
+				
+			}
+			
+			if(openPriceValue == 0) {
+				return;
+			}
 			
 			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 
+			FibCode hitChildCode = this.childFibInfo.getFibCode(openPriceValue);
+			if(hitChildCode.gte(FibCode.FIB382)) {
+				this.autoTrade = AutoTrade.CLOSE;
+			}
+			
 			double takeProfitCodeValue = this.childFibInfo.getFibValue(FibCode.FIB618);
 			
 			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
 			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
-			
-			this.fibAfterKlines = new ArrayList<Klines>();
 
 		}
 		
@@ -196,44 +239,38 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private PositionSide getPositionSide() {
 		PositionSide ps = PositionSide.DEFAULT;
-		
-		int size = list_trend.size();
-		if(size > 1) {
-			int index = list_trend.size() - 1;
-			Klines current = list_trend.get(index);
-			Klines parent = list_trend.get(index - 1);
-			if(verifyLong(current, parent)) {
-				ps = PositionSide.LONG;
-			} else if(verifyShort(current, parent)) {
-				ps = PositionSide.SHORT;
-			}
+		Klines current = PriceUtil.getLastKlines(list_trend);
+		if(verifyLong(current)) {
+			ps = PositionSide.LONG;
+		} else if(verifyShort(current)) {
+			ps = PositionSide.SHORT;
 		}
 		
 		return ps;
 	}
 	
-	private boolean verifyLong(Klines current, Klines parent) {
-		return PriceUtil.verifyPowerful_v28(current, parent);
+	private boolean verifyLong(Klines current) {
+		return current.getMacd() < 0;
 	}
 	
-	private boolean verifyShort(Klines current, Klines parent) {
-		return PriceUtil.verifyDeclining_v28(current, parent);
+	private boolean verifyShort(Klines current) {
+		return current.getMacd() > 0;
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
