@@ -167,9 +167,9 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list);
 		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -182,44 +182,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			double openPriceValue = 0;
-			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				
-				if(current.lte(end)) {
-					break;
-				}
-				
-				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
-				if(openPriceValue == 0 || 
-						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
-					openPriceValue = hitPrice;
-				}
-			}
-			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				Klines parent = list.get(index - 1);
-				
-				if(current.lte(end)) {
-					break;
-				}
-				
-				if((isLong() && PriceUtil.verifyPowerful_v33(current, parent)) 
-						|| (isShort() && PriceUtil.verifyDeclining_v33(current, parent))) {
-					double hitPrice = current.getClosePriceDoubleValue();
-					if(openPriceValue == 0 || 
-							((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
-						openPriceValue = hitPrice;
-					}
-				}
-				
-			}
-			
-			if(openPriceValue == 0) {
-				return;
-			}
+			double openPriceValue = isLong() ? ms.getBodyLowPrice() : ms.getBodyHighPrice();
 			
 			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
 			
