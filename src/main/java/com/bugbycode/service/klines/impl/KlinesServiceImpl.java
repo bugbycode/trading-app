@@ -283,7 +283,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			if(PriceUtil.isBreachLong_v2(hitKline, price)
+			if(PriceUtil.isBreachLong(hitKline, price)
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
 					&& openPrice.getAutoTrade() == AutoTrade.OPEN
@@ -390,7 +390,7 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			if(PriceUtil.isBreachShort_v2(hitKline, price)
+			if(PriceUtil.isBreachShort(hitKline, price)
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
 					&& openPrice.getAutoTrade() == AutoTrade.OPEN
