@@ -177,23 +177,42 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			MarketSentiment ms = new MarketSentiment(fibAfterKlines);
 			double openCodeValue = mode == QuotationMode.LONG ? ms.getLowPrice() : ms.getHighPrice();
 			
-			this.fibAfterKlines = new ArrayList<Klines>();
-			
 			double fib0Value = fibInfo.getFibValue(FibCode.FIB0);
 			FibCode openCode = fibInfo.getFibCode_v2(openCodeValue);
 			
-			double openPriceValue = isLong() ? ms.getBodyLowPrice() : ms.getBodyHighPrice();
+			double openPriceValue = 0;
 			
-			this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				
+				if(current.lte(end)) {
+					break;
+				}
+				
+				double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
+				if(openPriceValue == 0 || 
+						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
+					openPriceValue = hitPrice;
+				}
+			}
 			
-			double takeProfitCodeValue = this.childFibInfo.getFibValue(FibCode.FIB618);
-			
-			FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
-			double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-			
-			addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
+			if(openPriceValue > 0) {
+
+				this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+				
+				double takeProfitCodeValue = this.childFibInfo.getFibValue(FibCode.FIB618);
+				
+				FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
+				double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+				
+				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.FIB_RET, fibInfo));
+				
+			}
 
 		}
+		
+		this.fibAfterKlines = new ArrayList<Klines>();
+		
 	}
 	
 	private boolean verifyHigh(Klines c) {
