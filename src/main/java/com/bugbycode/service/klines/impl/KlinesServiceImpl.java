@@ -1567,7 +1567,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			if(PriceUtil.isBreachLong_v2(hitKline, price)
+			if(( (PriceUtil.isBreachLong(hitKline, price) && openPrice.getTradeStyle() == TradeStyle.RADICAL) 
+					|| (PriceUtil.isBreachLong_v2(hitKline, price) && openPrice.getTradeStyle() == TradeStyle.CONSERVATIVE) )
 					&& !PriceUtil.isObsoleteLong(afterLowKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
 					&& openPrice.getAutoTrade() == AutoTrade.OPEN
@@ -1685,8 +1686,8 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			FibCode code = openPrice.getCode();//当前斐波那契点位
 			
-			if(//PriceUtil.isShort_v3(price, klinesList_hit)
-					PriceUtil.isBreachShort_v2(hitKline, price)
+			if( ( (PriceUtil.isBreachShort(hitKline, price) && openPrice.getTradeStyle() == TradeStyle.RADICAL) 
+					|| (PriceUtil.isBreachShort_v2(hitKline, price) && openPrice.getTradeStyle() == TradeStyle.CONSERVATIVE) )
 					&& !PriceUtil.isObsoleteShort(afterHighKlines, openPrices, index)
 					&& !PriceUtil.isTrade(openPrice)
 					&& openPrice.getAutoTrade() == AutoTrade.OPEN
