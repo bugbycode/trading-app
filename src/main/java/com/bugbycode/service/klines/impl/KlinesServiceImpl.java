@@ -601,7 +601,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
-					if(priceInfo.getPriceDoubleValue() < openPrice.getPrice()) {
+					if(priceInfo.getPriceDoubleValue() < openPrice.getPrice() && openPrice.getTradeStyle() == TradeStyle.CONSERVATIVE) {
 						continue;
 					}
 					
@@ -898,7 +898,7 @@ public class KlinesServiceImpl implements KlinesService {
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
-					if(priceInfo.getPriceDoubleValue() > openPrice.getPrice()) {
+					if(priceInfo.getPriceDoubleValue() > openPrice.getPrice() && openPrice.getTradeStyle() == TradeStyle.CONSERVATIVE) {
 						continue;
 					}
 					
