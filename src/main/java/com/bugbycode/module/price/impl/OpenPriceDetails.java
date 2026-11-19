@@ -5,6 +5,7 @@ import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.PriceInfo;
@@ -36,6 +37,8 @@ public class OpenPriceDetails implements OpenPrice {
 	private AutoClosePosition autoClosePosition = AutoClosePosition.OPEN;
 	
 	private DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.CLOSE;
+	
+	private TradeStyle tradeStyle = TradeStyle.CONSERVATIVE;
 	
 	/**
 	 * 开仓价格信息
@@ -147,7 +150,7 @@ public class OpenPriceDetails implements OpenPrice {
 	@Override
 	public String toString() {
 		return "OpenPrice: " + code.getValue() + "(" + price + "), StopLossLimit: " + stopLossLimit + 
-				", FirstTakeProfit: " + firstTakeProfit + ", SecondTakeProfit: " + secondTakeProfit;
+				", FirstTakeProfit: " + firstTakeProfit + ", SecondTakeProfit: " + secondTakeProfit + ", tradeStyle: " + this.tradeStyle;
 	}
 
 	@Override
@@ -218,6 +221,14 @@ public class OpenPriceDetails implements OpenPrice {
 	public void setDualSidePositionStatus(DualSidePositionStatus dualSidePositionStatus) {
 		this.dualSidePositionStatus = dualSidePositionStatus;
 	}
+	
+	public TradeStyle getTradeStyle() {
+		return tradeStyle;
+	}
+
+	public void setTradeStyle(TradeStyle tradeStyle) {
+		this.tradeStyle = tradeStyle;
+	}
 
 	public FibInfo getChildFibInfo() {
 		return childFibInfo;
@@ -227,7 +238,7 @@ public class OpenPriceDetails implements OpenPrice {
 	public void setChildFibInfo(FibInfo childFibInfo) {
 		this.childFibInfo = childFibInfo;
 	}
-	
+
 	public FibCode getChildFibCode(PriceInfo priceInfo) {
 		FibCode fibCode = FibCode.FIB0;
 		if(this.childFibInfo != null && priceInfo != null) {

@@ -14,6 +14,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
+import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
@@ -52,6 +53,8 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	private boolean resetStopLoss = false;
 	
 	private PositionSide ps = PositionSide.DEFAULT;
+	
+	private TradeStyle tradeStyle = TradeStyle.CONSERVATIVE;
 	
 	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_15m, PositionSide ps) {
 		this.list = new ArrayList<Klines>();
@@ -196,6 +199,23 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				}
 			}
 			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
+				
+				if(current.lte(end)) {
+					break;
+				}
+				
+				if((isLong() && current.verifyPowerful()) || (isShort() && current.verifyDeclining())) {
+					double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
+					if(openPriceValue == 0 || 
+							((isLong() && hitPrice <= openPriceValue) || (isShort() && hitPrice >= openPriceValue))) {
+						openPriceValue = hitPrice;
+						tradeStyle = TradeStyle.RADICAL;
+					}
+				}
+			}
+			
 			if(openPriceValue > 0) {
 
 				this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
@@ -230,6 +250,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			price.setAutoClosePosition(autoClosePosition);
 			price.setDualSidePositionStatus(dualSidePositionStatus);
 			price.setChildFibInfo(childFibInfo);
+			price.setTradeStyle(tradeStyle);
 			openPrices.add(price);
 		}
 	}

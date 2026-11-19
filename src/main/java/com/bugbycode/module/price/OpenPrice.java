@@ -5,6 +5,7 @@ import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.QuotationMode;
+import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.PriceInfo;
@@ -86,5 +87,9 @@ public interface OpenPrice {
 	public void setChildFibInfo(FibInfo chilFibInfo);
 	
 	public boolean verifyOpen(PriceInfo priceInfo);
+	
+	public TradeStyle getTradeStyle();
+	
+	public void setTradeStyle(TradeStyle tradeStyle);
 	
 }

@@ -515,6 +515,24 @@ public class Klines {
 	public void setTrend(boolean trend) {
 		this.trend = trend;
 	}
+	
+	/**
+	 * 判断K线是否强势</br>
+	 * 下引线长度大于等于上引线长度为强势
+	 * @return
+	 */
+	public boolean verifyPowerful() {
+		return getHighPriceDoubleValue() - getBodyHighPriceDoubleValue() <= getBodyLowPriceDoubleValue() - getLowPriceDoubleValue();
+	}
+	
+	/**
+	 * 判断K线是否颓势</br>
+	 * 下引线长度小于等于上引线长度为颓势
+	 * @return
+	 */
+	public boolean verifyDeclining() {
+		return getHighPriceDoubleValue() - getBodyHighPriceDoubleValue() >= getBodyLowPriceDoubleValue() - getLowPriceDoubleValue();
+	}
 
 	/**
      * 校验时间级别
