@@ -50,7 +50,7 @@ public class PriceActionFactoryTest {
 		
         String pair = "AKEUSDT";
         
-        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D, 1500);
+        List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
         
         logger.info("execute findLastKlinesByPair() 1h finish.");
