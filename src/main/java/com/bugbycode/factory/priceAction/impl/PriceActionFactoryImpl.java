@@ -69,21 +69,21 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 		this.init(list_trend, list, list_15m);
 	}
 	
-	private void init(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+	private void init(List<Klines> list_trend_, List<Klines> list_, List<Klines> list_15m_) {
 		
 		this.list = new ArrayList<Klines>();
 		this.list_trend = new ArrayList<Klines>();
 		this.list_15m = new ArrayList<Klines>();
 		this.openPrices = new ArrayList<OpenPrice>();
 		this.fibAfterKlines = new ArrayList<Klines>();
-		if(!CollectionUtils.isEmpty(list_trend)) {
-			this.list_trend.addAll(list_trend);
+		if(!CollectionUtils.isEmpty(list_trend_)) {
+			this.list_trend.addAll(list_trend_);
 		}
-		if(!CollectionUtils.isEmpty(list_15m)) {
-			this.list_15m.addAll(list_15m);
+		if(!CollectionUtils.isEmpty(list_15m_)) {
+			this.list_15m.addAll(list_15m_);
 		}
-		if(!CollectionUtils.isEmpty(list)) {
-			this.list.addAll(list);
+		if(!CollectionUtils.isEmpty(list_)) {
+			this.list.addAll(list_);
 		}
 		
 		if(list_trend.size() < 99 || list.size() < 99 || CollectionUtils.isEmpty(list_15m)) {
@@ -192,34 +192,17 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = 0;
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
 				
-				double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
+				if(current.lte(end)) {
+					break;
+				}
+				
+				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
-				}
-				
-				if(current.lte(fibAfterKline)) {
-					break;
-				}
-			}
-			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
-				
-				if((isLong() && current.verifyPowerful_v2()) || (isShort() && current.verifyDeclining_v2())) {
-					double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
-					if(openPriceValue == 0 || 
-							((isLong() && hitPrice <= openPriceValue) || (isShort() && hitPrice >= openPriceValue))) {
-						openPriceValue = hitPrice;
-						tradeStyle = TradeStyle.RADICAL;
-					}
-				}
-				
-				if(current.lte(fibAfterKline)) {
-					break;
 				}
 			}
 			
