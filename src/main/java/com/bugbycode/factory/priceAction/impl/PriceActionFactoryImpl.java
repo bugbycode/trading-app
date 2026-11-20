@@ -55,7 +55,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private boolean resetStopLoss = false;
 	
-	private TradeStyle tradeStyle = TradeStyle.CONSERVATIVE;
+	private TradeStyle tradeStyle = TradeStyle.RADICAL;
 	
 	private final TradeTrend tradeTrend;
 	

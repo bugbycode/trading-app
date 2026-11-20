@@ -54,7 +54,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private PositionSide ps = PositionSide.DEFAULT;
 	
-	private TradeStyle tradeStyle = TradeStyle.CONSERVATIVE;
+	private TradeStyle tradeStyle = TradeStyle.RADICAL;
 	
 	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_15m, PositionSide ps) {
 		this.list = new ArrayList<Klines>();
