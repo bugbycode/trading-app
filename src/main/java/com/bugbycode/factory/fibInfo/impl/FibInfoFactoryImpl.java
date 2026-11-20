@@ -54,7 +54,7 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 	
 	private PositionSide ps = PositionSide.DEFAULT;
 	
-	private TradeStyle tradeStyle = TradeStyle.RADICAL;
+	private TradeStyle tradeStyle = TradeStyle.CONSERVATIVE;
 	
 	public FibInfoFactoryImpl(List<Klines> list, List<Klines> list_15m, PositionSide ps) {
 		this.list = new ArrayList<Klines>();
@@ -188,10 +188,27 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 			for(int index = list_15m.size() - 1; index > 0; index--) {
 				Klines current = list_15m.get(index);
 				
-				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
+				double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
+				}
+				
+				if(current.lte(fibAfterKline)) {
+					break;
+				}
+			}
+			
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
+				
+				if((isLong() && current.verifyPowerful_v2()) || (isShort() && current.verifyDeclining_v2())) {
+					double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
+					if(openPriceValue == 0 || 
+							((isLong() && hitPrice <= openPriceValue) || (isShort() && hitPrice >= openPriceValue))) {
+						openPriceValue = hitPrice;
+						tradeStyle = TradeStyle.RADICAL;
+					}
 				}
 				
 				if(current.lte(fibAfterKline)) {

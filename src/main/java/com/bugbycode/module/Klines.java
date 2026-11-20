@@ -533,6 +533,24 @@ public class Klines {
 	public boolean verifyDeclining() {
 		return getHighPriceDoubleValue() - getBodyHighPriceDoubleValue() >= getBodyLowPriceDoubleValue() - getLowPriceDoubleValue();
 	}
+	
+	/**
+	 * 判断K线是否强势</br>
+	 * 下引线长度大于等于实体长度为强势
+	 * @return
+	 */
+	public boolean verifyPowerful_v2() {
+		return getBodyLen() <= getBodyLowPriceDoubleValue() - getLowPriceDoubleValue();
+	}
+	
+	/**
+	 * 判断K线是否颓势</br>
+	 * 上引线长度大于等于实体长度为颓势
+	 * @return
+	 */
+	public boolean verifyDeclining_v2() {
+		return getHighPriceDoubleValue() - getBodyHighPriceDoubleValue() >= getBodyLen();
+	}
 
 	/**
      * 校验时间级别
