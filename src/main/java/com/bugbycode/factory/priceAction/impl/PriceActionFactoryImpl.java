@@ -15,6 +15,7 @@ import com.bugbycode.module.MarketSentiment;
 import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.SortType;
 import com.bugbycode.module.TradeStyle;
+import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.price.OpenPrice;
@@ -56,7 +57,15 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private TradeStyle tradeStyle = TradeStyle.CONSERVATIVE;
 	
+	private final TradeTrend tradeTrend;
+	
 	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m) {
+		this.tradeTrend = TradeTrend.FOLLOW;
+		this.init(list_trend, list, list_15m);
+	}
+	
+	public PriceActionFactoryImpl(List<Klines> list_trend, List<Klines> list, List<Klines> list_15m, TradeTrend tradeTrend) {
+		this.tradeTrend = tradeTrend == null ? TradeTrend.FOLLOW : tradeTrend;
 		this.init(list_trend, list, list_15m);
 	}
 	
@@ -183,34 +192,17 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = 0;
 			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
 				
-				if(current.lte(end)) {
-					break;
-				}
-				
-				double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
+				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
 				}
-			}
-			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
 				
-				if(current.lte(end)) {
+				if(current.lte(fibAfterKline)) {
 					break;
-				}
-				
-				if((isLong() && current.verifyPowerful()) || (isShort() && current.verifyDeclining())) {
-					double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
-					if(openPriceValue == 0 || 
-							((isLong() && hitPrice <= openPriceValue) || (isShort() && hitPrice >= openPriceValue))) {
-						openPriceValue = hitPrice;
-						tradeStyle = TradeStyle.RADICAL;
-					}
 				}
 			}
 			
@@ -222,6 +214,8 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				
 				FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 				double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
+				
+				stopLossLimit = isLong() ? PriceUtil.getMaxPrice(openCodeValue, stopLossLimit) : PriceUtil.getMinPrice(openCodeValue, stopLossLimit);
 				
 				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
 				
@@ -248,11 +242,19 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	}
 	
 	private boolean verifyLong(Klines current) {
-		return current.getDea() > 0;
+		if(this.tradeTrend == TradeTrend.FOLLOW) {
+			return current.getDea() > 0;
+		} else {
+			return current.getDea() < 0;
+		}
 	}
 	
 	private boolean verifyShort(Klines current) {
-		return current.getDea() < 0;
+		if(this.tradeTrend == TradeTrend.FOLLOW) {
+			return current.getDea() < 0;
+		} else {
+			return current.getDea() > 0;
+		}
 	}
 	
 	private boolean verifyHigh(Klines k) {
