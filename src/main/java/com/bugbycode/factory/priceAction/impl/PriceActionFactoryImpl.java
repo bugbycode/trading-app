@@ -55,7 +55,7 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 	
 	private boolean resetStopLoss = false;
 	
-	private TradeStyle tradeStyle = TradeStyle.RADICAL;
+	private TradeStyle tradeStyle = TradeStyle.CONSERVATIVE;
 	
 	private final TradeTrend tradeTrend;
 	
@@ -192,17 +192,34 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 			
 			double openPriceValue = 0;
 			
-			for(int index = list_15m.size() - 1; index > 0; index--) {
-				Klines current = list_15m.get(index);
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
 				
-				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
+				if(current.lte(end)) {
+					break;
+				}
+				
+				double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
 				}
+			}
+			
+			for(int index = list.size() - 1; index > 0; index--) {
+				Klines current = list.get(index);
 				
-				if(current.lte(fibAfterKline)) {
+				if(current.lte(end)) {
 					break;
+				}
+				
+				if((isLong() && current.verifyPowerful()) || (isShort() && current.verifyDeclining())) {
+					double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
+					if(openPriceValue == 0 || 
+							((isLong() && hitPrice <= openPriceValue) || (isShort() && hitPrice >= openPriceValue))) {
+						openPriceValue = hitPrice;
+						tradeStyle = TradeStyle.RADICAL;
+					}
 				}
 			}
 			
@@ -214,8 +231,6 @@ public class PriceActionFactoryImpl implements PriceActionFactory{
 				
 				FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 				double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
-				
-				stopLossLimit = isLong() ? PriceUtil.getMaxPrice(openCodeValue, stopLossLimit) : PriceUtil.getMinPrice(openCodeValue, stopLossLimit);
 				
 				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.PRICE_ACTION, fibInfo));
 				
