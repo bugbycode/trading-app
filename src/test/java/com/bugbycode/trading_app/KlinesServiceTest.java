@@ -223,7 +223,7 @@ public class KlinesServiceTest {
 
     @Test
     public void testFibInfo(){
-        String pair = "MMTUSDT";
+        String pair = "BTCUSDT";
         //List<Klines> list_1d = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
         //List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
         List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H, 1500);
@@ -237,7 +237,7 @@ public class KlinesServiceTest {
         
         Date start = new Date();
         
-        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_15m);
+        FibInfoFactory factory = new FibInfoFactoryImpl(list, list_15m, PositionSide.LONG);
         
         Date end = new Date();
         
