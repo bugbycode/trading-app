@@ -1656,7 +1656,7 @@ public class KlinesServiceImpl implements KlinesService {
 					sendEmail(u, subject, text, u.getUsername());
 				}
 				break;
-			} else if(PriceUtil.isBreachShort(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN && openPrice.getAutoTrade() == AutoTrade.OPEN) {
+			} else if(PriceUtil.isBreachShort(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭多头仓位
 				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.PRICE_ACTION, userDetailsService, openPrice, closePositionWebsocketApi));
 				break;
@@ -1776,7 +1776,7 @@ public class KlinesServiceImpl implements KlinesService {
 					sendEmail(u, subject,text, u.getUsername());
 				}
 				break;
-			} else if(PriceUtil.isBreachLong(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN && openPrice.getAutoTrade() == AutoTrade.OPEN) {
+			} else if(PriceUtil.isBreachLong(hitKline, price) && openPrice.getAutoClosePosition() == AutoClosePosition.OPEN) {
 				//关闭空头仓位
 				this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.PRICE_ACTION, userDetailsService, openPrice, closePositionWebsocketApi));
 				break;
