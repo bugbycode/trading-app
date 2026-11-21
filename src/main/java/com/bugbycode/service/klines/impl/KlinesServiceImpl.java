@@ -516,11 +516,6 @@ public class KlinesServiceImpl implements KlinesService {
 		for(User u : userList) {
 			
 			FollowMasterStatus followMasterStatus = FollowMasterStatus.valueOf(u.getTradeFollowMaster());
-			//SymbolExchangeInfo info = AppConfig.SYMBOL_EXCHANGE_INFO.get(pair);
-			if(followMasterStatus == FollowMasterStatus.OPEN && info != null
-					&& !binanceExchangeService.verifyCoin(info.getBaseAsset())) {
-				continue;
-			}
 			
 			String binanceApiKey = u.getBinanceApiKey();
 			String binanceSecretKey = u.getBinanceSecretKey();
@@ -579,6 +574,11 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 							}
 						}
+					}
+					
+					if(followMasterStatus == FollowMasterStatus.OPEN && info != null
+							&& !binanceExchangeService.verifyCoin(info.getBaseAsset())) {
+						continue;
 					}
 
 					if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
@@ -876,6 +876,11 @@ public class KlinesServiceImpl implements KlinesService {
 								}
 							}
 						}
+					}
+					
+					if(followMasterStatus == FollowMasterStatus.OPEN && info != null
+							&& !binanceExchangeService.verifyCoin(info.getBaseAsset())) {
+						continue;
 					}
 					
 					if(autoTradeType == AutoTradeType.FIB_RET || autoTradeType == AutoTradeType.PRICE_ACTION) {
