@@ -93,42 +93,43 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		Klines first = null;
 		
 		for(int index = list.size() - 1; index > 0; index--) {
+			
 			Klines current = list.get(index);
-			Klines parent = list.get(index - 1);
+			
 			if(ps == PositionSide.SHORT) {//high - low - high - low
 				if(fourth == null) {
-					if(verifyHigh(current, parent)) {
+					if(verifyHigh(current)) {
 						fourth = current;
 					}
 				} else if(third == null) {
-					if(verifyLow(current, parent)) {
+					if(verifyLow(current)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyHigh(current, parent)) {
+					if(verifyHigh(current)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow(current, parent)) {
+					if(verifyLow(current)) {
 						first = current;
 						break;
 					}
 				}
 			} else if(ps == PositionSide.LONG) { // low - high - low - high
 				if(fourth == null) {
-					if(verifyLow(current, parent)) {
+					if(verifyLow(current)) {
 						fourth = current;
 					}
 				} else if(third == null) {
-					if(verifyHigh(current, parent)) {
+					if(verifyHigh(current)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyLow(current, parent)) {
+					if(verifyLow(current)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh(current, parent)) {
+					if(verifyHigh(current)) {
 						first = current;
 						break;
 					}
@@ -237,12 +238,12 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 	}
 	
-	private boolean verifyHigh(Klines c, Klines p) {
-		return c.getMacd() > p.getMacd();
+	private boolean verifyHigh(Klines c) {
+		return c.getMacd() > 0;
 	}
 	
-	private boolean verifyLow(Klines c, Klines p) {
-		return c.getMacd() < p.getMacd();
+	private boolean verifyLow(Klines c) {
+		return c.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
