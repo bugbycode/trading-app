@@ -210,10 +210,10 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 						openPriceValue = hitPrice;
 						tradeStyle = TradeStyle.RADICAL;
 					}
-					
-					if(current.lte(fibAfterKline)) {
-						break;
-					}
+				}
+				
+				if(current.lte(fibAfterKline)) {
+					break;
 				}
 				
 			}
