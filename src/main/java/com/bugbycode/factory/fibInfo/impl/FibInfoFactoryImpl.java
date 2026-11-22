@@ -94,40 +94,41 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 		for(int index = list.size() - 1; index > 0; index--) {
 			Klines current = list.get(index);
+			Klines parent = list.get(index - 1);
 			if(ps == PositionSide.SHORT) {//high - low - high - low
 				if(fourth == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh(current, parent)) {
 						fourth = current;
 					}
 				} else if(third == null) {
-					if(verifyLow(current)) {
+					if(verifyLow(current, parent)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh(current, parent)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyLow(current)) {
+					if(verifyLow(current, parent)) {
 						first = current;
 						break;
 					}
 				}
 			} else if(ps == PositionSide.LONG) { // low - high - low - high
 				if(fourth == null) {
-					if(verifyLow(current)) {
+					if(verifyLow(current, parent)) {
 						fourth = current;
 					}
 				} else if(third == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh(current, parent)) {
 						third = current;
 					}
 				} else if(second == null) {
-					if(verifyLow(current)) {
+					if(verifyLow(current, parent)) {
 						second = current;
 					}
 				} else if(first == null) {
-					if(verifyHigh(current)) {
+					if(verifyHigh(current, parent)) {
 						first = current;
 						break;
 					}
@@ -199,6 +200,24 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 				}
 			}
 			
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
+				
+				if((isLong() && current.verifyPowerful_v2()) || (isShort() && current.verifyDeclining_v2())) {
+					double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
+					if(openPriceValue == 0 || 
+							((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
+						openPriceValue = hitPrice;
+						tradeStyle = TradeStyle.RADICAL;
+					}
+					
+					if(current.lte(fibAfterKline)) {
+						break;
+					}
+				}
+				
+			}
+			
 			if(openPriceValue > 0) {
 
 				this.childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
@@ -218,12 +237,12 @@ public class FibInfoFactoryImpl implements FibInfoFactory {
 		
 	}
 	
-	private boolean verifyHigh(Klines c) {
-		return c.getMacd() > 0;
+	private boolean verifyHigh(Klines c, Klines p) {
+		return c.getMacd() > p.getMacd();
 	}
 	
-	private boolean verifyLow(Klines c) {
-		return c.getMacd() < 0;
+	private boolean verifyLow(Klines c, Klines p) {
+		return c.getMacd() < p.getMacd();
 	}
 	
 	private void addPrices(OpenPrice price) {
