@@ -59,7 +59,7 @@ public class PriceActionFactoryTest {
         
         logger.info("execute findLastKlinesByPair() 15m finish.");
         
-        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m, PositionSide.SHORT);
+        PriceActionFactory factory = new PriceActionFactoryImpl(list, list_15m);
         
         PriceInfo priceInfo = new PriceInfo(pair, "80500", new Date().getTime());
         
