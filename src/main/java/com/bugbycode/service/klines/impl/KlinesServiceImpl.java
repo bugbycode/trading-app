@@ -1313,7 +1313,7 @@ public class KlinesServiceImpl implements KlinesService {
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
 		EoptionFactory[] factories = {
-				new EoptionFactoryImpl(list_1d, list_1h, list_15m),
+				new EoptionFactoryImpl(list_1h, list_15m),
 			};
 		
 		for(EoptionFactory factory : factories) {
@@ -1382,7 +1382,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						sendEmail(u, subject,text, u.getUsername());
 					}
-				} else if(PriceUtil.hitPrice(last, price.getSecondTakeProfit())
+				}/* else if(PriceUtil.hitPrice(last, price.getSecondTakeProfit())
 						&& price.getAutoTrade() == AutoTrade.OPEN) {
 					//
 					List<User> userList = userRepository.queryAllUserByEoptionsStatus(MonitorStatus.OPEN);
@@ -1406,7 +1406,7 @@ public class KlinesServiceImpl implements KlinesService {
 						
 						sendEmail(u, subject,text, u.getUsername());
 					}
-				}
+				}*/
 			}
 		}
 	}
