@@ -1233,7 +1233,7 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresPriceAction(List<Klines> list_1d, List<Klines> list_4h, List<Klines> list_1h,  List<Klines> list_15m) {
 		
 		PriceActionFactory[] factorys = {
-			new PriceActionFactoryImpl(list_1d, list_15m),
+			new PriceActionFactoryImpl(list_1h, list_15m),
 		};
 		
 		for(PriceActionFactory factory : factorys) {
@@ -1313,7 +1313,7 @@ public class KlinesServiceImpl implements KlinesService {
 		logger.debug("execute {} eoptionMonitor." , pair);
 		
 		EoptionFactory[] factories = {
-				new EoptionFactoryImpl(list_1h, list_15m),
+				new EoptionFactoryImpl(list_1d, list_15m),
 			};
 		
 		for(EoptionFactory factory : factories) {
