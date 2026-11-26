@@ -176,9 +176,9 @@ public class EoptionFactoryImpl implements EoptionFactory {
 		
 		QuotationMode mode = this.fibInfo.getQuotationMode();
 		
-		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list);
+		Klines fibAfterKline = PriceUtil.getAfterKlines(end, this.list_15m);
 		if(fibAfterKline != null) {
-			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list);
+			this.fibAfterKlines = PriceUtil.subList(fibAfterKline, this.list_15m);
 		}
 		
 		if(!CollectionUtils.isEmpty(fibAfterKlines)) {
@@ -191,34 +191,34 @@ public class EoptionFactoryImpl implements EoptionFactory {
 			
 			double openPriceValue = 0;
 			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
-				
-				if(current.lte(end)) {
-					break;
-				}
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
 				
 				double hitPrice = isLong() ? current.getHighPriceDoubleValue() : current.getLowPriceDoubleValue();
 				if(openPriceValue == 0 || 
 						((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 					openPriceValue = hitPrice;
 				}
-			}
-			
-			for(int index = list.size() - 1; index > 0; index--) {
-				Klines current = list.get(index);
 				
-				if(current.lte(end)) {
+				if(current.lte(fibAfterKline)) {
 					break;
 				}
+			}
+			
+			for(int index = list_15m.size() - 1; index > 0; index--) {
+				Klines current = list_15m.get(index);
 				
 				if((isLong() && current.verifyPowerful_v2()) || (isShort() && current.verifyDeclining_v2())) {
-					double hitPrice = current.getClosePriceDoubleValue();
+					double hitPrice = isLong() ? current.getBodyLowPriceDoubleValue() : current.getBodyHighPriceDoubleValue();
 					if(openPriceValue == 0 || 
 							((isLong() && hitPrice < openPriceValue) || (isShort() && hitPrice > openPriceValue))) {
 						openPriceValue = hitPrice;
 						tradeStyle = TradeStyle.RADICAL;
 					}
+				}
+				
+				if(current.lte(fibAfterKline)) {
+					break;
 				}
 				
 			}
@@ -265,19 +265,19 @@ public class EoptionFactoryImpl implements EoptionFactory {
 	}
 	
 	private boolean verifyHigh(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private boolean verifyHigh_end(Klines k) {
-		return k.getDea() > 0;
+		return k.getMacd() > 0;
 	}
 	
 	private boolean verifyLow_end(Klines k) {
-		return k.getDea() < 0;
+		return k.getMacd() < 0;
 	}
 	
 	private void addPrices(OpenPrice price) {
