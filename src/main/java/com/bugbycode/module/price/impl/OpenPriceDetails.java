@@ -222,7 +222,7 @@ public class OpenPriceDetails implements OpenPrice {
 	public boolean verifyOpen(PriceInfo priceInfo) {
 		boolean result = false;
 		FibCode code = getChildFibCode(priceInfo);
-		if(code.lte(FibCode.FIB382)) {
+		if(code.lte(FibCode.FIB382) || this.autoTradeType == AutoTradeType.FENCE_SITTER) {
 			result = true;
 		}
 		return result;

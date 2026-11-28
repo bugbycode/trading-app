@@ -7,7 +7,7 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.price.OpenPrice;
 
 /**
- * 墙头草策略接口
+ * 趋势跟随策略接口
  */
 public interface FenceSitterFactory {
 

@@ -1198,10 +1198,10 @@ public class KlinesServiceImpl implements KlinesService {
 	public void futuresFenceSitter(List<Klines> list, List<Klines> list_15m) {
 		
 		FenceSitterFactory[] factories = {
-				new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.LONG),
-				new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.FOLLOW, PositionSide.SHORT),
-				new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.AGAINST, PositionSide.LONG),
-				new FenceSitterFactoryImpl(list, list, list_15m, TradeTrend.AGAINST, PositionSide.SHORT),
+				new FenceSitterFactoryImpl(list_15m, list_15m, list_15m, TradeTrend.FOLLOW, PositionSide.LONG),
+				new FenceSitterFactoryImpl(list_15m, list_15m, list_15m, TradeTrend.FOLLOW, PositionSide.SHORT),
+				new FenceSitterFactoryImpl(list_15m, list_15m, list_15m, TradeTrend.AGAINST, PositionSide.LONG),
+				new FenceSitterFactoryImpl(list_15m, list_15m, list_15m, TradeTrend.AGAINST, PositionSide.SHORT),
 		};
     	
 		for(FenceSitterFactory factory : factories) {

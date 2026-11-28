@@ -200,31 +200,21 @@ public class FenceSitterFactoryImpl implements FenceSitterFactory{
 				}
 			}
 			
-			if(openPriceValue == 0) {
-				return;
-			}
-			
-			childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
-			
-			FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
-			
-			if(childHitCode.gte(FibCode.FIB382)) {
-				this.autoTrade = AutoTrade.CLOSE;
-			}
+			if(openPriceValue > 0) {
+				childFibInfo = new FibInfo(fib0Value, openCodeValue, fibInfo.getDecimalPoint());
+				
+				FibCode childHitCode = childFibInfo.getFibCode(openPriceValue);
+				
+				if(childHitCode.gte(FibCode.FIB5)) {
+					this.autoTrade = AutoTrade.CLOSE;
+				}
 
-			double stopLossLimit = mode == QuotationMode.LONG ? hit_k.getLowPriceDoubleValue() : hit_k.getHighPriceDoubleValue();
-			
-			if((mode == QuotationMode.LONG && ps_mode == PositionSide.SHORT)
-					|| (mode == QuotationMode.SHORT && ps_mode == PositionSide.LONG)) {
+				double lossLen = (hit_k.getHighPriceDoubleValue() - hit_k.getLowPriceDoubleValue()) * 2;
 				
-				double lossLen = hit_k.getHighPriceDoubleValue() - hit_k.getLowPriceDoubleValue();
-				
-				stopLossLimit = ps_mode == PositionSide.LONG ? openPriceValue - lossLen : openPriceValue + lossLen;
+				double stopLossLimit = ps_mode == PositionSide.LONG ? openPriceValue - lossLen : openPriceValue + lossLen;
 				
 				stopLossLimit = PriceUtil.formatDoubleDecimalValue(stopLossLimit, fibInfo.getDecimalPoint());
-			}
-			
-			if(this.autoTrade == AutoTrade.OPEN) {
+				
 				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, AutoTradeType.FENCE_SITTER));
 			}
 			

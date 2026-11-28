@@ -34,9 +34,9 @@ public enum AutoTradeType {
 	
 	
 	/**
-	 * 墙头草
+	 * 趋势跟随
 	 */
-	FENCE_SITTER(6, "墙头草")
+	FENCE_SITTER(6, "趋势跟随")
 	
 	;
 
