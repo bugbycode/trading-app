@@ -36,7 +36,6 @@ import com.bugbycode.factory.fibInfo.impl.FibInfoFactoryImpl;
 import com.bugbycode.factory.priceAction.PriceActionFactory;
 import com.bugbycode.factory.priceAction.impl.PriceActionFactoryImpl;
 import com.bugbycode.module.AutoClosePosition;
-import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
 import com.bugbycode.module.FibLevel;
@@ -513,7 +512,7 @@ public class KlinesServiceImpl implements KlinesService {
 			double activationPriceRatio = u.getActivationPriceRatio();
 			CallbackRateEnabled callbackRateEnabled = CallbackRateEnabled.valueOf(u.getCallbackRateEnabled());
 			
-			DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.valueOf(u.getDualSidePosition());
+			//DualSidePositionStatus dualSidePositionStatus = DualSidePositionStatus.valueOf(u.getDualSidePosition());
 			
 			ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 
@@ -540,22 +539,20 @@ public class KlinesServiceImpl implements KlinesService {
 					
 				try {
 
-					if(dualSidePositionStatus == DualSidePositionStatus.CLOSE && openPrice.getDualSidePositionStatus() == DualSidePositionStatus.CLOSE) {
-						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT);
-						for(PositionInfo p : positionList) {
-							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
-							RuntimeException ex = excute_rs.getErr();
-							if(ex != null) {
-								if(ex instanceof OrderPlaceException) {
-									OrderPlaceException orderEx = (OrderPlaceException) ex;
-									if(orderEx.getCode() == -2022) {
-										logger.error(orderEx.getLocalizedMessage(), orderEx);
-									} else {
-										throw new RuntimeException("关闭" + pair + "空头仓位时出现异常[" + orderEx.getCode() + "]", excute_rs.getErr());
-									}
+					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.SHORT);
+					for(PositionInfo p : positionList) {
+						com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
+						RuntimeException ex = excute_rs.getErr();
+						if(ex != null) {
+							if(ex instanceof OrderPlaceException) {
+								OrderPlaceException orderEx = (OrderPlaceException) ex;
+								if(orderEx.getCode() == -2022) {
+									logger.error(orderEx.getLocalizedMessage(), orderEx);
 								} else {
-									throw new RuntimeException("关闭" + pair + "空头仓位时出现异常", excute_rs.getErr());
+									throw new RuntimeException("关闭" + pair + "空头仓位时出现异常[" + orderEx.getCode() + "]", excute_rs.getErr());
 								}
+							} else {
+								throw new RuntimeException("关闭" + pair + "空头仓位时出现异常", excute_rs.getErr());
 							}
 						}
 					}
@@ -680,7 +677,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 					}
 					
-					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+					positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 						continue;
@@ -838,22 +835,20 @@ public class KlinesServiceImpl implements KlinesService {
 				
 				try {
 
-					if(dualSidePositionStatus == DualSidePositionStatus.CLOSE && openPrice.getDualSidePositionStatus() == DualSidePositionStatus.CLOSE) {
-						List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG);
-						for(PositionInfo p : positionList) {
-							com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
-							RuntimeException ex = excute_rs.getErr();
-							if(ex != null) {
-								if(ex instanceof OrderPlaceException) {
-									OrderPlaceException orderEx = (OrderPlaceException) ex;
-									if(orderEx.getCode() == -2022) {
-										logger.error(orderEx.getLocalizedMessage(), orderEx);
-									} else {
-										throw new RuntimeException("关闭" + pair + "多头仓位时出现异常[" + orderEx.getCode() + "]", excute_rs.getErr());
-									}
+					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, PositionSide.LONG);
+					for(PositionInfo p : positionList) {
+						com.bugbycode.module.Result<BinanceOrderInfo, RuntimeException> excute_rs = binanceWebsocketTradeService.closePositionInfo(binanceApiKey, binanceSecretKey, p);
+						RuntimeException ex = excute_rs.getErr();
+						if(ex != null) {
+							if(ex instanceof OrderPlaceException) {
+								OrderPlaceException orderEx = (OrderPlaceException) ex;
+								if(orderEx.getCode() == -2022) {
+									logger.error(orderEx.getLocalizedMessage(), orderEx);
 								} else {
-									throw new RuntimeException("关闭" + pair + "多头仓位时出现异常", excute_rs.getErr());
+									throw new RuntimeException("关闭" + pair + "多头仓位时出现异常[" + orderEx.getCode() + "]", excute_rs.getErr());
 								}
+							} else {
+								throw new RuntimeException("关闭" + pair + "多头仓位时出现异常", excute_rs.getErr());
 							}
 						}
 					}
@@ -979,7 +974,7 @@ public class KlinesServiceImpl implements KlinesService {
 						}
 					}
 					
-					List<PositionInfo> positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
+					positionList = binanceWebsocketTradeService.getPositionInfo(binanceApiKey, binanceSecretKey, pair, ps);
 					if(!CollectionUtils.isEmpty(positionList)) {
 						logger.debug("用户" + u.getUsername() + "在" + pair + "交易对中已有持仓");
 						continue;
