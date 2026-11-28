@@ -1216,16 +1216,12 @@ public class KlinesServiceImpl implements KlinesService {
 	    	OpenPrice price = factory.getOpenPrice();
 	    	
 	    	if(factory.isLong()) {
-	    		if(PriceUtil.isBreachLong(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
+	    		if(PriceUtil.isBreachLong_v2(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
 		    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.LONG, price, decimalNum));
-	    		} else if(PriceUtil.isBreachShort(last, price.getPrice())) {
-	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.LONG, AutoTradeType.FENCE_SITTER, userDetailsService, price, closePositionWebsocketApi));
 	    		}
 	    	} else if(factory.isShort()) {
-	    		if(PriceUtil.isBreachShort(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
+	    		if(PriceUtil.isBreachShort_v2(last, price.getPrice()) && price.getAutoTrade() == AutoTrade.OPEN) {
 		    		this.tradingTaskPool.add(new TradingTask(this, pair, PositionSide.SHORT, price, decimalNum));
-	    		} else if(PriceUtil.isBreachLong(last, price.getPrice())) {
-	    			this.closePositionTaskPool.add(new ClosePositionTask(pair, PositionSide.SHORT, AutoTradeType.FENCE_SITTER, userDetailsService, price, closePositionWebsocketApi));
 	    		}
 	    	}
 		}

@@ -41,6 +41,8 @@ public class User implements UserDetails {
 	
 	private int areaMonitor = 0;//是否订阅盘整区监控 0：否 1：是
 	
+	private int fenceSitterMonitor = 0;//是否订阅趋势跟随监控 0：否 1：是
+	
 	private String binanceApiKey;//币安API key
 	
 	private String binanceSecretKey;//币安 Secret Key
@@ -218,6 +220,14 @@ public class User implements UserDetails {
 
 	public void setAreaMonitor(int areaMonitor) {
 		this.areaMonitor = areaMonitor;
+	}
+
+	public int getFenceSitterMonitor() {
+		return fenceSitterMonitor;
+	}
+
+	public void setFenceSitterMonitor(int fenceSitterMonitor) {
+		this.fenceSitterMonitor = fenceSitterMonitor;
 	}
 
 	public String getBinanceApiKey() {
@@ -403,6 +413,7 @@ public class User implements UserDetails {
 		this.setEmaRiseAndFall(user.getEmaRiseAndFall());
 		this.setEmaMonitor(user.getEmaMonitor());
 		this.setAreaMonitor(user.getAreaMonitor());
+		this.setFenceSitterMonitor(user.getFenceSitterMonitor());
 		this.setVolumeMonitor(user.getVolumeMonitor());
 		this.setMonitorProfit(user.getMonitorProfit());
 		this.setTradeNumberMonitor(user.getTradeNumberMonitor());

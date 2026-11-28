@@ -94,6 +94,7 @@ public class UserRepositoryImpl implements UserRepository {
 		update.set("highOrLowMonitor", user.getHighOrLowMonitor());
 		update.set("riseAndFallMonitor", user.getRiseAndFallMonitor());
 		update.set("areaMonitor", user.getAreaMonitor());
+		update.set("fenceSitterMonitor", user.getFenceSitterMonitor());
 		update.set("volumeMonitor", user.getVolumeMonitor());
 		update.set("monitorProfit", user.getMonitorProfit());
 		update.set("tradeNumberMonitor", user.getTradeNumberMonitor());
