@@ -49,7 +49,6 @@ import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
 import com.bugbycode.module.SortType;
-import com.bugbycode.module.TradeStepBackStatus;
 import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.TradeTrend;
 import com.bugbycode.module.VolumeMonitorStatus;
@@ -319,13 +318,6 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					//回踩单判断
-					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-					
-					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-						continue;
-					}
-					
 					//止盈价
 					double profitPrice = openPrice.getTakeProfit();
 					
@@ -417,13 +409,6 @@ public class KlinesServiceImpl implements KlinesService {
 					}
 					
 					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
-						continue;
-					}
-
-					//回踩单判断
-					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-					
-					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 						continue;
 					}
 					
@@ -568,17 +553,7 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						//回踩单判断
-						TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-						if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-							continue;
-						}
-					} /* else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-						//突破交易控制
-						if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
-							continue;
-						}
-					}*/
+					}
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
@@ -864,17 +839,7 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						//回踩单判断
-						TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-						if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-							continue;
-						}
-					} /* else if(autoTradeType == AutoTradeType.PRICE_ACTION) {
-						//突破交易控制
-						if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && code.gte(FibCode.FIB1)) {
-							continue;
-						}
-					}*/
+					}
 					
 					PriceInfo priceInfo = binanceWebsocketTradeService.getPrice(pair);
 					
@@ -1562,21 +1527,8 @@ public class KlinesServiceImpl implements KlinesService {
 					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
 						continue;
 					}
-					/*
-					//是否监控突破交易
-					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughMonitor());
-					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && openPrice.getFibInfo().isShort()) {
-						continue;
-					}*/
 					
 					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
-						continue;
-					}
-					
-					//回踩单判断
-					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-					
-					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
 						continue;
 					}
 					
@@ -1674,24 +1626,11 @@ public class KlinesServiceImpl implements KlinesService {
 					if(oih.getTradeNumberIndex() > u.getTradeNumberIndexMonitor()) {
 						continue;
 					}
-					/*
-					//是否监控突破交易
-					BreakthroughTradeStatus breakthroughTradeStatus = BreakthroughTradeStatus.valueOf(u.getBreakthroughMonitor());
-					if(breakthroughTradeStatus == BreakthroughTradeStatus.CLOSE && openPrice.getFibInfo().isLong()) {
-						continue;
-					}*/
 					
 					if(code.lt(u.getMonitorFibLevelType().getLevelCode())) {
 						continue;
 					}
 
-					//回踩单判断
-					TradeStepBackStatus tradeStepBackStatus = TradeStepBackStatus.valueOf(u.getTradeStepBack());
-					
-					if(code.gt(FibCode.FIB1) && tradeStepBackStatus == TradeStepBackStatus.CLOSE) {
-						continue;
-					}
-					
 					//止盈价
 					double profitPrice = openPrice.getTakeProfit();
 					
