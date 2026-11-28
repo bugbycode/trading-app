@@ -288,7 +288,7 @@ public class KlinesServiceTest {
             for(OpenPrice price : openPrices) {
                 //logger.info("{} - {} ~ {}, istrade: {}, verifyOpenPrice: {}", price, fibInfo.getNextFibCode(price.getCode()), fibInfo.getTakeProfit_v2(price.getCode()), 
                 //		PriceUtil.isTraded(price.getCode(), fibInfo), fibInfo.verifyOpenPrice(price, last_15m.getClosePriceDoubleValue()));
-                logger.info("{}: {} - {} ~ {}, istrade: {}, autoTrade: {}, dualsStatus:{}", mode, price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), 
+                logger.info("{}: {} - {}, istrade: {}, autoTrade: {}, dualsStatus:{}", mode, price, price.getTakeProfit(), 
                 		PriceUtil.isTrade(price), price.getAutoTrade(), price.getDualSidePositionStatus());
             }
 
@@ -364,10 +364,9 @@ public class KlinesServiceTest {
 
             for(OpenPrice price : openPrices) {
             	logger.info(price.getFibInfo());
-            	logger.info("{}: {} -> {} ~ {}, istread: {}", mode, price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), PriceUtil.isTraded(price, factory));
-            	logger.info(price.getAreaTakeProfit(last.getClosePriceDoubleValue(), price, u.getProfit(), u.getProfitLimit(), mode));
-            	logger.info("risk: {}", PriceUtil.calculateRisk(price.getStopLossLimit(), price.getPrice(), price.getFirstTakeProfit()));
-            	logger.info("verifyRisk: {}", PriceUtil.verifyRisk(price.getStopLossLimit(), price.getPrice(), price.getFirstTakeProfit()));
+            	logger.info("{}: {} -> {} ~ {}, istread: {}", mode, price, price.getTakeProfit(), PriceUtil.isTraded(price, factory));
+            	logger.info("risk: {}", PriceUtil.calculateRisk(price.getStopLossLimit(), price.getPrice(), price.getTakeProfit()));
+            	logger.info("verifyRisk: {}", PriceUtil.verifyRisk(price.getStopLossLimit(), price.getPrice(), price.getTakeProfit()));
             }
         }
         
@@ -376,7 +375,7 @@ public class KlinesServiceTest {
     @Test
     public void testEoptionsFibInfo(){
     	String pair = "ETHUSDT";
-    	List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
+    	//List<Klines> list_trend = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1D,1500);
     	List<Klines> list = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         //List<Klines> list_hit = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_1H,1500);
         List<Klines> list_15m = klinesRepository.findLastKlinesByPair(pair, Inerval.INERVAL_15M,1500);
@@ -384,7 +383,7 @@ public class KlinesServiceTest {
         
         //Klines list_trend_last = PriceUtil.getLastWeekKlines(list_1d);
         
-        EoptionFactory factory = new EoptionFactoryImpl(list_trend, list, list_15m);
+        EoptionFactory factory = new EoptionFactoryImpl(list, list_15m);
         
         if(!(factory.isLong() || factory.isShort())) {
         	return;
@@ -410,8 +409,7 @@ public class KlinesServiceTest {
         for(User u : userList) {
 
             for(OpenPrice price : openPrices) {
-            	logger.info("{}: {} -> {} ~ {}, autoTrade: {}", mode, price, price.getFirstTakeProfit(), price.getSecondTakeProfit(), price.getAutoTrade());
-            	logger.info(price.getAreaTakeProfit(last.getClosePriceDoubleValue(), price, u.getProfit(), u.getProfitLimit(), mode));
+            	logger.info("{}: {} -> {} ~ {}, autoTrade: {}", mode, price, price.getTakeProfit(), price.getTakeProfit(), price.getAutoTrade());
             }
         }
         
@@ -565,10 +563,10 @@ public class KlinesServiceTest {
     	logger.info("{} : {} ~ {} <- {} -> {} ~ {}", pair, info.getNextLowPrice(), info.getLowPrice(), info.getHitPrice(), info.getHighPrice(), info.getNextHighPrice());
     	
     	OpenPrice priceLong = new OpenPriceDetails(FibCode.FIB618, info.getHighPriceDoubleValue(), info.getLowPriceDoubleValue(), 
-				info.getHighPriceDoubleValue(), info.getNextHighPriceDoubleValue());
+				info.getHighPriceDoubleValue());
     	
     	OpenPrice priceShort = new OpenPriceDetails(FibCode.FIB618, info.getHighPriceDoubleValue(), info.getHighPriceDoubleValue(), 
-				info.getLowPriceDoubleValue(), info.getNextLowPriceDoubleValue());
+				info.getLowPriceDoubleValue());
     	
     	logger.info(priceLong);
     	logger.info(priceShort);
