@@ -194,16 +194,15 @@ public class AreaFactoryImpl implements AreaFactory {
 			}
 			
 			double hitPrice = isLong() ? hitKlines.getBodyHighPriceDoubleValue() : hitKlines.getBodyLowPriceDoubleValue();
-			double firstTakeProfit = fibInfo.getFibValue(takeProfitCode);
-			double secondTakeProfit = fibInfo.getFibValue(takeProfitCode);
+			double takeProfit = fibInfo.getFibValue(takeProfitCode);
 			double stopLossLimit = isLong() ? hitKlines.getLowPriceDoubleValue() : hitKlines.getHighPriceDoubleValue();
 			
-			FibInfo stopLossFibInfo = new FibInfo(fib1Value, firstTakeProfit, fibInfo.getDecimalPoint());
+			FibInfo stopLossFibInfo = new FibInfo(fib1Value, takeProfit, fibInfo.getDecimalPoint());
 			double stopLoss1_272 = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 			
 			stopLossLimit = isLong() ? PriceUtil.getMaxPrice(stopLossLimit, stopLoss1_272) : PriceUtil.getMinPrice(stopLossLimit, stopLoss1_272);
 			
-			addPrices(new OpenPriceDetails(FibCode.FIB1, hitPrice, stopLossLimit, firstTakeProfit, secondTakeProfit, AutoTradeType.AREA_INDEX, fibInfo));
+			addPrices(new OpenPriceDetails(FibCode.FIB1, hitPrice, stopLossLimit, takeProfit, AutoTradeType.AREA_INDEX, fibInfo));
 			
 			this.fibAfterKlines = fibInfo.getFibAfterKlines();
 			

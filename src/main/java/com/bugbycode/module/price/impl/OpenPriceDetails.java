@@ -4,13 +4,11 @@ import com.bugbycode.module.AutoClosePosition;
 import com.bugbycode.module.DualSidePositionStatus;
 import com.bugbycode.module.FibCode;
 import com.bugbycode.module.FibInfo;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.TradeStyle;
 import com.bugbycode.module.binance.AutoTrade;
 import com.bugbycode.module.binance.AutoTradeType;
 import com.bugbycode.module.binance.PriceInfo;
 import com.bugbycode.module.price.OpenPrice;
-import com.util.PriceUtil;
 
 public class OpenPriceDetails implements OpenPrice {
 
@@ -20,9 +18,7 @@ public class OpenPriceDetails implements OpenPrice {
 	
 	private double stopLossLimit;
 	
-	private double firstTakeProfit;//第一止盈点
-	
-	private double secondTakeProfit;//第二止盈点
+	private double takeProfit;//止盈价
 	
 	private FibInfo fibInfo;
 
@@ -75,8 +71,7 @@ public class OpenPriceDetails implements OpenPrice {
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
 		this.autoTradeType = autoTradeType;
-		this.firstTakeProfit = -1;
-		this.secondTakeProfit = -1;
+		this.takeProfit = -1;
 	}
 	
 	/**
@@ -84,16 +79,14 @@ public class OpenPriceDetails implements OpenPrice {
 	 * @param code 所处的回撤点
 	 * @param price 开仓价
 	 * @param stopLoss 最佳止损点
-	 * @param firstTakeProfit 第一止盈点
-	 * @param secondTakeProfit 第二止盈点
+	 * @param takeProfit 止盈价
 	 */
 	public OpenPriceDetails(FibCode code, double price, double stopLossLimit,
-			double firstTakeProfit, double secondTakeProfit) {
+			double takeProfit) {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
-		this.firstTakeProfit = firstTakeProfit;
-		this.secondTakeProfit = secondTakeProfit;
+		this.takeProfit = takeProfit;
 	}
 	
 	/**
@@ -101,17 +94,15 @@ public class OpenPriceDetails implements OpenPrice {
 	 * @param code 所处的回撤点
 	 * @param price 开仓价
 	 * @param stopLoss 最佳止损点
-	 * @param firstTakeProfit 第一止盈点
-	 * @param secondTakeProfit 第二止盈点
+	 * @param takeProfit 止盈价
 	 * @param autoTradeType 参考指标
 	 */
 	public OpenPriceDetails(FibCode code, double price, double stopLossLimit,
-			double firstTakeProfit, double secondTakeProfit, AutoTradeType autoTradeType) {
+			double takeProfit, AutoTradeType autoTradeType) {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
-		this.firstTakeProfit = firstTakeProfit;
-		this.secondTakeProfit = secondTakeProfit;
+		this.takeProfit = takeProfit;
 		this.autoTradeType = autoTradeType;
 	}
 	
@@ -120,19 +111,17 @@ public class OpenPriceDetails implements OpenPrice {
 	 * @param code 所处的回撤点
 	 * @param price 开仓价
 	 * @param stopLoss 最佳止损点
-	 * @param firstTakeProfit 第一止盈点
-	 * @param secondTakeProfit 第二止盈点
+	 * @param takeProfit 止盈价
 	 * @param autoTradeType 参考指标
 	 * @param fibInfo 回撤信息
 	 */
 	public OpenPriceDetails(FibCode code, double price, double stopLossLimit,
-			double firstTakeProfit, double secondTakeProfit, AutoTradeType autoTradeType,
+			double takeProfit, AutoTradeType autoTradeType,
 			FibInfo fibInfo) {
 		this.code = code;
 		this.price = price;
 		this.stopLossLimit = stopLossLimit;
-		this.firstTakeProfit = firstTakeProfit;
-		this.secondTakeProfit = secondTakeProfit;
+		this.takeProfit = takeProfit;
 		this.autoTradeType = autoTradeType;
 		this.fibInfo = fibInfo;
 	}
@@ -150,7 +139,7 @@ public class OpenPriceDetails implements OpenPrice {
 	@Override
 	public String toString() {
 		return "OpenPrice: " + code.getValue() + "(" + price + "), StopLossLimit: " + stopLossLimit + 
-				", FirstTakeProfit: " + firstTakeProfit + ", SecondTakeProfit: " + secondTakeProfit + ", tradeStyle: " + this.tradeStyle;
+				", takeProfit: " + takeProfit + ", tradeStyle: " + this.tradeStyle;
 	}
 
 	@Override
@@ -158,25 +147,7 @@ public class OpenPriceDetails implements OpenPrice {
 		return this.stopLossLimit;
 	}
 
-	public double getFirstTakeProfit() {
-		return firstTakeProfit;
-	}
-
-	public double getSecondTakeProfit() {
-		return secondTakeProfit;
-	}
-
-
-	@Override
-	public double getAreaTakeProfit(double price, OpenPrice openPrice, double profit, double profitLimit, QuotationMode mode) {
-		double pricePercent = PriceUtil.getPercent(price, openPrice.getSecondTakeProfit(), mode);
-		double nextPricePercent = PriceUtil.getPercent(price, openPrice.getFirstTakeProfit(), mode);
-		
-		double takeProfit = openPrice.getSecondTakeProfit();
-		
-		if(PriceUtil.checkPercent(pricePercent, nextPricePercent, profit, profitLimit)) {
-			takeProfit = openPrice.getFirstTakeProfit();
-		}
+	public double getTakeProfit() {
 		return takeProfit;
 	}
 

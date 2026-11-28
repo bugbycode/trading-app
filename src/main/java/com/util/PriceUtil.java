@@ -3897,7 +3897,7 @@ public class PriceUtil {
 		FibCode code = openPrice.getCode();
 		FibInfo fibInfo = openPrice.getFibInfo();
 		if(fibInfo != null) {
-			result = isTrade(fibInfo.getFibValue(code), openPrice.getFirstTakeProfit(), fibInfo.getFibAfterKlines());
+			result = isTrade(fibInfo.getFibValue(code), openPrice.getTakeProfit(), fibInfo.getFibAfterKlines());
 		}
 		return result;
 	}
@@ -4064,7 +4064,7 @@ public class PriceUtil {
 					continue;
 				}
 				//判断是否命中止盈价
-				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, openPrice.getFirstTakeProfit())) {
+				if(hitCodeKlines != null && hitTakeProfitCodeKlines == null && hitPrice(k, openPrice.getTakeProfit())) {
 					hitTakeProfitCodeKlines = k;
 				}
 				

@@ -46,7 +46,6 @@ import com.bugbycode.module.Klines;
 import com.bugbycode.module.MonitorStatus;
 import com.bugbycode.module.PlaceOrderAgain;
 import com.bugbycode.module.QUERY_SPLIT;
-import com.bugbycode.module.QuotationMode;
 import com.bugbycode.module.RecvTradeStatus;
 import com.bugbycode.module.ResultCode;
 import com.bugbycode.module.ShapeInfo;
@@ -328,15 +327,8 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					//根据交易风格设置盈利限制
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					
 					//止盈价
-					double profitPrice = openPrice.getSecondTakeProfit();
-					//保守的交易风格
-					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						profitPrice = openPrice.getAreaTakeProfit(currentPrice, openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
-					}
+					double profitPrice = openPrice.getTakeProfit();
 					
 					//计算预计盈利百分比
 					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, profitPrice) * 100;
@@ -436,15 +428,8 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					//根据交易风格设置盈利限制
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					
 					//止盈价
-					double profitPrice = openPrice.getSecondTakeProfit();
-					//保守的交易风格
-					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						profitPrice = openPrice.getAreaTakeProfit(currentPrice, openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
-					}
+					double profitPrice = openPrice.getTakeProfit();
 					
 					//计算预计盈利百分比
 					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, profitPrice) * 100;
@@ -532,18 +517,17 @@ public class KlinesServiceImpl implements KlinesService {
 			
 			ProfitOrderEnabled profitOrderEnabled = ProfitOrderEnabled.OPEN;
 
-			if(openPrice.getFirstTakeProfit() <= 0 || openPrice.getSecondTakeProfit() <= 0) {
+			if(openPrice.getTakeProfit() <= 0) {
 				profitOrderEnabled = ProfitOrderEnabled.CLOSE;
 				logger.debug(pair + "止盈价未初始化");
 			}
-			
 
 			FibCode code = openPrice.getCode();
 			
 			//订单备份 当出现异常时作为邮件发送
 			String orderBackTitle = String.format("%s永续合约下单信息 %s", pair, dateStr);
-			String orderBackBody = String.format("方向: %s, 开仓价: %s, 止损价: %s, 第一止盈价: %s, 第二止盈价: %s", 
-					ps.getMemo(), openPrice.getPrice(), stopLossLimit, openPrice.getFirstTakeProfit(), openPrice.getSecondTakeProfit());
+			String orderBackBody = String.format("方向: %s, 开仓价: %s, 止损价: %s, 止盈价: %s", 
+					ps.getMemo(), openPrice.getPrice(), stopLossLimit, openPrice.getTakeProfit());
 			
 			
 			//计算预计盈利百分比
@@ -605,7 +589,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(priceInfo.getPriceDoubleValue() >= openPrice.getFirstTakeProfit() && profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+					if(priceInfo.getPriceDoubleValue() >= openPrice.getTakeProfit() && profitOrderEnabled == ProfitOrderEnabled.OPEN) {
 						continue;
 					}
 					
@@ -615,7 +599,7 @@ public class KlinesServiceImpl implements KlinesService {
 							);
 					
 					if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
-						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getFirstTakeProfit() , decimalNum));
+						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getTakeProfit() , decimalNum));
 						
 						//计算预计盈利百分比
 						profitPercent = PriceUtil.getRiseFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
@@ -629,11 +613,7 @@ public class KlinesServiceImpl implements KlinesService {
 					} else {
 						
 						//止盈价
-						double profitPrice = openPrice.getSecondTakeProfit();
-						
-						if(tradeStyle == TradeStyle.CONSERVATIVE) {
-							profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getProfit(), u.getProfitLimit(), QuotationMode.LONG);
-						}
+						double profitPrice = openPrice.getTakeProfit();
 						
 						takeProfit = new BigDecimal(
 								PriceUtil.formatDoubleDecimal(profitPrice, decimalNum)
@@ -907,7 +887,7 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					if(priceInfo.getPriceDoubleValue() <= openPrice.getFirstTakeProfit() && profitOrderEnabled == ProfitOrderEnabled.OPEN) {
+					if(priceInfo.getPriceDoubleValue() <= openPrice.getTakeProfit() && profitOrderEnabled == ProfitOrderEnabled.OPEN) {
 						continue;
 					}
 					
@@ -917,7 +897,7 @@ public class KlinesServiceImpl implements KlinesService {
 							);
 					
 					if(autoTradeType == AutoTradeType.DEFAULT) {//自定义止盈止损
-						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getFirstTakeProfit() , decimalNum));
+						takeProfit = new BigDecimal(PriceUtil.formatDoubleDecimal(openPrice.getTakeProfit() , decimalNum));
 						
 						//计算预计盈利百分比
 						profitPercent = PriceUtil.getFallFluctuationPercentage(Double.valueOf(priceInfo.getPrice()),takeProfit.doubleValue());
@@ -930,11 +910,7 @@ public class KlinesServiceImpl implements KlinesService {
 					} else {
 						
 						//止盈价
-						double profitPrice = openPrice.getSecondTakeProfit();
-						
-						if(tradeStyle == TradeStyle.CONSERVATIVE) {
-							profitPrice = openPrice.getAreaTakeProfit(priceInfo.getPriceDoubleValue(), openPrice, u.getProfit(), u.getProfitLimit(), QuotationMode.SHORT);
-						}
+						double profitPrice = openPrice.getTakeProfit();
 						
 						takeProfit = new BigDecimal(
 								PriceUtil.formatDoubleDecimal(profitPrice, decimalNum)
@@ -1460,14 +1436,7 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						//根据交易风格设置盈利限制
-						TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-						
-						double profitPrice = price.getSecondTakeProfit();
-						//保守的交易风格
-						if(tradeStyle == TradeStyle.CONSERVATIVE) {
-							profitPrice = price.getAreaTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
-						}
+						double profitPrice = price.getTakeProfit();
 						
 						//计算预计盈利百分比
 						double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, profitPrice) * 100;
@@ -1512,14 +1481,7 @@ public class KlinesServiceImpl implements KlinesService {
 							continue;
 						}
 						
-						//根据交易风格设置盈利限制
-						TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-						
-						double profitPrice = price.getSecondTakeProfit();
-						//保守的交易风格
-						if(tradeStyle == TradeStyle.CONSERVATIVE) {
-							profitPrice = price.getAreaTakeProfit(currentPrice, price, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
-						}
+						double profitPrice = price.getTakeProfit();
 						
 						//计算预计盈利百分比
 						double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, profitPrice) * 100;
@@ -1623,15 +1585,8 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					//根据交易风格设置盈利限制
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					
 					//止盈价
-					double profitPrice = openPrice.getSecondTakeProfit();
-					//保守的交易风格
-					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						profitPrice = openPrice.getAreaTakeProfit(currentPrice, openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.LONG);
-					}
+					double profitPrice = openPrice.getTakeProfit();
 					
 					//计算预计盈利百分比
 					double profitPercent = PriceUtil.getRiseFluctuationPercentage(currentPrice, profitPrice) * 100;
@@ -1742,16 +1697,8 @@ public class KlinesServiceImpl implements KlinesService {
 						continue;
 					}
 					
-					//根据交易风格设置盈利限制
-					TradeStyle tradeStyle = TradeStyle.valueOf(u.getTradeStyle());
-					
 					//止盈价
-					double profitPrice = openPrice.getSecondTakeProfit();
-					
-					//保守的交易风格
-					if(tradeStyle == TradeStyle.CONSERVATIVE) {
-						profitPrice = openPrice.getAreaTakeProfit(currentPrice, openPrice, u.getMonitorProfit(), u.getProfitLimit(), QuotationMode.SHORT);
-					}
+					double profitPrice = openPrice.getTakeProfit();
 					
 					//计算预计盈利百分比
 					double profitPercent = PriceUtil.getFallFluctuationPercentage(currentPrice, profitPrice) * 100;

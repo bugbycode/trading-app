@@ -232,7 +232,7 @@ public class EoptionFactoryImpl implements EoptionFactory {
 				FibInfo stopLossFibInfo = new FibInfo(openPriceValue, takeProfitCodeValue, fibInfo.getDecimalPoint());
 				double stopLossLimit = stopLossFibInfo.getFibValue(FibCode.FIB1_272);
 				
-				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, takeProfitCodeValue, AutoTradeType.EOPTION, fibInfo));
+				addPrices(new OpenPriceDetails(openCode, openPriceValue, stopLossLimit, takeProfitCodeValue, AutoTradeType.EOPTION, fibInfo));
 				
 			}
 
